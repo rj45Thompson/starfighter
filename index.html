@@ -882,7 +882,7 @@ function step(dt){
     for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||(owner&&owner.team===s.team)) continue;   // no friendly fire
       if(b.pos.distanceTo(s.pos)<CFG.SHIP_R+CFG.BULLET_R){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=dmg; if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup
+        s.hp-=dmg; noteHarm(s,owner); if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team)) continue;
             if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
@@ -943,6 +943,8 @@ function killShip(s){ s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible
 // killed by another pilot -> victim's credits scatter as bounty gems; killer earns score
 function killByShip(victim,killer){ const bounty=victim.credits; victim.credits=0; const wasPirate=victim.team==='pirate';
   const n=clamp(Math.round(bounty/6),wasPirate?2:0,5); for(let k=0;k<n;k++) spawnGem(victim.pos.clone().add(new T.Vector3(rand(-4,4),rand(-4,4),rand(-4,4))),rand(3,5));
+  if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
+    victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
   killShip(victim);
   if(killer&&killer.alive){ killer.score+=CFG.KILL_BOUNTY+(wasPirate?(victim.tier||0):0); checkRankUp(killer);   // M5: kills advance rank
     if(wasPirate){ const bty=victim.bounty||CFG.PIRATE_LOOT; killer.credits+=bty; say(killer,`Splashed ${victim.name} — +${bty}c bounty!`);
@@ -985,14 +987,37 @@ function updateSpeech(dt){ for(const s of ships){ const o=SPEAK[s.id]; if(!o) co
   if(s.speakT>0 && s.alive){ o.sp.visible=true; o.sp.position.copy(s.pos).addScaledVector(WUP,6.6); o.sp.material.opacity=clamp(s.speakT/0.6,0,1); }
   else o.sp.visible=false; } }
 const LOGS={ terminal:[], radio:[], events:[], thoughts:[] }; let activeTab='terminal';
-const TABDEF=[['terminal','TERMINAL'],['radio','RADIO'],['events','EVENTS'],['thoughts','THOUGHTS']];
+const TABDEF=[['terminal','TERMINAL'],['radio','RADIO'],['events','EVENTS'],['thoughts','THOUGHTS'],['chronicle','CHRONICLE']];
 function buildTabs(){ const el=document.getElementById('logtabs'); if(!el) return; el.innerHTML=TABDEF.map(([k,n])=>`<div class="logtab${k===activeTab?' on':''}" data-k="${k}">${n}</div>`).join('');
   el.querySelectorAll('.logtab').forEach(b=>b.onclick=()=>{ activeTab=b.dataset.k; buildTabs(); renderLog(); }); }
 function renderLog(){ const el=document.getElementById('logbody'); if(!el) return;
   if(activeTab==='thoughts'){ const s=ships[focus];                                              // A0: live chain-of-thought for the focused pilot
     el.innerHTML = s ? (`<div style="color:#9fe0ff;font-weight:700;margin-bottom:5px">${s.name} · live reasoning chain</div>`+reasonChain(s).map(t=>`<div style="padding:2px 0;line-height:1.42;color:#c4d6ea;border-bottom:1px solid rgba(60,80,110,.16)">${t}</div>`).join('')) : '<div style="opacity:.6">no pilot in focus</div>';
     return; }
+  if(activeTab==='chronicle'){ el.innerHTML=renderChronicle(); return; }                          // the loaded story + the focused pilot's interaction notes
   el.innerHTML=LOGS[activeTab].slice(-70).join(''); const t=document.getElementById('ticker'); if(t) t.scrollTop=t.scrollHeight; }
+// ---- CHRONICLE: the crushed story as a readable menu + each pilot's interaction NOTES (story memory + live combat grudges) ----
+function facLabel(s){ return s.team==='pirate'?'Iron Synod':'Coalition'; }
+function noteLog(s, text, val){ if(!s) return; s.log=s.log||[]; s.log.push({t:text, val}); if(s.log.length>40) s.log.shift(); }   // per-pilot interaction ledger
+function noteHarm(v, atk){ if(!atk||atk===v||!v||!v.alive) return; v.rel=v.rel||{}; v.hitBy=v.hitBy||{};
+  const first=!v.hitBy[atk.name]; v.hitBy[atk.name]=(v.hitBy[atk.name]||0)+1; v.rel[atk.name]=(v.rel[atk.name]||0)-0.03;      // accumulated grudge (cheap per-hit)
+  if(first) noteLog(v, `⚔ ${atk.name} (${facLabel(atk)}) opened fire on me`, -1); }                                          // a readable note only on first contact
+function renderChronicle(){ const s=ships[focus]; let h='';
+  if(STORY.text){ const reps=Object.entries(STORY.rep).map(([k,v])=>`${factionName(k)} <b style="color:${v>=0?'#6ee0b0':'#ff7a8a'}">${v>0?'+':''}${(+v).toFixed(1)}</b>`).join(' · ');
+    const facts=STORY.G.T.filter(t=>t.r==='in the story').length;
+    h+=`<div style="color:#e8c37a;font-weight:700;margin-bottom:4px">📖 THE CHRONICLE <span style="opacity:.55;font-weight:400">GIVEN story · ${STORY.ents.length} entities · ${facts} facts</span></div>`;
+    h+=`<div style="color:#c4d6ea;line-height:1.5;margin-bottom:6px;max-height:130px;overflow:auto;border-left:2px solid #2a3a52;padding-left:8px">${STORY.text.replace(/</g,'&lt;')}</div>`;
+    h+=`<div style="opacity:.75;margin-bottom:8px">standing from the tale: ${reps}</div>`;
+  } else h+=`<div style="opacity:.72;margin-bottom:8px">No chronicle loaded. Type <b>story</b> (or <b>story &lt;your text&gt;</b>) to crush a tale — then every pilot reads it and takes a side. Try <b>discuss</b> after.</div>`;
+  if(s){ h+=`<div style="color:#9fe0ff;font-weight:700;margin:6px 0 3px">${s.name}'s interaction notes <span style="opacity:.55;font-weight:400">${facLabel(s)}</span></div>`;
+    if(STORY.text){ storyStance(s).forEach(x=> h+=`<div style="color:#c9a0ff">🧭 ${x.s} ${x.r} ${x.o} <span style="opacity:.45">· disposition memory</span></div>`);
+      factsFor(shipFaction(s),'').forEach(t=> h+=`<div style="color:#c4d6ea">📖 ${String(t.o).replace(/</g,'&lt;')} <span style="opacity:.45">· from the chronicle</span></div>`); }
+    const lg=s.log||[]; if(lg.length) lg.slice(-8).reverse().forEach(n=> h+=`<div style="color:${n.val<0?'#ffb0a0':'#9fe0c0'}">${n.t.replace(/</g,'&lt;')}</div>`);
+    const rel=s.rel||{}, grudges=Object.entries(rel).filter(([,v])=>Math.abs(v)>=0.05).sort((a,b)=>a[1]-b[1]).slice(0,5);
+    if(grudges.length) h+=`<div style="margin-top:4px;opacity:.82">grudge ledger: ${grudges.map(([n,v])=>`${n} <b style="color:${v>=0?'#6ee0b0':'#ff7a8a'}">${v>0?'+':''}${(+v).toFixed(2)}</b>`).join(' · ')}</div>`;
+    if(STORY.text||lg.length||grudges.length){} else h+=`<div style="opacity:.5">no interactions recorded yet — fly and fight, or load a story.</div>`;
+  } else h+=`<div style="opacity:.6">click a pilot in the roster to read its notes</div>`;
+  return h; }
 function log(kind,html){ const L=LOGS[kind]; if(!L) return; L.push('<div class="tl">'+html+'</div>'); if(L.length>160) L.shift(); if(activeTab===kind) renderLog(); }
 function term(html,cls){ log('terminal', cls?`<span class="${cls}">${html}</span>`:html); }
 function ev(html){ log('events', `<span class="ev">${html}</span>`); }
@@ -1523,7 +1548,7 @@ function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try:
   const listOf={ threat:ctx.enemies, ally:ctx.allies, resource:ctx.gm.concat(ctx.rk), economy:ctx.pl };
   if(intent[0]&&NEG[intent[0]]&&!(listOf[intent[0]]&&listOf[intent[0]].length)){ emit([NEG[intent[0]]], null, '🛰️ GIVEN · sensor check'); return; }
   emit([`I only speak to what I actually know — my status, what I see, and what I'm doing. I've got nothing grounded on that.`], null, '🚫 abstained · no fabrication'); }
-function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thoughts') renderLog();   // A0: keep the live chain fresh
+function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thoughts'||activeTab==='chronicle') renderLog();   // A0: keep the live chain / chronicle notes fresh
   if(!b) return; const mc=MODE_COL[b.mode]||'#7fb0d0';
   const fwd=FWD.clone().applyQuaternion(s.quat), right=RGT.clone().applyQuaternion(s.quat); let bi=0, selPos=null;
   const ents=[];   // the perceived knowledge graph: each entity a node, colored by relation
@@ -1564,6 +1589,7 @@ function buildRoster(){ rosterEl.innerHTML=''; ships.slice(0,CFG.NSHIPS).forEach
   el.innerHTML=`<span class="fac">${s.team==='pirate'?'✖':'◈'}</span><span class="dot" style="background:hsl(${s.hue*360},80%,60%)"></span><span class="nm">${s.name}</span>
     <span class="hp"><i id="rhp${i}" style="width:100%"></i></span><span class="cr" id="rcr${i}">0c</span>`;
   el.onclick=()=>{ focus=i; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+s.name;
+    if(activeTab==='chronicle') renderLog();                                                                              // follow the selected pilot in the CHRONICLE
     if(s.backstory) term(`<b>${s.name}</b> · ${fac} <span style="opacity:.6">(GIVEN lore)</span> — ${s.backstory}.`,'sys'); };   // #21: backstory to terminal on select (works on touch)
   rosterEl.appendChild(el); }); }
 function updateRoster(){ ships.forEach((s,i)=>{ const hp=document.getElementById('rhp'+i),cr=document.getElementById('rcr'+i);
