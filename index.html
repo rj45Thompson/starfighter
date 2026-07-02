@@ -20,6 +20,9 @@
     background:#0c1623bb; border:1px solid #23344a; border-radius:6px; padding:4px 8px; width:182px; transition:.1s; }
   .rs:hover{ border-color:#3a567a; } .rs.foc{ border-color:var(--cyan); box-shadow:0 0 0 1px #46d6ff44 inset; }
   .rs .dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .rs .fac{ font-size:10px; flex:0 0 auto; }   /* faction emblem (GIVEN flavor): ◈ Coalition · ✖ Iron Synod */
+  .rs.war{ border-left:3px solid var(--cyan); } .rs.war .fac{ color:var(--cyan); }
+  .rs.syn{ border-left:3px solid var(--red); } .rs.syn .fac{ color:var(--red); }
   .rs .nm{ flex:1 1 auto; } .rs .cr{ color:var(--gold); font-size:10px; }
   .rs .hp{ width:30px; height:5px; border-radius:3px; background:#21304a; overflow:hidden; flex:0 0 auto; }
   .rs .hp i{ display:block; height:100%; background:linear-gradient(90deg,#ff5a6e,#ffd05a); }
@@ -1485,10 +1488,14 @@ function updateCamera(dt){ const s=ships[focus]; if(!s) return;
   const up=WUP.clone().lerp(UPL.clone().applyQuaternion(s.quat),0.6); chaseCam.up.lerp(up,1-Math.exp(-CFG.CAM_UP_LERP*dt)).normalize();
   chaseCam.lookAt(s.pos.clone().addScaledVector(FWD.clone().applyQuaternion(s.quat),CFG.CAM_AHEAD)); }
 const rosterEl=document.getElementById('roster');
-function buildRoster(){ rosterEl.innerHTML=''; ships.slice(0,CFG.NSHIPS).forEach((s,i)=>{ const el=document.createElement('div'); el.className='rs'+(i===focus?' foc':'');
-  el.innerHTML=`<span class="dot" style="background:hsl(${s.hue*360},80%,60%)"></span><span class="nm">${s.name}</span>
+function buildRoster(){ rosterEl.innerHTML=''; ships.slice(0,CFG.NSHIPS).forEach((s,i)=>{ const fac=s.team==='pirate'?'Iron Synod':'Coalition Warden';
+  const el=document.createElement('div'); el.className='rs'+(i===focus?' foc':'')+(s.team==='pirate'?' syn':' war');
+  el.title=`${s.name} · ${fac} — ${s.backstory||''}`;   // #21: backstory tooltip (desktop hover)
+  el.innerHTML=`<span class="fac">${s.team==='pirate'?'✖':'◈'}</span><span class="dot" style="background:hsl(${s.hue*360},80%,60%)"></span><span class="nm">${s.name}</span>
     <span class="hp"><i id="rhp${i}" style="width:100%"></i></span><span class="cr" id="rcr${i}">0c</span>`;
-  el.onclick=()=>{ focus=i; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+s.name; }; rosterEl.appendChild(el); }); }
+  el.onclick=()=>{ focus=i; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+s.name;
+    if(s.backstory) term(`<b>${s.name}</b> · ${fac} <span style="opacity:.6">(GIVEN lore)</span> — ${s.backstory}.`,'sys'); };   // #21: backstory to terminal on select (works on touch)
+  rosterEl.appendChild(el); }); }
 function updateRoster(){ ships.forEach((s,i)=>{ const hp=document.getElementById('rhp'+i),cr=document.getElementById('rcr'+i);
   if(hp) hp.style.width=(100*s.hp/s.maxHp).toFixed(0)+'%'; if(cr) cr.textContent=s.credits+'c'; }); }
 (function pillars(){ const el=document.getElementById('pillars');
@@ -1564,6 +1571,7 @@ for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 for(let i=0;i<CFG.AST_KEEP;i++) spawnAtShell();
 buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTabs(); economyIsOrganic();
 term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English. <b>Dock/trade:</b> tap a planet or ⌂ base in the TOP-DOWN view (or the <b>DOCK</b> button) to fly there &amp; auto-dock, then <b>market</b> / <b>buy ore 10</b> / <b>sell</b>.","sys");
+term("Factions: <b style='color:#46d6ff'>◈ Coalition Wardens</b> (you) vs <b style='color:#ff5a6e'>✖ the Iron Synod</b> (Hegemon). Tap a roster pilot for its backstory. <span style='opacity:.6'>(lore = GIVEN flavor)</span>","sys");
 document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
