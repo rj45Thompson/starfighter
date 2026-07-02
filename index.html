@@ -1465,13 +1465,24 @@ const STORY_FACTIONS={ coalition:{n:'the Coalition', alias:['coalition','warden'
 const DISPOS_PRIOR={ coalition:{coalition:0.6,synod:-0.9,traders:0.2}, synod:{coalition:-0.9,synod:0.5,traders:-0.3}, traders:{coalition:0.2,synod:-0.3,traders:0.5} };
 const HARM_WORDS=['burn','burned','tithe','tithed','took','kill','killed','raid','raided','starve','starved','conquer','enforce','crush','siege'];
 const AID_WORDS=['found','save','saved','swore','medicine','hold','held','shield','rescue','protect','protected','heal','freed','free'];
-const SAMPLE_STORY="In the ruins of Halcyon Station, a Coalition Warden found a child hiding in a cargo bay. The Iron Synod had tithed the colony and burned what it could not take. A Free Trader convoy slipped past the blockade with medicine, asking no side for permission. The Warden swore to hold the lane open. The Synod commander called that mercy a weakness. The Traders cared only that someone paid.";
+const SAMPLE_STORY="In the ruins of Halcyon Station, the Coalition Warden Vale found a child hiding in a cargo bay. The Iron Synod had tithed the colony and burned what it could not take. Warlord Kaine of the Iron Synod ordered the lane put to the torch. A Free Trader convoy under Mercer slipped past the blockade with medicine, asking no side for permission. Vale swore to hold the lane open. Kaine called that mercy a weakness. The Iron Synod raided the outer relays and tithed three more colonies. Vale rallied the Coalition and freed the miners Kaine had taken. Mercer sold fuel to both sides and slipped the blockade again. The Coalition sheltered the refugees Kaine had starved. Kaine swore to break Vale at Halcyon. The Coalition and the Free Traders held the lane together while the Iron Synod burned what it could not hold. Vale spared a Synod pilot who surrendered. Kaine executed his own captain for retreating. Mercer warned Vale of the coming fleet, though the Traders cared only that someone paid.";
 let STORY={ text:'', G:{T:[],bySubj:{},byObj:{}}, ents:[], rep:{coalition:0,synod:0,traders:0}, _v:0 };
 function facOf(text){ const t=' '+String(text).toLowerCase()+' '; for(const k in STORY_FACTIONS) if(STORY_FACTIONS[k].alias.some(a=>t.indexOf(' '+a)>=0)) return k; return null; }
 function factionName(k){ return STORY_FACTIONS[k]?STORY_FACTIONS[k].n:k; }
 function shipFaction(s){ return s.team==='pirate'?'synod':'coalition'; }
-function dispForFaction(fk){ const base=DISPOS_PRIOR[fk]||{}, d={}; for(const f in DISPOS_PRIOR) d[f]=Math.max(-1,Math.min(1,(base[f]||0)+(STORY.rep[f]||0)*0.5)); return d; }   // GIVEN prior + story-nudged
-function shipDisp(s){ if(!s._disp || s._dispV!==STORY._v){ s._disp=dispForFaction(shipFaction(s)); s._dispV=STORY._v; } return s._disp; }   // per-ship MEMORY
+function dispForFaction(fk){ const base=DISPOS_PRIOR[fk]||{}, d={}; for(const f in DISPOS_PRIOR) d[f]=Math.max(-1,Math.min(1,(base[f]||0)+(STORY.rep[f]||0)*0.5)); return d; }   // faction-level: GIVEN prior + story-nudged
+// GENETIC seed: a new ship inherits its disposition from living same-faction "parents" (blend) + faction prior + mutation.
+function seedGeneticDisp(s){ const fk=shipFaction(s), prior=DISPOS_PRIOR[fk]||{}, d={};
+  const parents=ships.filter(o=>o!==s&&o.alive&&o._gdisp&&shipFaction(o)===fk).slice(0,2);
+  const mut=(typeof rand==='function')?()=>rand(-1,1):()=>Math.random()*2-1;
+  for(const f in DISPOS_PRIOR){ const inh=parents.length?parents.reduce((a,o)=>a+(o._gdisp[f]||0),0)/parents.length:(prior[f]||0);
+    d[f]=Math.max(-1,Math.min(1, 0.6*inh + 0.4*(prior[f]||0) + 0.12*mut())); }                 // 60% inherited + 40% prior + mutation
+  s._gdisp=d; return d; }
+// per-ship disposition = GENETIC base (inherited, persistent) + REMEMBERED story reputation + LIVE combat grudges (s.rel).
+function shipDisp(s){ const g=s._gdisp||seedGeneticDisp(s), byName={}; for(const o of ships) byName[o.name]=o;
+  const gf={coalition:0,synod:0,traders:0}, gn={coalition:0,synod:0,traders:0};
+  if(s.rel) for(const nm in s.rel){ const o=byName[nm]; if(o){ const f=shipFaction(o); gf[f]+=s.rel[nm]; gn[f]++; } }   // combat grudges -> faction level
+  const d={}; for(const f in DISPOS_PRIOR) d[f]=Math.max(-1,Math.min(1,(g[f]||0)+(STORY.rep[f]||0)*0.5+(gn[f]?gf[f]/gn[f]:0))); return d; }
 function sfBadgeColor(tag){ return /lore/.test(tag)?'#e8c37a' : /(game-state|sensor|story)/.test(tag)?'#8fd0ff' : /stance/.test(tag)?'#c9a0ff' : '#9aa0a6'; }
 function sfEmit(speaker, tag, sentences, prov, sayShip){ const line=sentences.join(' '); if(sayShip) say(sayShip, line);   // module-level emitter (used by discuss, incl. factions with no live pilot)
   term(`<b>${speaker}</b> <span style="color:${sfBadgeColor(tag)};opacity:.9">[${tag}]</span>: ${line}`,'sys');
@@ -1487,7 +1498,7 @@ function crushStory(text){ const G={T:[],bySubj:{},byObj:{}}, add=(a,r,o,p)=>{ i
   const sents=String(text).split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean), entSet=new Set(), rep={coalition:0,synod:0,traders:0};
   sents.forEach(sent=>{ const low=' '+sent.toLowerCase()+' ';
     const facs=Object.keys(STORY_FACTIONS).filter(k=>STORY_FACTIONS[k].alias.some(a=>low.indexOf(' '+a)>=0));
-    const names=(sent.match(/\b[A-Z][a-z]{2,}\b/g)||[]).filter(w=>!/^(In|The|A|An|And|But|Their|They|He|She|It|That|This|What|When|Coalition|Iron|Synod|Free|Warden|Wardens|Trader|Traders|Hegemon)$/.test(w));
+    const names=(sent.match(/\b[A-Z][a-z]{2,}\b/g)||[]).filter(w=>!/^(In|The|A|An|And|But|Their|They|He|She|It|That|This|What|When|Though|While|Coalition|Iron|Synod|Free|Warden|Wardens|Trader|Traders|Hegemon|Warlord|Station|Captain|Chapter|One|Two|Three)$/.test(w));
     const ents=[...new Set([...facs.map(k=>STORY_FACTIONS[k].n), ...names])];
     ents.forEach(e=>{ entSet.add(e); add(e,'in the story', sent,'story'); });                                            // grounded fact = the sentence itself
     for(let i=0;i<ents.length;i++) for(let j=i+1;j<ents.length;j++){ add(ents[i],'appears with',ents[j],'story'); add(ents[j],'appears with',ents[i],'story'); }
@@ -1495,8 +1506,14 @@ function crushStory(text){ const G={T:[],bySubj:{},byObj:{}}, add=(a,r,o,p)=>{ i
     facs.forEach(k=>{ if(harm) rep[k]-=0.4; if(aid) rep[k]+=0.4; }); });
   for(const k in rep) rep[k]=Math.max(-1,Math.min(1,rep[k]));
   STORY={ text:String(text), G, ents:[...entSet], rep, _v:(STORY._v||0)+1 }; return STORY; }
-function storyStance(s){ return stanceFor(shipFaction(s), s.name); }             // a ship's stance = its faction's, spoken in its name
-function storyFactsFor(s, q){ return factsFor(shipFaction(s), q); }
+function storyStance(s){ const d=shipDisp(s), mine=shipFaction(s), out=[];        // per-ship stance from its OWN disposition (genetic + remembered story + live grudges)
+  const present=[...new Set(STORY.ents.map(facOf).filter(Boolean))].sort((a,b)=>Math.abs(d[b]||0)-Math.abs(d[a]||0));
+  for(const f of present){ if(f===mine) continue; const v=d[f]||0; const r=v<=-0.5?'distrusts':v<=-0.15?'is wary of':v>=0.4?'stands with':v>=0.15?'is friendly to':'is neutral toward'; out.push({s:s.name,r,o:factionName(f)}); }
+  return out.slice(0,2); }
+function storyFactsFor(s, q){ const d=shipDisp(s), own=factionName(shipFaction(s));
+  let ents=STORY.ents.filter(e=>q&&q.indexOf(e.toLowerCase())>=0);
+  if(!ents.length){ const rest=STORY.ents.slice().sort((a,b)=>{ const fa=facOf(a),fb=facOf(b); return Math.abs((fb?d[fb]:0)||0)-Math.abs((fa?d[fa]:0)||0); }); ents=STORY.ents.includes(own)?[own,...rest.filter(e=>e!==own)]:rest; }
+  const seen=new Set(),top=[]; for(const e of ents){ for(const t of (STORY.G.bySubj[e]||[])){ if(t.r==='in the story'&&!seen.has(t.o)){ seen.add(t.o); top.push(t); if(top.length>=2)break; } } if(top.length>=2)break; } return top; }
 function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try: scan, or click one in the roster','err'); return; }
   const {G,ctx}=shipKnowledge(s); lazyWorld(question, s, G);                              // CRUSH: lazy-load every mentioned noun's grounded knowledge
   const cs=tConcepts(question,G,ctx), intent=tIntent(question), q=(question||'').toLowerCase();
