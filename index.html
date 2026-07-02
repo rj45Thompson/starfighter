@@ -90,6 +90,7 @@
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="terminal — type 'help'  ·  ask ORION what are you doing  ·  go &lt;planet&gt; / dock / market / mine / attack ORION  ·  or plain English to order the squadron">
 <div id="touchbar">
   <button id="tbView"  title="cycle view">VIEW</button>
+  <button id="tbDock"  title="dock nearest / base">DOCK</button>
   <button id="tbPilot" title="next pilot">PILOT ►</button>
   <button id="tbMkt"   title="market">MKT</button>
   <button id="tbLog"   title="expand log">LOG</button>
@@ -759,7 +760,9 @@ function think(s,dt){
       else if(d<=CFG.DOCK_R){ if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE — docking refused, defenders inbound.`,'err'); mode='FLEE'; aimDir=_v.copy(s.pos).sub(p.pos); ease=1; }
         else { s.docked=p; s.obj=null; contractDeliver(p);
           if(s.role==='player' && p.rep>CFG.REP_HOSTILE && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
-          term(`Docked at ${p.name}${p.rep>=CFG.REP_ALLIED?' (ALLIED — best prices)':''}. (market · buy · sell · refuel · outfit · upgrade · terraform · contracts)`,'sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15; } }
+          term(`Docked at ${p.name}${p.rep>=CFG.REP_ALLIED?' (ALLIED — best prices)':''}. (market · buy · sell · refuel · outfit · upgrade · terraform · contracts)`,'sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
+          if(s.role==='player'){ marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } }   // auto-open the market on docking (discoverable on phone)
+        } }
       else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }
     else if(o.type==='hunt'){ if(o.target&&o.target.alive){ mode='HUNT'; target=o.target; aimDir=_v.copy(o.target.pos).sub(s.pos); } else { s.obj=null; term('Target down / lost.','sys'); } }
     else if(o.type==='bombard'){ if(planets.indexOf(o.planet)<0){ s.obj=null; } else { mode='HUNT'; target=o.planet; aimDir=_v.copy(o.planet.pos).sub(s.pos); } }
@@ -1560,7 +1563,7 @@ for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=320; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull
 for(let i=0;i<CFG.AST_KEEP;i++) spawnAtShell();
 buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTabs(); economyIsOrganic();
-term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English.","sys");
+term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English. <b>Dock/trade:</b> tap a planet or ⌂ base in the TOP-DOWN view (or the <b>DOCK</b> button) to fly there &amp; auto-dock, then <b>market</b> / <b>buy ore 10</b> / <b>sell</b>.","sys");
 document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
@@ -1624,6 +1627,9 @@ canvas.addEventListener('dblclick',e=>{ const vp=viewAt(e.clientX,e.clientY);
 // ---- ANDROID / TOUCH: view toggle + pilot cycle + market + log buttons; tap-select, one-finger pan, two-finger pinch ----
 (function(){ const $=id=>document.getElementById(id);
   const vb=$('tbView'); if(vb) vb.onclick=()=>{ const seq=['main','top','brain']; soloView=seq[(seq.indexOf(soloView)+1)%3]; resize(); term('view: '+({main:'CHASE CAM',top:'TOP-DOWN (tap a ship to focus)',brain:'REASONING'}[soloView]),'sys'); };
+  const db=$('tbDock'); if(db) db.onclick=()=>{ const P=ships[0]; MAN.active=false; const np=nearestPlanet(P.pos); const dB=base?P.pos.distanceTo(base.pos):1e9, dP=np?P.pos.distanceTo(np.pos):1e9;   // travel to & auto-dock the nearest port/base
+    if(base && dB<=dP){ P.obj={type:'goto',planet:{pos:base.pos.clone(),name:'Ranger Command',_base:true}}; term('⌂ course set for Ranger Command.','sys'); }
+    else if(np){ P.obj={type:'goto',planet:np}; term('Course set for '+np.name+' — auto-docking.','sys'); } };
   const pb=$('tbPilot'); if(pb) pb.onclick=()=>{ focus=(focus+1)%CFG.NSHIPS; buildRoster(); $('lblBrain').textContent='REASONING · '+ships[focus].name; };
   const mb=$('tbMkt'); if(mb) mb.onclick=()=>{ marketOn=!marketOn; $('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); };
   const lb=$('tbLog'); if(lb) lb.onclick=()=>{ $('ticker').classList.toggle('big'); };
@@ -1641,9 +1647,14 @@ canvas.addEventListener('dblclick',e=>{ const vp=viewAt(e.clientX,e.clientY);
 })();
 function topClick(mx,my){ const w=topWorldAt(mx,my), wpp=(topCam.right-topCam.left)/VIEW.top.w, thr=16*wpp; let best=null,bd=1e9,kind=null;
   for(const p of planets){ const d=Math.hypot(w.x-p.pos.x,w.z-p.pos.z); if(d<p.radius*(p.mesh.scale.x||1)+thr && d<bd){ bd=d; best=p; kind='planet'; } }
+  if(base){ const d=Math.hypot(w.x-base.pos.x,w.z-base.pos.z); if(d<CFG.BASE_R+thr && d<bd){ bd=d; best=base; kind='base'; } }
   for(const s of ships){ if(!s.alive) continue; const d=Math.hypot(w.x-s.pos.x,w.z-s.pos.z); if(d<thr+6 && d<bd){ bd=d; best=s; kind='ship'; } }
   if(!best){ return; }
-  if(kind==='planet'){ term(`<b>${best.name}</b> · ${best.type.t} Lv${best.dev} · ${best.system?best.system.name+' sys':''} · ${Math.round(best.wealth)}c · rep ${best.rep>0?'+':''}${Math.round(best.rep)} · hull ${Math.round(100*best.hull/best.maxHull)}%`,'sys'); }
+  const P=ships[0];
+  if(kind==='planet'){ if(typeof MAN!=='undefined') MAN.active=false; P.obj={type:'goto',planet:best};   // TAP TO TRAVEL + auto-dock
+    term(`<b>${best.name}</b> · ${best.type.t} Lv${best.dev} · ${Math.round(best.wealth)}c · rep ${best.rep>0?'+':''}${Math.round(best.rep)} — course set, auto-docking (then: market · buy · sell).`,'sys'); }
+  else if(kind==='base'){ if(typeof MAN!=='undefined') MAN.active=false; P.obj={type:'goto',planet:{pos:base.pos.clone(),name:'Ranger Command',_base:true}};
+    term('⌂ <b>Ranger Command</b> — course set; on arrival: base · hull &lt;class&gt; · blackmarket · repair.','sys'); }
   else { const idx=ships.indexOf(best); if(idx>=0 && idx<CFG.NSHIPS){ focus=idx; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+best.name; }
     term(`<b>${best.name}</b> · ${best.role} · ${best.mode} · hull ${Math.round(best.hp)} · ${best.credits}c${idx<CFG.NSHIPS?' · now focused':''}`,'sys'); } }
 
