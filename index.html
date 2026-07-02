@@ -1418,16 +1418,19 @@ function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try:
   const {G,ctx}=shipKnowledge(s); lazyWorld(question, s, G);                              // CRUSH: lazy-load every mentioned noun's grounded knowledge
   const cs=tConcepts(question,G,ctx), intent=tIntent(question), q=(question||'').toLowerCase();
   term(`<b style="color:#8fd0ff">&gt; @${s.name}:</b> ${(question||'').replace(/</g,'&lt;')}`,'');
-  const emit=(sentences, prov, tag)=>{ const line=sentences.join(' '); say(s, line); term(`<b>${s.name}</b> <span style="opacity:.55">(${tag})</span>: ${line}`,'sys');
+  const badgeColor=tag=> /lore/.test(tag)?'#e8c37a' : /(game-state|sensor)/.test(tag)?'#8fd0ff' : '#9aa0a6';   // 📖 lore=gold, 🛰️ game-state=cyan, 🚫 abstain=grey
+  const emit=(sentences, prov, tag)=>{ const line=sentences.join(' '); say(s, line);
+    term(`<b>${s.name}</b> <span style="color:${badgeColor(tag)};opacity:.9">[${tag}]</span>: ${line}`,'sys');
     if(prov) term(`<span style="opacity:.45">&nbsp;&nbsp;↳ grounded in: ${prov.replace(/</g,'&lt;')}</span>`,''); };
   const named=c=>{ const cl=String(c).toLowerCase(); return q.indexOf(cl)>=0 || cl.split(/[ ·\-]+/).some(t=>t.length>3&&q.indexOf(t)>=0); };
   const base=ch=>ch.length + new Set(ch.map(x=>x.pillar)).size*0.3;
   const score=ch=>{ const pil=ch.map(x=>x.pillar); let r=0; intent.forEach((p,i)=>{ const w=(intent.length-i)*10; for(const pp of pil) if(pp===p) r+=w; }); return r + base(ch); };
   const guard=ch=>({ say: renderChain(ch), raw: tVerbalize(ch) });   // generic structure — no hand-authored words
-  const answers=[], provs=[], used=new Set();
-  // 0) LORE (GIVEN game flavor, labeled) — the ship's faction + original backstory. Not learned, not an AGI claim.
+  const answers=[], provs=[], used=new Set(); let spoke=false;
+  // 0) LORE — its OWN badged line, 📖 GIVEN·lore. Hand-written flavor, NOT learned, NOT an AGI claim. (Fixes the old
+  // mislabel where a backstory answer was bundled under the "game-state" tag.)
   if(intent.includes('lore') && s.backstory){ const fac = s.team==='pirate' ? 'the Iron Synod' : 'the Coalition Wardens';
-    answers.push(`${s.name} of ${fac} — ${s.backstory}.`); provs.push('backstory (GIVEN game lore)'); }
+    emit([`${s.name} of ${fac} — ${s.backstory}.`], 'backstory (hand-written GIVEN lore — not learned)', '📖 GIVEN · lore'); spoke=true; }
   // 1) identity/status -> the ship's own GIVEN facts, rendered as structure
   if(intent.includes('identity')||intent.includes('status')){ const kind=intent.includes('identity')?'identity':'status', f=tCrush(s.name,G).filter(t=>t.s===s.name&&t.pillar===kind);
     if(f.length){ answers.push(renderFacts(s.name,f)); provs.push(f.map(t=>`${t.s} ${t.r} ${t.o}`).join('; ')); used.add(s.name); } }
@@ -1447,12 +1450,13 @@ function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try:
     cand.push({say:renderFacts(c,facts), prov:facts.map(t=>`${t.s} ${t.r} ${t.o}`).join('; '), sc:(named(c)?100:0)+Math.max((G.bySubj[c]||[]).length, ...tChains(c,5,G).map(score))}); }   // an explicitly-named noun leads
   cand.sort((a,b)=>b.sc-a.sc);
   for(const k of cand){ if(answers.length>=3) break; if(k.say&&!answers.includes(k.say)){ answers.push(k.say); provs.push(k.prov); } }
-  if(answers.length){ emit(answers, null, `grounded structure · ${answers.length} topic${answers.length>1?'s':''} (GIVEN game-state)`); return; }
+  if(answers.length){ emit(answers, provs.filter(Boolean).join(' · ')||null, `🛰️ GIVEN · game-state · ${answers.length} topic${answers.length>1?'s':''}`); return; }
+  if(spoke) return;   // lore alone was a complete, badged answer
   // 4) nothing crushed -> grounded sensor-negative for an empty perception query, else abstain
   const NEG={ threat:'No hostiles in sensor range right now.', ally:'No friendlies in sensor range.', resource:'No gems or ore in sensor range.', economy:'No port in range.' };
   const listOf={ threat:ctx.enemies, ally:ctx.allies, resource:ctx.gm.concat(ctx.rk), economy:ctx.pl };
-  if(intent[0]&&NEG[intent[0]]&&!(listOf[intent[0]]&&listOf[intent[0]].length)){ emit([NEG[intent[0]]], null, 'grounded — sensor check'); return; }
-  emit([`I only speak to what I actually know — my status, what I see, and what I'm doing. I've got nothing grounded on that.`], null, 'abstained — no fabrication'); }
+  if(intent[0]&&NEG[intent[0]]&&!(listOf[intent[0]]&&listOf[intent[0]].length)){ emit([NEG[intent[0]]], null, '🛰️ GIVEN · sensor check'); return; }
+  emit([`I only speak to what I actually know — my status, what I see, and what I'm doing. I've got nothing grounded on that.`], null, '🚫 abstained · no fabrication'); }
 function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thoughts') renderLog();   // A0: keep the live chain fresh
   if(!b) return; const mc=MODE_COL[b.mode]||'#7fb0d0';
   const fwd=FWD.clone().applyQuaternion(s.quat), right=RGT.clone().applyQuaternion(s.quat); let bi=0, selPos=null;
@@ -1572,6 +1576,7 @@ for(let i=0;i<CFG.AST_KEEP;i++) spawnAtShell();
 buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTabs(); economyIsOrganic();
 term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English. <b>Dock/trade:</b> tap a planet or ⌂ base in the TOP-DOWN view (or the <b>DOCK</b> button) to fly there &amp; auto-dock, then <b>market</b> / <b>buy ore 10</b> / <b>sell</b>.","sys");
 term("Factions: <b style='color:#46d6ff'>◈ Coalition Wardens</b> (you) vs <b style='color:#ff5a6e'>✖ the Iron Synod</b> (Hegemon). Tap a roster pilot for its backstory. <span style='opacity:.6'>(lore = GIVEN flavor)</span>","sys");
+term("<span style='opacity:.7'>Note: this game is the <b>GIVEN visualizer</b> — a ship's replies are its own game-state (<span style='color:#8fd0ff'>🛰️ GIVEN·game-state</span>) or hand-written lore (<span style='color:#e8c37a'>📖 GIVEN·lore</span>), never fabricated. The <b>LEARNED AGI</b> (decoded from black boxes, verify-first) is the bench: <code>node converse_vec.js</code>.</span>","sys");
 document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
