@@ -764,7 +764,7 @@ function think(s,dt){
       else if(d<=CFG.DOCK_R){ if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE — docking refused, defenders inbound.`,'err'); mode='FLEE'; aimDir=_v.copy(s.pos).sub(p.pos); ease=1; }
         else { s.docked=p; s.obj=null; contractDeliver(p);
           if(s.role==='player' && p.rep>CFG.REP_HOSTILE && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
-          term(`Docked at ${p.name}${p.rep>=CFG.REP_ALLIED?' (ALLIED — best prices)':''}. (market · buy · sell · refuel · outfit · upgrade · terraform · contracts)`,'sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
+          term(`Docked at ${p.name}${p.rep>=CFG.REP_ALLIED?' (ALLIED — best prices)':''}. (market · buy · sell · refuel · outfit · upgrade · terraform · contracts · <b>land</b> to walk the surface)`,'sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
           if(s.role==='player'){ marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } }   // auto-open the market on docking (discoverable on phone)
         } }
       else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }
@@ -1111,7 +1111,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
-  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness)   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
+  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1183,6 +1183,12 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🔗 honest ceiling','xpillar_vec','wiring the learned synonym-matcher into the REAL knowledge graph keeps cross-pillar at 4 (the graph is sparse; learned-merge == random) — DOCUMENTED, never faked']];
     D.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
     term('  <span style="opacity:.6">each is ablation/control-audited, 0-fabrication. Type <code>society</code> for the multi-agent pillars, <code>agent</code> for the fused embodied agent.</span>','sys'); return; }
+  if(c==='land'||c==='disembark'||c==='surface'){ const P=ships[0]; const np=nearestPlanet(P.pos);
+    const pl = P.docked || (np && P.pos.distanceTo(np.pos)<=CFG.DOCK_R*1.6 ? np : null);
+    if(!pl){ term('You must be at a planet to land. Tap a planet (or use DOCK) to fly there, then <b>land</b>.','err'); return; }
+    if(pl._base){ term('Ranger Command is an orbital station — nothing to walk on. Land on a planet instead.','err'); return; }
+    AWAY.enter(pl); return; }
+  if(c==='launch'||c==='liftoff'||c==='takeoff'){ if(AWAY.active()){ AWAY.exit(); term('Back aboard your ship, in orbit.','sys'); } else term('You are already in your ship.','sys'); return; }
   if(c==='scan'){ const ps=planets.map(p=>`${p.name}(${p.type.t} Lv${p.dev}) ${Math.round(P.pos.distanceTo(p.pos))}u`).join(' · ');
     const sh=ships.filter(o=>o!==P&&o.alive&&P.pos.distanceTo(o.pos)<CFG.SENSE_R*1.6).map(o=>`${o.name} ${Math.round(P.pos.distanceTo(o.pos))}u`).join(' · ')||'none';
     term('planets: '+ps,'sys'); term('ships near: '+sh,'sys'); return; }
@@ -1743,11 +1749,12 @@ function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
   MAN.fire=keysDown.has('Space');
   if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire) manOn(); }
 addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
+  if(AWAY.active()){ if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyF','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault(); AWAY.key(e,true); return; }
   if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[focus].name; return; }
   if(e.code==='KeyM'){ marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); return; }
   if(e.code==='Backquote'){ document.getElementById('ticker').classList.toggle('big'); return; }
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
-addEventListener('keyup',e=>{ if(keysDown.delete(e.code)) applyKeys(); });
+addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if(keysDown.delete(e.code)) applyKeys(); });
 // on-screen touch flight controls (multi-touch: steer + thrust + fire at once)
 (function(){ const stick=document.getElementById('stick'), knob=document.getElementById('knob'), thb=document.getElementById('btnThr'), fb=document.getElementById('btnFire'); if(!stick) return; const R=46; let sid=null;
   const set=t=>{ const r=stick.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; let dx=t.clientX-cx, dy=t.clientY-cy; const d=Math.hypot(dx,dy)||1; if(d>R){ dx*=R/d; dy*=R/d; } knob.style.transform=`translate(${dx}px,${dy}px)`; MAN.yaw=clamp(dx/R,-1,1); MAN.pitch=clamp(dy/R,-1,1); manOn(); };
@@ -1814,8 +1821,207 @@ function topClick(mx,my){ const w=topWorldAt(mx,my), wpp=(topCam.right-topCam.le
   else { const idx=ships.indexOf(best); if(idx>=0 && idx<CFG.NSHIPS){ focus=idx; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+best.name; }
     term(`<b>${best.name}</b> · ${best.role} · ${best.mode} · hull ${Math.round(best.hp)} · ${best.credits}c${idx<CFG.NSHIPS?' · now focused':''}`,'sys'); } }
 
+// ==================================================================================================================
+// AWAY MISSIONS — land on a world, WALK AROUND in 3D (the "boxes" demo), and fight a TURN-BASED (Tami-style) battle.
+// Fully self-contained: its own renderer + scene + full-screen overlay. The only hooks into the space game are the
+// frame-loop gate, the keydown route, and the `land` command. Lore/visuals are GIVEN flavor (not an AGI claim-path).
+// ==================================================================================================================
+const AWAY=(function(){
+  const G={ GROUND:130, NBOX:20, WALK:16, RUN:26, TURN:2.7, CAM_BACK:15, CAM_UP:9, INTERACT_R:6, AV_R:1.1,
+            GRID:8, TILE:4.2, TURN_DELAY:0.45 };
+  let active=false, phase='';           // '', 'ground', 'battle'
+  const keys=new Set();
+  // ---- overlay DOM + dedicated renderer (isolated from the space canvas/HUD) ----
+  const wrap=document.createElement('div'); wrap.id='awayWrap';
+  wrap.style.cssText='position:fixed;inset:0;z-index:60;display:none;background:#05070d;overflow:hidden';
+  const cv=document.createElement('canvas'); cv.style.cssText='display:block;width:100%;height:100%'; wrap.appendChild(cv);
+  const hint=document.createElement('div'); hint.id='awayHint';
+  hint.style.cssText='position:absolute;left:0;right:0;bottom:0;padding:12px 16px;font:14px/1.55 ui-monospace,Menlo,monospace;color:#cfe2f5;background:linear-gradient(0deg,rgba(4,7,13,.94),rgba(4,7,13,0));pointer-events:none;text-align:center;white-space:pre-wrap';
+  wrap.appendChild(hint);
+  const ui=document.createElement('div'); ui.id='awayUI'; ui.style.cssText='position:absolute;inset:0;pointer-events:none;font:13px/1.4 ui-monospace,Menlo,monospace'; wrap.appendChild(ui);
+  document.body.appendChild(wrap);
+  const rend=new T.WebGLRenderer({canvas:cv,antialias:true}); rend.setPixelRatio(Math.min(2,devicePixelRatio||1));
+  function say(html){ hint.innerHTML=html; }
+  function size(){ const w=innerWidth,h=innerHeight; rend.setSize(w,h,false); if(gCam){ gCam.aspect=w/h; gCam.updateProjectionMatrix(); } if(bCam){ bCam.aspect=w/h; bCam.updateProjectionMatrix(); } }
+  addEventListener('resize',()=>{ if(active) size(); });
+
+  // ================================ GROUND: walk around a settlement of boxes ================================
+  let gScene,gCam,avatar,yaw=0, boxes=[], foes=[], pad=null, worldName='', gt=0, prompt='';
+  const rr=(a,b)=>a+Math.random()*(b-a);
+  function enemyFigure(){ const g=new T.Group();
+    const b=new T.Mesh(new T.CylinderGeometry(0.9,0.9,2.4,10), new T.MeshStandardMaterial({color:0xff5a6e,emissive:0x400810,emissiveIntensity:0.7,roughness:0.5})); b.position.y=1.2; g.add(b);
+    const h=new T.Mesh(new T.SphereGeometry(0.72,14,10), new T.MeshStandardMaterial({color:0xffd0d6,roughness:0.4})); h.position.y=2.6; g.add(h);
+    const ring=new T.Mesh(new T.RingGeometry(2.3,3,26), new T.MeshBasicMaterial({color:0xff5a6e,transparent:true,opacity:0.55,side:T.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.y=0.05; g.add(ring); return g; }
+  function buildGround(pl){
+    gScene=new T.Scene(); const skc=0x0a1018; gScene.background=new T.Color(skc); gScene.fog=new T.Fog(skc,70,160);
+    gScene.add(new T.HemisphereLight(0xbfd8ff,0x0a0f16,0.95));
+    const sun=new T.DirectionalLight(0xfff0d8,1.05); sun.position.set(40,75,22); gScene.add(sun);
+    const col=(pl&&pl.type&&pl.type.col)||0x37506a;
+    const ground=new T.Mesh(new T.PlaneGeometry(G.GROUND,G.GROUND), new T.MeshStandardMaterial({color:new T.Color(col).multiplyScalar(0.5),roughness:0.97,metalness:0.04}));
+    ground.rotation.x=-Math.PI/2; gScene.add(ground);
+    const grid=new T.GridHelper(G.GROUND,G.GROUND/5,0x3a577a,0x1c2c40); grid.position.y=0.02; gScene.add(grid);
+    boxes=[]; for(let i=0;i<G.NBOX;i++){ const w=rr(3,9),d=rr(3,9),h=rr(3,15), x=rr(-56,56),z=rr(-56,56); if(Math.hypot(x-8,z-8)<14) continue;
+      const c=new T.Color(col).multiplyScalar(rr(0.55,1.05)).offsetHSL(rr(-0.04,0.08),0.08,rr(-0.04,0.16));
+      const m=new T.Mesh(new T.BoxGeometry(w,h,d), new T.MeshStandardMaterial({color:c,roughness:0.82,metalness:0.16})); m.position.set(x,h/2,z); gScene.add(m); boxes.push({x,z,hw:w/2+G.AV_R,hd:d/2+G.AV_R}); }
+    foes=[]; const nf=2; for(let i=0;i<nf;i++){ let fx,fz,tries=0; do{ fx=rr(-46,46); fz=rr(-46,46); tries++; }while(tries<30 && (Math.hypot(fx-8,fz-8)<16 || blocked(fx,fz)));
+      const g=enemyFigure(); g.position.set(fx,0,fz); gScene.add(g); foes.push({x:fx,z:fz,mesh:g,alive:true}); }
+    pad=new T.Group(); const disc=new T.Mesh(new T.CircleGeometry(4,36), new T.MeshBasicMaterial({color:0x46d6ff,transparent:true,opacity:0.5,side:T.DoubleSide})); disc.rotation.x=-Math.PI/2; disc.position.y=0.03; pad.add(disc);
+    const pr=new T.Mesh(new T.RingGeometry(3.6,4.2,32), new T.MeshBasicMaterial({color:0x9fe6ff,transparent:true,opacity:0.8,side:T.DoubleSide})); pr.rotation.x=-Math.PI/2; pr.position.y=0.05; pad.add(pr); pad.position.set(8,0,8); gScene.add(pad);
+    avatar=new T.Group(); const bd=new T.Mesh(new T.CylinderGeometry(0.8,0.8,2.4,14), new T.MeshStandardMaterial({color:0x46d6ff,emissive:0x0a2233,emissiveIntensity:0.5,roughness:0.5})); bd.position.y=1.2; avatar.add(bd);
+    const hd=new T.Mesh(new T.SphereGeometry(0.72,16,12), new T.MeshStandardMaterial({color:0xe6f4ff,roughness:0.4})); hd.position.y=2.6; avatar.add(hd);
+    const nose=new T.Mesh(new T.BoxGeometry(0.3,0.3,0.8), new T.MeshStandardMaterial({color:0x9fe6ff})); nose.position.set(0,2.55,0.7); avatar.add(nose);   // facing marker
+    avatar.position.set(0,0,0); yaw=Math.PI*0.25; gScene.add(avatar);
+    gCam=new T.PerspectiveCamera(62,innerWidth/innerHeight,0.1,700);
+  }
+  function blocked(x,z){ for(const b of boxes) if(Math.abs(x-b.x)<b.hw && Math.abs(z-b.z)<b.hd) return true; return false; }
+  function moveAvatar(dt){ const run=keys.has('ShiftLeft')||keys.has('ShiftRight'); const spd=(run?G.RUN:G.WALK);
+    if(keys.has('KeyA')||keys.has('ArrowLeft')) yaw+=G.TURN*dt;
+    if(keys.has('KeyD')||keys.has('ArrowRight')) yaw-=G.TURN*dt;
+    let fwd=0; if(keys.has('KeyW')||keys.has('ArrowUp')) fwd+=1; if(keys.has('KeyS')||keys.has('ArrowDown')) fwd-=1;
+    if(fwd){ const nx=avatar.position.x+Math.sin(yaw)*spd*fwd*dt, nz=avatar.position.z+Math.cos(yaw)*spd*fwd*dt;
+      const cx=Math.max(-62,Math.min(62,nx)), cz=Math.max(-62,Math.min(62,nz));
+      if(!blocked(cx,avatar.position.z)) avatar.position.x=cx; if(!blocked(avatar.position.x,cz)) avatar.position.z=cz; }
+    avatar.rotation.y=yaw;
+    const bx=avatar.position.x-Math.sin(yaw)*G.CAM_BACK, bz=avatar.position.z-Math.cos(yaw)*G.CAM_BACK;
+    gCam.position.lerp(new T.Vector3(bx,G.CAM_UP,bz),1-Math.pow(0.001,dt)); gCam.lookAt(avatar.position.x,2.2,avatar.position.z); }
+  function nearestFoe(){ let best=null,bd=G.INTERACT_R; for(const f of foes){ if(!f.alive) continue; const d=Math.hypot(avatar.position.x-f.x,avatar.position.z-f.z); if(d<bd){bd=d;best=f;} } return best; }
+  function onPad(){ return Math.hypot(avatar.position.x-8,avatar.position.z-8)<4; }
+  function frameGround(dt){ gt+=dt; moveAvatar(dt);
+    for(const f of foes){ if(f.alive){ f.mesh.rotation.y+=dt*0.8; f.mesh.children[2] && (f.mesh.children[2].material.opacity=0.4+0.25*Math.sin(gt*3)); } }
+    pad.children[1].material.opacity=0.5+0.4*Math.sin(gt*2.5);
+    const foe=nearestFoe(); const pad_=onPad();
+    if(foe){ prompt='foe'; say(`⚔  A hostile blocks your path — press <b>F</b> to engage (turn-based battle)`); }
+    else if(pad_){ prompt='pad'; say(`▲  Launch pad — press <b>F</b> to return to your ship in orbit`); }
+    else { prompt=''; const left=foes.filter(f=>f.alive).length; say(`<b>${worldName}</b> — on foot.  <b>W</b> walk · <b>A/D</b> turn · <b>Shift</b> run · <b>F</b> interact${left?`   ·   ${left} hostile${left>1?'s':''} on the surface`:`   ·   surface clear — reach the pad to launch`}`); }
+    rend.render(gScene,gCam); }
+
+  // ================================ BATTLE: turn-based grid tactics (Tami-style) ================================
+  let bScene,bCam,tiles=[],units=[],order=[],turnIx=0,cur=null,bt=0,bstate='',selTech=null,reach=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(),pendingFoe=null,acted=false,moved=false,aiTimer=0,blog=[];
+  const TECHS={
+    strike:{name:'Strike',power:16,range:1,kind:'phys',cd:0,desc:'melee'},
+    cleave:{name:'Cleave',power:22,range:1,kind:'phys',aff:'Burn',cd:2,desc:'melee, may Burn'},
+    bolt:{name:'Ion Bolt',power:15,range:4,kind:'special',cd:1,desc:'ranged'},
+    venom:{name:'Venom Dart',power:10,range:3,kind:'special',aff:'Poison',cd:2,desc:'ranged, Poison'},
+    stunrod:{name:'Stun Rod',power:9,range:1,kind:'phys',aff:'Stun',cd:3,desc:'melee, may Stun'},
+    mend:{name:'Mend',power:20,range:2,kind:'heal',cd:2,desc:'heal an ally'}
+  };
+  function mkUnit(name,side,hp,atk,def,spd,mv,techs,gx,gy){ return {name,side,hp,maxhp:hp,atk,def,spd,mv,techs,gx,gy,mesh:null,aff:{},cd:{},alive:true}; }
+  function party(){ return [
+    mkUnit('Warden',    'ally',56,16,9,11,3,['strike','cleave','mend'],1,3),
+    mkUnit('Ranger',    'ally',44,14,6,14,4,['bolt','venom'],1,4),
+    mkUnit('Bulwark',   'ally',70,13,13,7,2,['strike','stunrod'],0,3) ]; }
+  function foeParty(n){ const pool=[
+    mkUnit('Synod Blade','foe',48,15,8,12,3,['strike','cleave'],6,3),
+    mkUnit('Synod Gun',  'foe',40,15,5,13,4,['bolt','venom'],7,4),
+    mkUnit('Synod Brute','foe',66,14,11,7,2,['strike','stunrod'],6,4) ];
+    return pool.slice(0,Math.max(2,Math.min(3,n))); }
+  function tileFree(gx,gy,ignore){ if(gx<0||gy<0||gx>=G.GRID||gy>=G.GRID) return false; for(const u of units){ if(u.alive&&u!==ignore&&u.gx===gx&&u.gy===gy) return false; } return true; }
+  function unitAt(gx,gy){ return units.find(u=>u.alive&&u.gx===gx&&u.gy===gy); }
+  function w3(gx,gy){ return new T.Vector3((gx-(G.GRID-1)/2)*G.TILE, 0, (gy-(G.GRID-1)/2)*G.TILE); }
+  function buildBattle(foe){ pendingFoe=foe; phase='battle'; bstate='intro'; blog=[]; selTech=null; acted=false; moved=false;
+    bScene=new T.Scene(); const sk=0x0c1220; bScene.background=new T.Color(sk); bScene.fog=new T.Fog(sk,50,130);
+    bScene.add(new T.HemisphereLight(0xcfe0ff,0x10131c,1.0)); const sun=new T.DirectionalLight(0xffffff,0.9); sun.position.set(20,40,15); bScene.add(sun);
+    tiles=[]; for(let y=0;y<G.GRID;y++) for(let x=0;x<G.GRID;x++){ const dark=(x+y)%2; const m=new T.Mesh(new T.BoxGeometry(G.TILE*0.96,0.4,G.TILE*0.96), new T.MeshStandardMaterial({color:dark?0x1b2740:0x223150,roughness:0.9}));
+      const w=w3(x,y); m.position.set(w.x,-0.2,w.z); m.userData={gx:x,gy:y,base:dark?0x1b2740:0x223150}; bScene.add(m); tiles.push(m); }
+    units=party().concat(foeParty(foe? (foe.tier||2):2));
+    for(const u of units){ u.mesh=unitMesh(u); const w=w3(u.gx,u.gy); u.mesh.position.set(w.x,0,w.z); bScene.add(u.mesh); u.label=floatLabel(u); u.mesh.add(u.label.sp); }
+    bCam=new T.PerspectiveCamera(52,innerWidth/innerHeight,0.1,600); bCam.position.set(0,34,30); bCam.lookAt(0,0,2);
+    order=units.slice(); turnIx=-1; bt=0; log('The Iron Synod ambushes your away team!'); nextTurn(); }
+  function unitMesh(u){ const g=new T.Group(); const col=u.side==='ally'?0x46d6ff:0xff5a6e;
+    const b=new T.Mesh(new T.CylinderGeometry(0.9,1.1,2.2,12), new T.MeshStandardMaterial({color:col,emissive:new T.Color(col).multiplyScalar(0.18),roughness:0.5})); b.position.y=1.3; g.add(b);
+    const h=new T.Mesh(new T.SphereGeometry(0.7,14,10), new T.MeshStandardMaterial({color:0xeaf4ff,roughness:0.4})); h.position.y=2.7; g.add(h); return g; }
+  function floatLabel(u){ return spriteText(u.name,22,'#eaf2ff',{bg:'rgba(9,16,28,0.7)',pad:5,r:6,align:'center',ws:0.07}); }
+  function log(m){ blog.push(m); if(blog.length>4) blog.shift(); }
+  // battle rendering: highlight reachable tiles + current unit; draw the HTML panel
+  function paintTiles(){ for(const m of tiles){ let c=m.userData.base; if(reach.has(m.userData.gx+','+m.userData.gy)) c=0x2f6a4a; m.material.color.setHex(c); }
+    if(cur){ const t=tiles.find(x=>x.userData.gx===cur.gx&&x.userData.gy===cur.gy); if(t) t.material.color.setHex(cur.side==='ally'?0x2a5b8c:0x7a2436); } }
+  function reachable(u){ const S=new Set(), q=[[u.gx,u.gy,0]]; S.add(u.gx+','+u.gy);
+    while(q.length){ const [x,y,d]=q.shift(); if(d>=u.mv) continue; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx,ny=y+dy,k=nx+','+ny; if(nx<0||ny<0||nx>=G.GRID||ny>=G.GRID||S.has(k)||!tileFree(nx,ny,u)) continue; S.add(k); q.push([nx,ny,d+1]); } } S.delete(u.gx+','+u.gy); return S; }
+  function nextTurn(){ selTech=null; acted=false; moved=false;
+    for(let n=0;n<units.length+1;n++){ turnIx=(turnIx+1)%order.length; if(turnIx===0) order.sort((a,b)=>b.spd-a.spd);   // re-sort each round
+      cur=order[turnIx]; if(cur.alive) break; }
+    // start-of-turn afflictions
+    if(cur.aff.Burn>0){ dmg(cur,6,'Burn'); cur.aff.Burn--; } if(cur.aff.Poison>0){ dmg(cur,5,'Poison'); cur.aff.Poison--; }
+    for(const k in cur.cd) if(cur.cd[k]>0) cur.cd[k]--;
+    if(!cur.alive){ return void setTimeout(()=>{},0)||nextTurn(); }
+    if(cur.aff.Stun>0){ cur.aff.Stun--; log(`${cur.name} is STUNNED and loses its turn.`); bstate='wait'; aiTimer=G.TURN_DELAY; return; }
+    reach=reachable(cur);
+    if(cur.side==='ally'){ bstate='player'; } else { bstate='ai'; aiTimer=G.TURN_DELAY; }
+  }
+  function dmg(u,amount,src){ u.hp=Math.max(0,u.hp-Math.round(amount)); log(`${u.name} takes ${Math.round(amount)}${src?(' ('+src+')'):''}.`); if(u.hp<=0&&u.alive){ u.alive=false; u.mesh.visible=false; log(`${u.name} is down!`); } }
+  function useTech(actor,tech,targ){ const info=TECHS[tech];
+    if(info.kind==='heal'){ targ.hp=Math.min(targ.maxhp,targ.hp+info.power); log(`${actor.name} uses ${info.name} — ${targ.name} +${info.power} HP.`); }
+    else { const raw=info.power + (info.kind==='phys'?actor.atk:Math.round(actor.atk*0.8)) - (info.kind==='phys'?targ.def:Math.round(targ.def*0.5)); const amt=Math.max(2,Math.round(raw*rr(0.85,1.15))); dmg(targ,amt,info.name);
+      if(info.aff && targ.alive && Math.random()<0.6){ targ.aff[info.aff]=(info.aff==='Stun'?1:3); log(`${targ.name} is afflicted: ${info.aff}!`); } }
+    actor.cd[tech]=info.cd; acted=true; }
+  function endTurn(){ if(checkEnd()) return; bstate='wait'; aiTimer=G.TURN_DELAY*0.6; }
+  function checkEnd(){ const allies=units.filter(u=>u.side==='ally'&&u.alive).length, foesL=units.filter(u=>u.side==='foe'&&u.alive).length;
+    if(!foesL){ bstate='win'; return true; } if(!allies){ bstate='lose'; return true; } return false; }
+  function inRange(a,b,r){ return Math.abs(a.gx-b.gx)+Math.abs(a.gy-b.gy)<=r; }
+  function aiAct(){ // move toward nearest ally, then attack if in range
+    const targets=units.filter(u=>u.side==='ally'&&u.alive); if(!targets.length){ checkEnd(); return; }
+    let tgt=targets[0],bd=1e9; for(const t of targets){ const d=Math.abs(t.gx-cur.gx)+Math.abs(t.gy-cur.gy); if(d<bd){bd=d;tgt=t;} }
+    // pick best technique available
+    let best=null; for(const tk of cur.techs){ if((cur.cd[tk]||0)>0) continue; const info=TECHS[tk]; if(info.kind==='heal') continue; if(!best||info.power>TECHS[best].power) best=tk; }
+    const rng=best?TECHS[best].range:1;
+    if(!inRange(cur,tgt,rng)){ // step along reachable tiles minimizing distance to tgt
+      let bestTile=[cur.gx,cur.gy],bDist=bd; for(const k of reach){ const [x,y]=k.split(',').map(Number); const d=Math.abs(x-tgt.gx)+Math.abs(y-tgt.gy); if(d<bDist){bDist=d;bestTile=[x,y];} }
+      cur.gx=bestTile[0]; cur.gy=bestTile[1]; const w=w3(cur.gx,cur.gy); cur.mesh.position.set(w.x,0,w.z); }
+    if(best && inRange(cur,tgt,TECHS[best].range)) useTech(cur,best,tgt); else log(`${cur.name} repositions.`);
+    endTurn(); }
+  function frameBattle(dt){ bt+=dt;
+    // idle bob for current unit
+    for(const u of units){ if(u.mesh.visible){ u.mesh.position.y=(u===cur?Math.abs(Math.sin(bt*4))*0.5:0); } }
+    if(bstate==='wait'){ aiTimer-=dt; if(aiTimer<=0){ nextTurn(); } }
+    else if(bstate==='ai'){ aiTimer-=dt; if(aiTimer<=0){ aiAct(); } }
+    paintTiles(); drawBattleUI(); rend.render(bScene,bCam); }
+  function drawBattleUI(){ const rows=units.map(u=>{ const dead=!u.alive; const bar=Math.round(20*u.hp/u.maxhp);
+      const affs=Object.keys(u.aff).filter(k=>u.aff[k]>0).map(k=>k[0]).join(''); const col=u.side==='ally'?'#46d6ff':'#ff5a6e';
+      return `<div style="opacity:${dead?0.35:1};margin:2px 0"><span style="color:${col}">${u===cur?'▶':'&nbsp;'} ${u.name}</span> <span style="color:#7fdc8a">${'█'.repeat(bar)}</span><span style="opacity:.3">${'░'.repeat(20-bar)}</span> ${u.hp}/${u.maxhp} ${affs?`<span style='color:#ffcf52'>[${affs}]</span>`:''}</div>`; }).join('');
+    let ctrl='';
+    if(bstate==='player'){ const techBtns=cur.techs.map(tk=>{ const info=TECHS[tk], cd=cur.cd[tk]||0; const on=selTech===tk;
+        return `<button data-tech="${tk}" ${cd?'disabled':''} style="pointer-events:auto;margin:3px;padding:6px 9px;border-radius:7px;border:1px solid ${on?'#9fe6ff':'#2a3f5c'};background:${on?'#173049':'#0e1a2a'};color:${cd?'#5a6a80':'#cfe2f5'};font:inherit;cursor:${cd?'default':'pointer'}">${info.name} <span style="opacity:.6">${info.kind==='heal'?'♥':info.kind==='special'?'✦':'⚔'}r${info.range}${cd?` cd${cd}`:''}</span></button>`; }).join('');
+      ctrl=`<div style="margin-top:6px">${moved?'':'<span style="opacity:.7">click a green tile to MOVE, then</span> '}pick a technique:</div>${techBtns}<button data-act="end" style="pointer-events:auto;margin:3px;padding:6px 9px;border-radius:7px;border:1px solid #2a3f5c;background:#1a1216;color:#ffb3b3;font:inherit;cursor:pointer">End turn</button>`;
+      if(selTech) ctrl+=`<div style="margin-top:4px;color:#9fe6ff">${TECHS[selTech].name} armed — click a ${TECHS[selTech].kind==='heal'?'blue ally':'red foe'} in range (${TECHS[selTech].range}).</div>`; }
+    else if(bstate==='win'){ ctrl=`<div style="margin-top:8px;color:#7fdc8a;font-size:16px">✔ VICTORY — the away team prevails.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #2f6a4a;background:#13251b;color:#9fe6b0;font:inherit;cursor:pointer">Back to the surface</button>`; }
+    else if(bstate==='lose'){ ctrl=`<div style="margin-top:8px;color:#ff6a6a;font-size:16px">✖ DEFEAT — you retreat to your ship.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #6a2f2f;background:#251313;color:#ffb3b3;font:inherit;cursor:pointer">Retreat</button>`; }
+    else ctrl=`<div style="margin-top:6px;opacity:.7">${cur?cur.name:''}${bstate==='ai'?' (enemy) is acting…':'…'}</div>`;
+    ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:420px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
+      <div style="color:#8fd0ff;font-weight:bold;margin-bottom:4px">TURN-BASED BATTLE <span style="opacity:.5;font-weight:normal">— a Tami-style away-team fight</span></div>${rows}${ctrl}</div>
+      <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${blog.map(l=>'· '+l).join('<br>')}</div>`;
+    ui.querySelectorAll('button[data-tech]').forEach(b=>b.onclick=()=>{ const tk=b.getAttribute('data-tech'); selTech=(selTech===tk?null:tk); });
+    ui.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>{ const a=b.getAttribute('data-act'); if(a==='end'){ selTech=null; endTurn(); } else if(a==='return'){ finishBattle(bstate==='win'); } }); }
+  function onBattleClick(mx,my){ if(bstate!=='player'||!cur) return; pointer.x=mx/innerWidth*2-1; pointer.y=-(my/innerHeight*2-1); ray.setFromCamera(pointer,bCam);
+    // technique targeting?
+    if(selTech){ const info=TECHS[selTech]; const hits=ray.intersectObjects(units.filter(u=>u.alive).map(u=>u.mesh),true); if(hits.length){ let m=hits[0].object; while(m.parent&&!units.find(u=>u.mesh===m)) m=m.parent; const tgt=units.find(u=>u.mesh===m);
+        if(tgt){ const wantAlly=info.kind==='heal'; if((wantAlly&&tgt.side!=='ally')||(!wantAlly&&tgt.side!=='foe')){ log(`Invalid target for ${info.name}.`); return; }
+          if(!inRange(cur,tgt,info.range)){ log(`${tgt.name} is out of range.`); return; } useTech(cur,selTech,tgt); selTech=null; endTurn(); return; } } return; }
+    // else move
+    const th=ray.intersectObjects(tiles); if(th.length){ const td=th[0].object.userData; const k=td.gx+','+td.gy; if(!moved && reach.has(k)){ cur.gx=td.gx; cur.gy=td.gy; const w=w3(cur.gx,cur.gy); cur.mesh.position.set(w.x,0,w.z); moved=true; reach=new Set(); } } }
+  function finishBattle(won){ // clear the engaged foe on victory; return to ground
+    if(won && pendingFoe){ pendingFoe.alive=false; pendingFoe.mesh.visible=false; }
+    phase='ground'; bstate=''; ui.innerHTML=''; term(won?'Away team victorious — hostiles cleared.':'Away team routed — you fall back to the surface.', won?'sys':'err');
+    if(won && foes.every(f=>!f.alive)) say('Surface clear. Reach the launch pad and press F to return to orbit.'); }
+
+  // ================================ enter / exit / input / frame ================================
+  function enter(pl){ if(active) return; active=true; phase='ground'; worldName=pl&&pl.name||'the surface'; buildGround(pl); size(); wrap.style.display='block'; keys.clear();
+    term(`Landed on <b>${worldName}</b>. You disembark — <b>on foot</b>. (W walk · A/D turn · Shift run · F interact · type <b>launch</b> or step on the pad to leave)`,'sys'); }
+  function exit(){ active=false; phase=''; wrap.style.display='none'; ui.innerHTML=''; keys.clear();
+    // dispose scenes lightly
+    gScene=null; bScene=null; }
+  function interact(){ if(phase!=='ground') return; const foe=nearestFoe(); if(foe){ buildBattle(foe); return; } if(onPad()){ term('Launching back to orbit.','sys'); exit(); } }
+  function key(e,down){ if(down){ if(e.code==='Escape'){ if(phase==='battle'){ /* stay */ } else exit(); return; }
+      if(e.code==='KeyF'&&phase==='ground'){ interact(); return; } keys.add(e.code); }
+    else keys.delete(e.code); }
+  cv.addEventListener('mousedown',e=>{ if(phase==='battle') onBattleClick(e.clientX,e.clientY); });
+  cv.addEventListener('touchstart',e=>{ if(phase==='battle'&&e.touches[0]){ onBattleClick(e.touches[0].clientX,e.touches[0].clientY); } },{passive:true});
+  function frame(dt){ if(phase==='ground') frameGround(dt); else if(phase==='battle') frameBattle(dt); }
+  return { active:()=>active, enter, exit, key, frame };
+})();
+
 let last=performance.now(), mktAcc=0;
 function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=0.05; T0+=dt;
+  if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   step(dt); updateCamera(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain();
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
