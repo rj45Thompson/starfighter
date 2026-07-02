@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>STARFIGHTER · AI squadron — 3D flight · top-down · reasoning (all WebGL)</title>
 <style>
   :root{ --cyan:#46d6ff; --gold:#ffcf52; --red:#ff5a6e; --grn:#7dffa6; --ink:#080a10; }
@@ -53,6 +53,23 @@
   #vdiv,#hdiv{ position:fixed; z-index:6; background:#1b2troops; background:#1b2a3c; }
   #boot{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50;
     background:var(--ink); font:600 14px/1 ui-monospace,monospace; color:#86a0bd; transition:opacity .5s; }
+  /* ---- Android / touch ---- */
+  canvas{ touch-action:none; }
+  #touchbar{ position:fixed; z-index:9; right:9px; bottom:60px; display:none; flex-direction:column; gap:7px; pointer-events:auto; }
+  #touchbar button{ font:800 11px/1 ui-monospace,monospace; color:#cfe6ff; background:#0c1826ee; border:1px solid #3a6a8a;
+    border-radius:11px; padding:11px 10px; min-width:52px; -webkit-tap-highlight-color:transparent; }
+  #touchbar button:active{ background:#16324a; }
+  body.touch #touchbar{ display:flex; }
+  @media (max-width:760px){
+    #pillars{ display:none; }
+    #roster{ top:8px; left:8px; flex-direction:row; flex-wrap:nowrap; gap:5px; overflow-x:auto; max-width:calc(100% - 16px); -webkit-overflow-scrolling:touch; }
+    .rs{ width:auto; flex:0 0 auto; padding:5px 8px; }
+    #ticker{ left:8px; width:calc(100% - 16px); max-width:none; bottom:62px; max-height:30vh; font-size:12px; }
+    #ticker.big{ width:calc(100% - 16px); max-width:none; max-height:56vh; }
+    .vlabel{ font-size:9px; } .vlabel span{ display:none; }
+    #chat{ left:8px !important; width:calc(100% - 16px) !important; height:42px; font-size:16px; line-height:42px; bottom:10px; }
+    #market{ font-size:11px; max-width:94vw; left:50% !important; }
+  }
 </style>
 </head>
 <body>
@@ -65,6 +82,12 @@
 <div class="vlabel" id="lblBrain">REASONING <span>· scroll zoom · drag pan</span></div>
 <div id="vdiv"></div><div id="hdiv"></div>
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="terminal — type 'help'  ·  ask ORION what are you doing  ·  go &lt;planet&gt; / dock / market / mine / attack ORION  ·  or plain English to order the squadron">
+<div id="touchbar">
+  <button id="tbView"  title="cycle view">VIEW</button>
+  <button id="tbPilot" title="next pilot">PILOT ►</button>
+  <button id="tbMkt"   title="market">MKT</button>
+  <button id="tbLog"   title="expand log">LOG</button>
+</div>
 <div id="boot">loading squadron…</div>
 
 <script src="three.min.js"></script>
@@ -1497,6 +1520,9 @@ let brainZoom=1, brainCenter={x:300,y:235};
 function sizeBrainCam(vw,vh){ vw=vw||VIEW.brain.w||1; vh=vh||VIEW.brain.h||1; const va=vw/vh, ca=600/470; let hw,hh;
   if(va>ca){ hh=235*brainZoom; hw=hh*va; } else { hw=300*brainZoom; hh=hw/va; }
   brainCam.left=-hw; brainCam.right=hw; brainCam.top=hh; brainCam.bottom=-hh; brainCam.position.set(brainCenter.x,brainCenter.y,50); brainCam.lookAt(brainCenter.x,brainCenter.y,0); brainCam.updateProjectionMatrix(); }
+const IS_TOUCH = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window);
+let soloView = IS_TOUCH ? 'main' : null;   // MOBILE: one full-screen view at a time (toggled by the VIEW button)
+if(IS_TOUCH && document.body) document.body.classList.add('touch');
 function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   const rw=Math.round(clamp(W*CFG.RIGHT_FRAC,CFG.RIGHT_MIN,CFG.RIGHT_MAX)), mw=W-rw, hh=Math.round(H/2);
   VIEW.main={x:0,y:0,w:mw,h:H}; VIEW.top={x:mw,y:hh,w:rw,h:H-hh}; VIEW.brain={x:mw,y:0,w:rw,h:hh};
@@ -1506,8 +1532,16 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   vd.style.left=mw+'px'; vd.style.top='0'; vd.style.width='1px'; vd.style.height=H+'px';
   hd.style.left=mw+'px'; hd.style.top=hh+'px'; hd.style.width=rw+'px'; hd.style.height='1px';
   document.getElementById('chat').style.width=Math.max(240,mw-28)+'px';
-  document.getElementById('market').style.left=(mw*0.5)+'px'; }
-function renderView(r,sc,cam){ renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
+  document.getElementById('market').style.left=(mw*0.5)+'px';
+  if(soloView){ const full={x:0,y:0,w:W,h:H}, z={x:0,y:0,w:0,h:0};   // MOBILE: render only the active view, full-screen
+    VIEW.main = soloView==='main'?full:z; VIEW.top = soloView==='top'?full:z; VIEW.brain = soloView==='brain'?full:z;
+    if(soloView==='main'){ chaseCam.aspect=W/H; chaseCam.updateProjectionMatrix(); } else if(soloView==='top'){ sizeTopCam(W,H); } else { sizeBrainCam(W,H); }
+    document.getElementById('chat').style.width=(W-16)+'px';
+    const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain');
+    lt.style.display=soloView==='top'?'block':'none'; lb.style.display=soloView==='brain'?'block':'none';
+    lt.style.left='10px'; lt.style.top='34px'; lb.style.left='10px'; lb.style.top='34px';
+    document.getElementById('vdiv').style.display='none'; document.getElementById('hdiv').style.display='none'; } }
+function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
 function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,chaseCam); renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam); renderer.setScissorTest(false); }
 
 makePlanets();
@@ -1532,7 +1566,7 @@ chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
 
 // ---- interactive TOP-DOWN + REASONING views: wheel=zoom, drag=pan, click=inspect (top-down), dbl-click=reset ----
 const canvas=renderer.domElement;
-function viewAt(mx,my){ const H=innerH(); const inR=v=> mx>=v.x && mx<v.x+v.w && my>=(H-(v.y+v.h)) && my<(H-v.y);
+function viewAt(mx,my){ if(soloView) return soloView; const H=innerH(); const inR=v=> mx>=v.x && mx<v.x+v.w && my>=(H-(v.y+v.h)) && my<(H-v.y);
   if(inR(VIEW.top)) return 'top'; if(inR(VIEW.brain)) return 'brain'; return 'main'; }
 function topWorldAt(mx,my){ const H=innerH(), v=VIEW.top; const lx=(mx-v.x)/v.w*2-1, ly=-(((my-(H-(v.y+v.h)))/v.h)*2-1); return new T.Vector3(lx,ly,-1).unproject(topCam); }
 let drag=null;
@@ -1546,6 +1580,24 @@ window.addEventListener('mousemove',e=>{ if(!drag) return; const dx=e.clientX-dr
 window.addEventListener('mouseup',()=>{ if(drag){ if(drag.moved<5 && drag.vp==='top') topClick(drag.x0,drag.y0); drag=null; } });
 canvas.addEventListener('dblclick',e=>{ const vp=viewAt(e.clientX,e.clientY);
   if(vp==='top'){ topCenter=null; topZoom=1; } else if(vp==='brain'){ brainZoom=1; brainCenter={x:300,y:235}; sizeBrainCam(); } });
+// ---- ANDROID / TOUCH: view toggle + pilot cycle + market + log buttons; tap-select, one-finger pan, two-finger pinch ----
+(function(){ const $=id=>document.getElementById(id);
+  const vb=$('tbView'); if(vb) vb.onclick=()=>{ const seq=['main','top','brain']; soloView=seq[(seq.indexOf(soloView)+1)%3]; resize(); term('view: '+({main:'CHASE CAM',top:'TOP-DOWN (tap a ship to focus)',brain:'REASONING'}[soloView]),'sys'); };
+  const pb=$('tbPilot'); if(pb) pb.onclick=()=>{ focus=(focus+1)%CFG.NSHIPS; buildRoster(); $('lblBrain').textContent='REASONING · '+ships[focus].name; };
+  const mb=$('tbMkt'); if(mb) mb.onclick=()=>{ marketOn=!marketOn; $('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); };
+  const lb=$('tbLog'); if(lb) lb.onclick=()=>{ $('ticker').classList.toggle('big'); };
+  let td=null, pinchD=0;
+  canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ const t=e.touches[0], vp=viewAt(t.clientX,t.clientY);
+      if(vp==='top'||vp==='brain'){ e.preventDefault(); td={vp,x0:t.clientX,y0:t.clientY,mx:t.clientX,my:t.clientY,moved:0}; } }
+    else if(e.touches.length===2){ e.preventDefault(); const a=e.touches[0],b=e.touches[1]; pinchD=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY); td=null; } },{passive:false});
+  canvas.addEventListener('touchmove',e=>{ if(e.touches.length===2){ e.preventDefault(); const a=e.touches[0],b=e.touches[1], d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+      if(pinchD>0){ const r=d/pinchD, vp=viewAt((a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);
+        if(vp==='top') topZoom=clamp(topZoom/r,0.22,7); else if(vp==='brain'){ brainZoom=clamp(brainZoom/r,0.4,4.5); sizeBrainCam(); } } pinchD=d; }
+    else if(td&&e.touches.length===1){ e.preventDefault(); const t=e.touches[0], dx=t.clientX-td.mx, dy=t.clientY-td.my; td.mx=t.clientX; td.my=t.clientY; td.moved+=Math.abs(dx)+Math.abs(dy);
+      if(td.vp==='top'){ topCenter=topCenter||(ships[focus]?ships[focus].pos.clone():new T.Vector3()); const wpp=(topCam.right-topCam.left)/VIEW.top.w; topCenter.x-=dx*wpp; topCenter.z-=dy*wpp; }
+      else { const wpp=(brainCam.right-brainCam.left)/VIEW.brain.w; brainCenter.x-=dx*wpp; brainCenter.y+=dy*wpp; sizeBrainCam(); } } },{passive:false});
+  canvas.addEventListener('touchend',e=>{ if(td){ if(td.moved<9 && td.vp==='top') topClick(td.x0,td.y0); td=null; } if(e.touches.length<2) pinchD=0; },{passive:false});
+})();
 function topClick(mx,my){ const w=topWorldAt(mx,my), wpp=(topCam.right-topCam.left)/VIEW.top.w, thr=16*wpp; let best=null,bd=1e9,kind=null;
   for(const p of planets){ const d=Math.hypot(w.x-p.pos.x,w.z-p.pos.z); if(d<p.radius*(p.mesh.scale.x||1)+thr && d<bd){ bd=d; best=p; kind='planet'; } }
   for(const s of ships){ if(!s.alive) continue; const d=Math.hypot(w.x-s.pos.x,w.z-s.pos.z); if(d<thr+6 && d<bd){ bd=d; best=s; kind='ship'; } }
