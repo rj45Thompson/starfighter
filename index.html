@@ -55,19 +55,25 @@
     background:var(--ink); font:600 14px/1 ui-monospace,monospace; color:#86a0bd; transition:opacity .5s; }
   /* ---- Android / touch ---- */
   canvas{ touch-action:none; }
-  #touchbar{ position:fixed; z-index:9; right:9px; bottom:60px; display:none; flex-direction:column; gap:7px; pointer-events:auto; }
-  #touchbar button{ font:800 11px/1 ui-monospace,monospace; color:#cfe6ff; background:#0c1826ee; border:1px solid #3a6a8a;
-    border-radius:11px; padding:11px 10px; min-width:52px; -webkit-tap-highlight-color:transparent; }
+  #touchbar{ position:fixed; z-index:9; right:8px; top:8px; display:none; flex-direction:column; gap:6px; pointer-events:auto; }
+  #touchbar button{ font:800 10px/1 ui-monospace,monospace; color:#cfe6ff; background:#0c1826ee; border:1px solid #3a6a8a; border-radius:10px; padding:8px 9px; min-width:48px; -webkit-tap-highlight-color:transparent; }
   #touchbar button:active{ background:#16324a; }
   body.touch #touchbar{ display:flex; }
+  /* on-screen FLIGHT controls: steering stick (bottom-left) + THR/FIRE (bottom-right) */
+  #stick{ position:fixed; z-index:9; left:16px; bottom:80px; width:110px; height:110px; border-radius:50%; display:none; background:#0c182688; border:1px solid #3a6a8a; touch-action:none; pointer-events:auto; }
+  #knob{ position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; background:#2a5a7ecc; border:1px solid #6fb4d8; }
+  #btnThr,#btnFire{ position:fixed; z-index:9; right:16px; display:none; align-items:center; justify-content:center; width:66px; height:66px; border-radius:50%; font:800 12px/1 ui-monospace,monospace; color:#eaf6ff; border:1px solid #3a6a8a; -webkit-tap-highlight-color:transparent; pointer-events:auto; touch-action:none; }
+  #btnThr{ bottom:156px; background:#12324acc; } #btnFire{ bottom:80px; background:#5a1e2ccc; border-color:#ff6a6e; }
+  #btnThr:active,#btnFire:active{ filter:brightness(1.5); }
+  body.touch #stick, body.touch #btnThr, body.touch #btnFire{ display:block; }
   @media (max-width:760px){
     #pillars{ display:none; }
-    #roster{ top:8px; left:8px; flex-direction:row; flex-wrap:nowrap; gap:5px; overflow-x:auto; max-width:calc(100% - 16px); -webkit-overflow-scrolling:touch; }
+    #roster{ top:8px; left:8px; flex-direction:row; flex-wrap:nowrap; gap:5px; overflow-x:auto; max-width:calc(100% - 66px); -webkit-overflow-scrolling:touch; }
     .rs{ width:auto; flex:0 0 auto; padding:5px 8px; }
-    #ticker{ left:8px; width:calc(100% - 16px); max-width:none; bottom:62px; max-height:30vh; font-size:12px; }
-    #ticker.big{ width:calc(100% - 16px); max-width:none; max-height:56vh; }
+    #ticker{ left:8px; width:calc(100% - 16px); max-width:none; top:48px; bottom:auto; max-height:22vh; font-size:12px; }
+    #ticker.big{ width:calc(100% - 16px); max-width:none; max-height:52vh; }
     .vlabel{ font-size:9px; } .vlabel span{ display:none; }
-    #chat{ left:8px !important; width:calc(100% - 16px) !important; height:42px; font-size:16px; line-height:42px; bottom:10px; }
+    #chat{ left:8px !important; width:calc(100% - 16px) !important; height:42px; font-size:16px; line-height:42px; bottom:12px; }
     #market{ font-size:11px; max-width:94vw; left:50% !important; }
   }
 </style>
@@ -88,6 +94,9 @@
   <button id="tbMkt"   title="market">MKT</button>
   <button id="tbLog"   title="expand log">LOG</button>
 </div>
+<div id="stick"><div id="knob"></div></div>
+<button id="btnThr">THR</button>
+<button id="btnFire">FIRE</button>
 <div id="boot">loading squadron…</div>
 
 <script src="three.min.js"></script>
@@ -854,7 +863,7 @@ function step(dt){
   econTick(dt);
   for(const s of ships){
     if(s.warping){ advanceWarp(s,dt); continue; }
-    if(s.alive){ think(s,dt); flyStep(s,dt); }
+    if(s.alive){ if(s===ships[0] && MAN.active){ manualControl(s,dt); } else { think(s,dt); } flyStep(s,dt); }
     else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null;
       const sys=systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()}; s.pos.copy(sys.center).add(new T.Vector3(rand(-1,1),rand(-0.5,0.5),rand(-1,1)).setLength(rand(30,CFG.SYSTEM_R*0.6)));
       s.vel.set(0,0,0); s.quat.setFromEuler(new T.Euler(rand(-0.4,0.4),rand(0,TAU),0)); say(s,'Respawned — back in.'); } } }
@@ -1068,6 +1077,7 @@ function checkRankUp(s){ const i=rankIdx(s.score||0); if(s.rankShown==null){ s.r
 function equipCost(s,k){ return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip&&s.equip[k])||0)); }
 function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="color:#8fd0ff">&gt;</b> '+t.replace(/</g,'&lt;'),'');
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
+  if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
   if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · lang · tom · steer · rays · sense · discover · signals   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
@@ -1550,13 +1560,44 @@ for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=320; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull
 for(let i=0;i<CFG.AST_KEEP;i++) spawnAtShell();
 buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTabs(); economyIsOrganic();
-term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> You fly <b>YOU</b> (the focused ship). Type <b>help</b>. Everyone else is AI — order them in plain English.","sys");
+term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English.","sys");
 document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
 resize(); addEventListener('resize',resize);
+// ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
+//      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, active:false };
+function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name; } }
+function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
+  s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
+  s.fire-=dt;
+  if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
+    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0)));
+    const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null };
+    const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
+    if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),fwd,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),fwd,s.id,spec); }
+    else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec); }
+  s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false }; }
+const keysDown=new Set();
+function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
+  MAN.yaw=(keysDown.has('KeyD')||keysDown.has('ArrowRight')?1:0)-(keysDown.has('KeyA')||keysDown.has('ArrowLeft')?1:0);
+  MAN.pitch=(keysDown.has('ArrowDown')||keysDown.has('KeyS')?1:0)-(keysDown.has('ArrowUp')?1:0);
+  MAN.fire=keysDown.has('Space');
+  if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire) manOn(); }
 addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
-  if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[focus].name; }
-  else if(e.code==='KeyM'){ marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); }
-  else if(e.code==='Backquote'){ document.getElementById('ticker').classList.toggle('big'); } });
+  if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[focus].name; return; }
+  if(e.code==='KeyM'){ marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); return; }
+  if(e.code==='Backquote'){ document.getElementById('ticker').classList.toggle('big'); return; }
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
+addEventListener('keyup',e=>{ if(keysDown.delete(e.code)) applyKeys(); });
+// on-screen touch flight controls (multi-touch: steer + thrust + fire at once)
+(function(){ const stick=document.getElementById('stick'), knob=document.getElementById('knob'), thb=document.getElementById('btnThr'), fb=document.getElementById('btnFire'); if(!stick) return; const R=46; let sid=null;
+  const set=t=>{ const r=stick.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; let dx=t.clientX-cx, dy=t.clientY-cy; const d=Math.hypot(dx,dy)||1; if(d>R){ dx*=R/d; dy*=R/d; } knob.style.transform=`translate(${dx}px,${dy}px)`; MAN.yaw=clamp(dx/R,-1,1); MAN.pitch=clamp(dy/R,-1,1); manOn(); };
+  stick.addEventListener('touchstart',e=>{ e.preventDefault(); sid=e.changedTouches[0].identifier; set(e.changedTouches[0]); },{passive:false});
+  stick.addEventListener('touchmove',e=>{ e.preventDefault(); for(const t of e.changedTouches) if(t.identifier===sid) set(t); },{passive:false});
+  const send=e=>{ for(const t of e.changedTouches) if(t.identifier===sid){ sid=null; MAN.yaw=0; MAN.pitch=0; knob.style.transform='translate(0,0)'; } };
+  stick.addEventListener('touchend',send); stick.addEventListener('touchcancel',send);
+  const hold=(el,on)=>{ if(!el) return; el.addEventListener('touchstart',e=>{ e.preventDefault(); on(true); manOn(); },{passive:false}); const o=e=>{ e.preventDefault(); on(false); }; el.addEventListener('touchend',o); el.addEventListener('touchcancel',o); };
+  hold(thb,v=>MAN.thr=v?1:0); hold(fb,v=>MAN.fire=v); })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
