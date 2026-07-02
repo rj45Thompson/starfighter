@@ -1085,7 +1085,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
-  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · lang · tom · steer · rays · sense · discover · signals   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
+  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1197,6 +1197,20 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!need(s&&s.alive,'no pilot in focus — click one in the roster, or: ask <pilot> <question>')) return;
     if(!need(q.trim().length,`ask what? e.g. <b>ask ${s.name} what are you doing</b>`)) return;
     talkToShip(s,q); return; }
+  if(c==='story'){ const txt=a.slice(1).join(' ').trim(); crushStory(txt||SAMPLE_STORY);
+    const facts=STORY.G.T.filter(t=>t.r==='in the story').length, present=[...new Set(STORY.ents.map(facOf).filter(Boolean))].map(factionName);
+    term(`<b>Story crushed.</b> ${STORY.ents.length} entities · ${facts} grounded facts · factions present: ${present.join(', ')||'none named'}. <span style="opacity:.55">rep from the text → ${Object.entries(STORY.rep).map(([k,v])=>factionName(k)+' '+(v>0?'+':'')+v.toFixed(1)).join(' · ')}.</span>`,'sys');
+    term(`<span style="opacity:.6">Now: <b>ask &lt;pilot&gt; about the story</b> · <b>discuss</b> — pilots cite the text (📖) and take sides by disposition (🧭).${txt?'':' <i>(used the built-in sample — paste your own: story &lt;text&gt;)</i>'}</span>`,'sys'); return; }
+  if(c==='discuss'){ if(!STORY.text){ term('No story loaded — run <b>story</b> (or <b>story &lt;your text&gt;</b>) first.','sys'); return; }
+    const topic=a.slice(1).join(' '), alive=ships.filter(x=>x.alive), q=('the story '+topic).toLowerCase();
+    const present=[...new Set(STORY.ents.map(facOf).filter(Boolean))], order=present.filter(f=>f!=='traders').concat(present.includes('traders')?['traders']:[]);   // poles first, neutral last
+    if(!order.length){ term('The story names no factions to take sides.','sys'); return; }
+    term(`<b>Discussion${topic?': '+topic.replace(/</g,'&lt;'):' of the story'}</b> <span style="opacity:.55">— each faction cites the SAME crushed text (📖), then takes its side by disposition memory (🧭). Same story, opposite reads.</span>`,'sys');
+    order.forEach(fk=>{ const rep=alive.find(x=>shipFaction(x)===fk), speaker=rep?rep.name:(factionName(fk)+' (no pilot in range)'), facts=factsFor(fk,q);
+      if(!facts.length) return;
+      sfEmit(speaker, '📖 GIVEN · story (crushed)', facts.map(t=>`${t.s} — ${t.o}`), facts.map(t=>`"${t.o}"`).join(' · '), rep||null);
+      const st=stanceFor(fk, speaker); if(st.length) sfEmit(speaker, '🧭 stance · memory', st.map(x=>`${x.s} ${x.r} ${x.o}.`), 'GIVEN prior + story-nudged memory', null); });
+    return; }
   onChat(t);   // not a player command -> treat as a plain-English order to the AI squadron
 }
 
@@ -1350,7 +1364,8 @@ function tIntent(text){ const t=' '+text.toLowerCase().replace(/[^a-z0-9 ]/g,' '
   if(has('standing','reputation','faction','factions','coalition','territory','systems','system')) add('faction');
   if(has('planet','planets','port','dock','where','station','market','price','prices','sell','buy','trade','trading','nearest','profit','commodity','goods')) add('economy');
   if(has('who','yourself','identity','class','kind','name')) add('identity','status');
-  if(has('story','backstory','history','origin','lore','background','bio','past','who','yourself','fight')) add('lore');
+  if(has('story','tale','happened')) add('story');   // the CRUSHED story (facts + disposition), distinct from a ship's own backstory
+  if(has('backstory','history','origin','lore','background','bio','past','who','yourself','fight')) add('lore');
   return P; }
 
 function tCrush(c,G){ return [...(G.bySubj[c]||[]), ...(G.byObj[c]||[])]; }
@@ -1414,6 +1429,49 @@ function tVerbalize(chain){ if(!chain.length) return null; let s=chain[0].s; for
 function renderChain(chain){ if(!chain||!chain.length) return null; let s=String(chain[0].s); for(const st of chain) s+=` ${st.r} ${st.o}`; return s+'.'; }
 function renderFacts(subj, facts){ if(!facts||!facts.length) return null; return `${subj}: `+facts.map(t=>`${t.r} ${t.o}`).join(', ')+'.'; }
 
+// ===================== STORY CRUSH + faction DISPOSITION MEMORY (game feature, LABELED) =====================
+// Crush a short story into GROUNDED triples: facts = the story's OWN sentences, keyed by whoever they mention — a ship
+// can only cite text that is actually there (else it abstains). Each ship carries a DISPOSITION: a GIVEN faction-stance
+// prior stored as MEMORY and nudged by what the crushed story shows (harm vs aid). Facts are grounded (📖 story); stance
+// is a labeled memory (🧭 stance · memory), never a fabricated fact. Same crush/abstain discipline as talkToShip.
+const STORY_FACTIONS={ coalition:{n:'the Coalition', alias:['coalition','warden','wardens']},
+  synod:{n:'the Iron Synod', alias:['synod','iron synod','hegemon']},
+  traders:{n:'the Free Traders', alias:['trader','traders','free trader','free traders','guild']} };
+const DISPOS_PRIOR={ coalition:{coalition:0.6,synod:-0.9,traders:0.2}, synod:{coalition:-0.9,synod:0.5,traders:-0.3}, traders:{coalition:0.2,synod:-0.3,traders:0.5} };
+const HARM_WORDS=['burn','burned','tithe','tithed','took','kill','killed','raid','raided','starve','starved','conquer','enforce','crush','siege'];
+const AID_WORDS=['found','save','saved','swore','medicine','hold','held','shield','rescue','protect','protected','heal','freed','free'];
+const SAMPLE_STORY="In the ruins of Halcyon Station, a Coalition Warden found a child hiding in a cargo bay. The Iron Synod had tithed the colony and burned what it could not take. A Free Trader convoy slipped past the blockade with medicine, asking no side for permission. The Warden swore to hold the lane open. The Synod commander called that mercy a weakness. The Traders cared only that someone paid.";
+let STORY={ text:'', G:{T:[],bySubj:{},byObj:{}}, ents:[], rep:{coalition:0,synod:0,traders:0}, _v:0 };
+function facOf(text){ const t=' '+String(text).toLowerCase()+' '; for(const k in STORY_FACTIONS) if(STORY_FACTIONS[k].alias.some(a=>t.indexOf(' '+a)>=0)) return k; return null; }
+function factionName(k){ return STORY_FACTIONS[k]?STORY_FACTIONS[k].n:k; }
+function shipFaction(s){ return s.team==='pirate'?'synod':'coalition'; }
+function dispForFaction(fk){ const base=DISPOS_PRIOR[fk]||{}, d={}; for(const f in DISPOS_PRIOR) d[f]=Math.max(-1,Math.min(1,(base[f]||0)+(STORY.rep[f]||0)*0.5)); return d; }   // GIVEN prior + story-nudged
+function shipDisp(s){ if(!s._disp || s._dispV!==STORY._v){ s._disp=dispForFaction(shipFaction(s)); s._dispV=STORY._v; } return s._disp; }   // per-ship MEMORY
+function sfBadgeColor(tag){ return /lore/.test(tag)?'#e8c37a' : /(game-state|sensor|story)/.test(tag)?'#8fd0ff' : /stance/.test(tag)?'#c9a0ff' : '#9aa0a6'; }
+function sfEmit(speaker, tag, sentences, prov, sayShip){ const line=sentences.join(' '); if(sayShip) say(sayShip, line);   // module-level emitter (used by discuss, incl. factions with no live pilot)
+  term(`<b>${speaker}</b> <span style="color:${sfBadgeColor(tag)};opacity:.9">[${tag}]</span>: ${line}`,'sys');
+  if(prov) term(`<span style="opacity:.45">&nbsp;&nbsp;↳ grounded in: ${String(prov).replace(/</g,'&lt;')}</span>`,''); }
+function stanceFor(fk, speaker){ const d=dispForFaction(fk), out=[]; const present=[...new Set(STORY.ents.map(facOf).filter(Boolean))].sort((a,b)=>Math.abs(d[b]||0)-Math.abs(d[a]||0));
+  for(const f of present){ if(f===fk) continue; const v=d[f]||0; const r=v<=-0.5?'distrusts':v<=-0.15?'is wary of':v>=0.4?'stands with':v>=0.15?'is friendly to':'is neutral toward'; out.push({s:speaker, r, o:factionName(f)}); } return out.slice(0,2); }
+function factsFor(fk, q){ const d=dispForFaction(fk), own=factionName(fk);
+  let ents=STORY.ents.filter(e=>q&&q.indexOf(e.toLowerCase())>=0);
+  if(!ents.length){ const rest=STORY.ents.slice().sort((a,b)=>{ const fa=facOf(a),fb=facOf(b); return Math.abs((fb?d[fb]:0)||0)-Math.abs((fa?d[fa]:0)||0); });
+    ents = STORY.ents.includes(own) ? [own, ...rest.filter(e=>e!==own)] : rest; }   // lead with the speaker's OWN deeds in the story, then the rest by how strongly it feels
+  const seen=new Set(), top=[]; for(const e of ents){ for(const t of (STORY.G.bySubj[e]||[])){ if(t.r==='in the story' && !seen.has(t.o)){ seen.add(t.o); top.push(t); if(top.length>=2) break; } } if(top.length>=2) break; } return top; }
+function crushStory(text){ const G={T:[],bySubj:{},byObj:{}}, add=(a,r,o,p)=>{ if(a==null||o==null) return; const t={s:a,r,o,pillar:p||'story'}; G.T.push(t); (G.bySubj[a]=G.bySubj[a]||[]).push(t); (G.byObj[o]=G.byObj[o]||[]).push(t); };
+  const sents=String(text).split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean), entSet=new Set(), rep={coalition:0,synod:0,traders:0};
+  sents.forEach(sent=>{ const low=' '+sent.toLowerCase()+' ';
+    const facs=Object.keys(STORY_FACTIONS).filter(k=>STORY_FACTIONS[k].alias.some(a=>low.indexOf(' '+a)>=0));
+    const names=(sent.match(/\b[A-Z][a-z]{2,}\b/g)||[]).filter(w=>!/^(In|The|A|An|And|But|Their|They|He|She|It|That|This|What|When|Coalition|Iron|Synod|Free|Warden|Wardens|Trader|Traders|Hegemon)$/.test(w));
+    const ents=[...new Set([...facs.map(k=>STORY_FACTIONS[k].n), ...names])];
+    ents.forEach(e=>{ entSet.add(e); add(e,'in the story', sent,'story'); });                                            // grounded fact = the sentence itself
+    for(let i=0;i<ents.length;i++) for(let j=i+1;j<ents.length;j++){ add(ents[i],'appears with',ents[j],'story'); add(ents[j],'appears with',ents[i],'story'); }
+    const harm=HARM_WORDS.some(w=>low.indexOf(' '+w)>=0), aid=AID_WORDS.some(w=>low.indexOf(' '+w)>=0);                  // story reputation nudge
+    facs.forEach(k=>{ if(harm) rep[k]-=0.4; if(aid) rep[k]+=0.4; }); });
+  for(const k in rep) rep[k]=Math.max(-1,Math.min(1,rep[k]));
+  STORY={ text:String(text), G, ents:[...entSet], rep, _v:(STORY._v||0)+1 }; return STORY; }
+function storyStance(s){ return stanceFor(shipFaction(s), s.name); }             // a ship's stance = its faction's, spoken in its name
+function storyFactsFor(s, q){ return factsFor(shipFaction(s), q); }
 function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try: scan, or click one in the roster','err'); return; }
   const {G,ctx}=shipKnowledge(s); lazyWorld(question, s, G);                              // CRUSH: lazy-load every mentioned noun's grounded knowledge
   const cs=tConcepts(question,G,ctx), intent=tIntent(question), q=(question||'').toLowerCase();
@@ -1427,6 +1485,14 @@ function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try:
   const score=ch=>{ const pil=ch.map(x=>x.pillar); let r=0; intent.forEach((p,i)=>{ const w=(intent.length-i)*10; for(const pp of pil) if(pp===p) r+=w; }); return r + base(ch); };
   const guard=ch=>({ say: renderChain(ch), raw: tVerbalize(ch) });   // generic structure — no hand-authored words
   const answers=[], provs=[], used=new Set(); let spoke=false;
+  // STORY — grounded facts crushed from the loaded story + this ship's DISPOSITION stance (labeled memory). Routed first
+  // when the user asks about the story, so a Coalition pilot and a Synod pilot cite the same text but take opposite sides.
+  if( STORY.text && (intent.includes('story') || /\b(story|tale)\b/.test(q)) ){
+    const top=storyFactsFor(s,q);
+    if(top.length){ emit(top.map(t=>`${t.s} — ${t.o}`), top.map(t=>`story text: "${t.o}"`).join(' · '), '📖 GIVEN · story (crushed)');
+      const st=storyStance(s); if(st.length) emit(st.map(x=>`${x.s} ${x.r} ${x.o}.`), 'faction disposition · GIVEN prior + story-nudged memory', '🧭 stance · memory');
+      return; }
+    emit([`I read that, but nothing in it touches what you asked.`], null, '🚫 abstained · no fabrication'); return; }
   // 0) LORE — its OWN badged line, 📖 GIVEN·lore. Hand-written flavor, NOT learned, NOT an AGI claim. (Fixes the old
   // mislabel where a backstory answer was bundled under the "game-state" tag.)
   if(intent.includes('lore') && s.backstory){ const fac = s.team==='pirate' ? 'the Iron Synod' : 'the Coalition Wardens';
