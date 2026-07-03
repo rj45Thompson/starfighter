@@ -1115,6 +1115,11 @@ function equipCost(s,k){ return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip
 // so every badge below is a real suite number, never hand-typed. If the fetch fails (file://, offline, not yet deployed)
 // the surface commands render exactly as before (prose fallback).
 let BENCHDATA=null; fetch('./bench_results.json').then(r=>r.ok?r.json():null).then(j=>{ BENCHDATA=j; }).catch(()=>{});
+// AC3 (Round 10 pivot): the REAL Tami battle data — species/techniques/type-matrix/afflictions baked from the design
+// sheets + shipping C# rules by bake_tami_data.js. The away-mission battles consume TAMIDATA; if the fetch fails the
+// AWAY module keeps its legacy stand-in units (graceful fallback).
+let TAMIDATA=null; fetch('./tami_data.json').then(r=>r.ok?r.json():null).then(j=>{ TAMIDATA=j;
+  if(j) console.log(`TAMIDATA loaded: ${j.species.length} species · ${j.techniques.length} techniques · ${j.types.length}x${j.types.length} matrix`); }).catch(()=>{});
 function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
   const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
 function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
