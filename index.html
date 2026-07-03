@@ -138,6 +138,12 @@ const CFG = {
   HUNT_FIRE:0.85,          // wider fire cone when dogfighting a maneuvering ship
   AGGR_MIN:0.25, AGGR_MAX:1.0,   // per-pilot aggression trait
   KILL_BOUNTY:3,           // score to the killer; victim's credits drop as gems
+  // ---- collision fixes (user report "no collision"): player friendly-fire lands + ship-body contact ----
+  FF_RETALIATE_SEC:8,      // a teammate the player shoots turns on the player for this many seconds
+  SHIP_RAM_MIN_SPEED:10,   // closing speed (u/s) above which a ship-vs-ship contact scrapes hull
+  RAM_DMG_SCALE:0.8,       // hull damage per u/s of closing speed on a scrape (both ships take it)
+  SHIP_BOUNCE:0.65,        // restitution of the ship-vs-ship velocity impulse (1 = perfectly elastic)
+  SHIP_COLLIDE_SKIP_MULT:4,// broadphase: skip pairs farther than this ×SHIP_R on any axis (cheap early reject)
   // ---- player commands (chat) ----
   CMD_DURATION:11,         // seconds an order from the player stays in force
   NSHIPS:8,
@@ -871,6 +877,33 @@ function flyStep(s,dt){
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
   s.mesh.userData.eng.material.opacity=0.3+0.5*s.ctrl.thr; s.mesh.userData.eng.scale.setScalar(1.3+1.5*s.ctrl.thr);
 }
+// ---- friendly-fire exception + consequence (see bullets-vs-ships loop below) ----
+function ffCanHit(owner,victim){
+  if(owner.role==='player') return true;                                                          // player bullets ignore the team filter
+  if(victim.role==='player'&&owner.huntTarget===victim&&T0<(owner.huntUntil||0)) return true;     // a retaliating teammate's return fire lands on the player
+  return false; }
+function ffRetaliate(victim,owner){ if(!owner||owner.role!=='player'||!victim||!victim.alive||victim===owner||victim.team!==owner.team) return;
+  if(victim.huntTarget!==owner){ ev(`You're shooting at YOUR OWN coalition — <b>${victim.name}</b> returns fire!`); say(victim,`You TRAITOR — returning fire!`); }
+  victim.huntTarget=owner; victim.huntUntil=T0+CFG.FF_RETALIATE_SEC; }
+// ---- ship-vs-ship body collision (user report "ships fly through each other") ----
+const _cn=new T.Vector3(),_cv=new T.Vector3();   // dedicated scratch (killShip clobbers _v2 mid-loop)
+function shipCollisions(){
+  const minD=2*CFG.SHIP_R, minDSq=minD*minD, skipD=CFG.SHIP_COLLIDE_SKIP_MULT*CFG.SHIP_R;
+  for(let i=0;i<ships.length;i++){ const a=ships[i]; if(!a.alive||a.warping||a.docked) continue;
+    for(let j=i+1;j<ships.length;j++){ const c=ships[j]; if(!c.alive||c.warping||c.docked) continue;
+      if(Math.abs(a.pos.x-c.pos.x)>skipD||Math.abs(a.pos.z-c.pos.z)>skipD||Math.abs(a.pos.y-c.pos.y)>skipD) continue;   // cheap broadphase early reject
+      const dSq=a.pos.distanceToSquared(c.pos); if(dSq>=minDSq) continue;
+      _cn.copy(c.pos).sub(a.pos); if(_cn.lengthSq()<1e-6) _cn.set(1,0,0); _cn.normalize();
+      const overlap=minD-Math.sqrt(dSq);
+      a.pos.addScaledVector(_cn,-overlap*0.5); c.pos.addScaledVector(_cn,overlap*0.5);            // position correction, half each
+      const closing=_cv.copy(a.vel).sub(c.vel).dot(_cn);                                          // approach speed along the separation axis
+      if(closing>0){ const imp=(1+CFG.SHIP_BOUNCE)*0.5*closing;                                   // elastic-ish impulse (equal masses)
+        a.vel.addScaledVector(_cn,-imp); c.vel.addScaledVector(_cn,imp);
+        if(closing>CFG.SHIP_RAM_MIN_SPEED){ const dmg=closing*CFG.RAM_DMG_SCALE;                  // hull scrape on a hard ram (iframe respected)
+          burst(_cv.copy(a.pos).addScaledVector(_cn,CFG.SHIP_R),0xffc07a,8,14,2.4);
+          if(a.iframe<=0){ a.hp-=dmg; a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }
+          if(c.iframe<=0){ c.hp-=dmg; c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
+      a.mesh.position.copy(a.pos); c.mesh.position.copy(c.pos); } } }
 function step(dt){
   econTick(dt);
   for(const s of ships){
@@ -883,13 +916,18 @@ function step(dt){
     b.prev.copy(b.pos); b.pos.addScaledVector(b.vel,dt); b.life-=dt; b.mesh.position.copy(b.pos);
     if(b.life<=0||b.pos.length()>CFG.ARENA_R+8){ scene.remove(b.mesh); bullets.splice(i,1); } }
   // bullets vs rival ships (combat)
+  // COLLISION FIX (user report "bullets pass through ships"): the blanket same-team skip made the PLAYER's
+  // shots ghost through traders/raiders/defenders — the player is team 'squad' and so are most NPCs.
+  // Rule now: player bullets hit ANY other ship (ffCanHit); the consequence is ffRetaliate — a betrayed
+  // teammate hunts the player + its return fire can hit the player. NPC-vs-NPC keeps the team filter.
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner];
-    for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||(owner&&owner.team===s.team)) continue;   // no friendly fire
+    for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping) continue;
+      if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire — except the player (and teammates returning fire at the player)
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=dmg; noteHarm(s,owner); if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
-        if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team)) continue;
-            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE
+        s.hp-=dmg; noteHarm(s,owner); ffRetaliate(s,owner); if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
+        if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
+            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; ffRetaliate(o2,owner); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE — very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
@@ -907,6 +945,7 @@ function step(dt){
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
   for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; for(const a of asteroids){ if(s.pos.distanceTo(a.pos)<CFG.SHIP_R+a.scale){
     hurt(s,CFG.AST_DMG); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); break; } } }
+  shipCollisions();   // pairwise ship-body contact: separate + bounce + hull scrape on hard rams
   for(let i=gems.length-1;i>=0;i--){ const g=gems[i]; g.age+=dt; let taken=false;
     for(const s of ships){ if(!s.alive||s.warping) continue; const d=s.pos.distanceTo(g.pos);
       if(d<CFG.GEM_MAGNET && (!g.artifact || s.role==='player')) g.vel.addScaledVector(_v.copy(s.pos).sub(g.pos).setLength(1),(CFG.GEM_MAGNET-d)*0.9*dt*8);
@@ -1071,7 +1110,7 @@ function dispatch(addressees,verb,targetShip,rally){
 }
 function replyChatter(list){ const lines=['Loud and clear.','Copy that.','Standing by.','Reading you.','Go ahead.','Systems nominal.','In the fight.','Roger.'];
   list.slice(0,3).forEach((s,i)=> say(s, lines[(i*3+((T0*10)|0))%lines.length])); }
-function onChat(raw){ parseChat((raw||'').trim()); }
+function onChat(raw){ raw=(raw||'').trim(); const h=loreHail(raw); if(h){ askPilot(h.s,h.q); return; } parseChat(raw); }   // question-hails → ask path; else squadron order
 
 // ================= PLAYER TERMINAL — a human commands their own ship (ships[0]) by text =================
 function findPlanet(n){ if(!n) return null; return planets.find(p=>p.name.toLowerCase().startsWith(n)) || (parseInt(n)>=0?planets[parseInt(n)]:null); }
@@ -1120,6 +1159,10 @@ let BENCHDATA=null; fetch('./bench_results.json').then(r=>r.ok?r.json():null).th
 // AWAY module keeps its legacy stand-in units (graceful fallback).
 let TAMIDATA=null; fetch('./tami_data.json').then(r=>r.ok?r.json():null).then(j=>{ TAMIDATA=j;
   if(j) console.log(`TAMIDATA loaded: ${j.species.length} species · ${j.techniques.length} techniques · ${j.types.length}x${j.types.length} matrix`); }).catch(()=>{});
+// LOREDATA: authored pilot/faction/world corpus (lore_bios.json — GIVEN flavor, labeled; NOT an AGI claim). Soft-fail
+// like TAMIDATA: if the fetch fails, `ask` falls back to the legacy grounded-graph answerer unchanged.
+let LOREDATA=null; fetch('./lore_bios.json').then(r=>r.ok?r.json():null).then(j=>{ LOREDATA=j;
+  if(j) console.log(`LOREDATA loaded: ${Object.keys(j.pilots||{}).length} pilots · ${Object.keys(j.factions||{}).length} factions · ${Object.keys(j.worlds||{}).length} worlds`); }).catch(()=>{});
 // AC4 (user directive: run the ACTUAL C#, no port): when the TamiRules sidecar is up (`dotnet run` in tami-cs/ — it
 // compiles the LITERAL shipping DamageModel.cs+TypeEffectiveness.cs via <Compile Link>), battle math calls the real C#
 // over localhost. When absent (e.g. the public GitHub Pages site), battles fall back to TAMIDATA — whose matrix and
@@ -1257,7 +1300,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
-  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue) · <b>watch convention</b> (LIVE animated naming game)   TAMI: <b>tami</b> (battle-core status) · <b>demo battle</b> (auto-played REAL-rules battle — just watch; any battle button takes control back)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles; <b>Retreat</b> button flees with no rewards) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
+  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (deep lore — follow-ups work; grounded or abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue) · <b>watch convention</b> (LIVE animated naming game)   TAMI: <b>tami</b> (battle-core status) · <b>demo battle</b> (auto-played REAL-rules battle — just watch; any battle button takes control back)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles; <b>Retreat</b> button flees with no rewards) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1459,7 +1502,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(o){ s=o; q=a.slice(2).join(' '); } }
     if(!need(s&&s.alive,'no pilot in focus — click one in the roster, or: ask <pilot> <question>')) return;
     if(!need(q.trim().length,`ask what? e.g. <b>ask ${s.name} what are you doing</b>`)) return;
-    talkToShip(s,q); return; }
+    askPilot(s,q); return; }
   if(c==='story'){ const txt=a.slice(1).join(' ').trim(); crushStory(txt||SAMPLE_STORY);
     const facts=STORY.G.T.filter(t=>t.r==='in the story').length, present=[...new Set(STORY.ents.map(facOf).filter(Boolean))].map(factionName);
     term(`<b>Story crushed.</b> ${STORY.ents.length} entities · ${facts} grounded facts · factions present: ${present.join(', ')||'none named'}. <span style="opacity:.55">rep from the text → ${Object.entries(STORY.rep).map(([k,v])=>factionName(k)+' '+(v>0?'+':'')+v.toFixed(1)).join(' · ')}.</span>`,'sys');
@@ -1805,6 +1848,192 @@ function talkToShip(s, question){ if(!s||!s.alive){ term('no such pilot — try:
   const listOf={ threat:ctx.enemies, ally:ctx.allies, resource:ctx.gm.concat(ctx.rk), economy:ctx.pl };
   if(intent[0]&&NEG[intent[0]]&&!(listOf[intent[0]]&&listOf[intent[0]].length)){ emit([NEG[intent[0]]], null, '🛰️ GIVEN · sensor check'); return; }
   emit([`I only speak to what I actually know — my status, what I see, and what I'm doing. I've got nothing grounded on that.`], null, '🚫 abstained · no fabrication'); }
+
+// =================================================================================================
+//  DEEP-LORE DIALOGUE ENGINE — retrieval-driven pilot speech ("ask <pilot> <q>" + plain-English hails).
+//  Searches the pilot's whole corpus for everything the question touches: tf-idf cosine over
+//  lore_bios.json (bio + own-faction + world sentences — GIVEN authored flavor, labeled) FUSED with the
+//  pilot's LIVE shipKnowledge graph, plus topic-tag, entity and conversation-state boosts. Follow-ups
+//  ("tell me more", "why?") re-query with the remembered topic+entities and EXCLUDE already-said
+//  sentences, so "more" always yields NEW material or an honest "that's all".
+//
+//  CHEAT AUDIT (mission step 7) — findings, kept current with the code below:
+//   (a) VERBATIM GUARD — loreVerbatimGuard() checks every emitted body sentence against idx.byText
+//       (a Set of the EXACT corpus + live-graph strings built in this file). A sentence not in the set
+//       is BLOCKED and logged '[LORE CHEAT-GUARD]', so fabricated prose is structurally impossible.
+//       The only authored non-corpus strings are labeled DISCOURSE, carrying zero fact-claims: the
+//       topic ack ("My origin?"), the honest fallback frame ("I can't speak to that."), and the
+//       dry-topic frame ("That's all of that story."). Topic OFFERS are derived from the pilot's own
+//       unsaid index, never invented.
+//   (b) Canned paths audited for fake specificity:
+//       - ACK / replyChatter radio lines ("Copy — engaging X", "Loud and clear.") — order acks and
+//         pleasantries, no knowledge claims → kept.
+//       - NEG sensor-negatives in talkToShip — emitted only after checking the real perception lists
+//         → grounded → kept.
+//       - the old one-line s.backstory reply (talkToShip lore branch) — real GIVEN lore, but it
+//         answered EVERY personal question with the SAME sentence (pretended depth it didn't have,
+//         and follow-ups returned nothing). Personal/lore questions now route HERE first; that branch
+//         remains only for the roster-click + story flows.
+//       - reasonChain/speakChain — read live brain state → grounded → kept.
+//       - the old lazyWorld market reply answered "price of <anything>" with the nearest planet's
+//         cheap good (pretending it understood the noun). The router now refuses the tactical path
+//         when the question contains out-of-corpus nouns → those land on the honest fallback.
+//   (c) The honest-fallback path claims no facts: "I can't speak to that." + topics that verifiably
+//       exist (unsaid) in this pilot's index. The dry path likewise.
+//  ROUTING: tactical patterns (hull/threat/range/cargo/market/…) go to the OLD grounded-graph
+//  answerer (talkToShip) FIRST — live answers stay live. Lore/personal questions come here. The
+//  crushed-STORY flow ("ask <pilot> about the story") stays on the old path.
+// =================================================================================================
+const LORE_CFG={ MIN_SCORE:0.10, TOPIC_BOOST:0.35, ENTITY_BOOST:0.55, CONV_BOOST:0.22, EXPAND_W:0.5,
+  MAX_SENT:3, OFFER_N:3, ORD_EPS:0.001 };            // all tunables named here — no magic numbers below
+function loreStem(w){ if(w.length>5&&w.endsWith('ing')) return w.slice(0,-3); if(w.length>4&&w.endsWith('ed')) return w.slice(0,-2);
+  if(w.length>4&&w.endsWith('es')) return w.slice(0,-2); if(w.length>3&&w.endsWith('s')&&!w.endsWith('ss')) return w.slice(0,-1); return w; }
+const LORE_STOP=new Set(('a an the is are am was were be been being do does did done you your yours yourself i me my mine we us our '+
+  'they them their he him his she her it its of in on at to for with and or but not no yes what who where why how when which whom that '+
+  'this these those there here have has had having can could will would shall should may might must get got gets tell told say said says '+
+  'about know knows knew more then else ever really just so as by from up down out off over under into onto very too also still even again '+
+  'once please ok okay hey hi hello um uh oh right now going go goes keep kept let lets whats whos wheres hows '+
+  'any some anything nearby near around close far away current currently moment sector out there').split(' '));
+const LORE_CONTR=[[/\bwhat'?s\b/g,'what is'],[/\bwhere'?s\b/g,'where is'],[/\bwho'?s\b/g,'who is'],[/\bwho'?re\b/g,'who are'],
+  [/\bhow'?s\b/g,'how is'],[/\byou'?re\b/g,'you are'],[/\bi'?m\b/g,'i am'],[/\bdon'?t\b/g,'do not'],[/\bcan'?t\b/g,'can not'],
+  [/\bwon'?t\b/g,'will not'],[/\bdidn'?t\b/g,'did not'],[/\bisn'?t\b/g,'is not'],[/\baren'?t\b/g,'are not'],[/\bwasn'?t\b/g,'was not'],
+  [/\bthat'?s\b/g,'that is'],[/\bit'?s\b/g,'it is'],[/\bwho're\b/g,'who are']];
+function loreNorm(q){ let t=' '+String(q||'').toLowerCase()+' '; for(const [re,r] of LORE_CONTR) t=t.replace(re,r);
+  return t.replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function loreToks(q){ return loreNorm(q).split(' ').filter(w=>w&&!LORE_STOP.has(w)).map(loreStem).filter(w=>w.length>1); }
+// SYNONYM/TOPIC table — the query-understanding layer ("origin"→born/raised/grew…). Named + extensible; keys match
+// lane B's hand-tagged topics{} in lore_bios.json so a topic word boosts the tagged sentences too.
+const LORE_SYN={
+  origin:['origin','origins','born','home','homeworld','come','came','raised','grew','grow','past','history','background','backstory','childhood','young','youth','start','started','beginning','joined'],
+  family:['family','mother','father','brother','sister','parent','parents','kin','son','daughter','sibling','siblings','wife','husband','uncle','aunt','cousin','mom','dad','grandmother','grandfather'],
+  war:['war','battle','battles','fight','fought','fighting','synod','kaine','combat','front','blockade','raid','raided','kill','killed','shot','burn','burned','loss','lost','scar','scars','wound','wounded','died','dead','tithe','tithed'],
+  ship:['ship','vessel','ride','fly','flew','flying','engine','engines','cockpit','dart','craft','quirk','wings','thruster','fighter'],
+  beliefs:['think','feel','feels','felt','opinion','believe','believes','belief','beliefs','hate','hates','love','loves','fear','fears','afraid','scared','superstition','superstitious','goal','goals','dream','dreams','hope','hopes','faith','trust','want','wants','wish','regret','secret','secrets','hide','truth'],
+  relationships:['relationship','relationships','friend','friends','rival','rivalry','wingman','wingmen','squad','squadron','roster','respect','crew','others','pilots','teammates'] };
+const LORE_SYN_STEM={}; for(const k in LORE_SYN) LORE_SYN_STEM[k]=new Set(LORE_SYN[k].map(loreStem));
+const LORE_TOPIC_PHRASE={origin:'my origin',family:'my family',war:'the war',ship:'my ship',beliefs:'what I believe',relationships:'the other pilots'};
+const LORE_ACK={origin:'My origin?',family:'My family?',war:'The war?',ship:'My ship?',beliefs:'What I believe?',relationships:'The others?'};   // discourse only — no fact content
+const LORE_IDX={}, LORE_CONV={}; let LORE_LAST=null, LORE_VOCAB=null;
+function loreDoc(id,text,src,ord,topics){ const toks=loreNorm(text).split(' ').filter(w=>w&&!LORE_STOP.has(w)).map(loreStem).filter(w=>w.length>1);
+  const tf=new Map(); toks.forEach(w=>tf.set(w,(tf.get(w)||0)+1));
+  return {id,text:String(text),tf,src,ord,topics:topics||[],norm:1}; }
+const LORE_ENT_STOP=new Set('I The A An My We It He She They You His Her Our Their When After Before On In At But And If No Not That There Every Once Never So Then What Some From For To One Two Three Now Even All Most Nobody Half Its Ask'.split(' '));
+function loreEntities(idx){ const set=new Set(), add=w=>{ const lw=String(w).toLowerCase(); if(lw.length>2) set.add(loreStem(lw)); };
+  PILOTS.forEach(add); ['Kaine','Vale','Mercer','Synod','Hegemon','Coalition','Warden','Wardens','Traders'].forEach(add);
+  if(LOREDATA&&LOREDATA.worlds) for(const w in LOREDATA.worlds) w.split(/\s+/).forEach(x=>{ if(!/^the$/i.test(x)) add(x); });
+  for(const d of idx.docs){ const caps=d.text.match(/\b[A-Z][a-z]{2,}\b/g)||[]; caps.forEach(w=>{ if(!LORE_ENT_STOP.has(w)) add(w); }); }
+  return set; }
+// per-pilot index, built lazily ONCE: bio + own-faction + world sentences (worlds are shared knowledge — the query
+// decides relevance). Live shipKnowledge lines are appended per query (they change every frame).
+function loreIndex(s){ if(!LOREDATA||!s||!s.name||!LOREDATA.pilots||!LOREDATA.pilots[s.name]) return null;
+  const key=s.name; if(LORE_IDX[key]) return LORE_IDX[key];
+  const P=LOREDATA.pilots[key], docs=[]; let ord=0;
+  const topicOf=i=>{ const out=[]; for(const t in (P.topics||{})) if((P.topics[t]||[]).includes(i)) out.push(t); return out; };
+  (P.bio||[]).forEach((sent,i)=>docs.push(loreDoc('bio:'+i,sent,'bio',ord++,topicOf(i))));
+  const facKeys=s.team==='pirate'?['synod','hegemon']:['coalition'];
+  facKeys.forEach(fk=>(((LOREDATA.factions||{})[fk])||[]).forEach((sent,i)=>docs.push(loreDoc('fac:'+fk+':'+i,sent,'faction:'+fk,1000+ord++,[]))));
+  for(const w in (LOREDATA.worlds||{})) (LOREDATA.worlds[w]||[]).forEach((sent,i)=>docs.push(loreDoc('world:'+w+':'+i,sent,'world:'+w,2000+ord++,[])));
+  const df=new Map(); docs.forEach(d=>{ for(const t of d.tf.keys()) df.set(t,(df.get(t)||0)+1); });
+  const N=docs.length, idf=t=>Math.log(1+N/((df.get(t)||0)+0.5));
+  docs.forEach(d=>{ let n=0; for(const [t,c] of d.tf){ const w=c*idf(t); n+=w*w; } d.norm=Math.sqrt(n)||1; });
+  const idx={docs,N,idf,byText:new Set(docs.map(d=>d.text))}; idx.ents=loreEntities(idx);
+  LORE_IDX[key]=idx; return idx; }
+function loreLiveDocs(s,idx){ let T=[]; try{ T=shipKnowledge(s).G.T; }catch(e){}
+  return T.map((t,i)=>{ const d=loreDoc('live:'+i, `${t.s} ${t.r} ${t.o}.`, 'live', 3000+i, []);
+    let n=0; for(const [tm,c] of d.tf){ const w=c*idx.idf(tm); n+=w*w; } d.norm=Math.sqrt(n)||1; return d; }); }
+function loreTopics(qtoks){ const out=[]; for(const tp in LORE_SYN_STEM) if(qtoks.some(w=>LORE_SYN_STEM[tp].has(w))) out.push(tp); return out; }
+function loreQVec(qtoks,topics,idx){ const v=new Map(); qtoks.forEach(w=>v.set(w,(v.get(w)||0)+1));
+  for(const tp of topics) for(const w of LORE_SYN_STEM[tp]) if(!v.has(w)) v.set(w,LORE_CFG.EXPAND_W);
+  let n=0; const wv=new Map(); for(const [t,c] of v){ const wt=c*idx.idf(t); wv.set(t,wt); n+=wt*wt; }
+  return {wv,norm:Math.sqrt(n)||1}; }
+function loreCos(q,d,idx){ let dot=0; for(const [t,w] of q.wv){ const c=d.tf.get(t); if(c) dot+=w*(c*idx.idf(t)); } return dot/(q.norm*d.norm); }
+function loreTokDocMatch(tok,d,ents){ if(d.tf.has(tok)) return true;
+  if(ents&&ents.includes(tok)) return false;   // an ENTITY token only counts literally — no synonym-sibling credit
+  for(const tp in LORE_SYN_STEM){ const S=LORE_SYN_STEM[tp]; if(!S.has(tok)) continue;
+    if(d.topics.includes(tp)) return true; for(const w of S) if(d.tf.has(w)) return true; }
+  return false; }
+const LORE_FU=new Set('more another other rest else continue anything something'.split(' '));
+function loreContent(q){ return loreToks(q).filter(w=>!LORE_FU.has(w)); }
+function loreIsFollowUp(q){ const n=loreNorm(q); return n.length>0 && loreContent(q).length===0; }
+function loreState(s){ return LORE_CONV[s.name]||(LORE_CONV[s.name]={lastTopic:null,lastEnts:[],lastQuery:'',said:new Set()}); }
+// ROUTER: personal/lore → this engine; tactical live-state → talkToShip; a tactical keyword does NOT win when the
+// question contains out-of-corpus nouns ("price of cheese on mars") — those must reach the honest fallback.
+const LORE_TACT_RE=/\b(hull|health|hp|shield|armou?r|damage|damaged|credits?|cargo|hold|fuel|weapons?|armed|guns?|loadout|firepower|missiles?|lasers?|cannon|doing|plan|plans|intent|intend|target|mode|orders?|mission|objective|sensors?|scan|range|nearest|hostiles?|enemies|threats?|gems?|ore|rocks?|asteroids?|mining|market|prices?|contracts?|jobs?|bounty|rank|promotion|escalation|front|contested|stronghold|dock|docked|port)\b/;
+const LORE_PERS_RE=/\b(origin|origins|born|homeworld|childhood|grew|raised|past|history|background|backstory|bio|lore|family|mother|father|brother|sister|parents?|kin|feel|felt|think|believe|beliefs?|opinion|hate|love|fear|afraid|scared|superstition|secrets?|dream|hope|goal|regret|scars?|rivals?|rivalry|friends?|respect|trust|joined|kaine|vale|mercer|halcyon|meridian|yards|sundering|cydon|vantor|ferrus|ember|vigil|synod|hegemon|coalition|wardens?|traders?|blockade|tithe|colony|colonies|yourself)\b/;
+function loreVocab(){ if(LORE_VOCAB||!LOREDATA) return LORE_VOCAB; const v=new Set(), eat=s=>loreToks(s).forEach(w=>v.add(w));
+  for(const p in (LOREDATA.pilots||{})) (LOREDATA.pilots[p].bio||[]).forEach(eat);
+  for(const f in (LOREDATA.factions||{})) LOREDATA.factions[f].forEach(eat);
+  for(const w in (LOREDATA.worlds||{})){ LOREDATA.worlds[w].forEach(eat); loreToks(w).forEach(x=>v.add(x)); }
+  PILOTS.forEach(p=>v.add(loreStem(p.toLowerCase()))); LORE_VOCAB=v; return v; }
+function loreHasUnknown(qn){ const v=loreVocab(); if(!v) return false;
+  return loreToks(qn).some(w=> !v.has(w) && !LORE_TACT_RE.test(w) && ![...Object.values(LORE_SYN_STEM)].some(S=>S.has(w)) ); }
+function loreRoute(qn){
+  if(STORY.text && /\b(story|tale)\b/.test(qn)) return 'tactical';    // crushed-story flow stays on the old path
+  if(LORE_PERS_RE.test(qn)) return 'lore';
+  if(LORE_TACT_RE.test(qn) && !loreHasUnknown(qn)) return 'tactical';
+  return 'lore'; }
+function loreVerbatimGuard(sents,byText){ for(const x of sents){ if(!byText.has(x)){ console.error('[LORE CHEAT-GUARD] blocked non-corpus sentence:',x); return false; } } return true; }
+function loreAnswer(s,question){
+  const idx=loreIndex(s); if(!idx) return talkToShip(s,question);
+  const st=loreState(s), qn=loreNorm(question), fu=loreIsFollowUp(question)&&!!st.lastQuery;
+  term(`<b style="color:#8fd0ff">&gt; @${s.name}:</b> ${(question||'').replace(/</g,'&lt;')}`,'');
+  const emit=(sents,prov,tag)=>{ const line=sents.join(' '); say(s,line);
+    term(`<b>${s.name}</b> <span style="color:${/lore/.test(tag)?'#e8c37a':/game-state|sensor/.test(tag)?'#8fd0ff':'#9aa0a6'};opacity:.9">[${tag}]</span>: ${line}`,'sys');
+    if(prov) term(`<span style="opacity:.45">&nbsp;&nbsp;↳ grounded in: ${String(prov).replace(/</g,'&lt;')}</span>`,''); };
+  // CONVERSATION STATE: a follow-up re-queries with the remembered question+topic+entities (the follow-up fix)
+  const qEff = fu ? [st.lastQuery, st.lastTopic||'', (st.lastEnts||[]).join(' '), qn].filter(Boolean).join(' ') : qn;
+  const qtoks=loreToks(qEff), content=loreContent(qEff), topics=loreTopics(qtoks);
+  const selfStem=loreStem(String(s.name||'').toLowerCase());   // the addressee's own name is vocative, not a content entity
+  const ents=[...new Set(loreToks(qn).concat(fu?(st.lastEnts||[]):[]).filter(w=>idx.ents.has(w)&&w!==selfStem))];
+  const docs=idx.docs.concat(loreLiveDocs(s,idx));
+  const byText=new Set(idx.byText); docs.forEach(d=>byText.add(d.text));
+  const qv=loreQVec(qtoks,topics,idx), cand=[];
+  for(const d of docs){ if(st.said.has(d.id)) continue;
+    const entHit=ents.length&&ents.some(e=>d.tf.has(e));   // literally names an asked entity -> it IS on-topic
+    if(content.length&&!entHit){ const cov=content.filter(t=>loreTokDocMatch(t,d,ents)).length,
+      covNeed=content.length<=2?1:Math.ceil(content.length/2); if(cov<covNeed) continue; }   // must actually touch the question
+    let sc=loreCos(qv,d,idx);
+    if(topics.length&&d.topics.some(t=>topics.includes(t))) sc+=LORE_CFG.TOPIC_BOOST;
+    if(entHit) sc+=LORE_CFG.ENTITY_BOOST;
+    if(fu&&((st.lastTopic&&d.topics.includes(st.lastTopic))||(st.lastEnts||[]).some(e=>d.tf.has(e)))) sc+=LORE_CFG.CONV_BOOST;
+    sc+=LORE_CFG.ORD_EPS*(1-Math.min(1,d.ord/4000));   // stable tie-break toward earlier bio sentences
+    if(sc>=LORE_CFG.MIN_SCORE) cand.push({d,sc}); }
+  cand.sort((a,b)=>b.sc-a.sc);
+  const picks=cand.slice(0,LORE_CFG.MAX_SENT).sort((a,b)=>a.d.ord-b.d.ord);   // compose in bio-order
+  if(picks.length){
+    const sents=picks.map(p=>p.d.text);
+    if(!loreVerbatimGuard(sents,byText)){ emit([`I can't speak to that.`],'cheat-guard tripped — refusing a non-corpus sentence','🚫 abstained · no fabrication'); return; }
+    const cnt={}; picks.forEach(p=>p.d.topics.forEach(t=>{ if(topics.includes(t)) cnt[t]=(cnt[t]||0)+1; }));
+    const domTopic=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||topics[0]||null;
+    const body=((!fu&&domTopic&&LORE_ACK[domTopic])?[LORE_ACK[domTopic]]:[]).concat(sents);
+    const liveN=picks.filter(p=>p.d.src==='live').length;
+    emit(body, picks.map(p=>p.d.id).join(' · '), liveN===picks.length?'🛰️ GIVEN · game-state (live graph)':'📖 GIVEN · lore (retrieved — follow-ups work)');
+    picks.forEach(p=>st.said.add(p.d.id));
+    st.lastTopic=domTopic||st.lastTopic; if(ents.length) st.lastEnts=ents; if(!fu) st.lastQuery=qn;
+    return; }
+  // nothing scored — dry topic (on a follow-up) or honest fallback; offers come from the pilot's own UNSAID index
+  const unsaid=idx.docs.filter(d=>!st.said.has(d.id)), tc={};
+  unsaid.forEach(d=>d.topics.forEach(t=>tc[t]=(tc[t]||0)+1));
+  const offers=Object.keys(tc).sort((a,b)=>tc[b]-tc[a]).slice(0,LORE_CFG.OFFER_N).map(t=>LORE_TOPIC_PHRASE[t]||t);
+  const offer=offers.length?` Ask me about ${offers.slice(0,2).join(', or about ')}.`:` You have heard all my stories.`;
+  if(fu) emit([`That's all of that story.${offer}`],'said-set exhausted for the remembered thread — offering unsaid topics','🚫 honest · out of that thread');
+  else emit([`I can't speak to that.${offer}`],'no indexed sentence scored ≥ '+LORE_CFG.MIN_SCORE+' — abstain, never invent','🚫 abstained · no fabrication');
+}
+function askPilot(s,question){ const q=String(question||'');
+  if(loreIsFollowUp(q)&&LORE_LAST&&LORE_LAST.alive&&LOREDATA) s=LORE_LAST;    // "tell me more" continues the last conversation
+  if(!s||!s.alive){ term('no such pilot — try: scan, or click one in the roster','err'); return; }
+  LORE_LAST=s;
+  if(!LOREDATA||!loreIndex(s)||loreRoute(loreNorm(q))==='tactical') return talkToShip(s,q);   // tactical → OLD grounded graph
+  return loreAnswer(s,q); }
+// plain-English hail: a pilot named + a question mark or wh-word → the ask path (checked BEFORE order parsing so
+// "ORION why did you fight Kaine?" is a question, not a hunt order). Bare follow-ups continue the last conversation.
+const LORE_WH_RE=/\b(what|whats|who|whos|where|wheres|why|how|when|which|tell me|do you|did you|are you|were you|have you|was it|is it)\b/i;
+function loreHail(raw){ if(!raw) return null;
+  const isQ=/\?/.test(raw)||LORE_WH_RE.test(raw); if(!isQ) return null;
+  const toks=raw.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(Boolean);
+  for(const o of ships){ if(!o.alive||o.role==='player') continue; if(toks.includes(o.name.toLowerCase())) return {s:o,q:raw}; }
+  if(LORE_LAST&&LORE_LAST.alive&&loreIsFollowUp(raw)) return {s:LORE_LAST,q:raw};
+  return null; }
 function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thoughts'||activeTab==='chronicle') renderLog();   // A0: keep the live chain / chronicle notes fresh
   if(!b) return; const mc=MODE_COL[b.mode]||'#7fb0d0';
   const fwd=FWD.clone().applyQuaternion(s.quat), right=RGT.clone().applyQuaternion(s.quat); let bi=0, selPos=null;

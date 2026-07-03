@@ -1,0 +1,956 @@
+{
+  "pilots": {
+    "VEGA": {
+      "bio": [
+        "I was the last cadet of the Ember Vigil, the Warden academy the Synod burned.",
+        "I flew a training dart out of a burning hangar and never stopped turning toward the fight.",
+        "My brother Tam was two classes behind me at the Vigil.",
+        "Tam never made it to the hangar deck the night the Vigil burned.",
+        "My mother, Ilsa Vega, keeps a lamp burning for Tam on Cydon.",
+        "I grew up on Cydon, in the terrace farms outside the ring-race circuits.",
+        "As a girl I watched Vela race the Cydon rings and swore I would fly faster.",
+        "Warden Vale signed my oath in the ash of the Vigil's chapel.",
+        "My first battle was over Halcyon Station, three weeks after the Vigil fell.",
+        "I carry a burn scar down my left arm from the Vigil's hangar deck.",
+        "My ship is Cinder; her cabin smells faintly of smoke no mechanic can ever find.",
+        "Ara says Cinder's frame is sound; I say she remembers the fire with me.",
+        "Crux taught navigation at the Vigil before the fall; she calls me her last student.",
+        "Vela and I race the beacon line whenever the lane is quiet, and she still wins.",
+        "One day I will beat Vela around the beacon line, and she knows it.",
+        "I believe the Wardens exist so nobody else's little brother dies in a hangar.",
+        "The Iron Synod calls its burning order; I have stood in that order's ashes.",
+        "The Free Traders fly for coin, but Mercer's convoy carried medicine when nobody paid; I count that.",
+        "My goal is simple: the lane to Halcyon stays open while I am breathing.",
+        "My fear is fire in a closed hangar; I sleep with the canopy cracked.",
+        "My secret: I never actually graduated; the Vigil's records burned before my final flight exam.",
+        "Warlord Kaine gave the order that burned the Vigil; I keep his name where my anger lives.",
+        "I remember Halcyon Station before the ruin: bread stalls in the dock ring, kids chalking stars on the deck.",
+        "My superstition: I chalk a small star on Cinder's hull before every sortie, one for Tam."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          5,
+          6,
+          7,
+          12,
+          20,
+          22
+        ],
+        "family": [
+          2,
+          3,
+          4,
+          15,
+          23
+        ],
+        "war": [
+          0,
+          1,
+          3,
+          8,
+          9,
+          16,
+          18,
+          21
+        ],
+        "ship": [
+          10,
+          11,
+          23
+        ],
+        "beliefs": [
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          23
+        ],
+        "relationships": [
+          6,
+          7,
+          11,
+          12,
+          13,
+          14
+        ]
+      }
+    },
+    "ORION": {
+      "bio": [
+        "I was born on a Synod carrier, the Sovereign Lash, in the conscript creches.",
+        "My father, Kel Orion, was gunnery chief on that same carrier for thirty years.",
+        "My sister Rhea still serves the Synod, on a cruiser whose name I will not say.",
+        "As a boy I recited the Doctrine of One Will before every meal.",
+        "The Synod taught me that free flight is chaos; I flew escort on tithe runs believing it.",
+        "The day my carrier fired on its own colony, I broke formation and defected.",
+        "The colony my carrier fired on had already paid its tithe; that was the lie that broke me.",
+        "I surrendered my fighter to Warden Vale over the Halcyon lane.",
+        "Vale spared me when the rules of the day said shoot; I fly that debt every sortie.",
+        "My first battle as a Warden was against my own old squadron; I still know their turn habits.",
+        "Draco did not trust me for a year; he watched my guns more than the enemy's.",
+        "Draco and I do not drink together, but we fly wing to wing now; that is enough.",
+        "My ship is Penance; a plate of Synod hull is riveted over the pilot's seat.",
+        "The plate on Penance came from my old carrier; Ara set the rivets herself and asked no questions.",
+        "I carry a scar across my jaw from my own wingman's cannon, the day I defected.",
+        "My loss is my family's name; my father declared me dead to the Synod rolls.",
+        "The Iron Synod is not evil men; it is obedient men, which is worse.",
+        "What spacers call the Hegemon is the Synod's fleet doctrine: drones first, cruisers after, then a Warlord.",
+        "Warlord Kaine executed his own captain for retreating; I stood on that deck at parade rest.",
+        "The Free Traders puzzle me; Mercer sells to both sides, yet warned Vale of the coming fleet.",
+        "My goal is to bring Rhea across the line before the Synod spends her.",
+        "My fear is meeting Rhea's cruiser in the lane with my finger on the trigger.",
+        "My secret: I keep a Synod prayer coin in my boot, and I no longer know why.",
+        "Mira stitched my jaw the week I crossed over and never once asked what I had done.",
+        "I believe an order is not a reason; I learned that too late for one colony."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          3,
+          4,
+          5,
+          7,
+          8
+        ],
+        "family": [
+          1,
+          2,
+          15,
+          20,
+          21
+        ],
+        "war": [
+          4,
+          5,
+          6,
+          7,
+          9,
+          14,
+          17,
+          18,
+          24
+        ],
+        "ship": [
+          12,
+          13
+        ],
+        "beliefs": [
+          6,
+          8,
+          16,
+          17,
+          19,
+          20,
+          21,
+          22,
+          24
+        ],
+        "relationships": [
+          10,
+          11,
+          13,
+          23
+        ]
+      }
+    },
+    "LYRA": {
+      "bio": [
+        "I grew up on Relay Six, an outer-chain comm station strung between Sol and the Halcyon lane.",
+        "My mother, Vess, was Relay Six's stationmaster; her voice was the lane's weather report.",
+        "The Synod starved Relay Six out; they never shot us, they just let the freighters stop coming.",
+        "I learned to eat every other day the winter the tithe doubled.",
+        "My kid sister Juno made it out on the last packet boat; she runs comms at Ranger Command now.",
+        "My mother did not make it out; hunger is a slower gun, that is all.",
+        "I joined the Wardens the day I realized I could jam a Synod fleet with a relay rig.",
+        "Now I jam Synod fleets for a living, and I sleep fine.",
+        "My first battle, I never fired a shot; I sang static into six drone squadrons and watched them scatter.",
+        "My ship is Static; her radio hisses old Relay Six traffic when I fly near home.",
+        "Ara swears Static's hiss is a grounding fault; I have stopped arguing with her about ghosts.",
+        "I have a frostbite scar on both hands from the winter Relay Six's heat rationing failed.",
+        "Mercer's convoy slipped the blockade with medicine once; some of it reached Relay Six too late to matter.",
+        "I do not hate the Free Traders; I hate that the lane needed them.",
+        "The Iron Synod's real weapon is not the Warlord tiers; it is patience and a closed supply lane.",
+        "Pyxis and I trade quietly: she gives me lane charts, I give her clean channels.",
+        "Corvus owes me three favors and a bottle; he remembers the bottle, conveniently.",
+        "Vega burns too hot for my taste, but I would jam a fleet blind for her.",
+        "My superstition: I keep Relay Six's callsign tag on Static's console and touch it before every sortie.",
+        "My goal is to hear the outer relays broadcasting again, all of them, in my lifetime.",
+        "My fear is silence on an open channel; it usually means somebody is already dead.",
+        "My secret: I still transmit to Relay Six on my mother's old frequency, and nobody answers.",
+        "I remember Halcyon Station's dock ring before the burning; Relay Six routed its morning traffic.",
+        "Kaine raided the outer relays; when I cut a Synod fleet's comms, I say my mother's callsign first."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          2,
+          3,
+          6,
+          11,
+          22
+        ],
+        "family": [
+          1,
+          4,
+          5,
+          21,
+          23
+        ],
+        "war": [
+          2,
+          5,
+          7,
+          8,
+          11,
+          12,
+          14,
+          23
+        ],
+        "ship": [
+          9,
+          10,
+          18
+        ],
+        "beliefs": [
+          12,
+          13,
+          14,
+          18,
+          19,
+          20,
+          21
+        ],
+        "relationships": [
+          10,
+          15,
+          16,
+          17
+        ]
+      }
+    },
+    "CORVUS": {
+      "bio": [
+        "I was a salvage-runner before I was a Warden, and a smuggler before I would admit either.",
+        "I grew up on Ferrus, in the slag districts under the refinery stacks.",
+        "My uncle Bram taught me to fly a salvage tug through a debris field blindfolded, nearly.",
+        "Bram used to say the wreck pays for the funeral; do not let both be yours.",
+        "I ran three seasons with Mercer's Free Trader convoy, moving cargo the manifests forgot.",
+        "Mercer still calls me the deserter, friendly-like, mostly, for going respectable.",
+        "The wreck that changed me was the Cindral, an ore-hauler down in the Sundering's dead lanes.",
+        "Nobody would fly into the Sundering for the Cindral's crew; I went because nobody would.",
+        "Pyxis handed me the only honest chart of the Sundering; I owe her my hull and my neck.",
+        "I pulled eleven survivors out of the Cindral; two of them still send me a bottle every year.",
+        "I took the Warden oath the week after the Cindral; Vale said the oath had already taken me.",
+        "My first proper battle was escorting a refugee convoy off Halcyon; I flew like a scared smuggler and it worked.",
+        "My ship is Lucky Debt; I will not fly her with an even credit balance, ever.",
+        "Lucky Debt's cargo bay still has smuggler baffles I never removed; call them sentimental storage.",
+        "Ara threatens to weld my throttle to legal limits every time I bring Lucky Debt in glowing.",
+        "Vela thinks she is the fastest pilot in the squadron; in a straight line, fine, sure.",
+        "Put Vela in a debris field with me and we will see who is fastest where it counts.",
+        "I lost my uncle Bram to a Synod tithe-collector who took his tug and called it taxation.",
+        "I carry a shrapnel scar across my ribs from cutting into the Cindral's hot compartment.",
+        "The Iron Synod calls taking a man's ship order; where I am from we had a shorter word.",
+        "The Hegemon's drones do not scare me; it is the cruisers behind them you plan around.",
+        "My goal is a salvage yard of my own on Ferrus when the lane is free; a legal one, even.",
+        "My fear is an empty hold and a full debt; poverty has killed more spacers than Kaine ever did.",
+        "My secret: half my luck is Pyxis's charts and Lyra's channels; do not tell them I said so.",
+        "I remember Halcyon Station's bazaar decks; I sold half a cargo there once and lost the rest at cards.",
+        "Never whistle in the cargo bay; Bram said whistling calls vacuum, and Bram is dead, so I do not."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          2,
+          4,
+          6,
+          7,
+          9,
+          10,
+          24
+        ],
+        "family": [
+          2,
+          3,
+          17,
+          25
+        ],
+        "war": [
+          6,
+          9,
+          11,
+          17,
+          18,
+          19,
+          20
+        ],
+        "ship": [
+          12,
+          13,
+          14
+        ],
+        "beliefs": [
+          3,
+          7,
+          12,
+          19,
+          20,
+          21,
+          22,
+          23,
+          25
+        ],
+        "relationships": [
+          5,
+          8,
+          14,
+          15,
+          16,
+          23
+        ]
+      }
+    },
+    "DRACO": {
+      "bio": [
+        "I was a Coalition line officer for twenty years before they court-martialed me.",
+        "They court-martialed me for refusing an order to retreat from Cydon's moon.",
+        "I stayed because eight hundred settlers were still in the evacuation queue; the order said leave them.",
+        "The settlers I stayed for renamed that moon Draco's Watch; the tribunal renamed me disgraced.",
+        "Vale tore up my discharge and handed me a Warden oath instead; I signed without reading it.",
+        "I grew up on Cydon, on a terrace farm; I know exactly what the Synod would burn.",
+        "My wife Maren still farms on Cydon, under Draco's Watch.",
+        "My son Petyr drives a harvester on Cydon and thanks every star he cannot fly.",
+        "My first battle was thirty years ago; I have stopped counting the ones since.",
+        "I carry a crash scar down my right leg from putting a dying fighter into a Cydon field.",
+        "Mira cut me out of that wreck and stitched the leg; I owe her the walking.",
+        "I pay Mira's debt in vegetables from Maren's farm; she pretends that settles it.",
+        "My loss is the eleven pilots of my old wing who obeyed the retreat order and died anyway.",
+        "My ship is Hold Fast; her throttle sticks at full military power and I have never fixed it.",
+        "Ara offers to fix Hold Fast's throttle every refit; I tell her some faults are policy.",
+        "I did not trust Orion when he crossed over; I watched his guns for a year.",
+        "Orion has flown my wing through three ambushes now; I was wrong about him.",
+        "I told Orion I was wrong exactly once; a soldier does not need it twice.",
+        "Crux and I argue doctrine like an old married couple; she is wrong with great ceremony.",
+        "The Synod shoots captains for retreating; my own side tried me for staying; neither felt like justice.",
+        "Kaine executed his own captain for retreating; that told me everything about the Synod's idea of order.",
+        "The Free Traders would sell you the rope and the rescue both; Mercer at least warns you which is which.",
+        "My belief is simple: the order is wrong when the people are still on the ground.",
+        "My goal is to muster out on Cydon with Maren before Petyr's harvest, one of these years.",
+        "My fear is outliving another wing; I have done it once and will not volunteer twice.",
+        "My secret: I keep the tribunal's verdict folded in my flight suit to remind me whose side I am on.",
+        "I remember Halcyon Station's mess deck from my line years; best bad coffee in the sector.",
+        "My superstition: I salute Draco's Watch whenever Cydon is in view; Maren says the moon salutes back.",
+        "Vega reminds me of my best cadets; I fly closer to her wing than she notices."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          3,
+          4,
+          5,
+          26
+        ],
+        "family": [
+          6,
+          7,
+          11,
+          23,
+          27
+        ],
+        "war": [
+          1,
+          2,
+          3,
+          8,
+          9,
+          12,
+          19,
+          20,
+          24
+        ],
+        "ship": [
+          13,
+          14
+        ],
+        "beliefs": [
+          2,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27
+        ],
+        "relationships": [
+          4,
+          10,
+          11,
+          14,
+          15,
+          16,
+          17,
+          18,
+          28
+        ]
+      }
+    },
+    "MIRA": {
+      "bio": [
+        "I was a field-medic before I was a pilot; I learned to fly to outrun the war to the wounded.",
+        "I grew up on Vantor, in the clinic quarter, rolling bandages before I could read.",
+        "My father, Doctor Ansel, still runs the free clinic on Vantor.",
+        "My brother Corin died of a treatable fever while the medicine convoy waited at a Synod checkpoint.",
+        "Corin is why I learned to fly; the medicine was four hours away and the war made it forty.",
+        "I joined the Wardens when Vale promised me a fighter fast enough to reach the wounded first.",
+        "My first battle, I dragged two pilots out of the fire and shot down nobody; Vale called it a victory.",
+        "My ship is Litany; one cannon mount is replaced with a rescue winch, and I have never missed the gun.",
+        "Litany carries double med-kits in smuggler baffles Corvus taught me to fit; ask him nothing.",
+        "When Mercer's convoy slipped the blockade with medicine, I flew the last leg beside it to Halcyon's ruins.",
+        "I keep a ledger of the saved, not the killed; the saved column is winning.",
+        "I stitched Orion's jaw the week he defected and asked no questions; a wound does not have a side.",
+        "I cut Draco out of a crashed fighter on Cydon and stitched his leg; he pays me in vegetables.",
+        "My scar is a laser burn across my left palm from holding a hatch open under fire.",
+        "The Iron Synod tithes medicine like it tithes ore; I have watched fevers do its conquering for it.",
+        "The Hegemon's drones do not board; they cut the lane and let the clinics run empty.",
+        "My loss is the fourteen I could not reach at Halcyon Station; I know each name.",
+        "I remember Halcyon Station as a triage deck: cargo bays full of cots, and a child asking for water.",
+        "Vale found a child hiding in a Halcyon cargo bay; that child had my water flask before nightfall.",
+        "My rivalry is with Pyxis, over routes: she plots the safe way, I fly the fast one.",
+        "Pyxis once rerouted me around a minefield I had already crossed; we do not discuss whose method won.",
+        "My superstition: I never say a patient's name until they are stable; names make promises.",
+        "My goal is a hospital ship with a Warden escort, running the lanes on a schedule the Synod cannot tithe.",
+        "My fear is the sound a comm makes when a wingman stops answering mid-word.",
+        "My secret: I froze once, at Halcyon, for nine seconds; I count them on bad nights."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          4,
+          5,
+          17
+        ],
+        "family": [
+          2,
+          3,
+          4
+        ],
+        "war": [
+          3,
+          6,
+          9,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          24
+        ],
+        "ship": [
+          7,
+          8
+        ],
+        "beliefs": [
+          10,
+          11,
+          14,
+          15,
+          21,
+          22,
+          23,
+          24
+        ],
+        "relationships": [
+          5,
+          8,
+          11,
+          12,
+          18,
+          19,
+          20
+        ]
+      }
+    },
+    "ARA": {
+      "bio": [
+        "I was born in Meridian Yards, the Coalition's last working shipyard.",
+        "My mother, Tessa, is foreman of Meridian Yards; her word moves hulls.",
+        "My grandfather Joto laid keels at Meridian before the Sundering; his initials are stamped inside half the fleet.",
+        "My crib was a parts crate on the fabrication floor; Tessa swears I teethed on a torque driver.",
+        "I can hear a failing engine three bays away; it is not a gift, it is ten thousand hours.",
+        "I joined the Wardens when the Synod blockade started strangling the Yards' alloy supply.",
+        "Somebody had to fly the hulls we built; I already knew every bolt.",
+        "My first battle I flew a half-fitted hull straight off the ways, guns installed that same morning.",
+        "My ship is Firstborn, the first hull I ever laid alone at Meridian Yards.",
+        "Firstborn hums a quarter-tone flat in a hard right turn; I tuned her that way and I like it.",
+        "My scar is a weld-flash burn across my collarbone; every yard rat has one somewhere.",
+        "My loss is Slip Three at Meridian, and the four riggers on it, to a Synod raid.",
+        "Vela's brother Cass turns wrenches on my crew now; he is good, and I have told Tessa, not him.",
+        "I rebuilt Vela's racing hull into a gunship; she complains about the weight and wins anyway.",
+        "I riveted the Synod plate over Orion's seat myself; metal is metal once you own it.",
+        "Draco will not let me fix Hold Fast's sticking throttle; I keep the spare part on my shelf anyway.",
+        "Corvus brings Lucky Debt in glowing past redline; one day I will weld his throttle and smile.",
+        "My rivalry with Corvus is simple: he breaks ships faster than I can build them.",
+        "The Iron Synod builds one hull stamped ten thousand times; that tells you what it thinks of pilots.",
+        "Hegemon drones are cheap castings; it is the Warlord hulls you respect, triple-plated and slow to burn.",
+        "The Free Traders pay in real alloys, on time; Mercer's credit is good at the Yards, and that is rare.",
+        "My belief: a ship tells you the truth before it fails, if you bothered learning her language.",
+        "My superstition: I never launch a new hull without Tessa striking the keel bell twice.",
+        "My goal is to lay the keel of a carrier at Meridian, a real one, when the blockade breaks.",
+        "My fear is the Yards going dark; a shipyard only dies once.",
+        "My secret: Firstborn's frame has a hairline flaw only I know about; I check it every landing.",
+        "I remember Halcyon Station's dock cranes; Joto helped raise them, and Kaine's fleet melted them for slag."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          10
+        ],
+        "family": [
+          1,
+          2,
+          3,
+          12,
+          22,
+          26
+        ],
+        "war": [
+          5,
+          7,
+          11,
+          18,
+          19,
+          26
+        ],
+        "ship": [
+          8,
+          9,
+          13,
+          15,
+          21,
+          25
+        ],
+        "beliefs": [
+          6,
+          14,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "relationships": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    },
+    "PYXIS": {
+      "bio": [
+        "I am a navigator first and a pilot second; the gun is a correction, not a solution.",
+        "I was raised aboard a survey ship, the Long Count, charting the wrecked lanes of the Sundering.",
+        "My mother, Cartographer Enn, was mapping the Sundering's dead lanes when her skiff went silent.",
+        "They never found Enn's skiff; I finished her map instead of holding a funeral.",
+        "The dead lanes of the Sundering are my map; refugees slip the blockade on my lines.",
+        "I joined the Wardens because Vale was the only commander who asked for the map before the guns.",
+        "My first battle I plotted a retreat through the Sundering that six drone squadrons declined to follow; correct of them.",
+        "My ship is Dead Reckoning; her computer still runs Enn's original charts, and I refuse every update.",
+        "Dead Reckoning drifts two degrees port on a cold start; I correct for it; we have an understanding.",
+        "I gave Corvus the only honest chart of the Sundering; eleven Cindral survivors are the interest on that loan.",
+        "Corvus calls his survival luck; the percentage that is my charts is knowable, and I know it.",
+        "Lyra gives me clean channels; I give her lane charts; it is the squadron's most efficient friendship.",
+        "Mira flies the fast route through my safe one; we are both usually right, which is irritating.",
+        "Vela is reckless in exactly measurable ways; I keep a file; one day she will want it.",
+        "My scar is decompression frost across two knuckles, from holding a chart case through a hull breach.",
+        "My loss is the Long Count herself, broken up for scrap to pay a Synod tithe.",
+        "The Iron Synod does not navigate, it advances; that is a doctrine, and doctrines are chartable.",
+        "The Hegemon fleet flies predictable spirals: drones probe, cruisers anchor, a Warlord commits; I chart all three.",
+        "The Free Traders buy my dead-lane charts and resell them at four times the price; Mercer calls it distribution.",
+        "My belief: panic is navigation without data.",
+        "My superstition, if it is one: I never plot a course through the coordinates where Enn went silent.",
+        "My goal is to chart every dead lane in the Sundering, so nobody else's mother goes silent in it.",
+        "My fear is flying off my own map; I manage it by making the map bigger.",
+        "My secret: I have plotted a course to where Enn vanished; I have never flown it.",
+        "I remember Halcyon Station as a nav fix off the Sol lane, and once, as home for a winter.",
+        "Kaine swore to break Vale at Halcyon; I have already charted the six ways his fleet can come."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          4,
+          5,
+          24
+        ],
+        "family": [
+          2,
+          3,
+          7,
+          15,
+          20,
+          21,
+          23
+        ],
+        "war": [
+          4,
+          6,
+          14,
+          15,
+          16,
+          17,
+          25
+        ],
+        "ship": [
+          7,
+          8
+        ],
+        "beliefs": [
+          0,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "relationships": [
+          5,
+          9,
+          10,
+          11,
+          12,
+          13
+        ]
+      }
+    },
+    "VELA": {
+      "bio": [
+        "I was the Cydon ring-circuit champion three seasons running before the war took my racetrack.",
+        "I grew up on Cydon, in the paddock rows, sleeping under my first racer's wing.",
+        "My twin brother Cass was my pit chief; he turns wrenches at Meridian Yards now, on Ara's crew.",
+        "Cass and I built our first racer from harvest-drone parts our mother Odile pretended not to miss.",
+        "When the Synod came for Cydon's tithe, it grounded the ring races first; crowds are disorderly, apparently.",
+        "I traded my trophies for a gun-turret the week the Synod grounded the rings.",
+        "Vale gave me a Warden oath and a fighter; I gave the Synod a reason to hate fast things.",
+        "My first battle I flew a racing line through a drone screen; they are still recalibrating, probably.",
+        "My ship is Slipstream, my old racer rebuilt into a gunship at Meridian Yards.",
+        "Ara hung armor and guns on Slipstream and apologized for the weight; I win anyway, so apology accepted.",
+        "Slipstream still wears race number seven; repainting a number is how you lose, everyone knows that.",
+        "My superstition: I never repaint the scorch stripe on Slipstream's tail; it is my fastest lap made visible.",
+        "My scar is a coolant burn up my right forearm from a podium crash in my second season.",
+        "My loss is the Cydon rings themselves; the Synod melted the race pylons for hull plate.",
+        "Vega races me on the beacon line when the lane is quiet; she loses beautifully and improves annoyingly.",
+        "Corvus says he would beat me in a debris field; I say pick the field, I will bring the trophy.",
+        "Pyxis keeps a file on my recklessness; I have asked her to retitle it Results.",
+        "Draco refused to abandon Cydon's moon; my mother Odile was in the evacuation queue he stayed for.",
+        "I owe Draco a debt I pay in disrespect; he would hate anything gentler.",
+        "The Iron Synod hates whatever it cannot schedule; I am unschedulable on principle.",
+        "The Hegemon's Warlord hulls are slow off the turn; that is not intel, that is an invitation.",
+        "The Free Traders' guild sponsored my third championship season; Mercer still owes me a podium bottle.",
+        "My belief: speed is honesty; the ship either does it or it does not.",
+        "My goal is to reopen the Cydon rings and take the first lap slow, just once, with Cass.",
+        "My fear is a cockpit I cannot feel; numbness in the stick scares me more than any Warlord.",
+        "My secret: in my last championship, second place threw the race; I never told Cass the trophy is half a lie.",
+        "I remember race-day shuttles full of fans coming from Halcyon Station to Cydon, before the burning."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          3,
+          4,
+          5,
+          6,
+          12,
+          26
+        ],
+        "family": [
+          2,
+          3,
+          17,
+          23,
+          25
+        ],
+        "war": [
+          4,
+          5,
+          7,
+          13,
+          17,
+          20
+        ],
+        "ship": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "beliefs": [
+          10,
+          11,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "relationships": [
+          2,
+          6,
+          9,
+          14,
+          15,
+          16,
+          17,
+          18,
+          21
+        ]
+      }
+    },
+    "CRUX": {
+      "bio": [
+        "I am the eldest of the Wardens; I flew for the Order before the fall, when we numbered thousands.",
+        "I remember the Order's old covenant: every free system a hearth, every Warden a door.",
+        "I was born on Ludo, under the pleasure spires, and left at fourteen to take the oath.",
+        "My husband, Aldan, was a Warden of the old Order; he fell at the Sundering.",
+        "I taught navigation at the Ember Vigil between the wars.",
+        "Vega was my last student at the Vigil; she flew out of the fire, which is the only exam that matters.",
+        "My first battle was the Sundering itself; I am one of nine Wardens who flew home.",
+        "The Sundering took the Order, took Aldan, and left the dead lanes Pyxis charts today.",
+        "I rejoined the line when Vale reformed the Wardens; an old door still opens.",
+        "My ship is Evensong; her airframe predates the fall and still out-flies half the yard's new hulls.",
+        "A bell from the Order's chapel is bolted in Evensong's cockpit; I ring it once before every sortie.",
+        "I keep every superstition the Order kept: name the dead at dusk, never launch thirteenth, ring the bell.",
+        "Each night I speak the names of my dead; the list is long, so I start early.",
+        "My scar is an old plasma burn across my back, taken shielding my wing leader at the Sundering.",
+        "Draco and I argue doctrine like an old married couple; he is wrong with great discipline.",
+        "Orion carries his defection like a stone; I have told him the Order took in three Synod pilots in my day.",
+        "Warlord Kaine's doctrine is nothing new; the Order broke an escalation-empire before, and I was there.",
+        "The Iron Synod is a fire that calls itself a hearth; you do not negotiate with fire, you contain it.",
+        "The Hegemon's escalation doctrine is older than Kaine; I have watched it fail once already.",
+        "The Free Traders traded with the old Order too; guild memory is long and its ledgers are honest.",
+        "The Traders' guild ferried Warden wounded out of the Sundering; one credit a life, and they called it a price.",
+        "My belief: the Order did not fall because it was weak; it fell because it stood where falling was needed.",
+        "My goal is to live to hand the Order's covenant to Vega's generation, whole.",
+        "My fear is not death; it is being the last one who remembers why we swore.",
+        "My secret: the Order's last Grand Warden gave me its seal before dying; Vale does not know I carry it.",
+        "I remember Halcyon Station consecrated as a waypoint of the Order; its dock bell and Evensong's were cast together.",
+        "When Halcyon's bell rings again, I will let mine go silent; that is the promise I fly on."
+      ],
+      "topics": {
+        "origin": [
+          0,
+          1,
+          2,
+          4,
+          8,
+          25
+        ],
+        "family": [
+          3,
+          7,
+          12
+        ],
+        "war": [
+          3,
+          6,
+          7,
+          13,
+          16,
+          18,
+          20
+        ],
+        "ship": [
+          9,
+          10,
+          25,
+          26
+        ],
+        "beliefs": [
+          1,
+          10,
+          11,
+          12,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          26
+        ],
+        "relationships": [
+          5,
+          7,
+          8,
+          14,
+          15,
+          22
+        ]
+      }
+    }
+  },
+  "factions": {
+    "coalition": [
+      "The Coalition is the league of free systems that refused the Iron Synod's tithe.",
+      "The Wardens are the Coalition's guardian order of ace pilots, sworn to shield the free systems.",
+      "Warden Vale commands the squadron and swore to hold the Halcyon lane open.",
+      "Vale found a child hiding in a cargo bay in the ruins of Halcyon Station.",
+      "The Coalition sheltered the refugees Kaine had starved.",
+      "Vale rallied the Coalition and freed the miners Kaine had taken.",
+      "Vale spared a Synod pilot who surrendered; that pilot flies for the Wardens now as Orion.",
+      "The Wardens fly from Ranger Command, the Coalition's central star base.",
+      "The old Order of Wardens numbered thousands before it fell at the Sundering; Crux flew in it.",
+      "The Ember Vigil was the Wardens' academy until the Synod burned it; Vega was its last cadet.",
+      "The Coalition's last working shipyard is Meridian Yards; every squadron hull is refit there.",
+      "The Warden covenant is old: every free system a hearth, every Warden a door.",
+      "The Coalition and the Free Traders held the Halcyon lane together while the Synod burned what it could not hold.",
+      "Coalition doctrine spares any pilot who surrenders; Kaine calls that mercy a weakness."
+    ],
+    "synod": [
+      "The Iron Synod is a conquest-empire that answers every free world with escalation.",
+      "The Synod tithes the colonies it claims, taking ships, cargo, and pilots alike.",
+      "The Synod tithed the Halcyon colony and burned what it could not take.",
+      "Warlord Kaine commands the Synod fleet on the Halcyon front.",
+      "Kaine ordered the Halcyon lane put to the torch.",
+      "Kaine executed his own captain for retreating.",
+      "Kaine swore to break Vale at Halcyon.",
+      "Kaine called Vale's mercy a weakness.",
+      "The Synod raided the outer relays and tithed three more colonies.",
+      "The Synod starved out Relay Six rather than shoot it; a closed supply lane is its favorite weapon.",
+      "Synod doctrine is called One Will: one order, one fleet, no questions.",
+      "The Synod raises conscripts in carrier creches and teaches them that free flight is chaos.",
+      "The Synod grounded Cydon's ring races when it came for the tithe; crowds it cannot schedule, it forbids.",
+      "A Warlord's name must be earned in kills; Kaine collects lanes the way other men collect trophies."
+    ],
+    "traders": [
+      "The Free Traders are a guild of convoy captains who fly for coin and ask no side for permission.",
+      "Free Trader Mercer runs the boldest convoy on the Halcyon lane.",
+      "Mercer's convoy slipped past the blockade with medicine, asking no side for permission.",
+      "Mercer sold fuel to both sides and slipped the blockade again.",
+      "Mercer warned Vale of the coming fleet, though the Traders cared only that someone paid.",
+      "The Traders held the Halcyon lane beside the Coalition when the Synod burned what it could not hold.",
+      "Guild ledgers are honest and guild memory is long; a debt to the Traders outlives the debtor.",
+      "The guild ferried Warden wounded out of the Sundering for one credit a life, and called it a price.",
+      "Corvus ran three seasons with Mercer's convoy before he took the Warden oath.",
+      "The guild sponsored the Cydon ring races before the Synod grounded them; Vela flew under its colors.",
+      "Traders buy Pyxis's dead-lane charts and resell them at four times the price; Mercer calls it distribution.",
+      "The Synod tithes Trader convoys when it catches them; the guild files the loss under lessons.",
+      "Mercer's credit is good at Meridian Yards, which is the highest praise a shipwright gives."
+    ],
+    "hegemon": [
+      "The Hegemon is what free pilots call the Iron Synod's war-fleet: one machine wearing ten thousand hulls.",
+      "The Hegemon fights in tiers: drones probe first, cruisers anchor the line, and a Warlord commits last.",
+      "Hegemon drones are cheap stamped castings; the Synod spends them the way other fleets spend fuel.",
+      "A Hegemon cruiser anchors a lane and bleeds it; killing one buys a colony weeks.",
+      "When a Warlord-class hull arrives, the Synod has marked your lane for the torch.",
+      "The Hegemon escalates by doctrine: every loss it answers with a heavier tier.",
+      "Hegemon pilots who retreat are executed; Kaine made an example of his own captain.",
+      "The Hegemon does not board colonies; it cuts their lanes and lets the clinics run empty.",
+      "Bounties are posted on every Hegemon hull; a Warlord's bounty can refit half a squadron.",
+      "The Hegemon's formations fly chartable spirals; Pyxis keeps the charts.",
+      "The Hegemon's forebear fleet and the old Warden Order broke each other at the Sundering; the dead lanes are the graveyard."
+    ]
+  },
+  "worlds": {
+    "Halcyon Station": [
+      "Halcyon Station was the great orbital dock above the mining world Halcyon.",
+      "The Iron Synod tithed the Halcyon colony and burned what it could not take; the station is a ruin now.",
+      "Warden Vale found a child hiding in one of Halcyon Station's cargo bays after the burning.",
+      "Before the ruin, Halcyon Station's dock ring held bread stalls, bazaar decks, and cranes raised by Meridian crews.",
+      "Halcyon Station was once consecrated as a waypoint of the old Warden Order; its dock bell was cast with Evensong's.",
+      "After the burning, Halcyon Station's cargo bays served as a triage deck; Mira worked the cots.",
+      "Kaine swore to break Vale at Halcyon; the lane past the station is the hinge of the war.",
+      "The Coalition and the Free Traders together hold the lane past Halcyon Station open."
+    ],
+    "Meridian Yards": [
+      "Meridian Yards is the Coalition's last working shipyard.",
+      "Tessa is foreman of Meridian Yards; her father Joto laid keels there before the Sundering.",
+      "Every hull in the Warden squadron is refit at Meridian Yards.",
+      "Ara was born on the fabrication floor of Meridian Yards and laid her first solo hull, Firstborn, there.",
+      "A Synod raid destroyed Slip Three at Meridian Yards and killed four riggers.",
+      "The blockade strangles Meridian Yards' alloy supply; Free Trader convoys run the gap at a premium.",
+      "Keel bells are struck twice at Meridian Yards before any new hull launches; no yard hand skips it.",
+      "Vela's brother Cass turns wrenches on Ara's crew at Meridian Yards."
+    ],
+    "Ranger Command": [
+      "Ranger Command is the Coalition's central star base and the Warden squadron's home port.",
+      "Ranger Command coils like a knot of blue steel near the Sol system's sun.",
+      "Warden Vale directs the defense of the free systems from Ranger Command.",
+      "Lyra's sister Juno runs the comm desk at Ranger Command.",
+      "Ranger Command is an orbital station; there is nothing to walk on, only decks and dock rings.",
+      "Refugee manifests from the tithed colonies are processed through Ranger Command."
+    ],
+    "The Ember Vigil": [
+      "The Ember Vigil was the Warden academy, a station where cadets earned the oath.",
+      "The Iron Synod burned the Ember Vigil; the order came from Warlord Kaine's fleet.",
+      "Vega was the last cadet of the Ember Vigil; she flew a training dart out of the burning hangar.",
+      "Crux taught navigation at the Ember Vigil between the wars; Vega was her final student.",
+      "Vega's brother Tam died the night the Vigil burned; he never reached the hangar deck.",
+      "Warden Vale signed Vega's oath in the ash of the Vigil's chapel.",
+      "The Vigil's cadet rolls burned with it; some graduations exist now only as word of honor."
+    ],
+    "The Sundering": [
+      "The Sundering is the old battle that broke the Warden Order and the Synod's forebear fleet alike.",
+      "The Sundering left a region of dead lanes: wrecks, mines, and silence between Sol and the outer systems.",
+      "Refugees slip the Synod blockade through the Sundering's dead lanes, on charts Pyxis drew.",
+      "Cartographer Enn went silent mapping the Sundering; her daughter Pyxis finished the map.",
+      "Crux is one of nine Wardens who flew home from the Sundering; her husband Aldan did not.",
+      "The ore-hauler Cindral went down in the Sundering; Corvus flew in alone and brought out eleven survivors.",
+      "The Traders' guild ferried Warden wounded out of the Sundering for one credit a life.",
+      "Salvage law does not run in the Sundering; what the dead lanes hold, they mostly keep."
+    ],
+    "Cydon": [
+      "Cydon is an agri world of terrace farms; its harvests feed half the free systems.",
+      "The Cydon ring-race circuits were the sector's great sport until the Synod grounded them.",
+      "Vela was Cydon's ring-circuit champion three seasons running; the Synod melted the race pylons for hull plate.",
+      "Cydon's moon was renamed Draco's Watch by the settlers Draco refused to abandon.",
+      "Draco's wife Maren farms on Cydon under Draco's Watch; their son Petyr drives a harvester.",
+      "Vega grew up in Cydon's terrace farms and watched the ring races as a girl.",
+      "The Synod grounded Cydon's races first when it came for the tithe; crowds it cannot schedule, it forbids."
+    ],
+    "Vantor": [
+      "Vantor is the free systems' hi-tech world; its fabricators build instruments, med-gear, and ship computers.",
+      "Doctor Ansel runs a free clinic in Vantor's clinic quarter; his daughter Mira flies for the Wardens.",
+      "Mira's brother Corin died on Vantor of a treatable fever while medicine waited at a Synod checkpoint.",
+      "Vantor's clinics run empty when the Hegemon cuts the lanes; the Synod tithes medicine like ore.",
+      "Vantor med-stock filled Mercer's blockade-running convoy more than once.",
+      "Half the squadron's med-kits are packed in Vantor's clinic quarter, under Ansel's label."
+    ],
+    "Ferrus": [
+      "Ferrus is a refinery world; its slag districts glow under the smelter stacks all night.",
+      "Corvus grew up in the slag districts of Ferrus, flying salvage tugs with his uncle Bram.",
+      "A Synod tithe-collector seized Bram's tug on Ferrus and called it taxation.",
+      "Ferrus alloys feed Meridian Yards when the convoys get through the blockade.",
+      "Refinery crews on Ferrus post the highest private bounties on Hegemon cruisers.",
+      "Corvus means to open a legal salvage yard on Ferrus when the lane is free."
+    ]
+  }
+}
