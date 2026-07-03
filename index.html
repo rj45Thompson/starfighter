@@ -488,9 +488,10 @@ function planTrade(s){ if(s.fuel<CFG.FUEL_LOW){ s.tradePlan={type:'refuel',plane
 function doTrade(s,dt){ s.tradeCd=Math.max(0,s.tradeCd-dt); if(!s.tradePlan && s.tradeCd<=0) planTrade(s);
   if(!s.tradePlan||!s.tradePlan.planet||planets.indexOf(s.tradePlan.planet)<0){ s.tradePlan=null; return null; } const p=s.tradePlan.planet, d=s.pos.distanceTo(p.pos);
   if(d<=CFG.DOCK_R){ const pl=s.tradePlan;
-    if(pl.type==='refuel'){ const g=refuel(s,p); say(s, g>0?`Refueled at ${p.name} · +${g} gas`:`${p.name}: tanks full / no gas`); }
-    else if(pl.type==='buy'){ const q=buy(s,p,pl.good,CFG.TRADE_QTY); say(s, q>0?`Bought ${q} ${GKEY[pl.good].n} @ ${p.name} (${Math.round(priceOf(p,pl.good))}c/u)`:`${p.name}: can't buy ${GKEY[pl.good].n}`); }
-    else if(pl.type==='sell'){ const r=sell(s,p,pl.good,CFG.HOLD_CAP); say(s, r>0?`Sold ${GKEY[pl.good].n} @ ${p.name} · +${r}c`:`${p.name}: nothing to sell`); }
+    if(s.inhabitant) INH.onDocked(p);   // I2: the Inhabitant's OWN docking = episode + docked-market price observations
+    if(pl.type==='refuel'){ const g=refuel(s,p); if(g>0&&s.inhabitant) INH.onRefueled(p.name,g); say(s, g>0?`Refueled at ${p.name} · +${g} gas`:`${p.name}: tanks full / no gas`); }
+    else if(pl.type==='buy'){ const q=buy(s,p,pl.good,CFG.TRADE_QTY); if(q>0&&s.inhabitant) INH.onTraded('buy',p,pl.good,q); say(s, q>0?`Bought ${q} ${GKEY[pl.good].n} @ ${p.name} (${Math.round(priceOf(p,pl.good))}c/u)`:`${p.name}: can't buy ${GKEY[pl.good].n}`); }
+    else if(pl.type==='sell'){ const r=sell(s,p,pl.good,CFG.HOLD_CAP); if(r>0&&s.inhabitant) INH.onTraded('sell',p,pl.good,r); say(s, r>0?`Sold ${GKEY[pl.good].n} @ ${p.name} · +${r}c`:`${p.name}: nothing to sell`); }
     s.tradePlan=null; s.tradeCd=CFG.TRADE_COOLDOWN; return {mode:'DOCK',target:null,aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }
   return {mode:'TRADE',target:null,aimDir:_v.copy(p.pos).sub(s.pos),ease:1}; }   // hyperspace REMOVED (balance): traders fly real-space like everyone
 
@@ -733,7 +734,8 @@ function broadcast(sender,kind,data){ if(sender.commCd>0) return; sender.commCd=
   if(kind==='help'){ msg=`Mayday — taking fire${data?' from '+data.name:''}! Need backup.`; sender.foeNote='took fire from '+(data?data.name:'a hostile'); rally(()=>true, ()=>data); }   // A0: recorded belief for the recall step
   else if(kind==='threat'){ msg=`Contact — marauder near ${nearestPlanet(sender.pos)?nearestPlanet(sender.pos).name:'us'}.`; rally(o=>o.aggr>0.55, o=>nearestRival(o)); }
   else if(kind==='tally'){ msg=`Engaging ${data?data.name:'hostile'} — form up on me!`; rally(o=>o.aggr>0.6 && o.pos.distanceTo(sender.pos)<CFG.COMM_R*0.7, ()=>data); }
-  if(msg){ const EMERGENT_SIG={help:'σ3',threat:'σ7',tally:'σ1'}, sig=EMERGENT_SIG[kind]||'σ0';   // W16: an emergent-signal glyph on each broadcast (learned-code STYLE, GIVEN flavor — the audited code is world_vec/lang_vec)
+  if(msg){ INH.onRadio(sender,msg,kind,data);   // I1: a radio line the Inhabitant could hear (COMM_R gate inside)
+    const EMERGENT_SIG={help:'σ3',threat:'σ7',tally:'σ1'}, sig=EMERGENT_SIG[kind]||'σ0';   // W16: an emergent-signal glyph on each broadcast (learned-code STYLE, GIVEN flavor — the audited code is world_vec/lang_vec)
     say(sender, `⟨${sig}⟩ ${msg}`); } }
 // turn an active player order into {mode,target,aimDir,ease}
 function applyCommand(s,c,dt){ let mode='SEEK',target=null,aimDir=null,ease=1;
@@ -901,8 +903,8 @@ function shipCollisions(){
         a.vel.addScaledVector(_cn,-imp); c.vel.addScaledVector(_cn,imp);
         if(closing>CFG.SHIP_RAM_MIN_SPEED){ const dmg=closing*CFG.RAM_DMG_SCALE;                  // hull scrape on a hard ram (iframe respected)
           burst(_cv.copy(a.pos).addScaledVector(_cn,CFG.SHIP_R),0xffc07a,8,14,2.4);
-          if(a.iframe<=0){ a.hp-=dmg; a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }
-          if(c.iframe<=0){ c.hp-=dmg; c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
+          if(a.iframe<=0){ if(a.inhabitant) INH.onDamaged(c.name,dmg); a.hp-=dmg; a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }
+          if(c.iframe<=0){ if(c.inhabitant) INH.onDamaged(a.name,dmg); c.hp-=dmg; c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
       a.mesh.position.copy(a.pos); c.mesh.position.copy(c.pos); } } }
 function step(dt){
   econTick(dt);
@@ -925,9 +927,10 @@ function step(dt){
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire — except the player (and teammates returning fire at the player)
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=dmg; noteHarm(s,owner); ffRetaliate(s,owner); if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
+        s.hp-=dmg; noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors — bullets outrange senseR, so a shot from the dark is src 'unknown'
+        if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
-            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; ffRetaliate(o2,owner); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE
+            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors)
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE — very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
@@ -973,11 +976,13 @@ function step(dt){
   rayqCd-=dt; if(rayqCd<=0){ rayqCd=CFG.RAY_Q_CD; rayQSample(); }   // A7: sample reasoning-vs-random ray value (ablation proof)
   rwCd-=dt; if(rwCd<=0){ rwCd=CFG.RAY_ADAPT_CD; if(CFG.RAY_LEARN) adaptRayWeights(); }   // A9: adapt learned ray-weights
   encounterTick(dt);   // M11: derelicts / caches / distress + galaxy news
+  INH.tick(dt);   // I8 skeleton: the Inhabitant senses + remembers on its OWN cadence (INH_TICK), never prodded
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
-function hurt(s,d){ if(s.iframe>0||!s.alive) return; s.hp-=d; if(s.hp<=0) killShip(s); }
-function killShip(s){ s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
+function hurt(s,d){ if(s.iframe>0||!s.alive) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=d; if(s.hp<=0) killShip(s); }
+function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
+  s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   dropCargo(s);                                                     // spill the hold as salvage pods
   spawnGem(_v2.copy(s.pos).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))), CFG.SCRAP_GEM);   // ALWAYS drop some loot
   s.credits=Math.round(s.credits*(1-CFG.DEATH_CREDIT_LOSS)); burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); say(s,'Hull breach! Punching out.');
@@ -990,7 +995,7 @@ function killByShip(victim,killer){ const bounty=victim.credits; victim.credits=
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
   killShip(victim);
-  if(killer&&killer.alive){ killer.score+=CFG.KILL_BOUNTY+(wasPirate?(victim.tier||0):0); checkRankUp(killer);   // M5: kills advance rank
+  if(killer&&killer.alive){ killer.score+=CFG.KILL_BOUNTY+(wasPirate?(victim.tier||0):0); checkRankUp(killer); if(killer.inhabitant) INH.onKill(victim);   // M5: kills advance rank · I2: destroyed_foe episode
     if(wasPirate){ const bty=victim.bounty||CFG.PIRATE_LOOT; killer.credits+=bty; say(killer,`Splashed ${victim.name} — +${bty}c bounty!`);
       if(killer.team==='squad'){ const np=nearestPlanet(victim.pos); if(np) repAdd(np,CFG.REP_KILL_HEG); if(killer.role==='player') contractKill(); } }   // M2 standing + M4 bounty
     else say(killer,`Splashed ${victim.name}!`); } }
@@ -1191,7 +1196,7 @@ const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false; let pr
 // VOICES them in character; a grounding post-check (speakGroundOk) discards any reply naming an entity outside
 // facts ∪ the pilot's corpus, so the no-fabrication guarantee survives the paraphrase. Soft-fail like TAMI_CS:
 // sidecar absent (public site) -> the verbatim composer answers exactly as before. `?csoff=1` skips this probe too.
-const SPEAK_CFG={ TIMEOUT_MS:6000, MAX_FACTS:8, MAX_HISTORY:4 };   // named tunables (contract limits) — no magic numbers below
+const SPEAK_CFG={ TIMEOUT_MS:8000, MAX_FACTS:8, MAX_HISTORY:4 };   // named tunables (contract limits) — no magic numbers below. TIMEOUT_MS 6000→8000 (speech-verifier wave-0 backlog: guard-retry latency 4.7–7s exceeded the old 6s timeout on ~2/7 turns)
 const TAMI_SPEAK=(()=>{ const BASE='http://localhost:7876'; let alive=false, info=null; let probed;
   if(CSOFF){ probed=Promise.resolve(); console.log('TAMI_SPEAK probe SKIPPED (?csoff=1) — pilot speech stays on the retrieval composer'); }
   else probed=fetch(BASE+'/health').then(r=>r.ok?r.json():null).then(j=>{ alive=!!(j&&j.ok); info=j||null;
@@ -1250,6 +1255,114 @@ const WATCH=(()=>{ let panel=null, cv=null, ctx=null, raf=0, title=null, sub=nul
   function loop(fn){ curFn=fn; if(raf) cancelAnimationFrame(raf); const tick=()=>{ const go=fn(); if(go!==false) raf=requestAnimationFrame(tick); else raf=0; }; raf=requestAnimationFrame(tick); }
   function step(n){ for(let i=0;i<(n||1);i++) if(curFn) curFn(); }                 // manual drive (headless verify / hidden tab, where rAF is paused)
   return { mulberry32, stop, show, loop, step, setSub:s=>{ if(sub) sub.innerHTML=s; }, setToggle:(label,fn)=>{ btnA.textContent=label; btnA.onclick=fn; }, get cv(){return cv;}, get ctx(){return ctx;} };
+})();
+// ===== THE INHABITANT (INHABITANT_PILLARS.md — I1 + I2 + I8 skeleton) — ONE pilot in the live game that is a real agent =====
+// I1 BLACK-BOX PERCEPTION: every observation record is built ONLY through SENSE_WHITELIST (the literal field list below).
+// sense() reads exactly four sensor-legal channels: (1) OWN instruments, (2) contacts within its senseR (name/dist/rough
+// bearing/team/type — never another ship's hull, cargo or brain), (3) the docked market board (only while inside DOCK_R),
+// (4) radio lines actually broadcast within COMM_R of it. No other game-state path feeds INH — auditable: grep this module
+// for reads, and INH.senseAudit() verifies every field of the last observation is whitelist-only.
+// I2 PERSISTENT MEMORY (contract INH_STATE_v1): episodes (ring EP_CAP) + observation-traced triples (TRIPLE_CAP) + counters,
+// persisted to localStorage every SAVE_EVERY sim-s + on exit; INH.export()/INH.import(json) round-trip for tests.
+// STARTS EMPTY — no baked knowledge; every entry traces to an observation or a game event involving the Inhabitant.
+// I8 AUTONOMY-CADENCE SKELETON: INH.tick runs on its OWN INH_TICK clock inside step() — sensing, episode + triple growth
+// are self-initiated, never prodded. Goal attribution is labeled 'GIVEN-role:<mode>' (real drives land in I4).
+const INH_CFG={ INH_TICK:0.5, SAVE_EVERY:15, EP_CAP:400, TRIPLE_CAP:600, CRED_SAMPLES:20, CONTACT_CAP:24,
+  BEARING_STEP_DEG:15, DMG_EP_CD:2, PRICE_OBS_CD:10, CONF_START:0.3, CONF_STEP:0.15, RADIO_BUF_CAP:8, TEXT_CLIP:90,
+  LS_KEY:'INH_STATE_v1' };
+const SENSE_WHITELIST=['hull','fuel','pos','vel','credits','mode','system',   // own-ship instruments (star chart is GIVEN)
+  'name','dist','bearing','team','type',                                      // sensor contacts — what a sensor would show
+  'planet','good','price',                                                    // the market board, readable only while docked
+  'from','text'];                                                             // radio lines actually broadcast within range
+const INH=(()=>{
+  let ship=null, ST=null, loadedPrev=false, priorAge=0;
+  let acc=0, saveAcc=0, lastObs=null, sawSet=new Set(), prevSystem=null;
+  let dmgAcc=0, dmgSrc=null, dmgEpT=-1e9, priceObsT=-1e9, lastDockName=null, radioBuf=[];
+  const r1=x=>Math.round(x*10)/10;
+  function freshState(name){ return { version:1, pilot:name, born:r1(T0), episodes:[], triples:[], counters:{ ticks:0, credits_seen:[], damage_taken:0 } }; }
+  function pickWL(rec){ const out={}; for(const k of SENSE_WHITELIST) if(Object.prototype.hasOwnProperty.call(rec,k)) out[k]=rec[k]; return out; }
+  function bearingOf(from,to){ const deg=Math.atan2(to.z-from.z,to.x-from.x)*180/Math.PI; return Math.round(deg/INH_CFG.BEARING_STEP_DEG)*INH_CFG.BEARING_STEP_DEG; }   // ROUGH heading only (quantized)
+  function systemOf(pos){ let best=null,bd=1e9; for(const sy of systems){ const d=pos.distanceTo(sy.center); if(d<bd){bd=d;best=sy;} } return best?best.name:null; }
+  function senseMarket(p){ return GOODS.map(g=>pickWL({ planet:p.name, good:g.k, price:Math.round(priceOf(p,g.k)) })); }
+  function sense(){ if(!ship||!ship.alive) return null; const me=ship, sr=me.senseR||CFG.SENSE_R;
+    const own=pickWL({ hull:r1(me.hp), fuel:r1(me.fuel), pos:[r1(me.pos.x),r1(me.pos.y),r1(me.pos.z)], vel:[r1(me.vel.x),r1(me.vel.y),r1(me.vel.z)], credits:Math.round(me.credits), mode:me.mode, system:systemOf(me.pos) });
+    const contacts=[];
+    for(const o of ships){ if(o===me||!o.alive) continue; const d=me.pos.distanceTo(o.pos); if(d<sr) contacts.push(pickWL({ name:o.name, dist:Math.round(d), bearing:bearingOf(me.pos,o.pos), team:o.team, type:'ship' })); }
+    for(const p of planets){ const d=me.pos.distanceTo(p.pos); if(d<sr) contacts.push(pickWL({ name:p.name, dist:Math.round(d), bearing:bearingOf(me.pos,p.pos), type:'planet' })); }
+    for(const a of asteroids){ const d=me.pos.distanceTo(a.pos); if(d<sr) contacts.push(pickWL({ name:'asteroid', dist:Math.round(d), bearing:bearingOf(me.pos,a.pos), type:'asteroid' })); }
+    contacts.sort((x,y)=>x.dist-y.dist); if(contacts.length>INH_CFG.CONTACT_CAP) contacts.length=INH_CFG.CONTACT_CAP;
+    const np=nearestPlanet(me.pos), docked=!!(np&&me.pos.distanceTo(np.pos)<=CFG.DOCK_R);
+    return { t:r1(T0), own, contacts, market:docked?senseMarket(np):null, radio:radioBuf.length?radioBuf.splice(0):null }; }
+  function pushEp(kind,data,goal){ if(!ST) return; ST.episodes.push({ t:r1(T0), kind, data:data||{}, goal:goal||('GIVEN-role:'+(ship?ship.mode:'?')) });
+    if(ST.episodes.length>INH_CFG.EP_CAP) ST.episodes.splice(0,ST.episodes.length-INH_CFG.EP_CAP); }   // ring: oldest dropped
+  function trimTriples(){ if(ST.triples.length>INH_CFG.TRIPLE_CAP) ST.triples.splice(0,ST.triples.length-INH_CFG.TRIPLE_CAP); }
+  function upsert(s,r,o,src){ const ex=ST.triples.find(t=>t.s===s&&t.r===r&&t.o===o);
+    if(ex){ ex.conf=Math.min(1,+(ex.conf+INH_CFG.CONF_STEP).toFixed(2)); ex.t=r1(T0); return ex; }   // repeat observation → conf grows
+    const tr={ s, r, o, conf:INH_CFG.CONF_START, src:src||'episode', t:r1(T0) }; ST.triples.push(tr); trimTriples(); return tr; }
+  function upsertPrice(planet,good,price){ const o=good+'@'+price, ex=ST.triples.find(t=>t.s===planet&&t.r==='sells'&&String(t.o).indexOf(good+'@')===0);
+    if(ex){ if(ex.o===o) ex.conf=Math.min(1,+(ex.conf+INH_CFG.CONF_STEP).toFixed(2)); else { ex.o=o; ex.conf=INH_CFG.CONF_START; } ex.t=r1(T0); return; }   // price moved → re-learn from scratch
+    ST.triples.push({ s:planet, r:'sells', o, conf:INH_CFG.CONF_START, src:'episode', t:r1(T0) }); trimTriples(); }
+  function doTick(){ ST.counters.ticks++; if(!ship||!ship.alive) return;
+    const obs=sense(); lastObs=obs;
+    ST.counters.credits_seen.push(obs.own.credits); if(ST.counters.credits_seen.length>INH_CFG.CRED_SAMPLES) ST.counters.credits_seen.splice(0,ST.counters.credits_seen.length-INH_CFG.CRED_SAMPLES);
+    for(const c of obs.contacts){ if(c.type==='ship'&&!sawSet.has(c.name)){ sawSet.add(c.name); pushEp('saw',{ name:c.name, team:c.team, dist:c.dist }); } }   // first contact per ship per session
+    if(obs.own.system){ if(prevSystem&&obs.own.system!==prevSystem) pushEp('moved_system',{ from:prevSystem, to:obs.own.system }); prevSystem=obs.own.system; }
+    if(obs.market&&T0-priceObsT>=INH_CFG.PRICE_OBS_CD){ for(const m of obs.market) upsertPrice(m.planet,m.good,m.price); priceObsT=T0; } }
+  function tick(dt){ if(!ship||!ST) return; acc+=dt; saveAcc+=dt;
+    while(acc>=INH_CFG.INH_TICK){ acc-=INH_CFG.INH_TICK; doTick(); }
+    if(saveAcc>=INH_CFG.SAVE_EVERY){ saveAcc=0; save(); } }
+  // ---- game events involving the Inhabitant (each call site passes only what that event legitimately exposes to it) ----
+  function onDamaged(srcName,amount,fatal){ if(!ST) return; const amt=Math.max(0,amount||0);
+    ST.counters.damage_taken=Math.round((ST.counters.damage_taken+amt)*10)/10;
+    if(srcName) upsert(srcName,'damaged',ST.pilot,'episode');   // learned fact: WHO/what hurts me
+    dmgAcc+=amt; if(srcName) dmgSrc=srcName;
+    if(fatal||T0-dmgEpT>=INH_CFG.DMG_EP_CD){ pushEp('damaged',{ src:dmgSrc||'unknown', amount:Math.round(dmgAcc*10)/10, fatal:!!fatal }); dmgEpT=T0; dmgAcc=0; dmgSrc=null; } }
+  function onKill(victim){ if(!ST||!victim) return; pushEp('destroyed_foe',{ name:victim.name, team:victim.team }); }
+  function onDocked(p){ if(!ST||!p) return; pushEp('docked',{ planet:p.name }); upsert(ST.pilot,'docked_at',p.name,'episode');   // docking history
+    if(lastDockName!==p.name||T0-priceObsT>=INH_CFG.PRICE_OBS_CD){ for(const m of senseMarket(p)) upsertPrice(m.planet,m.good,m.price); priceObsT=T0; }
+    lastDockName=p.name; }
+  function onTraded(dir,p,good,amt){ if(!ST||!p) return; const price=Math.round(priceOf(p,good));
+    pushEp('traded',{ dir, planet:p.name, good, amt, price }); upsertPrice(p.name,good,price); }   // price observation at its OWN trade
+  function onRefueled(pName,gas){ if(!ST) return; pushEp('refueled',{ planet:pName, gas }); }
+  function onRadio(sender,msg,kind,data){ if(!ST||!ship||!ship.alive||!sender||sender===ship) return;
+    if(sender.pos.distanceTo(ship.pos)>CFG.COMM_R) return;   // out of radio range → it never heard this
+    const rec=pickWL({ from:sender.name, text:String(msg).slice(0,INH_CFG.TEXT_CLIP) });
+    radioBuf.push(rec); if(radioBuf.length>INH_CFG.RADIO_BUF_CAP) radioBuf.shift();
+    pushEp('heard',{ from:rec.from, text:rec.text });
+    if(kind==='help'&&data&&data.name) upsert(data.name,'attacked',sender.name,'radio'); }   // radio-sourced fact, labeled src:'radio'
+  // ---- persistence (contract INH_STATE_v1 — JSON-serializable round-trip) ----
+  function exportState(){ return JSON.stringify(ST); }
+  function importState(j){ const o=(typeof j==='string')?JSON.parse(j):j;
+    if(!o||o.version!==1||!Array.isArray(o.episodes)||!Array.isArray(o.triples)||!o.counters) throw new Error('INH.import: not a v1 INH_STATE');
+    ST={ version:1, pilot:String(o.pilot||(ship?ship.name:'?')), born:+o.born||0, episodes:o.episodes, triples:o.triples,
+      counters:{ ticks:+o.counters.ticks||0, credits_seen:Array.isArray(o.counters.credits_seen)?o.counters.credits_seen:[], damage_taken:+o.counters.damage_taken||0 } };
+    loadedPrev=false; priorAge=0;   // I9 round-trip FIX: an explicit import is THIS session's state, not a prior-session claim (awaken()'s load path sets these)
+    return true; }
+  function save(){ if(!ST) return false; try{ localStorage.setItem(INH_CFG.LS_KEY, exportState()); return true; }catch(e){ return false; } }
+  function load(){ try{ const j=localStorage.getItem(INH_CFG.LS_KEY); if(!j) return false; importState(j); return true; }catch(e){ return false; } }
+  function wipe(){ ST=freshState(ship?ship.name:'?'); sawSet=new Set(); prevSystem=null; lastObs=null; dmgAcc=0; dmgSrc=null; dmgEpT=-1e9; priceObsT=-1e9; lastDockName=null; radioBuf=[];
+    loadedPrev=false; priorAge=0;   // I9 round-trip FIX (puppet audit wave 1): a wiped mind must not report a prior life
+    try{ localStorage.removeItem(INH_CFG.LS_KEY); }catch(e){} }   // ablation/removal hook for the I2 puppet audit
+  function awaken(){ ship=null; for(const s of ships){ if(s.alive&&s.team==='squad'&&s.role!=='player'){ ship=s; break; } }   // deterministic: FIRST alive non-player squad ship at boot
+    if(!ship){ console.warn('INHABITANT: no eligible squad pilot at boot'); return null; }
+    ship.inhabitant=true;
+    if(load()&&ST.pilot===ship.name){ loadedPrev=true; priorAge=+(ST.counters.ticks*INH_CFG.INH_TICK).toFixed(1); }
+    else { ST=freshState(ship.name); loadedPrev=false; priorAge=0; }
+    console.log('INHABITANT: '+ship.name+' is awake'+(loadedPrev?(' — memory restored: prior age '+priorAge+'s · '+ST.episodes.length+' episodes · '+ST.triples.length+' triples'):' — fresh mind (no prior state)'));
+    return ship; }
+  function senseNow(){ const o=sense(); if(o) lastObs=o; return o; }   // manual sense (tests / hidden-tab pumping)
+  function senseAudit(){ const bad=[]; const chk=(rec,path)=>{ if(rec==null||typeof rec!=='object') return;
+      if(Array.isArray(rec)){ rec.forEach((x,i)=>chk(x,path+'['+i+']')); return; }
+      for(const k in rec){ if(SENSE_WHITELIST.indexOf(k)<0) bad.push(path+'.'+k); else chk(rec[k],path+'.'+k); } };
+    if(lastObs){ chk(lastObs.own,'own'); chk(lastObs.contacts,'contacts'); chk(lastObs.market,'market'); chk(lastObs.radio,'radio'); }
+    return { whitelist:SENSE_WHITELIST.slice(), violations:bad, ok:bad.length===0 }; }
+  function age(){ return ST?+(ST.counters.ticks*INH_CFG.INH_TICK).toFixed(1):0; }   // sim seconds, accumulates across sessions
+  addEventListener('pagehide',()=>save()); addEventListener('beforeunload',()=>save());   // persist on exit
+  return { awaken, tick, save, load, wipe, senseNow, senseAudit, age,
+    onDamaged, onKill, onDocked, onTraded, onRefueled, onRadio,
+    export:exportState, import:importState,
+    get ship(){ return ship; }, get state(){ return ST; }, get lastObs(){ return lastObs; },
+    loadedFromPrevious:()=>loadedPrev, priorAge:()=>priorAge };
 })();
 let WATCH_SEED_BUMP=0;   // each fresh `watch X` uses the next seed -> different (but deterministic) run; shows arbitrariness
 // --- watch convention: LIVE naming game. Mechanics ported VERBATIM from convention_vec.js (CFG POP:30; speaker utters a
@@ -1323,7 +1436,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
-  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (deep lore — follow-ups work; grounded or abstains · voice: <b>LLM Qwen local</b> when the speech sidecar is up, else the retrieval composer — public site = composer; see <b>tami</b>) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue) · <b>watch convention</b> (LIVE animated naming game)   TAMI: <b>tami</b> (battle-core status) · <b>demo battle</b> (auto-played REAL-rules battle — just watch; any battle button takes control back)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles; <b>Retreat</b> button flees with no rewards) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
+  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · <b>inhabitant</b> (the Inhabitant’s mind — its episodes/facts/persistence) · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (deep lore — follow-ups work; grounded or abstains · voice: <b>LLM Qwen local</b> when the speech sidecar is up, else the retrieval composer — public site = composer; see <b>tami</b>) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue) · <b>watch convention</b> (LIVE animated naming game)   TAMI: <b>tami</b> (battle-core status) · <b>demo battle</b> (auto-played REAL-rules battle — just watch; any battle button takes control back)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles; <b>Retreat</b> button flees with no rewards) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1539,6 +1652,18 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       if(!facts.length) return;
       sfEmit(speaker, '📖 GIVEN · story (crushed)', facts.map(t=>`${t.s} — ${t.o}`), facts.map(t=>`"${t.o}"`).join(' · '), rep||null);
       const st=stanceFor(fk, speaker); if(st.length) sfEmit(speaker, '🧭 stance · memory', st.map(x=>`${x.s} ${x.r} ${x.o}.`), 'GIVEN prior + story-nudged memory', null); });
+    return; }
+  if(c==='inhabitant'||c==='inh'){ const sI=INH.state, sh=INH.ship;   // I9 seed: EVERY number below is read from INH.state — nothing hand-typed
+    if(!need(sI&&sh,'no Inhabitant awake (it is chosen at boot — first alive non-player squad pilot)')) return;
+    const byKind={}; sI.episodes.forEach(e=>byKind[e.kind]=(byKind[e.kind]||0)+1);
+    term(`<b style="color:#8fd0ff">THE INHABITANT — ${sI.pilot}</b> · age ${INH.age()}s (${sI.counters.ticks} ticks × ${INH_CFG.INH_TICK}s, lifetime across sessions) · ${sh.alive?'alive':'down'} · mode ${sh.mode} · role ${sh.role}`,'sys');
+    term(`&nbsp;&nbsp;episodes ${sI.episodes.length}/${INH_CFG.EP_CAP}: ${Object.keys(byKind).map(k=>k+' '+byKind[k]).join(' · ')||'none yet'}`,'sys');
+    term(`&nbsp;&nbsp;triples ${sI.triples.length}/${INH_CFG.TRIPLE_CAP} · damage_taken ${sI.counters.damage_taken} · credits_seen (last ${sI.counters.credits_seen.length} samples) tail: ${sI.counters.credits_seen.slice(-5).join(', ')||'—'}`,'sys');
+    sI.episodes.slice(-3).reverse().forEach(e=>term(`&nbsp;&nbsp;· [${e.t}s] <b>${e.kind}</b> ${JSON.stringify(e.data).replace(/</g,'&lt;')} <span style="opacity:.5">${e.goal}</span>`,'sys'));
+    const rels={}; sI.triples.forEach(t=>rels[t.r]=(rels[t.r]||0)+1);
+    const sample=sI.triples.slice(-2).map(t=>`${t.s} ${t.r} ${t.o} (conf ${t.conf})`).join(' · ');
+    term(`&nbsp;&nbsp;GIVEN: role behavior, senses, renderer, Qwen mouth · LEARNED: ${sI.triples.length?(Object.keys(rels).map(k=>rels[k]+'× '+k).join(' · ')+(sample?' — e.g. '+sample.replace(/</g,'&lt;'):'')):'nothing yet (starts EMPTY — facts appear only from observation)'}`,'sys');
+    term(`&nbsp;&nbsp;persistence: loaded-from-previous <b>${INH.loadedFromPrevious()?'yes (prior age '+INH.priorAge()+'s)':'no'}</b> · autosave every ${INH_CFG.SAVE_EVERY}s + on exit → localStorage ${INH_CFG.LS_KEY} · INH.export()/INH.import(json)`,'sys');
     return; }
   if(c==='tami'){ tamiStatus(); return; }
   if(c==='demo'||c==='autobattle'){ if(c==='demo'&&(a[1]||'').toLowerCase()!=='battle'){ term('demo what? try: <b>demo battle</b> — an auto-played Tami battle on the C# core.','sys'); return; } demoBattle(); return; }
@@ -2232,6 +2357,7 @@ makePlanets();
 makeBase();   // M8: the Ranger Command hub
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=320; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull
+INH.awaken();   // I1/I2/I8: the Inhabitant wakes — deterministic (first alive non-player squad ship); restores INH_STATE_v1 if present
 for(let i=0;i<CFG.AST_KEEP;i++) spawnAtShell();
 buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTabs(); economyIsOrganic();
 term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English. <b>Dock/trade:</b> tap a planet or ⌂ base in the TOP-DOWN view (or the <b>DOCK</b> button) to fly there &amp; auto-dock, then <b>market</b> / <b>buy ore 10</b> / <b>sell</b>.","sys");
