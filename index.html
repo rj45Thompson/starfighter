@@ -1107,6 +1107,13 @@ function rankIdx(sc){ let i=0; for(let k=0;k<RANKS.length;k++) if(sc>=RANKS[k].p
 function rankOf(sc){ return RANKS[rankIdx(sc)]; }
 function checkRankUp(s){ const i=rankIdx(s.score||0); if(s.rankShown==null){ s.rankShown=i; return; } if(i>s.rankShown){ s.rankShown=i; if(s.role==='player'){ term(`★ PROMOTED to ${RANKS[i].n} (rank ${i+1}/${RANKS.length}).`,'sys'); ev(`You made ${RANKS[i].n}.`);} else say(s,`Promoted — ${RANKS[i].n}.`); } }
 function equipCost(s,k){ return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip&&s.equip[k])||0)); }
+// AC1 (Round 10): live bench numbers. bench_results.json is BAKED by `node run_all.js --json` — the game only READS it,
+// so every badge below is a real suite number, never hand-typed. If the fetch fails (file://, offline, not yet deployed)
+// the surface commands render exactly as before (prose fallback).
+let BENCHDATA=null; fetch('./bench_results.json').then(r=>r.ok?r.json():null).then(j=>{ BENCHDATA=j; }).catch(()=>{});
+function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
+  const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
+function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
 function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="color:#8fd0ff">&gt;</b> '+t.replace(/</g,'&lt;'),'');
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
@@ -1151,7 +1158,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     rows.sort((a,z)=>z.q-a.q).forEach(r=>term(`  ${r.label.padEnd(11,' ').replace(/ /g,'&nbsp;')} value <b style="color:${r.q>0.4?'#7fdc8a':(r.q<-0.4?'#ff6a6a':'#cfe2f5')}">${r.q>=0?'+':''}${r.q.toFixed(1)}</b> · tried ${r.n}×`,'sys'));
     term('  (top rows = what it DISCOVERED is worth engaging; it never read object TYPE — only size, speed & reward.)','sys'); return; }
   if(c==='society'||c==='swarm'||c==='world'){   // W15: surface the LEARNED multi-agent world (the bench IS the AGI; these are its audited results)
-    term('<b style="color:#8fd0ff">THE MULTI-AGENT WORLD</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#8fd0ff">THE MULTI-AGENT WORLD</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const R=[['🗣 communication','world_vec','a scout\'s LEARNED signal lets foragers find hidden food — sever it and yield falls to chance (load-bearing)'],
       ['🤝 theory-of-mind','swarm_vec','foragers SPREAD to avoid crowding a shared site; ablate it and they pile (yield 14→8)'],
       ['🔎 discovery','swarm_vec','learn which food TYPES pay (type-blind); ablate it and forage worthless sites (14→6.8)'],
@@ -1160,7 +1167,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🏙 civilization','civ_vec','240 agents: coalitions + polarization + scarcity-driven conflict EMERGE vs a blind control'],
       ['⚖ division of labour','roles_vec','from reward alone, agents differentiate into a BALANCED 50/50 role split'],
       ['🛰 fused society','magent_vec','one society: comm+ToM+discovery+nav each ablation-audited load-bearing']];
-    R.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    R.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">honest gaps: heavy-drift SLAM-DA + a learned synonym-matcher lift cross-pillar 4→5 (mechanism proven, converse\'s real graph is sparser).</span>','sys'); return; }
   if(c==='agent'||c==='why'){   // W17: surface the FUSED AGENT's target-choice reasoning (agent_vec), labeled learned
     term('<b style="color:#8fd0ff">THE FUSED AGENT</b> <span style="opacity:.6">— agent_vec (learned; run <code>node agent_vec.js</code>). How it picks where to trade, each pillar ablation-audited load-bearing:</span>','sys');
@@ -1172,7 +1179,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     ].forEach(t=>term('  '+t,'sys'));
     term('  <span style="opacity:.6">it banks profit only if it actually reaches the target — so every pillar matters. The ships you fly are the GIVEN visualizer; this reasoning is the learned bench.</span>','sys'); return; }
   if(c==='dynamics'||c==='evolution'||c==='openended'||c==='round5'){   // X9: surface the OPEN-ENDEDNESS dynamics (Round 5) — labeled visualizer of real audited bench numbers
-    term('<b style="color:#c9a0ff">OPEN-ENDEDNESS — how the world keeps GENERATING structure</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#c9a0ff">OPEN-ENDEDNESS — how the world keeps GENERATING structure</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const D=[['🧗 cumulative culture','culture_vec','faithful hand-down RATCHETS complexity 24→48; break transmission and it stalls at 25, lossy 22 — no single lifetime passes 36'],
       ['⚖ punishment norms','norms_vec','from reward alone cooperation COLLAPSES to 0.00 (free-riding); add a norm (cooperators fine defectors) and it holds at 1.00 (Fehr-Gächter)'],
       ['🐇 Red Queen','redqueen_vec','predator vs prey co-evolve: catch self-stabilises at 0.50 while traits ESCALATE forever — freeze the prey → predator wins 1.00, freeze the predator → prey escapes 0.00'],
@@ -1181,10 +1188,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🧬 meta-learning','meta_vec','learns-to-learn across a task family → adapts to a NEW task in a few steps (0.30 vs from-scratch 0.63); a meta-init from an UNRELATED family does NOT transfer'],
       ['👑 emergent leadership','hierarchy_vec','pure coordination, no boss handed down: trust SNOWBALLS onto one emergent leader (all 12 follow) → agreement 0.36→1.00; remove the coordination need and no leader forms'],
       ['🔗 honest ceiling','xpillar_vec','wiring the learned synonym-matcher into the REAL knowledge graph keeps cross-pillar at 4 (the graph is sparse; learned-merge == random) — DOCUMENTED, never faked']];
-    D.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    D.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each is ablation/control-audited, 0-fabrication. Type <code>society</code> for the multi-agent pillars, <code>agent</code> for the fused embodied agent.</span>','sys'); return; }
   if(c==='autonomy'||c==='agency'||c==='round6'){   // Y9: surface the OPEN-ENDED AGENCY pillars (Round 6) — labeled visualizer of real audited bench numbers
-    term('<b style="color:#7fe0c0">OPEN-ENDED AGENCY — an agent that generates its own problems, tools & skills</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#7fe0c0">OPEN-ENDED AGENCY — an agent that generates its own problems, tools & skills</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const A=[['♾ lifelong learning','continual_vec','learn task A then B: naive training FORGETS A (0.97→0.56); a small REPLAY buffer RETAINS it (0.87) — a non-conflicting task doesn\'t forget, so it\'s the CONFLICT'],
       ['🧗 POET (problems+solvers)','poet_vec','co-evolve environments & solvers: a self-generated 17-step CURRICULUM solves the hard task (fitness 0.99); DIRECT optimisation with MORE budget scores 0'],
       ['🪜 skill reuse','skills_vec','DISCOVER the reusable doorway bottlenecks from experience, plan over them → 468→66 search steps (7× cheaper); off-path subgoals give NO speedup'],
@@ -1193,10 +1200,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🪞 metacognition','metacog_vec','the agent predicts its OWN correctness and ABSTAINS when unsure → accuracy 0.75→0.87 (answer the confident half); shuffled confidence gives no lift (calibrated, ECE 0.01)'],
       ['🤝 negotiation','negotiate_vec','two self-interested agents LEARN to split a surplus at the NASH bargaining point (equal split above outside options); a better outside option buys more; greedy demands BREAK DOWN'],
       ['🔷 abstraction','abstract_vec','learn SAME-vs-DIFFERENT as a RELATION → transfers to NOVEL objects never seen (0.99); an identity-memoriser nails seen (1.0) but is chance on novel (0.54)']];
-    A.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    A.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>dynamics</code> for the open-endedness world, <code>society</code> for the multi-agent pillars.</span>','sys'); return; }
   if(c==='worldmodel'||c==='deliberate'||c==='round7'){   // Z9: surface the WORLD MODELS & DELIBERATIVE AGENCY pillars (Round 7) — labeled visualizer of real audited bench numbers
-    term('<b style="color:#9fb8ff">WORLD MODELS & DELIBERATIVE AGENCY — imagine, predict, plan & learn from others</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#9fb8ff">WORLD MODELS & DELIBERATIVE AGENCY — imagine, predict, plan & learn from others</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const W=[['🧠 world model','worldmodel_vec','learn the transition model and PLAN IN IMAGINATION → reach a sparse goal in 455 real steps vs model-free 3734 (8× fewer); a CORRUPTED model never solves'],
       ['🔬 active learning','active_vec','query the most INFORMATIVE (most-uncertain) point → learn a concept in 8.3 labels vs random 25.5 (3× fewer); the queries sit right on the decision boundary'],
       ['🧩 compositional','compose_vec','learn operator⊙operand and GENERALISE to NOVEL combinations never trained (1.0); a joint memoriser nails the seen pairs but is 0.0 on novel'],
@@ -1205,10 +1212,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🪜 long-horizon plan','plan_vec','a small near reward vs a BIG far one: a long planning horizon takes the distant big reward at every distance; a MYOPIC learner grabs the near one — failing as the horizon grows'],
       ['✨ curiosity','curious_vec','a count-based NOVELTY bonus explores a reward-SPARSE maze → covers 90/91 cells & reaches the goal; a reward-only agent random-walks and STALLS (dense reward fixes it — curiosity is for sparsity)'],
       ['🛡 robustness','robust_vec','a spurious feature that FLIPS at test breaks a naive learner (0.34, below chance); training across environments forces the CAUSAL feature → robust under shift (0.84)']];
-    W.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    W.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>autonomy</code> for open-ended agency, <code>dynamics</code> for open-endedness.</span>','sys'); return; }
   if(c==='grounded'||c==='reasoning'||c==='round8'){   // AA9: surface the GROUNDED LANGUAGE & ABSTRACT REASONING pillars (Round 8) — labeled visualizer of real audited bench numbers
-    term('<b style="color:#d9b3ff">GROUNDED LANGUAGE & ABSTRACT REASONING — symbols, analogy & thinking before acting</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#d9b3ff">GROUNDED LANGUAGE & ABSTRACT REASONING — symbols, analogy & thinking before acting</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const L=[['🔤 symbol grounding','symbol_vec','learn a hidden word↔object map from AMBIGUOUS scenes (cross-situational) → 1.0; MUTUAL EXCLUSIVITY fast-maps a NOVEL word to a novel object one-shot (1.0) vs 0.32 without elimination'],
       ['🧭 instruction following','instruct_vec','parse (verb,direction,count)→action sequence and GENERALISE to NOVEL combinations (SCAN systematicity) 1.0; a holistic memoriser fits the seen commands but is 0.0 on novel'],
       ['🔗 analogy A:B::C:?','analogy_vec','learn the RELATION (a linear map) from exemplar pairs and apply it in a NOVEL domain → 1.0; a surface-similarity baseline is at chance (0.18) — it\'s the relation, not the features'],
@@ -1217,10 +1224,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🧠 false-belief (ToM)','belief_vec','track where an agent BELIEVES an object is (the last state they witnessed) → 1.0 on the false-belief case; answering from reality fails it (0.0) but passes the true-belief control (1.0)'],
       ['✓ self-verification','verify_vec','CHECK each reasoning step & backtrack on an invalid one → answered accuracy 0.99 where unchecked generation compounds errors to 0.15; a shuffled (fake) verifier gives no lift'],
       ['🔵 grounded semantics','ground_vec','ground each predicate then COMPOSE to judge "a red object left-of a blue one" → NOVEL predicate combinations 1.0; a holistic classifier that can\'t compose falls to 0.66']];
-    L.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    L.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>worldmodel</code> for world models & deliberative agency, <code>autonomy</code> for open-ended agency.</span>','sys'); return; }
   if(c==='dialogue'||c==='society2'||c==='round9'){   // AB9: surface the MULTI-AGENT LANGUAGE GAMES & GROUNDED DIALOGUE pillars (Round 9) — labeled visualizer of real audited bench numbers
-    term('<b style="color:#ffd9a0">MULTI-AGENT LANGUAGE GAMES & GROUNDED DIALOGUE — reason, teach & argue with other minds</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>','sys');
+    term('<b style="color:#ffd9a0">MULTI-AGENT LANGUAGE GAMES & GROUNDED DIALOGUE — reason, teach & argue with other minds</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const Dg=[['🎯 pragmatic reference','refer_vec','pick the message that UNIQUELY identifies the target in context → listener 1.0 vs a literal (context-blind) speaker 0.66; when NO distinguishing message exists pragmatics honestly can\'t help (0.5 = 0.5)'],
       ['🎓 pedagogy','teach_vec','a helpful teacher + a learner who reasons about WHY those examples were chosen pin a concept in 3.0 examples — below the log2(20)=4.3 bisection bound; without pedagogy 4.7 (above it)'],
       ['🤝 common ground','commonground_vec','two agents with DISJOINT partial maps fuse them through dialogue (exchange frontiers) → 1.0 where each alone is 0.58; a single exchange can\'t traverse the long path (0.71)'],
@@ -1229,7 +1236,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🏷 emergent convention','convention_vec','30 agents agree on ONE arbitrary name with no coordinator (naming game) → consensus 1.0; 6 runs → 6 DIFFERENT winners (emergent symmetry-breaking); no reinforcement → no convention'],
       ['👥 peer verification','peerverify_vec','a jury of INDEPENDENT learned verifiers: majority accuracy rises 0.71→0.87 with jury size (Condorcet); CORRELATED (colluding) verifiers stay at 0.70 — independence, not voting, buys reliability'],
       ['🌐 translation','translate_vec','two agents grounded the SAME world in DIFFERENT codes; from a few paired anchors they LEARN the mapping → translate 1.0; without alignment: mutual unintelligibility (0.008 ≈ chance)']];
-    Dg.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}`,'sys'));
+    Dg.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>grounded</code> for language & reasoning, <code>worldmodel</code> for world models.</span>','sys'); return; }
   if(c==='land'||c==='disembark'||c==='surface'){ const P=ships[0]; const np=nearestPlanet(P.pos);
     const pl = P.docked || (np && P.pos.distanceTo(np.pos)<=CFG.DOCK_R*1.6 ? np : null);

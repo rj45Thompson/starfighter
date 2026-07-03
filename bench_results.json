@@ -1,0 +1,2290 @@
+{
+ "generated": "2026-07-03T05:59:48.459Z",
+ "suite": "65/65",
+ "claims_total": 354,
+ "benches": {
+  "phys_vec": {
+   "green": true,
+   "flags_true": 2,
+   "flags_total": 2,
+   "runtime_ms": null,
+   "audit": {
+    "decode_torque_relErr": 0.003,
+    "decode_thrust_relErr": 0.001,
+    "recovered_ok": true,
+    "mutation_stale_model_relErr": 1.029,
+    "mutation_redecoded_relErr": 0.003,
+    "mutation_test_passes": true,
+    "sample_learned_triples": [
+     "(wire0, torques, [-0.49,-0.03,0.26])",
+     "(wire0, thrusts, -0.41)",
+     "(wire1, torques, [-0.44,-0.26,0.02])"
+    ]
+   }
+  },
+  "econ_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": null,
+   "audit": {
+    "learned_avg_profit": 12232,
+    "random_avg_profit": -584,
+    "learned_beats_random": true,
+    "organic_market": true,
+    "no_omniscience": "by construction — planRoute reads only tr.obs (visited), never priceOf directly",
+    "mutation_stale_profit": -11569,
+    "mutation_relearned_profit": 12566,
+    "mutation_passes": true,
+    "sample_learned_triples": [
+     "(planet0, sells_cheap, good2@6.8)",
+     "(planet3, sells_cheap, good0@7.5)",
+     "(planet4, buys_dear, good0@12.6)"
+    ]
+   }
+  },
+  "comm_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": null,
+   "audit": {
+    "game": "Lewis signaling — the code EMERGES from reward only; no symbol meaning is given or hardcoded",
+    "chance": 0.2,
+    "early_accuracy": 0.6,
+    "learned_accuracy": 1,
+    "learned_beats_chance": true,
+    "ablation_shuffled_code": 0,
+    "code_is_load_bearing": true,
+    "mutation_stale": 0.2,
+    "mutation_relearned": 1,
+    "mutation_passes": true,
+    "adversary_pooling_acc": 0.8,
+    "pooling_ceiling": 0.8,
+    "pooling_ceiling_respected": true,
+    "adversary_noise0": 1,
+    "adversary_noise60": 0.49,
+    "channel_noise_degrades": true,
+    "emerged_code": [
+     "situation0 signalled_as symbol2",
+     "situation1 signalled_as symbol3",
+     "situation2 signalled_as symbol0",
+     "situation3 signalled_as symbol1",
+     "situation4 signalled_as symbol4",
+     "symbol0 means action1",
+     "symbol1 means action0",
+     "symbol2 means action4",
+     "symbol3 means action2",
+     "symbol4 means action3"
+    ]
+   }
+  },
+  "tom_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": null,
+   "audit": {
+    "task": "infer another agent's HIDDEN disposition from its behaviour; predict its choices (LEARNED model, not a coded rule)",
+    "chance": 0.2,
+    "learned_prediction_acc": 0.99,
+    "beats_chance": true,
+    "control_random_other_acc": 0.21,
+    "honest_cannot_predict_noise": true,
+    "mutation_stale": 0.09,
+    "mutation_relearned": 0.97,
+    "mutation_passes": true,
+    "confound_popularity_acc": 0.26,
+    "beats_popularity_confound": true,
+    "inferred": [
+     "rival prefers high feature4",
+     "rival is predictable"
+    ]
+   }
+  },
+  "discover_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": null,
+   "audit": {
+    "task": "discover WHICH feature-regions are worth engaging from reward+curiosity — no goal menu, no type ever read",
+    "per_step_discovered": 0.511,
+    "per_step_engage_everything": 0.224,
+    "discovers_value": true,
+    "control_structureless_discovered": -0.003,
+    "control_structureless_baseline": -0.005,
+    "honest_no_value_without_structure": true,
+    "mutation_stale_net": 0.011,
+    "mutation_rediscovered_net": 0.453,
+    "mutation_passes": true,
+    "typeleak_cheat_reads_type": 0.5,
+    "typeleak_honest_features_only": 0,
+    "typeleak_engage_all": 0,
+    "type_signal_exploitable_by_cheat": true,
+    "honest_is_type_blind": true,
+    "discovered": [
+     "goal discovered_in region f0=2 f1=0",
+     "agent avoids region f0=0 f1=0"
+    ]
+   }
+  },
+  "nav_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": null,
+   "audit": {
+    "inputs": "RAW (relative-goal vector + proprioception) — NO hand-engineered cross/dot features",
+    "policy": "16-unit hidden layer (a depth the mutation must use); model-free; evolved by MORTALITY selection",
+    "heldout_success_random": 0.07,
+    "heldout_success_evolved": 0.42,
+    "evolved_beats_random": true,
+    "wire_ignoring_policy_success": 0.07,
+    "dies_if_not_using_wires": true,
+    "mutation_stale_success": 0.08,
+    "mutation_reevolved_success": 0.6,
+    "mutation_passes": true
+   }
+  },
+  "slam_vec": {
+   "green": true,
+   "flags_true": 10,
+   "flags_total": 10,
+   "runtime_ms": null,
+   "audit": {
+    "task": "SLAM: solve every pose + every landmark from noisy odometry + relative observations; no omniscient pose, no handed loop closures",
+    "poses": 52,
+    "landmarks": 46,
+    "seen": 42,
+    "reobserved_2plus": 42,
+    "observations": 430,
+    "dead_reckoning_err": 1.59,
+    "solved_err": 0.041,
+    "ablation_noobs_err": 1.59,
+    "landmark_map_err": 0.037,
+    "dead_reckoning_drifts": true,
+    "landmarks_reobserved_are_closures": true,
+    "sensing_corrects_the_drift": true,
+    "observations_load_bearing": true,
+    "heldout_residual": 0.08,
+    "heldout_deadreckon_residual": 1.774,
+    "predicts_unseen_observations_no_leak": true,
+    "mutation_stale_err": 12.37,
+    "mutation_relearned_err": 0.031,
+    "mutation_passes": true,
+    "data_assoc_clusters": 13,
+    "da_true_landmarks": 18,
+    "data_assoc_err": 0.098,
+    "da_withid_err": 0.057,
+    "da_deadreckon_err": 0.521,
+    "data_assoc_purity": 0.824,
+    "shuffled_assoc_err": 9.104,
+    "data_assoc_map_solved": true,
+    "data_assoc_recovers_landmarks": true,
+    "data_assoc_beats_shuffled": true,
+    "data_assoc_drift_sweep": [
+     {
+      "bias": 0.015,
+      "drift": 0.52,
+      "purity": 0.82,
+      "map_err": 0.1
+     },
+     {
+      "bias": 0.06,
+      "drift": 2.12,
+      "purity": 0.82,
+      "map_err": 0.1
+     },
+     {
+      "bias": 0.12,
+      "drift": 4.28,
+      "purity": 0.76,
+      "map_err": 0.17
+     },
+     {
+      "bias": 0.2,
+      "drift": 7.17,
+      "purity": 0.75,
+      "map_err": 8.1
+     }
+    ],
+    "data_assoc_robust_to_moderate_drift": true,
+    "map_sample": [
+     "landmark0 mapped_at pos_-8_3",
+     "landmark1 mapped_at pos_-11_1.5",
+     "landmark2 mapped_at pos_10_8",
+     "landmark3 mapped_at pos_0.5_8.5",
+     "landmark4 mapped_at pos_-10_0.5",
+     "landmark5 mapped_at pos_6_-5.5",
+     "landmark6 mapped_at pos_10.5_-8",
+     "landmark7 mapped_at pos_8.5_-0.5",
+     "landmark9 mapped_at pos_-2.5_-1",
+     "landmark10 mapped_at pos_-1.5_-9",
+     "map solved_from observations",
+     "pose localized_by landmark_reobservation",
+     "observations sensed_as relative_vector"
+    ]
+   }
+  },
+  "creativity_vec": {
+   "green": true,
+   "flags_true": 2,
+   "flags_total": 2,
+   "runtime_ms": null,
+   "audit": {
+    "genome": "controller weights; operators = point + hidden-unit PERMUTE + CROSSOVER (all permutations that matter)",
+    "behaviour_space": "36 cells (avg turn-rate x avg speed)",
+    "QD_coverage": "17/36",
+    "QD_reached_cells": 6,
+    "QD_verified_cells": 8,
+    "QD_score": -843,
+    "fitness_only_coverage": "4/36",
+    "creativity_beats_fitness_only": true,
+    "repertoire_is_VERIFIED": true,
+    "note": "creativity = novel solutions the WORLD verifies; QD fills many behaviour cells with working flyers, fitness-only collapses to one."
+   }
+  },
+  "vgs_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": null,
+   "audit": {
+    "tech": "VERIFIER-GATED SAMPLING (the Las Vegas transform) on the P4 economy — candidates = arbitrage ASTs",
+    "generator": "fallible (guesses arbitrage claims, never checks)",
+    "verifier": "sound — recompute the trade profit in the market",
+    "raw_solved": 6,
+    "raw_fabricated": 34,
+    "raw_precision": 0.15,
+    "vgs_solved": 21,
+    "vgs_fabrications": 0,
+    "vgs_abstained": 19,
+    "vgs_precision": 1,
+    "vgs_recall": 0.53,
+    "raw_generator_fabricates": true,
+    "vgs_zero_fabrication": true,
+    "vgs_beats_raw_precision": true,
+    "vgs_retains_recall": true,
+    "sample_committed_AST": "(arbitrage (buy g3 @p2) (sell @p3))"
+   }
+  },
+  "memory_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": null,
+   "audit": {
+    "task": "recall a learned cue->action association across a distractor DELAY; memory must be LEARNED (gate) + used",
+    "chance": 0.25,
+    "learned_recall": 1,
+    "memory_beats_chance": true,
+    "same_agent_memory_off": 0.28,
+    "trained_no_memory": 0.24,
+    "memory_is_load_bearing": true,
+    "recall_delay2": 1,
+    "recall_delay14": 0.97,
+    "delay_invariant": true,
+    "gate_on_cue": 0.092,
+    "gate_on_noise": 0.012,
+    "gate_writes_cue_not_noise": true,
+    "mutation_stale": 0.51,
+    "mutation_relearned": 1,
+    "mutation_passes": true,
+    "per_cue_min_accuracy": 1,
+    "discriminates_all_cues": true,
+    "gate_on_cue_norm": 0.092,
+    "gate_on_loud_diffuse": 0.035,
+    "gate_keys_on_peak_not_magnitude": true,
+    "recalled": [
+     "cue0 recalled_as action3",
+     "cue1 recalled_as action1",
+     "cue2 recalled_as action0",
+     "cue3 recalled_as action2"
+    ]
+   }
+  },
+  "transfer_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": null,
+   "audit": {
+    "task": "a REWARD-learned linear skill transfers to a RELATED world (fast) but not an UNRELATED one (negative control)",
+    "budget": 8,
+    "related_transfer": 0.87,
+    "related_scratch": 0.56,
+    "transfer_helps_related": true,
+    "unrelated_transfer": 0.5,
+    "unrelated_scratch": 0.57,
+    "unrelated_no_help": true,
+    "transfer_advantage_related": 0.32,
+    "transfer_advantage_unrelated": -0.07,
+    "transfer_is_structural": true,
+    "shuffled_source_transfer": 0.5,
+    "shuffled_advantage": -0.06,
+    "shuffled_source_no_better_than_scratch": true,
+    "transfer_needs_real_direction": true,
+    "learned": [
+     "a skill transfers_to a related world",
+     "a skill does_not_transfer_to an unrelated world"
+    ]
+   }
+  },
+  "saga_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": null,
+   "audit": {
+    "task": "read a novel: crush thousands of interaction-facts into latent per-entity profiles + valenced interaction memory + genetic inheritance of disposition",
+    "characters": 64,
+    "factions": 3,
+    "interactions": 4000,
+    "distinct_verbs": 12,
+    "crush_recall": 1,
+    "lossy_recall": 0.098,
+    "crush_is_complete": true,
+    "reconstruct_precision": 1,
+    "corrupt_precision": 0.952,
+    "zero_fabrication": true,
+    "latent_margin": 0.05,
+    "shuffled_label_margin": 0.001,
+    "latent_clusters_by_behavior": true,
+    "disposition_vs_events": 0.984,
+    "prior_only_vs_events": 0.615,
+    "disposition_tracks_counted_valence": true,
+    "grudge_corr": -0.682,
+    "nemesis_harm_count": 12,
+    "nemesis_disposition": -11.89,
+    "grudge_grows_with_repeated_harm": true,
+    "heritability_corr": 0.988,
+    "random_parent_corr": 0.13,
+    "high_mutation_corr": 0.424,
+    "disposition_is_heritable": true,
+    "lineage_corr_low_mut": 0.597,
+    "lineage_corr_high_mut": 0.048,
+    "grudge_handed_down_across_generations": true
+   }
+  },
+  "civ_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 48,
+   "audit": {
+    "task": "civilization at scale under contention: hundreds of agents act on disposition memory, reproduce genetically; watch for EMERGENT coalitions / polarization / scarcity-driven conflict (vs a disposition-blind control)",
+    "agents": 240,
+    "factions": 5,
+    "rounds": 120,
+    "interactions": 31200,
+    "runtime_ms": 48,
+    "modularity_real": 0.606,
+    "modularity_blind": 0.009,
+    "coalitions_emerge": true,
+    "polar_start": 0.635,
+    "polar_end": 1.981,
+    "polar_end_blind": 0.635,
+    "polarizes_over_time": true,
+    "conflict_low_scarcity": 0.643,
+    "conflict_high_scarcity": 0.946,
+    "contention_drives_conflict": true,
+    "within_coop_rate": 0.759,
+    "cross_coop_rate": 0.003,
+    "ingroup_cooperation_emerges": true,
+    "emergent_not_imposed": true,
+    "heritability_corr": 0.995,
+    "random_parent_corr": 0.202,
+    "disposition_transmits_genetically": true,
+    "scales_without_bogging_down": true
+   }
+  },
+  "fluent_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": null,
+   "audit": {
+    "task": "fluent English verbalization of grounded triples behind a ROUND-TRIP GUARD (commit fluent only if it re-parses to the same facts, else structural fallback)",
+    "groups": 6,
+    "triples": 12,
+    "sentences": 8,
+    "triples_per_sentence": 1.5,
+    "roundtrip_preserves_all_facts": true,
+    "fluent_beats_structural": true,
+    "corruptions_tested": 60,
+    "corruptions_caught": 60,
+    "guard_catches_corruption": true,
+    "unrealizable_mode": "structural",
+    "unrealizable_falls_back": true,
+    "deterministic": true,
+    "sample_fluent": [
+     "Wire2 produces torque. Policy drives wire2, and reaches goal.",
+     "Trade profits from Halcyon. Halcyon sells cheap ore.",
+     "The Iron Synod distrusts the Coalition, and is neutral toward the Free Traders.",
+     "VEGA stands with the Coalition, and is wary of the Iron Synod.",
+     "Map solved from observations, and feeds policy.",
+     "Cue3 recalled as action1."
+    ]
+   }
+  },
+  "fusion_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": null,
+   "audit": {
+    "task": "FUSED agent: navigate (P2 controller, P1 body) using the pose it estimates with its own SLAM map (P3)",
+    "slam_pose_error": 0.075,
+    "deadreckon_pose_error": 14.366,
+    "slam_pose_beats_deadreckon": true,
+    "omniscient_reach": 0.76,
+    "slam_reach": 0.67,
+    "deadreckon_reach": 0.09,
+    "slam_matches_omniscient": true,
+    "deadreckon_breaks_navigation": true,
+    "slam_map_is_load_bearing_for_nav": true,
+    "fusion_passes": true,
+    "fused_edges": [
+     "map feeds policy",
+     "goal reached_using map"
+    ]
+   }
+  },
+  "agent_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 14593,
+   "audit": {
+    "task": "FUSED AGENT (6 pillars): fly the learned controller (P2) on the decoded body (P1) using the SLAM-estimated pose (P3), to the economy's (P4) most-profitable planet — REMEMBERED across a delay (P10), the economy TRANSFERRED to a related market (P11). Bank profit only if reached. Each pillar ABLATION-audited in the SAME agent.",
+    "pillars_coupled": [
+     "P1 body",
+     "P2 nav",
+     "P3 slam",
+     "P4 economy",
+     "P10 memory",
+     "P11 transfer"
+    ],
+    "slam_pose_error": 0.075,
+    "deadreckon_pose_error": 14.366,
+    "memory_recall_learned": 1,
+    "memory_recall_none": 0.24,
+    "transfer_related": 0.87,
+    "transfer_scratch": 0.56,
+    "reach_rate": 0.68,
+    "best_possible_profit": 12.89,
+    "fused_profit": 8.13,
+    "ablation_ledger": {
+     "remove P2 (controller)": 0,
+     "remove P3 (SLAM pose)": 0.86,
+     "remove P4 (economy)": 6.38,
+     "remove P10 (memory)": 6.55,
+     "remove P11 (transfer)": 7.26
+    },
+    "profit_drop_when_removed": {
+     "P2": 1,
+     "P3": 0.89,
+     "P4": 0.22,
+     "P10": 0.2,
+     "P11": 0.11
+    },
+    "fused_banks_profit": true,
+    "P2_controller_load_bearing": true,
+    "P3_slam_load_bearing": true,
+    "P4_economy_load_bearing": true,
+    "P10_memory_load_bearing": true,
+    "P11_transfer_load_bearing": true,
+    "every_pillar_load_bearing": true,
+    "honest_modality_boundary": "P5 comm / P6 ToM / P7 discovery / P8 creativity are different MODALITIES (a Lewis game, another mind, open-ended goals, verified-novelty) — deliberately NOT forced into this embodied trader; they stay standalone benches. P1 (body decode) is inherited from fusion_vec (mutation-audited there).",
+    "runtime_ms": 14593
+   }
+  },
+  "world_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 89,
+   "audit": {
+    "task": "multi-agent world: a scout broadcasts a LEARNED signal; W foragers decode it to find hidden food. Communication is load-bearing for the collective yield.",
+    "L": 8,
+    "S": 8,
+    "foragers": 6,
+    "chance": 0.125,
+    "collective_yield": 1,
+    "yield_signal_severed": 0.135,
+    "signaling_is_learned": true,
+    "communication_is_load_bearing": true,
+    "second_seed_yield": 1,
+    "code_agreement_across_seeds": 0.13,
+    "code_is_emergent_not_authored": true,
+    "bottleneck_yield": 0.505,
+    "pooling_ceiling": 0.5,
+    "respects_pooling_ceiling": true,
+    "mutation_stale": 0.122,
+    "mutation_relearned": 1,
+    "mutation_relearns": true,
+    "aligned_yield": 1,
+    "opposed_scout_yield": 0.505,
+    "indifferent_scout_yield": 0.119,
+    "honesty_requires_aligned_incentives": true,
+    "runtime_ms": 89
+   }
+  },
+  "swarm_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 393,
+   "audit": {
+    "task": "multi-agent congestion foraging: spread across the VALUABLE sites (shared yield). ToM (avoid crowds) + discovery (which types pay) each LEARNED from reward and each load-bearing.",
+    "sites": 16,
+    "foragers": 8,
+    "types": 4,
+    "best_possible_yield": 16,
+    "full_yield": 14,
+    "full_spread": 0.88,
+    "full_occupied": 7,
+    "ablate_ToM_yield": 8,
+    "ablate_ToM_spread": 0.5,
+    "ablate_discovery_yield": 6.78,
+    "ablate_neither_yield": 6.64,
+    "foragers_spread_not_pile": true,
+    "tom_is_load_bearing": true,
+    "discovery_is_load_bearing": true,
+    "full_near_optimal": true,
+    "every_component_load_bearing": true,
+    "low_budget": 12,
+    "related_transfer": 14.23,
+    "related_scratch": 10.06,
+    "unrelated_transfer": 10.54,
+    "unrelated_scratch": 12,
+    "coordination_transfers_to_related": true,
+    "transfer_is_structural": true,
+    "runtime_ms": 393
+   }
+  },
+  "lang_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": 7,
+   "audit": {
+    "task": "a population evolves a COMPOSITIONAL language via iterated learning; a transmission BOTTLENECK drives compositionality up over generations (topographic similarity).",
+    "meanings": 25,
+    "alphabet": 6,
+    "signal_len": 2,
+    "generations": 40,
+    "bottleneck": 12,
+    "handcrafted_compositional_topsim": 1,
+    "random_topsim": 0.032,
+    "topsim_measure_valid": true,
+    "gen0_topsim": 0.034,
+    "final_topsim_with_bottleneck": 0.659,
+    "compositionality_emerges": true,
+    "final_topsim_no_bottleneck": 0.034,
+    "bottleneck_is_required": true,
+    "runtime_ms": 7
+   }
+  },
+  "dialect_vec": {
+   "green": true,
+   "flags_true": 2,
+   "flags_total": 2,
+   "runtime_ms": 6,
+   "audit": {
+    "task": "feed the emergent dialect into a society: shared dialect -> mutual intelligibility -> cooperation -> coalitions along dialect lines.",
+    "groups": 4,
+    "agents": 120,
+    "meanings": 25,
+    "same_dialect_intelligibility": 1,
+    "cross_dialect_intelligibility": 0,
+    "within_dialect_coop": 1,
+    "cross_dialect_coop": 0,
+    "shared_dialect_drives_cooperation": true,
+    "coalition_modularity": 0.757,
+    "shuffled_modularity": 0.001,
+    "coalitions_along_dialect_lines": true,
+    "runtime_ms": 6
+   }
+  },
+  "matcher_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": 2,
+   "audit": {
+    "task": "a LEARNED co-occurrence matcher recovers synonyms the lexical matcher misses, merging them to earn a 5-pillar chain (cross-pillar past the lexical ceiling of 4).",
+    "synonym_cosine": 0.889,
+    "random_pair_cosine": 0.192,
+    "learned_matcher_recovers_synonyms": true,
+    "cross_pillar_lexical": 2,
+    "cross_pillar_with_learned_matcher": 5,
+    "learned_matcher_deepens_chain": true,
+    "cross_pillar_random_merge": 2,
+    "deepening_needs_real_synonymy": true,
+    "honest_note": "MECHANISM demo on a graph built with synonym gaps; the synonyms are LEARNED from co-occurrence (not told). Wiring this into converse's real graph is a further step — its synonyms are sparser (the embedder-wall caveat).",
+    "runtime_ms": 2
+   }
+  },
+  "magent_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 271,
+   "audit": {
+    "task": "FUSED MULTI-AGENT: collective foraging yield = product of four LEARNED capabilities (communication, theory-of-mind, discovery, navigation), each from its own audited bench, each ablation-audited in the same society.",
+    "capability_rates": {
+     "comm_on": 1,
+     "comm_off": 0.14,
+     "spread_on": 0.88,
+     "spread_off": 0.5,
+     "value_on": 0.88,
+     "value_off": 0.42,
+     "nav_on": 1,
+     "nav_off": 0.3
+    },
+    "full_yield": 0.766,
+    "ablation_ledger": {
+     "remove comm (P5)": 0.103,
+     "remove ToM (P6)": 0.438,
+     "remove discovery (P7)": 0.371,
+     "remove nav (P2)": 0.23
+    },
+    "yield_drop_when_removed": {
+     "comm": 0.86,
+     "tom": 0.43,
+     "discovery": 0.52,
+     "nav": 0.7
+    },
+    "comm_load_bearing": true,
+    "tom_load_bearing": true,
+    "discovery_load_bearing": true,
+    "nav_load_bearing": true,
+    "every_capability_load_bearing": true,
+    "note": "each factor is a REAL learned bench performance (world_vec comm on/off; swarm_vec spread + value on/off); the fused claim is that all four are jointly load-bearing for the society, like agent_vec for the embodied trader.",
+    "runtime_ms": 271
+   }
+  },
+  "roles_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": 44,
+   "audit": {
+    "task": "emergent ROLES: from an identical start and reward alone, agents DIFFERENTIATE into stable, balanced role specialists (division of labour). Control: role-independent reward -> no specialization.",
+    "agents": 40,
+    "specialization": 1,
+    "role_balance": 1,
+    "fraction_role_A": 0.5,
+    "control_balance": 0.6,
+    "control_fraction_role_A": 0.7,
+    "roles_emerge_from_reward": true,
+    "division_of_labour_is_balanced": true,
+    "balance_needs_complementarity": true,
+    "runtime_ms": 44
+   }
+  },
+  "culture_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": 2,
+   "audit": {
+    "task": "cumulative culture: with faithful transmission, complexity RATCHETS up over generations far beyond any single lifetime; no/lossy transmission -> no ratchet.",
+    "bits": 48,
+    "innovation_budget_per_generation": 6,
+    "generations": 40,
+    "single_lifetime_best": 36,
+    "faithful_final": 48,
+    "no_transmission_final": 25,
+    "lossy_final": 22,
+    "culture_ratchets_up": true,
+    "no_individual_could_alone": true,
+    "transmission_is_required": true,
+    "fidelity_matters": true,
+    "faithful_curve_sample": [
+     24,
+     41,
+     46,
+     48
+    ],
+    "runtime_ms": 2
+   }
+  },
+  "norms_vec": {
+   "green": true,
+   "flags_true": 2,
+   "flags_total": 2,
+   "runtime_ms": 53,
+   "audit": {
+    "task": "public-goods game: cooperation is individually tempting to free-ride, so it COLLAPSES from reward alone; a punishment NORM (cooperators fine defectors at a cost) stabilises it.",
+    "agents": 50,
+    "multiplier": 3,
+    "cooperation_with_norm": 1,
+    "cooperation_no_norm": 0.001,
+    "cooperation_collapses_without_norms": true,
+    "norm_stabilises_cooperation": true,
+    "runtime_ms": 53
+   }
+  },
+  "redqueen_vec": {
+   "green": true,
+   "flags_true": 3,
+   "flags_total": 3,
+   "runtime_ms": 7,
+   "audit": {
+    "task": "predator-prey CO-EVOLUTION (Red Queen): both adapt -> neither wins, they circle at a constant gap with both traits still MOVING; freeze one -> the other wins.",
+    "coevolve_catch": 0.5,
+    "coevolve_prey_velocity": 0.01,
+    "coevolve_predator_velocity": 0.01,
+    "coevolve_trait_escalation": 180,
+    "freeze_prey_catch": 0.996,
+    "freeze_predator_catch": 0.004,
+    "both_keep_adapting": true,
+    "neither_wins_permanently": true,
+    "freezing_one_lets_the_other_win": true,
+    "runtime_ms": 7
+   }
+  },
+  "curriculum_vec": {
+   "green": true,
+   "flags_true": 8,
+   "flags_total": 8,
+   "runtime_ms": 7,
+   "audit": {
+    "task": "auto-curriculum (target-success staircase) keeps difficulty in the ZONE OF PROXIMAL DEVELOPMENT (just ahead of competence); it beats the oracle-best SINGLE fixed difficulty because the optimal difficulty MOVES as the learner improves.",
+    "curriculum_final": 0.966,
+    "curriculum_success_rate": 0.304,
+    "curriculum_final_difficulty": 1.084,
+    "best_fixed_final": 0.555,
+    "best_fixed_level": 7,
+    "too_easy_final": 0.14,
+    "too_hard_final": 0,
+    "random_difficulty_final": 0.217,
+    "frozen_at_final_difficulty_final": 0,
+    "early_mean_difficulty": 0.351,
+    "late_mean_difficulty": 0.803,
+    "corr_difficulty_competence": 0.998,
+    "corr_difficulty_step": 0.994,
+    "curriculum_beats_best_fixed": true,
+    "too_easy_plateaus_low": true,
+    "too_hard_never_starts": true,
+    "curriculum_holds_zpd_success": true,
+    "difficulty_climbs_as_learner_improves": true,
+    "difficulty_tracks_the_frontier": true,
+    "ramp_is_load_bearing": true,
+    "structure_beats_random_variety": true,
+    "runtime_ms": 7
+   }
+  },
+  "unified_vec": {
+   "green": true,
+   "flags_true": 12,
+   "flags_total": 12,
+   "runtime_ms": 14534,
+   "audit": {
+    "task": "UNIFIED AGENT: ONE society scout whose single compound mission needs EIGHT learned pillars at once — social (P5 comm, P6 ToM, P7 discovery) AND embodied (P4 economy, P11 transfer, P10 memory, P2 controller, P3 SLAM pose). Yield = product of the eight REAL learned rates; remove any pillar -> yield drops. Closes agent_vec's \"single agent exercising ALL pillars is the next frontier\".",
+    "pillars_exercised": [
+     "P5_comm",
+     "P6_tom",
+     "P7_discovery",
+     "P4_economy",
+     "P11_transfer",
+     "P10_memory",
+     "P2_nav",
+     "P3_slam"
+    ],
+    "pillars_count": 8,
+    "capability_rates": {
+     "comm": [
+      1,
+      0.14
+     ],
+     "tom": [
+      0.88,
+      0.5
+     ],
+     "discovery": [
+      0.88,
+      0.42
+     ],
+     "target_economy": [
+      0.87,
+      0.17
+     ],
+     "transfer": [
+      0.87,
+      0.56
+     ],
+     "memory": [
+      1,
+      0.24
+     ],
+     "reach_nav": [
+      0.68,
+      0
+     ],
+     "reach_slam": [
+      0.68,
+      0.08
+     ]
+    },
+    "unified_mission_yield": 0.456,
+    "ablation_ledger": {
+     "P5_comm": 0.0616,
+     "P6_tom": 0.2606,
+     "P7_discovery": 0.221,
+     "P4_economy": 0.0872,
+     "P11_transfer": 0.2904,
+     "P10_memory": 0.1083,
+     "P2_nav": 0,
+     "P3_slam": 0.0556
+    },
+    "yield_drop_when_removed": {
+     "P5_comm": 0.86,
+     "P6_tom": 0.43,
+     "P7_discovery": 0.52,
+     "P4_economy": 0.81,
+     "P11_transfer": 0.36,
+     "P10_memory": 0.76,
+     "P2_nav": 1,
+     "P3_slam": 0.88
+    },
+    "load_bearing": {
+     "P5_comm": true,
+     "P6_tom": true,
+     "P7_discovery": true,
+     "P4_economy": true,
+     "P11_transfer": true,
+     "P10_memory": true,
+     "P2_nav": true,
+     "P3_slam": true
+    },
+    "unified_agent_exercises_8_pillars": true,
+    "social_and_embodied_both_present": true,
+    "every_pillar_load_bearing": true,
+    "surpasses_agent_vec_scope": true,
+    "honest_boundary": "P8 creativity (verified novelty) and P9 program-synth (induce a program from examples) are genuinely different modalities — they produce ARTEFACTS, not a forager's mission outcome — so they stay standalone benches (creativity_vec/vgs_vec/ast_vec). P1 body-decode is inherited under reach (mutation-audited in fusion_vec). This unifies 8 of the behaviour pillars in one agent, up from agent_vec's 6.",
+    "runtime_ms": 14534
+   }
+  },
+  "meta_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 2032,
+   "audit": {
+    "task": "META-LEARNING (Reptile) on the sine family y=A*sin(x+phi): a learner trained across MANY sine tasks gets a meta-init that adapts to a NEW sine in a few steps; from-scratch is slow, and a meta-init from an UNRELATED family (parabolas) does NOT transfer.",
+    "eval_steps": 10,
+    "threshold": 0.1,
+    "query_mse_at_k": {
+     "meta": 0.297,
+     "scratch": 0.633,
+     "unrelated_meta": 1.026
+    },
+    "steps_to_threshold": {
+     "meta": 82.8,
+     "scratch": 142.1,
+     "unrelated_meta": 86.8
+    },
+    "loss_before_any_adaptation": {
+     "meta": 0.324,
+     "scratch": 1.084,
+     "unrelated_meta": 2.515
+    },
+    "meta_captures_family_structure": true,
+    "meta_adapts_faster_than_scratch": true,
+    "meta_reaches_threshold_sooner": true,
+    "unrelated_family_does_not_transfer": true,
+    "advantage_needs_related_structure": true,
+    "runtime_ms": 2032
+   }
+  },
+  "hierarchy_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 174,
+   "audit": {
+    "task": "emergent HIERARCHY: N agents in a PURE coordination game (no correct answer) must rally on one option; from reward, trust snowballs onto one emergent LEADER everyone copies -> agreement ~1. No coordination benefit -> no leader (flat); shuffle who-follows-whom -> agreement collapses.",
+    "agents": 12,
+    "options": 5,
+    "chance_agreement": 0.2,
+    "flat_baseline_agreement": 0.358,
+    "coordination": {
+     "agreement": 1,
+     "leader_followership": 1,
+     "followership_gini": 0.92
+    },
+    "shuffled_ablation": {
+     "agreement": 0.447
+    },
+    "no_coordination_control": {
+     "agreement": 0.358,
+     "leader_followership": 0.08,
+     "followership_gini": 0
+    },
+    "hierarchy_emerges_a_leader": true,
+    "leadership_improves_coordination": true,
+    "no_benefit_no_hierarchy": true,
+    "shuffling_breaks_coordination": true,
+    "leaderless_control_stays_near_chance": true,
+    "runtime_ms": 174
+   }
+  },
+  "continual_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 490,
+   "audit": {
+    "task": "CONTINUAL learning: learn A then B. Naive sequential FORGETS A (catastrophic interference); a small REPLAY buffer RETAINS A while still learning B. Control: a non-conflicting B does not cause forgetting -> the forgetting is from task CONFLICT.",
+    "accA_after_learning_A": 0.973,
+    "naive_sequential": {
+     "accA": 0.56,
+     "accB": 0.978
+    },
+    "with_replay": {
+     "accA": 0.873,
+     "accB": 0.963
+    },
+    "joint_upper_bound": {
+     "accA": 0.927,
+     "accB": 0.965
+    },
+    "control_nonconflicting_B_accA": 0.97,
+    "replay_buffer_size": 150,
+    "train_per_task": 400,
+    "catastrophic_forgetting_happens": true,
+    "naive_still_learns_B": true,
+    "replay_retains_A": true,
+    "replay_also_learns_B": true,
+    "replay_beats_naive_on_retention": true,
+    "conflict_causes_forgetting_not_training": true,
+    "runtime_ms": 490
+   }
+  },
+  "poet_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 131,
+   "audit": {
+    "task": "POET: co-evolve a population of (environment, solver) niches. Auto-generate harder envs admitted by a MINIMAL CRITERION (ZPD) and TRANSFER solvers between niches, walking a self-made curriculum to the far optimum that direct optimisation cannot reach.",
+    "poet": {
+     "niches": 17,
+     "max_difficulty": 1,
+     "solved_difficulty": 1,
+     "fitness_on_hardest": 0.992
+    },
+    "admitted_difficulties": [
+     0,
+     0.07,
+     0.14,
+     0.21,
+     0.28,
+     0.35,
+     0.42,
+     0.49,
+     0.56,
+     0.63,
+     0.7,
+     0.77,
+     0.84,
+     0.91,
+     0.98,
+     1,
+     1
+    ],
+    "ablate_generation": {
+     "solved_difficulty": 0,
+     "fitness_on_hardest": 0
+    },
+    "ablate_transfer": {
+     "niches": 6,
+     "max_difficulty": 0.35,
+     "solved_difficulty": 0.35,
+     "fitness_on_hardest": 0
+    },
+    "direct_optimization_on_hardest": 0,
+    "evals_poet": 81713,
+    "evals_direct": 82000,
+    "poet_reaches_the_hard_env": true,
+    "direct_optimization_fails": true,
+    "poet_beats_direct_with_no_more_budget": true,
+    "generation_is_load_bearing": true,
+    "transfer_is_load_bearing": true,
+    "minimal_criterion_builds_a_curriculum": true,
+    "runtime_ms": 131
+   }
+  },
+  "skills_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 145,
+   "audit": {
+    "task": "hierarchical SKILLS (options): discover the reusable doorway bottlenecks from experience and reuse them, planning a NEW task over the tiny option graph in far fewer node expansions than planning over primitives. OFF-PATH (non-bottleneck) subgoals give no speedup — it must be the RIGHT decomposition.",
+    "map": "30 rooms of 6x6",
+    "true_doorways": 29,
+    "discovered_subgoals": 35,
+    "discovery_precision": 0.8,
+    "discovery_recall": 0.97,
+    "median_expansions": {
+     "primitives": 468,
+     "with_skills": 66,
+     "offpath_subgoals": 468
+    },
+    "skill_success": 0.96,
+    "offpath_success": 0.08,
+    "ratio_skill_vs_primitive": {
+     "big_map": 0.14,
+     "small_map": 1.32
+    },
+    "skills_cut_search_cost": true,
+    "skills_still_reach_the_goal": true,
+    "offpath_subgoals_dont_help": true,
+    "discovery_finds_the_bottlenecks": true,
+    "advantage_grows_with_map_size": true,
+    "runtime_ms": 145
+   }
+  },
+  "tool_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 1,
+   "audit": {
+    "task": "TOOL construction & use: learn the hidden affordance (which FUNCTION solves which obstacle) from experience, then construct a tool sized/keyed to the obstacle. Bare agent is unreachable; a wrong-function tool fails even as a big object; a useless decoy gives nothing.",
+    "learned_affordance": {
+     "gap": "bridge",
+     "wall": "ladder",
+     "door": "key"
+    },
+    "true_affordance": {
+     "gap": "bridge",
+     "wall": "ladder",
+     "door": "key"
+    },
+    "success": {
+     "bare": 0,
+     "learned_tool": 1,
+     "random_function": 0.29,
+     "wrong_function": 0,
+     "useless_object": 0,
+     "too_small": 0
+    },
+    "bare_agent_cannot_reach": true,
+    "constructed_tool_reaches_goal": true,
+    "learned_affordance_load_bearing": true,
+    "wrong_function_tool_fails": true,
+    "useless_object_gives_no_lift": true,
+    "size_must_be_adequate": true,
+    "agent_learned_the_true_affordance": true,
+    "runtime_ms": 1
+   }
+  },
+  "causal_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 37,
+   "audit": {
+    "task": "CAUSAL discovery: a hidden confounder Z->X, Z->Y makes X,Y correlate though neither causes the other, while X->W is real. Observation hallucinates spurious edges; the do-operator (intervene) recovers the TRUE directed graph and its direction.",
+    "true_causal_graph": [
+     "X->W"
+    ],
+    "observational_correlations": {
+     "X-Y": 0.86,
+     "X-W": 0.94,
+     "Y-W": 0.81
+    },
+    "observational_skeleton": [
+     "X-Y",
+     "X-W",
+     "Y-W"
+    ],
+    "spurious_edges_from_observation": [
+     "X-Y",
+     "Y-W"
+    ],
+    "interventional_graph": [
+     "X->W"
+    ],
+    "intervention_correlations": {
+     "do(X)->Y": 0.02,
+     "do(X)->W": 0.93,
+     "do(Y)->X": 0.01,
+     "do(Y)->W": 0.02,
+     "do(W)->X": 0,
+     "do(W)->Y": 0.01
+    },
+    "observation_is_confounded": true,
+    "intervention_recovers_true_graph": true,
+    "spurious_edge_broken_by_intervention": true,
+    "real_effect_survives_intervention": true,
+    "intervention_gets_the_direction": true,
+    "observation_alone_gets_it_wrong": true,
+    "runtime_ms": 37
+   }
+  },
+  "metacog_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 42,
+   "audit": {
+    "task": "SELF-MODELING / calibration: learn P(correct | margin) and ABSTAIN when unsure. Answering only confident items raises accuracy on the attempted set (selective prediction); confidence is calibrated; shuffled confidence gives no benefit; an overconfident baseline is badly calibrated.",
+    "base_accuracy_all_items": 0.746,
+    "selective_accuracy": {
+     "coverage_0_3": 0.916,
+     "coverage_0_5": 0.865,
+     "coverage_0_6": 0.844,
+     "coverage_1_0": 0.746
+    },
+    "shuffled_confidence_accuracy_0_5": 0.751,
+    "brier": {
+     "learned_self_model": 0.17,
+     "overconfident_baseline": 0.214
+    },
+    "expected_calibration_error": 0.014,
+    "base_accuracy_is_imperfect": true,
+    "abstaining_raises_accuracy": true,
+    "risk_coverage_is_monotone": true,
+    "self_model_is_load_bearing": true,
+    "shuffled_gives_no_selective_benefit": true,
+    "confidence_is_calibrated": true,
+    "runtime_ms": 42
+   }
+  },
+  "negotiate_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 906,
+   "audit": {
+    "task": "emergent NEGOTIATION (Nash demand game): two self-interested agents LEARN their demands from experience and converge to the NASH BARGAINING solution — the surplus above outside options is split EQUALLY. Fair when symmetric; a better outside option buys a bigger share; fixed greedy demands break down.",
+    "symmetric": {
+     "outside": [
+      0.1,
+      0.1
+     ],
+     "learned_split": [
+      0.428,
+      0.428
+     ],
+     "deal_rate": 0.7
+    },
+    "asymmetric": {
+     "outside": [
+      0.35,
+      0.1
+     ],
+     "learned_split": [
+      0.649,
+      0.399
+     ],
+     "deal_rate": 0.43,
+     "surplus_above_outside": [
+      0.299,
+      0.299
+     ],
+     "player1_surplus_share": 0.5
+    },
+    "ablation_fixed_greedy": {
+     "demands": [
+      0.7,
+      0.7
+     ],
+     "deal_rate": 0.09,
+     "payoff": [
+      0.152,
+      0.152
+     ]
+    },
+    "symmetric_split_is_fair": true,
+    "surplus_split_equally_above_outside": true,
+    "matches_nash_bargaining": true,
+    "outside_option_buys_a_bigger_share": true,
+    "learning_avoids_breakdown": true,
+    "fixed_greedy_breaks_down": true,
+    "efficiency_note": "the SMOOTHED (trembling) frontier leaves the equilibrium demands summing to <1 (some pie unclaimed) — an efficiency artifact of the smoothing; the sharp-frontier limit claims the whole pie but destabilises naive co-adaptive learning. The Nash bargaining PROPERTY (equal surplus split) holds exactly regardless.",
+    "runtime_ms": 906
+   }
+  },
+  "abstract_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 386,
+   "audit": {
+    "task": "CONCEPT ABSTRACTION (relational same-vs-different): learn the RELATION, not the objects. An abstract (relational) learner transfers to NOVEL unseen objects; an identity-memoriser does not; a linear classifier on the raw objects cannot even represent the relation.",
+    "accuracy": {
+     "abstract_seen": 0.994,
+     "abstract_novel": 0.995,
+     "identity_memoriser_seen": 1,
+     "identity_memoriser_novel": 0.541,
+     "raw_linear_seen": 0.454
+    },
+    "abstract_learns_the_relation": true,
+    "abstraction_transfers_to_novel_objects": true,
+    "memoriser_ok_on_seen": true,
+    "memoriser_fails_on_novel": true,
+    "abstraction_is_what_transfers": true,
+    "raw_features_cannot_represent_the_relation": true,
+    "runtime_ms": 386
+   }
+  },
+  "worldmodel_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 5066,
+   "audit": {
+    "task": "MODEL-BASED planning vs MODEL-FREE: learn the transition model and PLAN in imagination to reach a sparse-reward goal in far fewer REAL env steps than model-free Q-learning; a corrupted model destroys the advantage.",
+    "optimal_path_length": 21,
+    "planning_steps_per_real_step": 40,
+    "real_steps_to_solve": {
+     "model_based": 455,
+     "model_free": 3734,
+     "corrupted_model": 48000
+    },
+    "solve_rate": {
+     "model_based": 1,
+     "model_free": 1,
+     "corrupted_model": 0
+    },
+    "learned_model_accuracy": 1,
+    "model_learned_accurately": true,
+    "model_based_more_sample_efficient": true,
+    "both_eventually_solve": true,
+    "model_accuracy_is_load_bearing": true,
+    "planning_beats_no_planning": true,
+    "runtime_ms": 5066
+   }
+  },
+  "active_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": 305,
+   "audit": {
+    "task": "ACTIVE LEARNING: query the most INFORMATIVE (most-uncertain, nearest-the-boundary) point and learn a hidden linear concept in far fewer labels than random querying.",
+    "queries_to_reach_accuracy": {
+     "target": 0.9,
+     "active": 8.3,
+     "random": 25.5
+    },
+    "accuracy_at_10_queries": {
+     "active": 0.88,
+     "random": 0.85
+    },
+    "final_accuracy": {
+     "active": 0.989,
+     "random": 0.945
+    },
+    "budget": 70,
+    "mean_query_margin": {
+     "active": 0.225,
+     "random": 4.482
+    },
+    "active_reaches_target_in_fewer_queries": true,
+    "active_at_least_2x_label_efficient": true,
+    "both_eventually_learn": true,
+    "active_queries_near_the_boundary": true,
+    "runtime_ms": 305
+   }
+  },
+  "compose_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 540,
+   "audit": {
+    "task": "COMPOSITIONAL generalisation: outputs factorise as operator ⊙ operand. Train on a subset of (a,b) pairs; a compositional (factorised) learner generalises to HELD-OUT combinations of seen primitives, a joint memoriser does not.",
+    "operators": 6,
+    "operands": 6,
+    "held_out_pairs": 10,
+    "match_rate": {
+     "compositional_seen": 1,
+     "compositional_novel": 1,
+     "memoriser_seen": 1,
+     "memoriser_novel": 0
+    },
+    "compositional_fits_training": true,
+    "compositional_generalises_to_novel": true,
+    "memoriser_fits_training": true,
+    "memoriser_fails_on_novel": true,
+    "compositionality_is_what_transfers": true,
+    "runtime_ms": 540
+   }
+  },
+  "imitate_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": 41,
+   "audit": {
+    "task": "IMITATION / social learning: warm-start from an expert's demonstrations (behavioural cloning) then fine-tune by RL -> reach a sparse-reward goal in far fewer REAL env steps than learning solo. Shuffled demonstrations give no speedup.",
+    "optimal_path_length": 21,
+    "real_steps_to_solve": {
+     "imitation": 0,
+     "from_scratch": 3734,
+     "shuffled_demos": 4953
+    },
+    "solve_rate": {
+     "imitation": 1,
+     "from_scratch": 1,
+     "shuffled_demos": 1
+    },
+    "imitation_much_faster_than_scratch": true,
+    "shuffled_demos_give_no_speedup": true,
+    "right_demos_beat_wrong_demos": true,
+    "both_eventually_solve": true,
+    "runtime_ms": 41
+   }
+  },
+  "reward_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 585,
+   "audit": {
+    "task": "INVERSE RL: recover the hidden reward from an expert's demonstrations (match state-visitation), then plan on it to match the expert. The recovered REWARD generalises to a NEW start where behavioural cloning fails; a wrong reward gives wrong behaviour. Averaged over randomised reward maps.",
+    "return_ratio_vs_expert": {
+     "irl_demo_starts": 1,
+     "irl_new_start": 0.95,
+     "cloning_new_start": 0.44,
+     "uniform_reward_new_start": -0.05,
+     "uniform_reward_demo_starts": 0.02
+    },
+    "recovered_reward_correlation_with_true": 0.661,
+    "irl_recovers_expert_behavior": true,
+    "recovered_reward_generalises_to_new_start": true,
+    "reward_learning_beats_cloning_on_generalisation": true,
+    "wrong_reward_gives_wrong_behavior": true,
+    "recovered_reward_correlates_with_true": true,
+    "honest_note": "the recovered reward is APPROXIMATE (correlation ~0.66 with the true map, from only 3 demonstrated starts), yet planning on it still yields most of the optimal return from an UNSEEN start — the point being that a learned REWARD transfers to new starts where behavioural cloning, having no demonstration there, does not.",
+    "runtime_ms": 585
+   }
+  },
+  "plan_vec": {
+   "green": true,
+   "flags_true": 4,
+   "flags_total": 4,
+   "runtime_ms": 59,
+   "audit": {
+    "task": "LONG-HORIZON credit assignment (delayed gratification): a small near reward vs a BIG reward L steps away. A long planning horizon (high discount) propagates the distant reward and takes it; a MYOPIC short horizon over-discounts it and grabs the near small one — failing as L grows.",
+    "reward_layout": {
+     "small": "1 at 2 left",
+     "big": "10 at L right"
+    },
+    "chain_lengths": [
+     4,
+     8,
+     16,
+     32
+    ],
+    "reaches_big_reward": {
+     "full_horizon": {
+      "4": 1,
+      "8": 1,
+      "16": 1,
+      "32": 1
+     },
+     "myopic": {
+      "4": 1,
+      "8": 0,
+      "16": 0,
+      "32": 0
+     }
+    },
+    "full_horizon_reaches_big_at_all_lengths": true,
+    "myopic_fails_at_long_horizon": true,
+    "both_get_big_at_short_horizon": true,
+    "planning_advantage_grows_with_horizon": true,
+    "runtime_ms": 59
+   }
+  },
+  "curious_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 149,
+   "audit": {
+    "task": "INTRINSIC MOTIVATION: a count-based novelty bonus drives exploration of a reward-SPARSE maze — the agent covers the map and finds the far goal, where a reward-only learner (plain zero init) random-walks and stalls near start. With DENSE reward both do fine (curiosity only matters when reward is sparse).",
+    "free_cells": 91,
+    "coverage": {
+     "curious_sparse": 90,
+     "reward_only_sparse": 41,
+     "reward_only_dense": 66
+    },
+    "reached_goal_rate": {
+     "curious_sparse": 1,
+     "reward_only_sparse": 0,
+     "reward_only_dense": 1
+    },
+    "curiosity_explores_far_more_when_sparse": true,
+    "curiosity_finds_the_sparse_goal": true,
+    "reward_only_stalls_when_sparse": true,
+    "dense_reward_rescues_reward_only": true,
+    "curiosity_is_load_bearing": true,
+    "runtime_ms": 149
+   }
+  },
+  "robust_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 246,
+   "audit": {
+    "task": "ROBUSTNESS to distribution shift: a noisy CAUSAL feature always determines the label; a clean SPURIOUS feature predicts it in train but FLIPS at test. ERM (one env) rides the spurious feature and fails under shift; training across two environments with opposite spurious sign forces the CAUSAL feature and generalises.",
+    "accuracy_under_shift": {
+     "erm": 0.342,
+     "invariant": 0.839
+    },
+    "accuracy_no_shift": {
+     "erm": 0.961,
+     "invariant": 0.842
+    },
+    "spurious_over_causal_effective_contribution": {
+     "erm": 1.5,
+     "invariant": 0.02
+    },
+    "erm_fails_under_shift": true,
+    "invariant_generalises_under_shift": true,
+    "invariance_is_load_bearing": true,
+    "no_shift_both_fine": true,
+    "invariant_weights_the_causal_feature": true,
+    "runtime_ms": 246
+   }
+  },
+  "symbol_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 42,
+   "audit": {
+    "task": "SYMBOL GROUNDING: a hidden word<->object bijection is never shown directly; each scene gives a SET of K objects and the SET of their K words (order shuffled -> one scene is ambiguous). Accumulating CROSS-SITUATIONAL co-occurrence recovers the bijection; MUTUAL EXCLUSIVITY fast-maps a novel word to a novel object in one shot by eliminating what its known words already claim.",
+    "vocab": 12,
+    "objects_per_scene": 3,
+    "scenes": 300,
+    "chance_map": 0.083,
+    "chance_fastmap": 0.333,
+    "mapping_accuracy": {
+     "cross_situational": 1,
+     "single_scene": 0.208,
+     "shuffled_words": 0.146
+    },
+    "fastmap_accuracy": {
+     "mutual_exclusivity": 1,
+     "no_elimination": 0.317
+    },
+    "cross_situational_learns_bijection": true,
+    "single_scene_is_ambiguous": true,
+    "accumulation_is_load_bearing": true,
+    "shuffled_words_prevent_grounding": true,
+    "mutual_exclusivity_fast_maps_novel": true,
+    "no_elimination_is_chance": true,
+    "me_is_load_bearing": true,
+    "runtime_ms": 42
+   }
+  },
+  "instruct_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 2,
+   "audit": {
+    "task": "COMPOSITIONAL INSTRUCTION FOLLOWING (SCAN-style): a hidden generator maps (verb,direction,count) -> an action sequence (turn then COUNT action-repeats). Trained on a primitive-COVERING subset that HOLDS OUT whole combinations, a compositional learner (slot decomposition, content learned) generalises to the novel combinations; a holistic memoriser fits seen commands but fails novel ones.",
+    "grid": 36,
+    "test_frac": 0.35,
+    "exact_match_train": {
+     "compositional": 1,
+     "memoriser": 1
+    },
+    "exact_match_novel": {
+     "compositional": 1,
+     "memoriser": 0
+    },
+    "learned_lexicon_matches_generator": 1,
+    "compositional_fits_train": true,
+    "memoriser_fits_train": true,
+    "compositional_generalises_to_novel": true,
+    "memoriser_fails_on_novel": true,
+    "systematicity_is_what_transfers": true,
+    "learned_the_generator": true,
+    "runtime_ms": 2
+   }
+  },
+  "analogy_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 327,
+   "audit": {
+    "task": "RELATIONAL ANALOGY A:B::C:? — a hidden linear RELATION M is revealed by exemplar pairs (A,MA); given a novel-domain query C, the relation solver learns M by paired least-squares and applies D=M*C. It transfers to the novel domain; a surface-similarity baseline (nearest the query or the exemplars) is at chance because D=M*C is far from both.",
+    "dim": 8,
+    "exemplars": 16,
+    "candidates": 6,
+    "chance": 0.167,
+    "domain_shift": 6,
+    "accuracy_in_domain": {
+     "relation": 1,
+     "surface": 0.183
+    },
+    "accuracy_novel_domain": {
+     "relation": 1,
+     "surface": 0.178
+    },
+    "learned_map_rel_error_novel": 0.027,
+    "relation_solver_novel_accuracy_shuffled_pairs": 0.251,
+    "relation_solves_analogies": true,
+    "surface_similarity_is_chance": true,
+    "relation_beats_surface": true,
+    "relation_transfers_across_domains": true,
+    "learned_map_recovers_relation": true,
+    "paired_structure_is_load_bearing": true,
+    "runtime_ms": 327
+   }
+  },
+  "induce_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 358,
+   "audit": {
+    "task": "RULE / PROGRAM INDUCTION with an Occam simplicity prior: a hidden short boolean rule (conjunction of 2 literals) is shown via a few labeled examples. The shortest-consistent-rule learner recovers it and generalises to held-out inputs; an overfitting learner (memorise positives = a consistent but complex hypothesis) fits train but fails to generalise. The prior earns its keep only when the target is actually simple.",
+    "n_bits": 8,
+    "true_rule_literals": 2,
+    "train_examples": 16,
+    "input_space": 256,
+    "mean_induced_rule_len": 1.98,
+    "balanced_accuracy_train": {
+     "simplicity": 1,
+     "overfit_memorise": 1
+    },
+    "balanced_accuracy_held_out": {
+     "simplicity": 0.961,
+     "overfit_memorise": 0.5
+    },
+    "recovered_true_rule": 0.97,
+    "simplicity_held_out_on_COMPLEX_target": 0.501,
+    "simplicity_fits_train": true,
+    "overfit_fits_train": true,
+    "simplicity_generalises": true,
+    "overfit_fails_to_generalise": true,
+    "simplicity_beats_overfit": true,
+    "simplicity_recovers_true_rule": true,
+    "prior_needs_a_simple_target": true,
+    "runtime_ms": 358
+   }
+  },
+  "hierplan_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 55,
+   "audit": {
+    "task": "HIERARCHICAL PLANNING over subgoals: collect K free-order keys then reach the goal. A flat planner searches (position x key-bitmask) and blows up as ~2^K reachable masks; a hierarchical planner decomposes into a learned nearest-first subgoal sequence and plans each leg on position-space -> linear in K. Off-path subgoals fail; a random visit order costs more; the advantage grows with K.",
+    "K_small": 2,
+    "K_large": 8,
+    "grid": "8x8",
+    "node_expansions_K_large": {
+     "flat": 14190,
+     "hierarchical": 160,
+     "random_order": 281
+    },
+    "speedup_ratio_flat_over_hier": {
+     "K_small": 2.1,
+     "K_large": 88.9
+    },
+    "success": {
+     "hierarchical": 1,
+     "flat": 1,
+     "random_order": 1,
+     "off_path": 0
+    },
+    "subgoal_sequence_covers_all_keys": 1,
+    "hierarchical_solves": true,
+    "flat_solves": true,
+    "hierarchical_far_cheaper": true,
+    "advantage_grows_with_K": true,
+    "off_path_decomposition_fails": true,
+    "learned_order_beats_random_order": true,
+    "decomposition_covers_the_goal": true,
+    "runtime_ms": 55
+   }
+  },
+  "belief_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 6,
+   "audit": {
+    "task": "FALSE-BELIEF theory of mind (Sally-Anne): a character stores an object at A; it is moved to B; sometimes they witness the move, sometimes not. Where do they LOOK? The belief learner tracks the last state THEY witnessed (look = witnessed ? final : initial) and gets the FALSE-belief case right; a reality baseline (answer where the object now IS) fails the false-belief case but passes the true-belief control.",
+    "locations": 4,
+    "p_witness": 0.6,
+    "false_belief_accuracy": {
+     "belief_tracker": 1,
+     "reality_baseline": 0,
+     "belief_without_witnessed_feature": 0.161
+    },
+    "true_belief_accuracy": {
+     "belief_tracker": 1,
+     "reality_baseline": 1
+    },
+    "belief_overall_accuracy": 1,
+    "belief_tracker_passes_false_belief": true,
+    "reality_baseline_fails_false_belief": true,
+    "both_pass_true_belief": true,
+    "belief_beats_reality_on_false_belief": true,
+    "witnessed_feature_is_load_bearing": true,
+    "belief_learned_the_rule": true,
+    "runtime_ms": 6
+   }
+  },
+  "verify_vec": {
+   "green": true,
+   "flags_true": 7,
+   "flags_total": 7,
+   "runtime_ms": 191,
+   "audit": {
+    "task": "SELF-VERIFICATION of reasoning chains: a generator derives an answer in N steps but each step is wrong with prob P_ERR (errors compound). A learned step-verifier checks each step and backtracks (resamples) on an invalid one, abstaining if stuck -> high answered-set accuracy where unchecked generation is at floor. A shuffled verifier (decorrelated from real validity) gives no lift.",
+    "steps": 8,
+    "p_err": 0.25,
+    "retries": 3,
+    "unchecked_floor": 0.1,
+    "unchecked_accuracy": 0.152,
+    "verified": {
+     "answered_accuracy": 0.988,
+     "coverage": 0.889
+    },
+    "shuffled_verifier": {
+     "answered_accuracy": 0.067,
+     "coverage": 0.059
+    },
+    "verifier_accuracy": 0.998,
+    "unchecked_is_poor": true,
+    "verification_lifts_answered_accuracy": true,
+    "verified_beats_unchecked": true,
+    "shuffled_gives_no_lift": true,
+    "checking_signal_is_load_bearing": true,
+    "coverage_is_meaningful": true,
+    "verifier_learned_to_check": true,
+    "runtime_ms": 191
+   }
+  },
+  "ground_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 115,
+   "audit": {
+    "task": "GROUNDED COMPOSITIONAL SEMANTICS: statements are truth conditions over a scene (\"a P object R a Q object\"). A compositional learner grounds each atomic predicate and composes them by the logical form to evaluate NOVEL predicate combinations; a holistic learner memorises (statement,scene)->truth and fails on unseen combinations.",
+    "predicate_combinations": 50,
+    "test_frac": 0.35,
+    "objects_per_scene": 3,
+    "exact_match_train": {
+     "compositional": 1,
+     "holistic": 1
+    },
+    "exact_match_novel_combinations": {
+     "compositional": 1,
+     "holistic": 0.658
+    },
+    "learned_grounding_accuracy": 1,
+    "compositional_fits_train": true,
+    "holistic_fits_train": true,
+    "compositional_generalises_to_novel": true,
+    "holistic_fails_on_novel": true,
+    "compositionality_is_what_transfers": true,
+    "grounded_predicates_learned": true,
+    "runtime_ms": 115
+   }
+  },
+  "refer_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 36,
+   "audit": {
+    "task": "REFERENTIAL GROUNDING under ambiguity (RSA pragmatics): a speaker utters one grounded token so a listener picks the target among distractors. A pragmatic (context-sensitive) speaker chooses the most DISTINGUISHING message and grounds reference; a literal (context-blind) speaker utters a random true attribute and is often ambiguous. When no distinguishing message exists, pragmatics cannot manufacture information (honest ceiling).",
+    "context_size": 4,
+    "tokens": 7,
+    "listener_success_distinguishing": {
+     "pragmatic": 1,
+     "literal": 0.658
+    },
+    "listener_success_no_distinguishing": {
+     "pragmatic": 0.5,
+     "literal": 0.5
+    },
+    "pragmatic_advantage": {
+     "distinguishing": 0.342,
+     "no_distinguishing": 0
+    },
+    "learned_grounding_accuracy": 1,
+    "pragmatic_grounds_reference": true,
+    "literal_is_ambiguous": true,
+    "pragmatic_beats_literal": true,
+    "context_sensitivity_is_load_bearing": true,
+    "no_free_lunch_without_information": true,
+    "learned_the_groundings": true,
+    "runtime_ms": 36
+   }
+  },
+  "teach_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 32,
+   "audit": {
+    "task": "PEDAGOGY / teaching by example: a helpful teacher picks the examples that most single out the target concept and a pedagogical learner reasons about that choice -> identify the concept in FEW examples. Ablating helpful SELECTION (random teacher) or pedagogical INFERENCE (weak learner, size principle only) needs many more examples; the no-pedagogy corner is worst.",
+    "hypotheses": 20,
+    "item_space": 50,
+    "cap": 10,
+    "bisection_bound_log2H": 4.32,
+    "avg_examples_to_identify": {
+     "helpful_teacher_pedagogical_learner": 3,
+     "random_teacher_weak_learner": 4.73,
+     "helpful_teacher_weak_learner": 4.6,
+     "random_teacher_pedagogical_learner": 3.51
+    },
+    "pedagogy_beats_bisection_bound": true,
+    "no_pedagogy_above_bound": true,
+    "no_pedagogy_needs_more": true,
+    "helpful_selection_helps": true,
+    "pedagogical_inference_helps": true,
+    "both_factors_load_bearing": true,
+    "runtime_ms": 32
+   }
+  },
+  "commonground_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 77,
+   "audit": {
+    "task": "DIALOGUE to COMMON GROUND: two agents hold disjoint partial maps of a world (a hidden s->t path alternates edge ownership, so neither can advance alone). By exchanging reachable frontiers round by round, dialogue fuses the maps and answers reachability queries neither can solo. Solo (no exchange) fails; a single exchange cannot traverse the long alternating path (sustained dialogue is needed).",
+    "nodes": 26,
+    "alternating_path_len": 9,
+    "rounds": 14,
+    "balanced_accuracy": {
+     "dialogue": 1,
+     "solo_avg": 0.577,
+     "single_exchange": 0.705
+    },
+    "dialogue_matches_ground_truth_union": 1,
+    "dialogue_answers_joint_queries": true,
+    "solo_cannot_answer_alone": true,
+    "dialogue_beats_solo": true,
+    "single_exchange_insufficient": true,
+    "iterated_dialogue_is_load_bearing": true,
+    "dialogue_fuses_correctly": true,
+    "runtime_ms": 77
+   }
+  },
+  "persuade_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 97,
+   "audit": {
+    "task": "ARGUMENTATION with evidence: a hostile persuader floods the stream with fallacious arguments pushing the WRONG answer; a minority of valid arguments point at the truth. A Bayesian agent learns a validity classifier and updates its belief weighted by assessed validity -> resists the fallacies and reaches the truth. A gullible (accept-all) agent is dragged below chance; a stubborn (accept-none) agent stays at chance.",
+    "args_per_debate": 20,
+    "fallacy_rate": 0.6,
+    "final_accuracy": {
+     "bayesian": 0.905,
+     "gullible": 0.153,
+     "stubborn": 0.506,
+     "bayesian_shuffled_check": 0.156
+    },
+    "validity_classifier_accuracy": 0.937,
+    "bayesian_reaches_truth": true,
+    "gullible_is_manipulated": true,
+    "stubborn_stuck_at_chance": true,
+    "bayesian_beats_baselines": true,
+    "validity_classifier_learned": true,
+    "learned_check_is_load_bearing": true,
+    "runtime_ms": 97
+   }
+  },
+  "question_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 60,
+   "audit": {
+    "task": "OPTIMAL QUESTION selection (20-questions): an asker uncertain about a hidden target picks yes/no questions to reduce its OWN uncertainty. Maximising information gain (split the consistent set ~50/50) pins the target in about log2(N) questions; random questioning wastes many; computing info-gain on a scrambled model degrades to random.",
+    "items": 64,
+    "log2N_floor": 6,
+    "attributes": 32,
+    "cap": 45,
+    "avg_questions": {
+     "info_gain": 6,
+     "random": 17.8,
+     "scrambled_model": 12.26
+    },
+    "identify_rate": {
+     "info_gain": 1,
+     "random": 1,
+     "scrambled_model": 1
+    },
+    "info_gain_near_optimal": true,
+    "info_gain_identifies_all": true,
+    "random_needs_more": true,
+    "info_gain_beats_random": true,
+    "scrambled_model_degrades_to_random": true,
+    "info_gain_is_load_bearing": true,
+    "runtime_ms": 60
+   }
+  },
+  "convention_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 33,
+   "audit": {
+    "task": "EMERGENT CONVENTION (naming game): a population must agree on ONE arbitrary name for an object with no coordinator. Local pairwise interactions with delete-on-success alignment make the population symmetry-break onto a single shared convention; the winner is arbitrary (varies across runs). Removing the reinforcement (no delete-on-success) prevents convergence.",
+    "population": 30,
+    "interactions": 6000,
+    "final_consensus": 1,
+    "final_success_rate": 1,
+    "distinct_committed_names": 1,
+    "distinct_winners_across_seeds": 6,
+    "no_reinforcement_committed_fraction": 0,
+    "population_converges": true,
+    "single_convention_emerges": true,
+    "communication_succeeds_after": true,
+    "convention_is_arbitrary": true,
+    "no_reinforcement_prevents_convergence": true,
+    "reinforcement_is_load_bearing": true,
+    "runtime_ms": 33
+   }
+  },
+  "peerverify_vec": {
+   "green": true,
+   "flags_true": 6,
+   "flags_total": 6,
+   "runtime_ms": 473,
+   "audit": {
+    "task": "PEER VERIFICATION (Condorcet jury): each verifier is a learned classifier with individual accuracy ~p; the MAJORITY vote of INDEPENDENT verifiers grows more reliable as their number rises. Making the verifiers share the SAME noisy view (correlated/colluding) removes the gain — the majority is no better than one verifier. Independence, not voting, is what buys reliability.",
+    "dim": 6,
+    "sigma": 1.3,
+    "jury_sizes": [
+     3,
+     9,
+     15
+    ],
+    "accuracy": {
+     "single_verifier": 0.709,
+     "majority_independent_N3": 0.769,
+     "majority_independent_N9": 0.843,
+     "majority_independent_N15": 0.866,
+     "majority_correlated_N9": 0.698,
+     "random_untrained_verifier": 0.413
+    },
+    "single_verifier_above_chance": true,
+    "independent_majority_more_reliable": true,
+    "reliability_rises_with_N": true,
+    "correlated_majority_gives_no_gain": true,
+    "independence_is_load_bearing": true,
+    "verifiers_are_learned": true,
+    "runtime_ms": 473
+   }
+  },
+  "translate_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 14,
+   "audit": {
+    "task": "LANGUAGE ALIGNMENT: two agents grounded the same world in different coordinate frames (E_B = E_A * hidden Q). From a few PAIRED anchor concepts they learn the mapping (Procrustes least-squares) and translate any concept — A embedding -> mapped -> nearest B concept -> the right referent. No alignment (identity map) is at chance; too few anchors under-determine the map (partial).",
+    "concepts": 40,
+    "dim": 8,
+    "anchors_full": 20,
+    "anchors_few": 4,
+    "chance": 0.025,
+    "translation_accuracy": {
+     "aligned": 1,
+     "no_alignment": 0.008,
+     "few_anchors": 0.264
+    },
+    "alignment_enables_translation": true,
+    "no_alignment_is_chance": true,
+    "alignment_beats_none": true,
+    "enough_anchors_needed": true,
+    "few_anchors_still_above_chance": true,
+    "runtime_ms": 14
+   }
+  },
+  "converse_vec": {
+   "green": true,
+   "flags_true": 14,
+   "flags_total": 14,
+   "runtime_ms": null,
+   "audit": {
+    "graph_triples": 60,
+    "pillars_grounded": [
+     "embodiment",
+     "navigation",
+     "economy",
+     "communication",
+     "theory_of_mind",
+     "discovery",
+     "creativity",
+     "memory",
+     "transfer",
+     "slam",
+     "fusion",
+     "saga",
+     "agent",
+     "inferred"
+    ],
+    "learned_nav": {
+     "policy_reaches_goal_rate": 0.23,
+     "policy_drives": "wire2"
+    },
+    "turns": [
+     {
+      "you": "how does the body reach its goal?",
+      "agent": "goal —reached_using→ map —feeds→ policy —drives→ wire2 —produces→ torque",
+      "depth": 4,
+      "pillars": [
+       "fusion",
+       "navigation",
+       "embodiment"
+      ],
+      "provenance": [
+       "LEARNED:fusion",
+       "LEARNED:fusion",
+       "LEARNED:navigation",
+       "LEARNED:embodiment"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what is profitable in the economy",
+      "agent": "trade —profits_from→ planet3 —sells_cheap→ good0 —bought_dear_at→ planet4 —pays→ credits",
+      "depth": 4,
+      "pillars": [
+       "economy"
+      ],
+      "provenance": [
+       "LEARNED:economy",
+       "LEARNED:economy",
+       "LEARNED:economy",
+       "LEARNED:economy"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what does the wire do?",
+      "agent": "wire2 —produces→ torque",
+      "depth": 1,
+      "pillars": [
+       "embodiment"
+      ],
+      "provenance": [
+       "LEARNED:embodiment"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "how does the policy navigate?",
+      "agent": "policy —reaches→ goal —reached_using→ map —solved_from→ observations —sensed_as→ relative_vector",
+      "depth": 4,
+      "pillars": [
+       "navigation",
+       "fusion",
+       "slam"
+      ],
+      "provenance": [
+       "LEARNED:navigation",
+       "LEARNED:fusion",
+       "LEARNED:slam",
+       "LEARNED:slam"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what does a symbol mean?",
+      "agent": "symbol0 —means→ action1",
+      "depth": 1,
+      "pillars": [
+       "communication"
+      ],
+      "provenance": [
+       "LEARNED:communication"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what does the rival prefer?",
+      "agent": "rival —prefers→ high feature4",
+      "depth": 1,
+      "pillars": [
+       "theory_of_mind"
+      ],
+      "provenance": [
+       "LEARNED:theory_of_mind"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what does the agent avoid?",
+      "agent": "agent —flies→ policy —reaches→ goal —reached_using→ map —solved_from→ observations —sensed_as→ relative_vector",
+      "depth": 5,
+      "pillars": [
+       "agent",
+       "navigation",
+       "fusion",
+       "slam"
+      ],
+      "provenance": [
+       "LEARNED:agent",
+       "LEARNED:navigation",
+       "LEARNED:fusion",
+       "LEARNED:slam",
+       "LEARNED:slam"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what flying style reaches the goal?",
+      "agent": "style_spin3_speed0 —reaches→ goal —reached_using→ map —feeds→ policy —drives→ wire2 —produces→ torque",
+      "depth": 5,
+      "pillars": [
+       "creativity",
+       "fusion",
+       "navigation",
+       "embodiment"
+      ],
+      "provenance": [
+       "LEARNED:creativity",
+       "LEARNED:fusion",
+       "LEARNED:fusion",
+       "LEARNED:navigation",
+       "LEARNED:embodiment"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "how is the map built?",
+      "agent": "map —feeds→ policy —drives→ wire2 —produces→ torque",
+      "depth": 3,
+      "pillars": [
+       "fusion",
+       "navigation",
+       "embodiment"
+      ],
+      "provenance": [
+       "LEARNED:fusion",
+       "LEARNED:navigation",
+       "LEARNED:embodiment"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "where are the landmarks?",
+      "agent": "I know: pose localized_by landmark_reobservation.",
+      "depth": 0,
+      "pillars": [
+       "slam"
+      ],
+      "provenance": [
+       "LEARNED:slam"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "how does the map help the policy reach the goal?",
+      "agent": "policy —reaches→ goal —reached_using→ map —solved_from→ observations —sensed_as→ relative_vector",
+      "depth": 4,
+      "pillars": [
+       "navigation",
+       "fusion",
+       "slam"
+      ],
+      "provenance": [
+       "LEARNED:navigation",
+       "LEARNED:fusion",
+       "LEARNED:slam",
+       "LEARNED:slam"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "what does the novel remember?",
+      "agent": "the novel —records→ C34 harmed C33",
+      "depth": 1,
+      "pillars": [
+       "saga"
+      ],
+      "provenance": [
+       "LEARNED:saga"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "who holds a grudge?",
+      "agent": "the grudge —grows with→ repeated harm",
+      "depth": 1,
+      "pillars": [
+       "saga"
+      ],
+      "provenance": [
+       "LEARNED:saga"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "how does the agent make money?",
+      "agent": "agent —flies→ policy —reaches→ goal —reached_using→ map —solved_from→ observations —sensed_as→ relative_vector",
+      "depth": 5,
+      "pillars": [
+       "agent",
+       "navigation",
+       "fusion",
+       "slam"
+      ],
+      "provenance": [
+       "LEARNED:agent",
+       "LEARNED:navigation",
+       "LEARNED:fusion",
+       "LEARNED:slam",
+       "LEARNED:slam"
+      ],
+      "abstained": false
+     },
+     {
+      "you": "explain your feelings about jazz",
+      "agent": "I have no grounded knowledge about that yet — I only speak from triples I've earned.",
+      "depth": 0,
+      "pillars": [],
+      "provenance": [],
+      "abstained": true
+     }
+    ],
+    "fluent_example": {
+     "mode": "fluent",
+     "text": "Policy reaches goal. Goal reached_using map. Map solved_from observations. Observations sensed_as relative_vector."
+    },
+    "audit": {
+     "deepest_chain_hops": 5,
+     "favors_deep_chains": true,
+     "abstains_on_unknown": true,
+     "matcher": "GENERIC lexical (no hand-authored synonym map); true-synonym bridging needs the GIVEN embedder (TODO)",
+     "nav_facts_are_probed_learned": true,
+     "pillars_grounded": "14 (embodiment, navigation, economy, communication, theory_of_mind, discovery, creativity, memory, transfer, slam, fusion, saga, agent, inferred)",
+     "all_learned": true,
+     "cross_pillar_max_pillars": 4,
+     "cross_pillar_chain": true,
+     "fusion_load_bearing": true,
+     "fusion_reach": {
+      "slamReach": 0.31,
+      "deadReach": 0.02,
+      "pass": true
+     },
+     "fluent_layer_faithful": true,
+     "fluent_example": {
+      "mode": "fluent",
+      "text": "Policy reaches goal. Goal reached_using map. Map solved_from observations. Observations sensed_as relative_vector."
+     },
+     "per_answer_provenance_labeled": true,
+     "no_hand_authored_triples": true,
+     "non_learned_pillars": [],
+     "verify_first_inference": {
+      "committed_on_live_graph": 3,
+      "commits_when_overdetermined": true,
+      "abstains_on_single_path": true,
+      "zero_fab_on_corrupt": true,
+      "law": "commit an inferred connection only if re-derivable >=2 edge-disjoint ways, else abstain (fm_chain_verify law)"
+     },
+     "mutation_torque_wire": "wire2 -> wire1",
+     "mutation_nav_drive_wire": "wire2 -> wire4",
+     "mutation_tracks_learned_state": true,
+     "every_answer_is_real_triples": "by construction — verbalize() only walks G.T (earned/decoded triples), never invents"
+    }
+   }
+  },
+  "xpillar_vec": {
+   "green": true,
+   "flags_true": 5,
+   "flags_total": 5,
+   "runtime_ms": 5298,
+   "audit": {
+    "task": "wire the LEARNED co-occurrence matcher into converse's REAL fused-pillar graph and re-measure cross-pillar. HONEST finding: it does NOT earn 5 — the real graph is too sparse, so high-cosine matches are sparsity artifacts (learned lift == random lift). The SAME matcher earns 5 on a rich-synonym graph, so the matcher is sound; the real graph's synonymy is the limit.",
+    "real_graph": {
+     "nodes": 78,
+     "triples": 60,
+     "frac_nodes_degree_le_2": 0.74
+    },
+    "cross_pillar_baseline": 4,
+    "cross_pillar_after_learned_merge": 4,
+    "cross_pillar_after_random_merge": 4,
+    "learned_merges": 8,
+    "mean_max_degree_of_merged_pairs": 3.57,
+    "rich_synonym_graph": {
+     "synonym_cosine": 0.889,
+     "cross_pillar_reached": 5
+    },
+    "real_graph_is_sparse": true,
+    "learned_merge_earns_no_lift_on_real_graph": true,
+    "learned_merge_not_better_than_random": true,
+    "same_matcher_earns_5_on_rich_synonyms": true,
+    "cross_pillar_honestly_capped_at_4": true,
+    "verdict": "DOCUMENTED CEILING (not EARNED-5): the real fused graph is sparse and topologically shallow — no 5-distinct-pillar path exists, and co-occurrence cannot find reliable synonyms (learned==random). Earning 5 needs the GIVEN embedder's real semantic vectors to merge true synonym islands (turn<->torque, goal<->target) — which the iron law permits (verified LLM latent knowledge) but a hand-authored bridge or an artifact-riding merge does NOT. Cross-pillar stays honestly at 4.",
+    "runtime_ms": 5298
+   }
+  },
+  "ast_vec": {
+   "green": true,
+   "flags_true": 2,
+   "flags_total": 2,
+   "runtime_ms": null,
+   "audit": {
+    "controller": "a PROGRAM (K expression-ASTs) SYNTHESISED by the agent — not weights; op-set [\"add\",\"sub\",\"mul\",\"neg\",\"tnh\"]",
+    "operators": "subtree mutation + point/node mutation + crossover (graft subtrees) — all the permutations that matter",
+    "A_ast_generation": {
+     "heldout_success_random_program": 0.05,
+     "heldout_success_synthesised": 0.4,
+     "synthesised_beats_random": true
+    },
+    "B_verifier_gated_sampling": {
+     "generators": 10,
+     "generator": "short (16-gen) evolution -> overfits train",
+     "RAW_commit_train_best": {
+      "generalized": 1,
+      "FABRICATED": 9,
+      "precision": 0.1
+     },
+     "VGS": {
+      "committed": 2,
+      "fabrications": 0,
+      "abstained": 8,
+      "precision": 1,
+      "recall": 0.2
+     },
+     "result": "Monte-Carlo search -> Las Vegas solver: VGS turns overfit-fabrications into honest abstentions at 0-fab (precision=verifier, recall=generator)"
+    },
+    "C_mutation": {
+     "stale_success": 0.07,
+     "reevolved_success": 0.3,
+     "passes": true
+    },
+    "synthesised_program": {
+     "depth": 5,
+     "size": 56,
+     "sample": [
+      "wire0=tanh(mul(tnh(sub(s7,tnh(s0))),sub(mul(add(1.222,-1.091),-0.32),add(1.222,-1.091))))",
+      "wire1=tanh(add(s9,1.905))",
+      "wire2=tanh(neg(mul(neg(neg(s0)),neg(neg(3.34)))))"
+     ]
+    }
+   }
+  }
+ }
+}
