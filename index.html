@@ -1124,12 +1124,16 @@ let TAMIDATA=null; fetch('./tami_data.json').then(r=>r.ok?r.json():null).then(j=
 // compiles the LITERAL shipping DamageModel.cs+TypeEffectiveness.cs via <Compile Link>), battle math calls the real C#
 // over localhost. When absent (e.g. the public GitHub Pages site), battles fall back to TAMIDATA — whose matrix and
 // constants are themselves verified cell-for-cell against the executing C# by tami_rules_test in the suite.
-const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false;
-  fetch(BASE+'/health').then(r=>r.ok?r.json():null).then(j=>{ alive=!!(j&&j.ok); if(alive) console.log('TAMI_CS sidecar connected — battle math runs the ACTUAL shipping C#'); }).catch(()=>{});
+// AC9: battle-math TIER order is sidecar C# > WASM C# > local JS. `?csoff=1` skips the sidecar probe entirely
+// (health() answers null without fetching) — deterministic tier testing: forces the WASM tier when the payload is present.
+const CSOFF=/[?&]csoff=1(&|$)/.test(location.search);
+const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false; let probed;
+  if(CSOFF){ probed=Promise.resolve(); console.log('TAMI_CS probe SKIPPED (?csoff=1) — sidecar tier disabled for this page load'); }
+  else probed=fetch(BASE+'/health').then(r=>r.ok?r.json():null).then(j=>{ alive=!!(j&&j.ok); if(alive) console.log('TAMI_CS sidecar connected — battle math runs the ACTUAL shipping C#'); }).catch(()=>{});
   const get=async p=>{ const r=await fetch(BASE+p); return r.json(); };
-  return { get alive(){return alive;},
+  return { get alive(){return alive;}, probed,
     // live re-probe: the sidecar may (re)start after page load — health() refreshes `alive` and returns the /health json
-    health:async()=>{ try{ const j=await get('/health'); alive=!!(j&&j.ok); return alive?j:null; }catch(e){ alive=false; return null; } },
+    health:async()=>{ if(CSOFF) return null; try{ const j=await get('/health'); alive=!!(j&&j.ok); return alive?j:null; }catch(e){ alive=false; return null; } },
     typemult:(atk,d1,d2)=>get(`/typemult?atk=${atk}&d1=${d1||'Null'}&d2=${d2||'Null'}`),
     damage:(o)=>get(`/damage?level=${o.level}&power=${o.power}&atk=${o.atk}&def=${o.def}&stab=${o.stab?1:0}&atkType=${o.atkType}&d1=${o.d1||'Null'}&d2=${o.d2||'Null'}&crit=${o.crit?1:0}&rng=${o.rng??1}&elev=${o.elev??1}&strike=${o.strike??1}`),
     hit:(adex,dagi,ddex)=>get(`/hit?adex=${adex}&dagi=${dagi}&ddex=${ddex}`),
@@ -1138,6 +1142,29 @@ const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false;
     battleNew:(seed,party,enemies)=>get(`/battle/new?seed=${seed}${party&&party.length?`&party=${party.join(',')}`:''}${enemies&&enemies.length?`&enemies=${enemies.join(',')}`:''}`),
     battleState:(id)=>get(`/battle/state?id=${encodeURIComponent(id)}`),
     battleAct:(id,unit,p)=>{ let q=`/battle/act?id=${encodeURIComponent(id)}&unit=${encodeURIComponent(unit)}`; for(const k in p) q+=`&${k}=${encodeURIComponent(p[k])}`; return get(q); } }; })();
+// AC9: TAMI_WASM — the ACTUAL C# core (Tami.Core published to .NET WebAssembly, payload ./tami-wasm/, build docs
+// tami-cs/wasm/README.md) as the PUBLIC site's battle math. Loads ONLY when the sidecar tier is absent: after the
+// TAMI_CS health probe resolves (or the timeout below — a hung probe must not block the wasm tier), if !alive we
+// import the payload's fingerprinted loader (its inlined boot config carries the other fingerprinted asset names,
+// so no importmap is needed). Errors fail SOFT: TAMI_WASM stays null and legacy battles keep the local JS math.
+window.TAMI_WASM=null;
+(()=>{ const ENTRY='./tami-wasm/_framework/dotnet.o6jiqlzuxg.js';   // EXACT fingerprinted filename in the copied payload (see README "Fingerprinting caveat")
+  const PROBE_TIMEOUT_MS=2000;
+  Promise.race([TAMI_CS.probed,new Promise(res=>setTimeout(res,PROBE_TIMEOUT_MS))]).then(async()=>{
+    if(TAMI_CS.alive) return;                                       // tier 1 (sidecar C#) is up — wasm not needed
+    try{
+      const { dotnet } = await import(ENTRY);
+      const { getAssemblyExports, getConfig } = await dotnet.create();
+      const core=(await getAssemblyExports(getConfig().mainAssemblyName)).TamiCoreExports;
+      const n=core.TechniqueCount();                                // proves the real TechniqueDB is in the wasm (736)
+      window.TAMI_WASM={
+        techniqueCount:()=>core.TechniqueCount(),
+        typeMult:(atk,d1,d2)=>core.TypeMult(atk||'Null',d1||'Null',d2||'Null'),
+        damage:o=>core.Damage(o.level,o.power,o.atk,o.def,!!o.stab,o.atkType,o.d1||'Null',o.d2||'Null',!!o.crit,(o.rng==null?1:o.rng)),
+        hitRatio:(adex,dagi,ddex)=>core.HitRatio(adex,dagi,ddex) };
+      console.log(`TAMI_WASM loaded — battle math runs the ACTUAL C# core in-browser (${n} techniques)`);
+    }catch(e){ console.warn('TAMI_WASM unavailable (payload missing or wasm boot failed) — legacy battles stay on local JS math:', (e&&e.message)||e); }
+  }); })();
 function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
   const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
 function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
@@ -1208,7 +1235,13 @@ async function tamiStatus(){
   else term('&nbsp;&nbsp;data: tami_data.json NOT loaded — away-mission battles fall back to legacy stand-in units.','err');
   const h=await TAMI_CS.health();   // live probe (also refreshes TAMI_CS.alive if the sidecar was started after page load)
   if(h&&h.ok) term(`&nbsp;&nbsp;sidecar: <b style="color:#7fdc8a">ONLINE</b> — ${String(h.engine||'').replace(/</g,'&lt;')} · <b>${h.techniques}</b> techniques loaded <span style="opacity:.5">(localhost:7877 — battle math runs the ACTUAL shipping C#)</span>`,'sys');
-  else{ term('&nbsp;&nbsp;sidecar: <b style="color:#ff9a9a">OFFLINE</b> — battles fall back to local stand-ins. '+TAMI_SIDECAR_HINT,'sys'); }
+  else if(CSOFF) term('&nbsp;&nbsp;sidecar: <b style="color:#ffb454">SKIPPED</b> — <b>?csoff=1</b> disables the sidecar probe for this page load (deterministic tier testing).','sys');
+  else{ term('&nbsp;&nbsp;sidecar: <b style="color:#ff9a9a">OFFLINE</b> — battles fall back to the next tier. '+TAMI_SIDECAR_HINT,'sys'); }
+  // AC9: which battle-math tier is ACTIVE right now (order: sidecar C# > WASM C# > local JS)
+  const tier=(h&&h.ok)?'<b style="color:#7fdc8a">sidecar C#</b> — live TamiRules process (localhost:7877)'
+    :(window.TAMI_WASM?`<b style="color:#7fdc8a">WASM C#</b> — the ACTUAL C# core in-browser (<b>${window.TAMI_WASM.techniqueCount()}</b> techniques, ./tami-wasm/ .NET wasm payload)`
+    :'<b style="color:#ffb454">local JS</b> — stand-in math (no sidecar, no wasm payload)');
+  term(`&nbsp;&nbsp;battle math tier: ${tier} <span style="opacity:.5">(tier order: sidecar C# &gt; WASM C# &gt; local JS · add <b>?csoff=1</b> to the URL to skip the sidecar probe and force the WASM tier when the payload is present)</span>`,'sys');
   term('&nbsp;&nbsp;how to play: <b>dock</b> a planet → <b>land</b> → walk (W/A/D) up to a hostile → press <b>F</b> — a turn-based battle on the REAL Tami rules. Or <b>demo battle</b> to watch one auto-played (any battle button takes control back; <b>Retreat</b> flees with no rewards).','sys');
 }
 async function demoBattle(){
@@ -1995,7 +2028,8 @@ function topClick(mx,my){ const w=topWorldAt(mx,my), wpp=(topCam.right-topCam.le
 // ==================================================================================================================
 const AWAY=(function(){
   const G={ GROUND:130, NBOX:20, WALK:16, RUN:26, TURN:2.7, CAM_BACK:15, CAM_UP:9, INTERACT_R:6, AV_R:1.1,
-            GRID:8, TILE:4.2, TURN_DELAY:0.45 };
+            GRID:8, TILE:4.2, TURN_DELAY:0.45,
+            FOE_AGGRO_R:34, FOE_SPEED:7.5, FOE_ENGAGE_R:2.4 };   // USER-REPORTED: hostiles "stood there and did nothing" — they now HUNT: chase inside AGGRO_R at FOE_SPEED and auto-engage at ENGAGE_R (F-prompt still works at INTERACT_R)
   let active=false, phase='';           // '', 'ground', 'battle'
   const keys=new Set();
   // ---- overlay DOM + dedicated renderer (isolated from the space canvas/HUD) ----
@@ -2030,7 +2064,7 @@ const AWAY=(function(){
     boxes=[]; for(let i=0;i<G.NBOX;i++){ const w=rr(3,9),d=rr(3,9),h=rr(3,15), x=rr(-56,56),z=rr(-56,56); if(Math.hypot(x-8,z-8)<14) continue;
       const c=new T.Color(col).multiplyScalar(rr(0.55,1.05)).offsetHSL(rr(-0.04,0.08),0.08,rr(-0.04,0.16));
       const m=new T.Mesh(new T.BoxGeometry(w,h,d), new T.MeshStandardMaterial({color:c,roughness:0.82,metalness:0.16})); m.position.set(x,h/2,z); gScene.add(m); boxes.push({x,z,hw:w/2+G.AV_R,hd:d/2+G.AV_R}); }
-    foes=[]; const nf=2; for(let i=0;i<nf;i++){ let fx,fz,tries=0; do{ fx=rr(-46,46); fz=rr(-46,46); tries++; }while(tries<30 && (Math.hypot(fx-8,fz-8)<16 || blocked(fx,fz)));
+    foes=[]; const nf=2; for(let i=0;i<nf;i++){ let fx,fz,tries=0; do{ fx=rr(-46,46); fz=rr(-46,46); tries++; }while(tries<30 && (Math.hypot(fx-8,fz-8)<16 || Math.hypot(fx,fz)<G.FOE_AGGRO_R*0.9 || blocked(fx,fz)));   // also spawn OUTSIDE aggro of the avatar start (0,0) — hunting foes must not instant-ambush on landing
       const g=enemyFigure(); g.position.set(fx,0,fz); gScene.add(g); foes.push({x:fx,z:fz,mesh:g,alive:true}); }
     pad=new T.Group(); const disc=new T.Mesh(new T.CircleGeometry(4,36), new T.MeshBasicMaterial({color:0x46d6ff,transparent:true,opacity:0.5,side:T.DoubleSide})); disc.rotation.x=-Math.PI/2; disc.position.y=0.03; pad.add(disc);
     const pr=new T.Mesh(new T.RingGeometry(3.6,4.2,32), new T.MeshBasicMaterial({color:0x9fe6ff,transparent:true,opacity:0.8,side:T.DoubleSide})); pr.rotation.x=-Math.PI/2; pr.position.y=0.05; pad.add(pr); pad.position.set(8,0,8); gScene.add(pad);
@@ -2054,7 +2088,16 @@ const AWAY=(function(){
   function nearestFoe(){ let best=null,bd=G.INTERACT_R; for(const f of foes){ if(!f.alive) continue; const d=Math.hypot(avatar.position.x-f.x,avatar.position.z-f.z); if(d<bd){bd=d;best=f;} } return best; }
   function onPad(){ return Math.hypot(avatar.position.x-8,avatar.position.z-8)<4; }
   function frameGround(dt){ gt+=dt; moveAvatar(dt);
-    for(const f of foes){ if(f.alive){ f.mesh.rotation.y+=dt*0.8; f.mesh.children[2] && (f.mesh.children[2].material.opacity=0.4+0.25*Math.sin(gt*3)); } }
+    for(const f of foes){ if(!f.alive) continue;
+      const dx=avatar.position.x-f.x, dz=avatar.position.z-f.z, d=Math.hypot(dx,dz);
+      if(d>G.FOE_ENGAGE_R){                                                // HUNT: hostiles ALWAYS close on the player (user fix: foes no longer stand idle); spawn grace = they start ≥0.9*AGGRO_R away
+        const step=Math.min(G.FOE_SPEED*dt, d-G.FOE_ENGAGE_R*0.9);
+        const nx=f.x+dx/d*step, nz=f.z+dz/d*step;
+        if(!blocked(nx,f.z)) f.x=nx; if(!blocked(f.x,nz)) f.z=nz;
+        f.mesh.position.set(f.x,0,f.z); f.mesh.rotation.y=Math.atan2(dx,dz); }
+      else f.mesh.rotation.y+=dt*0.8;
+      f.mesh.children[2] && (f.mesh.children[2].material.opacity=0.4+0.25*Math.sin(gt*3));
+      if(d<=G.FOE_ENGAGE_R){ say('⚔ A hostile lunges at you!'); buildBattle(f); return; } }   // contact -> battle starts itself
     pad.children[1].material.opacity=0.5+0.4*Math.sin(gt*2.5);
     const foe=nearestFoe(); const pad_=onPad();
     if(foe){ prompt='foe'; say(`⚔  A hostile blocks your path — press <b>F</b> to engage (turn-based battle)`); }
@@ -2065,24 +2108,38 @@ const AWAY=(function(){
   // ================================ BATTLE: turn-based grid tactics (Tami-style) ================================
   let bScene,bCam,tiles=[],units=[],order=[],turnIx=0,cur=null,bt=0,bstate='',selTech=null,reach=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(),pendingFoe=null,acted=false,moved=false,aiTimer=0,blog=[];
   let core=null, debugBattle=false;    // core!=null -> battle rendered from the C# sidecar STATE; debugBattle -> battle was started via the AWAY.debugStartBattle hook from orbit (exit fully when it ends)
+  let uiSig='';                        // last-rendered battle-UI html. setUI only touches the DOM when the html actually
+                                       // changed — per-frame innerHTML rewrites destroy buttons mid-click (see drawBattleUI).
+  function setUI(html){ if(html===uiSig) return false; uiSig=html; ui.innerHTML=html; return true; }
+  function clearUI(){ uiSig=''; ui.innerHTML=''; }
   let retreatArmed=false;              // two-click Retreat confirm (works headless — no blocking window.confirm); any other battle button disarms it
-  const TECHS={
-    strike:{name:'Strike',power:16,range:1,kind:'phys',cd:0,desc:'melee'},
-    cleave:{name:'Cleave',power:22,range:1,kind:'phys',aff:'Burn',cd:2,desc:'melee, may Burn'},
-    bolt:{name:'Ion Bolt',power:15,range:4,kind:'special',cd:1,desc:'ranged'},
-    venom:{name:'Venom Dart',power:10,range:3,kind:'special',aff:'Poison',cd:2,desc:'ranged, Poison'},
-    stunrod:{name:'Stun Rod',power:9,range:1,kind:'phys',aff:'Stun',cd:3,desc:'melee, may Stun'},
+  // AC9 tier 2: when window.TAMI_WASM is loaded, legacy damage runs the ACTUAL C# core in-browser with the SAME stat
+  // mapping the core battles use (BattleService.ResolveAttack): physical -> Force vs Ten, mental -> Int vs Wis, STAB
+  // when the tech's element ∈ the attacker's types, then Damage() applies type-chart/STAB/crit/rng inside the core.
+  // Constants (named, no magic numbers in the logic):
+  const WASMB={ LEVEL:5,            // stand-in units fight at level 5 (legacy has no roster levels)
+    POWER_SCALE:4,                  // legacy tech powers are 9..22; real Tami powers are 40..95 — scale into core range
+    CRIT_P:0.04, RNG_MIN:0.90, RNG_SPAN:0.20 };   // crit 4% (x1.5 applied INSIDE the core), damage variance uniform 0.90-1.10
+  const TECHS={   // el = real Tami element (tami_data.json type list) so the CORE type chart + STAB apply on the wasm tier
+    strike:{name:'Strike',power:16,range:1,kind:'phys',el:'Martial',cd:0,desc:'melee'},
+    cleave:{name:'Cleave',power:22,range:1,kind:'phys',el:'Pyro',aff:'Burn',cd:2,desc:'melee, may Burn'},
+    bolt:{name:'Ion Bolt',power:15,range:4,kind:'special',el:'Ionic',cd:1,desc:'ranged'},
+    venom:{name:'Venom Dart',power:10,range:3,kind:'special',el:'Toxin',aff:'Poison',cd:2,desc:'ranged, Poison'},
+    stunrod:{name:'Stun Rod',power:9,range:1,kind:'phys',el:'Sonic',aff:'Stun',cd:3,desc:'melee, may Stun'},
     mend:{name:'Mend',power:20,range:2,kind:'heal',cd:2,desc:'heal an ally'}
   };
-  function mkUnit(name,side,hp,atk,def,spd,mv,techs,gx,gy){ return {name,side,hp,maxhp:hp,atk,def,spd,mv,techs,gx,gy,mesh:null,aff:{},cd:{},alive:true}; }
+  // force/ten/int/wis mirror the core stat slots; the int/wis derivation keeps the legacy phys-vs-special asymmetry
+  // (special always used 0.8*atk vs 0.5*def here) — only the FORMULA moves into the C# core, not the balance intent.
+  function mkUnit(name,side,hp,atk,def,spd,mv,techs,gx,gy,types){ return {name,side,hp,maxhp:hp,atk,def,spd,mv,techs,gx,gy,types:types||[],
+    force:atk,ten:def,int:Math.round(atk*0.8),wis:Math.round(def*0.5),mesh:null,aff:{},cd:{},alive:true}; }
   function party(){ return [
-    mkUnit('Warden',    'ally',56,16,9,11,3,['strike','cleave','mend'],1,3),
-    mkUnit('Ranger',    'ally',44,14,6,14,4,['bolt','venom'],1,4),
-    mkUnit('Bulwark',   'ally',70,13,13,7,2,['strike','stunrod'],0,3) ]; }
+    mkUnit('Warden',    'ally',56,16,9,11,3,['strike','cleave','mend'],1,3,['Martial']),
+    mkUnit('Ranger',    'ally',44,14,6,14,4,['bolt','venom'],1,4,['Ionic']),
+    mkUnit('Bulwark',   'ally',70,13,13,7,2,['strike','stunrod'],0,3,['Mineral']) ]; }
   function foeParty(n){ const pool=[
-    mkUnit('Synod Blade','foe',48,15,8,12,3,['strike','cleave'],6,3),
-    mkUnit('Synod Gun',  'foe',40,15,5,13,4,['bolt','venom'],7,4),
-    mkUnit('Synod Brute','foe',66,14,11,7,2,['strike','stunrod'],6,4) ];
+    mkUnit('Synod Blade','foe',48,15,8,12,3,['strike','cleave'],6,3,['Martial']),
+    mkUnit('Synod Gun',  'foe',40,15,5,13,4,['bolt','venom'],7,4,['Toxin']),
+    mkUnit('Synod Brute','foe',66,14,11,7,2,['strike','stunrod'],6,4,['Mineral']) ];
     return pool.slice(0,Math.max(2,Math.min(3,n))); }
   function tileFree(gx,gy,ignore){ if(gx<0||gy<0||gx>=G.GRID||gy>=G.GRID) return false; for(const u of units){ if(u.alive&&u!==ignore&&u.gx===gx&&u.gy===gy) return false; } return true; }
   function unitAt(gx,gy){ return units.find(u=>u.alive&&u.gx===gx&&u.gy===gy); }
@@ -2121,7 +2178,16 @@ const AWAY=(function(){
   function dmg(u,amount,src){ u.hp=Math.max(0,u.hp-Math.round(amount)); log(`${u.name} takes ${Math.round(amount)}${src?(' ('+src+')'):''}.`); if(u.hp<=0&&u.alive){ u.alive=false; u.mesh.visible=false; log(`${u.name} is down!`); } }
   function useTech(actor,tech,targ){ const info=TECHS[tech];
     if(info.kind==='heal'){ targ.hp=Math.min(targ.maxhp,targ.hp+info.power); log(`${actor.name} uses ${info.name} — ${targ.name} +${info.power} HP.`); }
-    else { const raw=info.power + (info.kind==='phys'?actor.atk:Math.round(actor.atk*0.8)) - (info.kind==='phys'?targ.def:Math.round(targ.def*0.5)); const amt=Math.max(2,Math.round(raw*rr(0.85,1.15))); dmg(targ,amt,info.name);
+    else if(window.TAMI_WASM){   // AC9 tier 2: damage from the ACTUAL C# core (in-browser wasm) — core stat mapping, see WASMB
+      const P=info.kind==='phys', d1=(targ.types||[])[0]||'', d2=(targ.types||[])[1]||'';
+      const stab=(actor.types||[]).indexOf(info.el)>=0;                                    // STAB iff tech element ∈ attacker types (core rule)
+      const crit=Math.random()<WASMB.CRIT_P, rng=WASMB.RNG_MIN+Math.random()*WASMB.RNG_SPAN;
+      const mult=window.TAMI_WASM.typeMult(info.el,d1,d2);                                 // core type chart (log flavour; Damage() applies it too)
+      const amt=window.TAMI_WASM.damage({level:WASMB.LEVEL,power:info.power*WASMB.POWER_SCALE,
+        atk:P?actor.force:actor.int,def:P?targ.ten:targ.wis,stab,atkType:info.el,d1,d2,crit,rng});
+      dmg(targ,amt,`${info.name} [C# wasm]${crit?' crit!':''}${mult>1.001?' SUPER EFFECTIVE':(mult<0.999?' resisted':'')}`);
+      if(info.aff && targ.alive && Math.random()<0.6){ targ.aff[info.aff]=(info.aff==='Stun'?1:3); log(`${targ.name} is afflicted: ${info.aff}!`); } }
+    else { const raw=info.power + (info.kind==='phys'?actor.atk:Math.round(actor.atk*0.8)) - (info.kind==='phys'?targ.def:Math.round(targ.def*0.5)); const amt=Math.max(2,Math.round(raw*rr(0.85,1.15))); dmg(targ,amt,info.name);   // last resort: local JS stand-in math
       if(info.aff && targ.alive && Math.random()<0.6){ targ.aff[info.aff]=(info.aff==='Stun'?1:3); log(`${targ.name} is afflicted: ${info.aff}!`); } }
     actor.cd[tech]=info.cd; acted=true; }
   function endTurn(){ if(checkEnd()) return; bstate='wait'; aiTimer=G.TURN_DELAY*0.6; }
@@ -2156,9 +2222,13 @@ const AWAY=(function(){
     else if(bstate==='win'){ ctrl=`<div style="margin-top:8px;color:#7fdc8a;font-size:16px">✔ VICTORY — the away team prevails.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #2f6a4a;background:#13251b;color:#9fe6b0;font:inherit;cursor:pointer">Back to the surface</button>`; }
     else if(bstate==='lose'){ ctrl=`<div style="margin-top:8px;color:#ff6a6a;font-size:16px">✖ DEFEAT — you retreat to your ship.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #6a2f2f;background:#251313;color:#ffb3b3;font:inherit;cursor:pointer">Retreat</button>`; }
     else ctrl=`<div style="margin-top:6px;opacity:.7">${cur?cur.name:''}${bstate==='ai'?' (enemy) is acting…':'…'}</div>`;
-    ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:420px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
+    const html=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:420px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
       <div style="color:#8fd0ff;font-weight:bold;margin-bottom:4px">TURN-BASED BATTLE <span style="opacity:.5;font-weight:normal">— a Tami-style away-team fight</span></div>${rows}${ctrl}</div>
       <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${blog.map(l=>'· '+l).join('<br>')}</div>`;
+    if(!setUI(html)) return;   // USER-REPORTED BUG FIX: rewriting innerHTML EVERY frame (60fps) destroyed the buttons
+                               // between a real mousedown and mouseup, so no click event ever fired ("couldn't click
+                               // anything to attack"). Synthetic .click() in headless tests fires atomically on a live
+                               // node — which is exactly why verification missed it. Only re-render on real UI change.
     ui.querySelectorAll('button[data-tech]').forEach(b=>b.onclick=()=>{ const tk=b.getAttribute('data-tech'); selTech=(selTech===tk?null:tk); });
     ui.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>{ const a=b.getAttribute('data-act');
       if(a==='retreat'){ if(!retreatArmed){ retreatArmed=true; log('Retreat? Click again to confirm — the party flees with NO rewards.'); } else retreatBattle(); return; }
@@ -2173,13 +2243,13 @@ const AWAY=(function(){
     const th=ray.intersectObjects(tiles); if(th.length){ const td=th[0].object.userData; const k=td.gx+','+td.gy; if(!moved && reach.has(k)){ cur.gx=td.gx; cur.gy=td.gy; const w=w3(cur.gx,cur.gy); cur.mesh.position.set(w.x,0,w.z); moved=true; reach=new Set(); } } }
   function retreatBattle(){ // RETREAT (shared by legacy + core battles): client-side abandon — NO rewards, foe stays alive.
     // The server session (in-memory) is simply orphaned; nothing to tell it. Works even if the sidecar just died.
-    retreatArmed=false; autoStop(); core=null; bScene=null; bstate=''; ui.innerHTML='';
+    retreatArmed=false; autoStop(); core=null; bScene=null; bstate=''; clearUI();
     term('The party retreats!','sys');
     if(debugBattle){ debugBattle=false; exit(); term('Back aboard your ship — no spoils.','sys'); return; }   // hook/demo-started from orbit: no ground scene to return to
     phase='ground'; term('You fall back to the surface — no spoils, and the hostiles remain.','sys'); }
   function finishBattle(won){ // clear the engaged foe on victory; return to ground (shared by legacy + core battles)
     if(won && pendingFoe){ pendingFoe.alive=false; pendingFoe.mesh.visible=false; }
-    retreatArmed=false; autoStop(); core=null; bstate=''; ui.innerHTML='';
+    retreatArmed=false; autoStop(); core=null; bstate=''; clearUI();
     if(debugBattle){ debugBattle=false; exit(); term(won?'[debugStartBattle] battle complete — victory.':'[debugStartBattle] battle complete — defeat.','sys'); return; }   // hook-started from orbit: no ground scene to return to
     phase='ground'; term(won?'Away team victorious — hostiles cleared.':'Away team routed — you fall back to the surface.', won?'sys':'err');
     if(won && foes.every(f=>!f.alive)) say('Surface clear. Reach the launch pad and press F to return to orbit.'); }
@@ -2232,7 +2302,7 @@ const AWAY=(function(){
     if(/miss/i.test(l)) return `<span style="opacity:.65">${esc}</span>`;
     return esc; }
   function frameCore(dt){ bt+=dt;
-    if(!core.state||!core.scene){ ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px;color:#cfe2f5">⚔ ${core.note||'contacting battle core…'}</div>`; return; }
+    if(!core.state||!core.scene){ setUI(`<div style="position:absolute;top:12px;left:12px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px;color:#cfe2f5">⚔ ${core.note||'contacting battle core…'}</div>`); return; }
     const st=core.state, cu=st.units.find(u=>u.id===st.current);
     for(const u of st.units){ const g=core.mesh[u.id]; if(g&&g.visible) g.position.y=(cu&&u.id===cu.id&&!st.result)?Math.abs(Math.sin(bt*4))*0.5:0; }
     if(!st.result&&!core.busy&&cu&&cu.side==='enemy'){ core.pollT+=dt; if(core.pollT>0.9){ core.pollT=0; coreRefresh(); } }   // defensive: act/new should already leave a party unit current
@@ -2259,9 +2329,10 @@ const AWAY=(function(){
       if(core.arm) ctrl+=`<div style="margin-top:4px;color:#9fe6ff">${core.arm.kind==='strike'?pretty(sk&&sk.id):pretty(core.arm.id)} armed — click a red foe in range (${Math.max(1,core.arm.range||1)}).</div>`; }
     else ctrl=`<div style="margin-top:6px;opacity:.7">${cu?cu.name+' (enemy) is acting…':'…'}</div>`;
     if(core.note) ctrl+=`<div style="margin-top:4px;color:#ff9a9a">${core.note}</div>`;
-    ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:470px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
+    const html=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:470px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
       <div style="color:#8fd0ff;font-weight:bold;margin-bottom:4px">TURN-BASED BATTLE <span style="opacity:.5;font-weight:normal">— live Tami C# core${core.id?` · ${core.id}`:''}</span></div>${rows}${ctrl}</div>
       <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${core.logLines.slice(-6).map(l=>'· '+coreLogLine(l)).join('<br>')}</div>`;
+    if(!setUI(html)) return;   // same click-eating fix as drawBattleUI: never rewrite the DOM mid-click when nothing changed
     ui.querySelectorAll('button[data-core]').forEach(b=>b.onclick=()=>{ const k=b.getAttribute('data-core');
       if(autoOn) autoStop('[demo] You pressed a battle button — control is yours.');            // ANY battle button hands control back from the demo driver
       if(k==='return'){ finishBattle(st.result==='victory'); return; }
@@ -2352,7 +2423,7 @@ const AWAY=(function(){
   // ================================ enter / exit / input / frame ================================
   function enter(pl){ if(active) return; active=true; phase='ground'; worldName=pl&&pl.name||'the surface'; buildGround(pl); size(); wrap.style.display='block'; keys.clear();
     term(`Landed on <b>${worldName}</b>. You disembark — <b>on foot</b>. (W walk · A/D turn · Shift run · F interact · type <b>launch</b> or step on the pad to leave)`,'sys'); }
-  function exit(){ autoStop(); retreatArmed=false; active=false; phase=''; wrap.style.display='none'; ui.innerHTML=''; keys.clear();
+  function exit(){ autoStop(); retreatArmed=false; active=false; phase=''; wrap.style.display='none'; clearUI(); keys.clear();
     // dispose scenes lightly
     gScene=null; bScene=null; core=null; }
   function interact(){ if(phase!=='ground') return; const foe=nearestFoe(); if(foe){ buildBattle(foe); return; } if(onPad()){ term('Launching back to orbit.','sys'); exit(); } }

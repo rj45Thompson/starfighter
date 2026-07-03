@@ -1,7 +1,7 @@
 {
- "generated": "2026-07-03T05:59:48.459Z",
- "suite": "65/65",
- "claims_total": 354,
+ "generated": "2026-07-03T16:27:55.972Z",
+ "suite": "67/67",
+ "claims_total": 370,
  "benches": {
   "phys_vec": {
    "green": true,
@@ -371,14 +371,14 @@
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 48,
+   "runtime_ms": 50,
    "audit": {
     "task": "civilization at scale under contention: hundreds of agents act on disposition memory, reproduce genetically; watch for EMERGENT coalitions / polarization / scarcity-driven conflict (vs a disposition-blind control)",
     "agents": 240,
     "factions": 5,
     "rounds": 120,
     "interactions": 31200,
-    "runtime_ms": 48,
+    "runtime_ms": 50,
     "modularity_real": 0.606,
     "modularity_blind": 0.009,
     "coalitions_emerge": true,
@@ -455,7 +455,7 @@
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 14593,
+   "runtime_ms": 10644,
    "audit": {
     "task": "FUSED AGENT (6 pillars): fly the learned controller (P2) on the decoded body (P1) using the SLAM-estimated pose (P3), to the economy's (P4) most-profitable planet — REMEMBERED across a delay (P10), the economy TRANSFERRED to a related market (P11). Bank profit only if reached. Each pillar ABLATION-audited in the SAME agent.",
     "pillars_coupled": [
@@ -497,14 +497,14 @@
     "P11_transfer_load_bearing": true,
     "every_pillar_load_bearing": true,
     "honest_modality_boundary": "P5 comm / P6 ToM / P7 discovery / P8 creativity are different MODALITIES (a Lewis game, another mind, open-ended goals, verified-novelty) — deliberately NOT forced into this embodied trader; they stay standalone benches. P1 (body decode) is inherited from fusion_vec (mutation-audited there).",
-    "runtime_ms": 14593
+    "runtime_ms": 10644
    }
   },
   "world_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 89,
+   "runtime_ms": 111,
    "audit": {
     "task": "multi-agent world: a scout broadcasts a LEARNED signal; W foragers decode it to find hidden food. Communication is load-bearing for the collective yield.",
     "L": 8,
@@ -528,14 +528,14 @@
     "opposed_scout_yield": 0.505,
     "indifferent_scout_yield": 0.119,
     "honesty_requires_aligned_incentives": true,
-    "runtime_ms": 89
+    "runtime_ms": 111
    }
   },
   "swarm_vec": {
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 393,
+   "runtime_ms": 432,
    "audit": {
     "task": "multi-agent congestion foraging: spread across the VALUABLE sites (shared yield). ToM (avoid crowds) + discovery (which types pay) each LEARNED from reward and each load-bearing.",
     "sites": 16,
@@ -561,14 +561,14 @@
     "unrelated_scratch": 12,
     "coordination_transfers_to_related": true,
     "transfer_is_structural": true,
-    "runtime_ms": 393
+    "runtime_ms": 432
    }
   },
   "lang_vec": {
    "green": true,
    "flags_true": 3,
    "flags_total": 3,
-   "runtime_ms": 7,
+   "runtime_ms": 8,
    "audit": {
     "task": "a population evolves a COMPOSITIONAL language via iterated learning; a transmission BOTTLENECK drives compositionality up over generations (topographic similarity).",
     "meanings": 25,
@@ -584,7 +584,7 @@
     "compositionality_emerges": true,
     "final_topsim_no_bottleneck": 0.034,
     "bottleneck_is_required": true,
-    "runtime_ms": 7
+    "runtime_ms": 8
    }
   },
   "dialect_vec": {
@@ -631,7 +631,7 @@
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 271,
+   "runtime_ms": 270,
    "audit": {
     "task": "FUSED MULTI-AGENT: collective foraging yield = product of four LEARNED capabilities (communication, theory-of-mind, discovery, navigation), each from its own audited bench, each ablation-audited in the same society.",
     "capability_rates": {
@@ -663,14 +663,14 @@
     "nav_load_bearing": true,
     "every_capability_load_bearing": true,
     "note": "each factor is a REAL learned bench performance (world_vec comm on/off; swarm_vec spread + value on/off); the fused claim is that all four are jointly load-bearing for the society, like agent_vec for the embodied trader.",
-    "runtime_ms": 271
+    "runtime_ms": 270
    }
   },
   "roles_vec": {
    "green": true,
    "flags_true": 3,
    "flags_total": 3,
-   "runtime_ms": 44,
+   "runtime_ms": 32,
    "audit": {
     "task": "emergent ROLES: from an identical start and reward alone, agents DIFFERENTIATE into stable, balanced role specialists (division of labour). Control: role-independent reward -> no specialization.",
     "agents": 40,
@@ -682,7 +682,7 @@
     "roles_emerge_from_reward": true,
     "division_of_labour_is_balanced": true,
     "balance_needs_complementarity": true,
-    "runtime_ms": 44
+    "runtime_ms": 32
    }
   },
   "culture_vec": {
@@ -716,7 +716,7 @@
    "green": true,
    "flags_true": 2,
    "flags_total": 2,
-   "runtime_ms": 53,
+   "runtime_ms": 40,
    "audit": {
     "task": "public-goods game: cooperation is individually tempting to free-ride, so it COLLAPSES from reward alone; a punishment NORM (cooperators fine defectors at a cost) stabilises it.",
     "agents": 50,
@@ -725,7 +725,7 @@
     "cooperation_no_norm": 0.001,
     "cooperation_collapses_without_norms": true,
     "norm_stabilises_cooperation": true,
-    "runtime_ms": 53
+    "runtime_ms": 40
    }
   },
   "redqueen_vec": {
@@ -751,7 +751,7 @@
    "green": true,
    "flags_true": 8,
    "flags_total": 8,
-   "runtime_ms": 7,
+   "runtime_ms": 5,
    "audit": {
     "task": "auto-curriculum (target-success staircase) keeps difficulty in the ZONE OF PROXIMAL DEVELOPMENT (just ahead of competence); it beats the oracle-best SINGLE fixed difficulty because the optimal difficulty MOVES as the learner improves.",
     "curriculum_final": 0.966,
@@ -775,14 +775,14 @@
     "difficulty_tracks_the_frontier": true,
     "ramp_is_load_bearing": true,
     "structure_beats_random_variety": true,
-    "runtime_ms": 7
+    "runtime_ms": 5
    }
   },
   "unified_vec": {
    "green": true,
    "flags_true": 12,
    "flags_total": 12,
-   "runtime_ms": 14534,
+   "runtime_ms": 11030,
    "audit": {
     "task": "UNIFIED AGENT: ONE society scout whose single compound mission needs EIGHT learned pillars at once — social (P5 comm, P6 ToM, P7 discovery) AND embodied (P4 economy, P11 transfer, P10 memory, P2 controller, P3 SLAM pose). Yield = product of the eight REAL learned rates; remove any pillar -> yield drops. Closes agent_vec's \"single agent exercising ALL pillars is the next frontier\".",
     "pillars_exercised": [
@@ -866,14 +866,14 @@
     "every_pillar_load_bearing": true,
     "surpasses_agent_vec_scope": true,
     "honest_boundary": "P8 creativity (verified novelty) and P9 program-synth (induce a program from examples) are genuinely different modalities — they produce ARTEFACTS, not a forager's mission outcome — so they stay standalone benches (creativity_vec/vgs_vec/ast_vec). P1 body-decode is inherited under reach (mutation-audited in fusion_vec). This unifies 8 of the behaviour pillars in one agent, up from agent_vec's 6.",
-    "runtime_ms": 14534
+    "runtime_ms": 11030
    }
   },
   "meta_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 2032,
+   "runtime_ms": 2773,
    "audit": {
     "task": "META-LEARNING (Reptile) on the sine family y=A*sin(x+phi): a learner trained across MANY sine tasks gets a meta-init that adapts to a NEW sine in a few steps; from-scratch is slow, and a meta-init from an UNRELATED family (parabolas) does NOT transfer.",
     "eval_steps": 10,
@@ -898,14 +898,14 @@
     "meta_reaches_threshold_sooner": true,
     "unrelated_family_does_not_transfer": true,
     "advantage_needs_related_structure": true,
-    "runtime_ms": 2032
+    "runtime_ms": 2773
    }
   },
   "hierarchy_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 174,
+   "runtime_ms": 175,
    "audit": {
     "task": "emergent HIERARCHY: N agents in a PURE coordination game (no correct answer) must rally on one option; from reward, trust snowballs onto one emergent LEADER everyone copies -> agreement ~1. No coordination benefit -> no leader (flat); shuffle who-follows-whom -> agreement collapses.",
     "agents": 12,
@@ -930,14 +930,14 @@
     "no_benefit_no_hierarchy": true,
     "shuffling_breaks_coordination": true,
     "leaderless_control_stays_near_chance": true,
-    "runtime_ms": 174
+    "runtime_ms": 175
    }
   },
   "continual_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 490,
+   "runtime_ms": 587,
    "audit": {
     "task": "CONTINUAL learning: learn A then B. Naive sequential FORGETS A (catastrophic interference); a small REPLAY buffer RETAINS A while still learning B. Control: a non-conflicting B does not cause forgetting -> the forgetting is from task CONFLICT.",
     "accA_after_learning_A": 0.973,
@@ -962,14 +962,14 @@
     "replay_also_learns_B": true,
     "replay_beats_naive_on_retention": true,
     "conflict_causes_forgetting_not_training": true,
-    "runtime_ms": 490
+    "runtime_ms": 587
    }
   },
   "poet_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 131,
+   "runtime_ms": 112,
    "audit": {
     "task": "POET: co-evolve a population of (environment, solver) niches. Auto-generate harder envs admitted by a MINIMAL CRITERION (ZPD) and TRANSFER solvers between niches, walking a self-made curriculum to the far optimum that direct optimisation cannot reach.",
     "poet": {
@@ -1016,14 +1016,14 @@
     "generation_is_load_bearing": true,
     "transfer_is_load_bearing": true,
     "minimal_criterion_builds_a_curriculum": true,
-    "runtime_ms": 131
+    "runtime_ms": 112
    }
   },
   "skills_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 145,
+   "runtime_ms": 116,
    "audit": {
     "task": "hierarchical SKILLS (options): discover the reusable doorway bottlenecks from experience and reuse them, planning a NEW task over the tiny option graph in far fewer node expansions than planning over primitives. OFF-PATH (non-bottleneck) subgoals give no speedup — it must be the RIGHT decomposition.",
     "map": "30 rooms of 6x6",
@@ -1047,7 +1047,7 @@
     "offpath_subgoals_dont_help": true,
     "discovery_finds_the_bottlenecks": true,
     "advantage_grows_with_map_size": true,
-    "runtime_ms": 145
+    "runtime_ms": 116
    }
   },
   "tool_vec": {
@@ -1089,7 +1089,7 @@
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 37,
+   "runtime_ms": 20,
    "audit": {
     "task": "CAUSAL discovery: a hidden confounder Z->X, Z->Y makes X,Y correlate though neither causes the other, while X->W is real. Observation hallucinates spurious edges; the do-operator (intervene) recovers the TRUE directed graph and its direction.",
     "true_causal_graph": [
@@ -1126,14 +1126,14 @@
     "real_effect_survives_intervention": true,
     "intervention_gets_the_direction": true,
     "observation_alone_gets_it_wrong": true,
-    "runtime_ms": 37
+    "runtime_ms": 20
    }
   },
   "metacog_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 42,
+   "runtime_ms": 29,
    "audit": {
     "task": "SELF-MODELING / calibration: learn P(correct | margin) and ABSTAIN when unsure. Answering only confident items raises accuracy on the attempted set (selective prediction); confidence is calibrated; shuffled confidence gives no benefit; an overconfident baseline is badly calibrated.",
     "base_accuracy_all_items": 0.746,
@@ -1155,14 +1155,14 @@
     "self_model_is_load_bearing": true,
     "shuffled_gives_no_selective_benefit": true,
     "confidence_is_calibrated": true,
-    "runtime_ms": 42
+    "runtime_ms": 29
    }
   },
   "negotiate_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 906,
+   "runtime_ms": 980,
    "audit": {
     "task": "emergent NEGOTIATION (Nash demand game): two self-interested agents LEARN their demands from experience and converge to the NASH BARGAINING solution — the surplus above outside options is split EQUALLY. Fair when symmetric; a better outside option buys a bigger share; fixed greedy demands break down.",
     "symmetric": {
@@ -1210,14 +1210,14 @@
     "learning_avoids_breakdown": true,
     "fixed_greedy_breaks_down": true,
     "efficiency_note": "the SMOOTHED (trembling) frontier leaves the equilibrium demands summing to <1 (some pie unclaimed) — an efficiency artifact of the smoothing; the sharp-frontier limit claims the whole pie but destabilises naive co-adaptive learning. The Nash bargaining PROPERTY (equal surplus split) holds exactly regardless.",
-    "runtime_ms": 906
+    "runtime_ms": 980
    }
   },
   "abstract_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 386,
+   "runtime_ms": 452,
    "audit": {
     "task": "CONCEPT ABSTRACTION (relational same-vs-different): learn the RELATION, not the objects. An abstract (relational) learner transfers to NOVEL unseen objects; an identity-memoriser does not; a linear classifier on the raw objects cannot even represent the relation.",
     "accuracy": {
@@ -1233,14 +1233,14 @@
     "memoriser_fails_on_novel": true,
     "abstraction_is_what_transfers": true,
     "raw_features_cannot_represent_the_relation": true,
-    "runtime_ms": 386
+    "runtime_ms": 452
    }
   },
   "worldmodel_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 5066,
+   "runtime_ms": 4795,
    "audit": {
     "task": "MODEL-BASED planning vs MODEL-FREE: learn the transition model and PLAN in imagination to reach a sparse-reward goal in far fewer REAL env steps than model-free Q-learning; a corrupted model destroys the advantage.",
     "optimal_path_length": 21,
@@ -1261,14 +1261,14 @@
     "both_eventually_solve": true,
     "model_accuracy_is_load_bearing": true,
     "planning_beats_no_planning": true,
-    "runtime_ms": 5066
+    "runtime_ms": 4795
    }
   },
   "active_vec": {
    "green": true,
    "flags_true": 4,
    "flags_total": 4,
-   "runtime_ms": 305,
+   "runtime_ms": 315,
    "audit": {
     "task": "ACTIVE LEARNING: query the most INFORMATIVE (most-uncertain, nearest-the-boundary) point and learn a hidden linear concept in far fewer labels than random querying.",
     "queries_to_reach_accuracy": {
@@ -1293,14 +1293,14 @@
     "active_at_least_2x_label_efficient": true,
     "both_eventually_learn": true,
     "active_queries_near_the_boundary": true,
-    "runtime_ms": 305
+    "runtime_ms": 315
    }
   },
   "compose_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 540,
+   "runtime_ms": 596,
    "audit": {
     "task": "COMPOSITIONAL generalisation: outputs factorise as operator ⊙ operand. Train on a subset of (a,b) pairs; a compositional (factorised) learner generalises to HELD-OUT combinations of seen primitives, a joint memoriser does not.",
     "operators": 6,
@@ -1317,14 +1317,14 @@
     "memoriser_fits_training": true,
     "memoriser_fails_on_novel": true,
     "compositionality_is_what_transfers": true,
-    "runtime_ms": 540
+    "runtime_ms": 596
    }
   },
   "imitate_vec": {
    "green": true,
    "flags_true": 4,
    "flags_total": 4,
-   "runtime_ms": 41,
+   "runtime_ms": 42,
    "audit": {
     "task": "IMITATION / social learning: warm-start from an expert's demonstrations (behavioural cloning) then fine-tune by RL -> reach a sparse-reward goal in far fewer REAL env steps than learning solo. Shuffled demonstrations give no speedup.",
     "optimal_path_length": 21,
@@ -1342,14 +1342,14 @@
     "shuffled_demos_give_no_speedup": true,
     "right_demos_beat_wrong_demos": true,
     "both_eventually_solve": true,
-    "runtime_ms": 41
+    "runtime_ms": 42
    }
   },
   "reward_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 585,
+   "runtime_ms": 613,
    "audit": {
     "task": "INVERSE RL: recover the hidden reward from an expert's demonstrations (match state-visitation), then plan on it to match the expert. The recovered REWARD generalises to a NEW start where behavioural cloning fails; a wrong reward gives wrong behaviour. Averaged over randomised reward maps.",
     "return_ratio_vs_expert": {
@@ -1366,14 +1366,14 @@
     "wrong_reward_gives_wrong_behavior": true,
     "recovered_reward_correlates_with_true": true,
     "honest_note": "the recovered reward is APPROXIMATE (correlation ~0.66 with the true map, from only 3 demonstrated starts), yet planning on it still yields most of the optimal return from an UNSEEN start — the point being that a learned REWARD transfers to new starts where behavioural cloning, having no demonstration there, does not.",
-    "runtime_ms": 585
+    "runtime_ms": 613
    }
   },
   "plan_vec": {
    "green": true,
    "flags_true": 4,
    "flags_total": 4,
-   "runtime_ms": 59,
+   "runtime_ms": 63,
    "audit": {
     "task": "LONG-HORIZON credit assignment (delayed gratification): a small near reward vs a BIG reward L steps away. A long planning horizon (high discount) propagates the distant reward and takes it; a MYOPIC short horizon over-discounts it and grabs the near small one — failing as L grows.",
     "reward_layout": {
@@ -1404,14 +1404,14 @@
     "myopic_fails_at_long_horizon": true,
     "both_get_big_at_short_horizon": true,
     "planning_advantage_grows_with_horizon": true,
-    "runtime_ms": 59
+    "runtime_ms": 63
    }
   },
   "curious_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 149,
+   "runtime_ms": 105,
    "audit": {
     "task": "INTRINSIC MOTIVATION: a count-based novelty bonus drives exploration of a reward-SPARSE maze — the agent covers the map and finds the far goal, where a reward-only learner (plain zero init) random-walks and stalls near start. With DENSE reward both do fine (curiosity only matters when reward is sparse).",
     "free_cells": 91,
@@ -1430,14 +1430,14 @@
     "reward_only_stalls_when_sparse": true,
     "dense_reward_rescues_reward_only": true,
     "curiosity_is_load_bearing": true,
-    "runtime_ms": 149
+    "runtime_ms": 105
    }
   },
   "robust_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 246,
+   "runtime_ms": 305,
    "audit": {
     "task": "ROBUSTNESS to distribution shift: a noisy CAUSAL feature always determines the label; a clean SPURIOUS feature predicts it in train but FLIPS at test. ERM (one env) rides the spurious feature and fails under shift; training across two environments with opposite spurious sign forces the CAUSAL feature and generalises.",
     "accuracy_under_shift": {
@@ -1457,14 +1457,14 @@
     "invariance_is_load_bearing": true,
     "no_shift_both_fine": true,
     "invariant_weights_the_causal_feature": true,
-    "runtime_ms": 246
+    "runtime_ms": 305
    }
   },
   "symbol_vec": {
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 42,
+   "runtime_ms": 24,
    "audit": {
     "task": "SYMBOL GROUNDING: a hidden word<->object bijection is never shown directly; each scene gives a SET of K objects and the SET of their K words (order shuffled -> one scene is ambiguous). Accumulating CROSS-SITUATIONAL co-occurrence recovers the bijection; MUTUAL EXCLUSIVITY fast-maps a novel word to a novel object in one shot by eliminating what its known words already claim.",
     "vocab": 12,
@@ -1488,14 +1488,14 @@
     "mutual_exclusivity_fast_maps_novel": true,
     "no_elimination_is_chance": true,
     "me_is_load_bearing": true,
-    "runtime_ms": 42
+    "runtime_ms": 24
    }
   },
   "instruct_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 2,
+   "runtime_ms": 3,
    "audit": {
     "task": "COMPOSITIONAL INSTRUCTION FOLLOWING (SCAN-style): a hidden generator maps (verb,direction,count) -> an action sequence (turn then COUNT action-repeats). Trained on a primitive-COVERING subset that HOLDS OUT whole combinations, a compositional learner (slot decomposition, content learned) generalises to the novel combinations; a holistic memoriser fits seen commands but fails novel ones.",
     "grid": 36,
@@ -1515,14 +1515,14 @@
     "memoriser_fails_on_novel": true,
     "systematicity_is_what_transfers": true,
     "learned_the_generator": true,
-    "runtime_ms": 2
+    "runtime_ms": 3
    }
   },
   "analogy_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 327,
+   "runtime_ms": 340,
    "audit": {
     "task": "RELATIONAL ANALOGY A:B::C:? — a hidden linear RELATION M is revealed by exemplar pairs (A,MA); given a novel-domain query C, the relation solver learns M by paired least-squares and applies D=M*C. It transfers to the novel domain; a surface-similarity baseline (nearest the query or the exemplars) is at chance because D=M*C is far from both.",
     "dim": 8,
@@ -1546,14 +1546,14 @@
     "relation_transfers_across_domains": true,
     "learned_map_recovers_relation": true,
     "paired_structure_is_load_bearing": true,
-    "runtime_ms": 327
+    "runtime_ms": 340
    }
   },
   "induce_vec": {
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 358,
+   "runtime_ms": 394,
    "audit": {
     "task": "RULE / PROGRAM INDUCTION with an Occam simplicity prior: a hidden short boolean rule (conjunction of 2 literals) is shown via a few labeled examples. The shortest-consistent-rule learner recovers it and generalises to held-out inputs; an overfitting learner (memorise positives = a consistent but complex hypothesis) fits train but fails to generalise. The prior earns its keep only when the target is actually simple.",
     "n_bits": 8,
@@ -1578,14 +1578,14 @@
     "simplicity_beats_overfit": true,
     "simplicity_recovers_true_rule": true,
     "prior_needs_a_simple_target": true,
-    "runtime_ms": 358
+    "runtime_ms": 394
    }
   },
   "hierplan_vec": {
    "green": true,
    "flags_true": 7,
    "flags_total": 7,
-   "runtime_ms": 55,
+   "runtime_ms": 75,
    "audit": {
     "task": "HIERARCHICAL PLANNING over subgoals: collect K free-order keys then reach the goal. A flat planner searches (position x key-bitmask) and blows up as ~2^K reachable masks; a hierarchical planner decomposes into a learned nearest-first subgoal sequence and plans each leg on position-space -> linear in K. Off-path subgoals fail; a random visit order costs more; the advantage grows with K.",
     "K_small": 2,
@@ -1614,7 +1614,7 @@
     "off_path_decomposition_fails": true,
     "learned_order_beats_random_order": true,
     "decomposition_covers_the_goal": true,
-    "runtime_ms": 55
+    "runtime_ms": 75
    }
   },
   "belief_vec": {
@@ -1680,7 +1680,7 @@
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 115,
+   "runtime_ms": 108,
    "audit": {
     "task": "GROUNDED COMPOSITIONAL SEMANTICS: statements are truth conditions over a scene (\"a P object R a Q object\"). A compositional learner grounds each atomic predicate and composes them by the logical form to evaluate NOVEL predicate combinations; a holistic learner memorises (statement,scene)->truth and fails on unseen combinations.",
     "predicate_combinations": 50,
@@ -1701,14 +1701,14 @@
     "holistic_fails_on_novel": true,
     "compositionality_is_what_transfers": true,
     "grounded_predicates_learned": true,
-    "runtime_ms": 115
+    "runtime_ms": 108
    }
   },
   "refer_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 36,
+   "runtime_ms": 33,
    "audit": {
     "task": "REFERENTIAL GROUNDING under ambiguity (RSA pragmatics): a speaker utters one grounded token so a listener picks the target among distractors. A pragmatic (context-sensitive) speaker chooses the most DISTINGUISHING message and grounds reference; a literal (context-blind) speaker utters a random true attribute and is often ambiguous. When no distinguishing message exists, pragmatics cannot manufacture information (honest ceiling).",
     "context_size": 4,
@@ -1732,14 +1732,14 @@
     "context_sensitivity_is_load_bearing": true,
     "no_free_lunch_without_information": true,
     "learned_the_groundings": true,
-    "runtime_ms": 36
+    "runtime_ms": 33
    }
   },
   "teach_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 32,
+   "runtime_ms": 14,
    "audit": {
     "task": "PEDAGOGY / teaching by example: a helpful teacher picks the examples that most single out the target concept and a pedagogical learner reasons about that choice -> identify the concept in FEW examples. Ablating helpful SELECTION (random teacher) or pedagogical INFERENCE (weak learner, size principle only) needs many more examples; the no-pedagogy corner is worst.",
     "hypotheses": 20,
@@ -1758,14 +1758,14 @@
     "helpful_selection_helps": true,
     "pedagogical_inference_helps": true,
     "both_factors_load_bearing": true,
-    "runtime_ms": 32
+    "runtime_ms": 14
    }
   },
   "commonground_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 77,
+   "runtime_ms": 48,
    "audit": {
     "task": "DIALOGUE to COMMON GROUND: two agents hold disjoint partial maps of a world (a hidden s->t path alternates edge ownership, so neither can advance alone). By exchanging reachable frontiers round by round, dialogue fuses the maps and answers reachability queries neither can solo. Solo (no exchange) fails; a single exchange cannot traverse the long alternating path (sustained dialogue is needed).",
     "nodes": 26,
@@ -1783,14 +1783,14 @@
     "single_exchange_insufficient": true,
     "iterated_dialogue_is_load_bearing": true,
     "dialogue_fuses_correctly": true,
-    "runtime_ms": 77
+    "runtime_ms": 48
    }
   },
   "persuade_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 97,
+   "runtime_ms": 88,
    "audit": {
     "task": "ARGUMENTATION with evidence: a hostile persuader floods the stream with fallacious arguments pushing the WRONG answer; a minority of valid arguments point at the truth. A Bayesian agent learns a validity classifier and updates its belief weighted by assessed validity -> resists the fallacies and reaches the truth. A gullible (accept-all) agent is dragged below chance; a stubborn (accept-none) agent stays at chance.",
     "args_per_debate": 20,
@@ -1808,14 +1808,14 @@
     "bayesian_beats_baselines": true,
     "validity_classifier_learned": true,
     "learned_check_is_load_bearing": true,
-    "runtime_ms": 97
+    "runtime_ms": 88
    }
   },
   "question_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 60,
+   "runtime_ms": 42,
    "audit": {
     "task": "OPTIMAL QUESTION selection (20-questions): an asker uncertain about a hidden target picks yes/no questions to reduce its OWN uncertainty. Maximising information gain (split the consistent set ~50/50) pins the target in about log2(N) questions; random questioning wastes many; computing info-gain on a scrambled model degrades to random.",
     "items": 64,
@@ -1838,14 +1838,14 @@
     "info_gain_beats_random": true,
     "scrambled_model_degrades_to_random": true,
     "info_gain_is_load_bearing": true,
-    "runtime_ms": 60
+    "runtime_ms": 42
    }
   },
   "convention_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 33,
+   "runtime_ms": 25,
    "audit": {
     "task": "EMERGENT CONVENTION (naming game): a population must agree on ONE arbitrary name for an object with no coordinator. Local pairwise interactions with delete-on-success alignment make the population symmetry-break onto a single shared convention; the winner is arbitrary (varies across runs). Removing the reinforcement (no delete-on-success) prevents convergence.",
     "population": 30,
@@ -1861,14 +1861,14 @@
     "convention_is_arbitrary": true,
     "no_reinforcement_prevents_convergence": true,
     "reinforcement_is_load_bearing": true,
-    "runtime_ms": 33
+    "runtime_ms": 25
    }
   },
   "peerverify_vec": {
    "green": true,
    "flags_true": 6,
    "flags_total": 6,
-   "runtime_ms": 473,
+   "runtime_ms": 493,
    "audit": {
     "task": "PEER VERIFICATION (Condorcet jury): each verifier is a learned classifier with individual accuracy ~p; the MAJORITY vote of INDEPENDENT verifiers grows more reliable as their number rises. Making the verifiers share the SAME noisy view (correlated/colluding) removes the gain — the majority is no better than one verifier. Independence, not voting, is what buys reliability.",
     "dim": 6,
@@ -1892,14 +1892,14 @@
     "correlated_majority_gives_no_gain": true,
     "independence_is_load_bearing": true,
     "verifiers_are_learned": true,
-    "runtime_ms": 473
+    "runtime_ms": 493
    }
   },
   "translate_vec": {
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 14,
+   "runtime_ms": 13,
    "audit": {
     "task": "LANGUAGE ALIGNMENT: two agents grounded the same world in different coordinate frames (E_B = E_A * hidden Q). From a few PAIRED anchor concepts they learn the mapping (Procrustes least-squares) and translate any concept — A embedding -> mapped -> nearest B concept -> the right referent. No alignment (identity map) is at chance; too few anchors under-determine the map (partial).",
     "concepts": 40,
@@ -1917,7 +1917,83 @@
     "alignment_beats_none": true,
     "enough_anchors_needed": true,
     "few_anchors_still_above_chance": true,
-    "runtime_ms": 14
+    "runtime_ms": 13
+   }
+  },
+  "tami_rules_test": {
+   "green": true,
+   "flags_true": 8,
+   "flags_total": 8,
+   "runtime_ms": 104,
+   "audit": {
+    "task": "RUN THE ACTUAL C# CORE (no port): tami-cs/ references Tami.Core from the tami-core-headless branch (sparse worktree) — the REAL TechniqueDB/DamageModel/TypeEffectiveness — and this bench executes it (dotnet run -- --vectors), cross-checking the baked tami_data.json against the RUNNING code: full 18x18 matrix equality, constants, base-damage formula, hit clamps, heal STAB rounding asymmetry, dual-type product, poison stacks, and that the core data tables are loaded (736 techniques).",
+    "engine": "Tami.Core (tami-core-headless)",
+    "matrix_cells_checked": 324,
+    "core_techniques": 736,
+    "core_abilities": 109,
+    "core_data_tables_loaded": true,
+    "executing_matrix_equals_baked": true,
+    "constants_match_baked": true,
+    "base_damage_formula_verified": true,
+    "hit_ratio_clamps_verified": true,
+    "heal_stab_rounding_asymmetry_verified": true,
+    "dual_type_product_verified": true,
+    "poison_heal_stacks_verified": true,
+    "runtime_ms": 104
+   }
+  },
+  "tami_link_test": {
+   "green": true,
+   "flags_true": 8,
+   "flags_total": 8,
+   "runtime_ms": 8,
+   "audit": {
+    "task": "DATA-LINKAGE integrity over tami_data.json — every join the away battles depend on, measured with the pipeline normalization N(s)=uppercase-alnum: roster->species, roster techs->techniques∪basic_strikes, species->basicStrike, evolvesFrom->species, plus matrix/stat/level sanity. Thresholds are MEASURED floors (floor(observed*100)/100), re-frozen 2026-07-03 after the baker gained header-row skips + verified NAME_ALIAS/TYPO_ALIAS rename maps; remaining sub-1.0 rates are documented data ceilings (names with no unambiguous sheet target) with every miss enumerated in gaps — never a silent pass.",
+    "counts": {
+     "species": 300,
+     "techniques": 579,
+     "basic_strikes": 157,
+     "roster": 358,
+     "roster_rows_with_techs": 4,
+     "roster_tech_refs": 16,
+     "evolves_from_set": 194,
+     "species_basic_strike_empty": 0
+    },
+    "rates": {
+     "roster_species": 0.9944,
+     "roster_techs": 0.9375,
+     "species_basic_strike": 0.9733,
+     "evolution_links": 1
+    },
+    "gaps": {
+     "roster_species": [
+      "ASSASOTTER",
+      "SAFIDDLE"
+     ],
+     "roster_techs": [
+      "TWIRLING_LEAF"
+     ],
+     "species_basic_strike": [
+      "PLUME <- PIA",
+      "PLUME <- PIASTELLA",
+      "PLUME <- PIACOSMA",
+      "PLUME <- AVEATE",
+      "PLUME <- ROSEATE",
+      "STELLAR_SPARK <- WOOLM",
+      "STELLAR_SPARK <- CHRYSALUNE",
+      "STELLAR_SPARK <- LUMOSTELLE"
+     ],
+     "evolution_links": []
+    },
+    "roster_species_resolve": true,
+    "roster_techs_resolve": true,
+    "species_basic_strike_resolve": true,
+    "evolution_links_resolve": true,
+    "misses_are_enumerated": true,
+    "matrix_symmetric_coverage": true,
+    "stats_positive": true,
+    "roster_levels_sane": true,
+    "runtime_ms": 8
    }
   },
   "converse_vec": {
@@ -2214,7 +2290,7 @@
    "green": true,
    "flags_true": 5,
    "flags_total": 5,
-   "runtime_ms": 5298,
+   "runtime_ms": 5728,
    "audit": {
     "task": "wire the LEARNED co-occurrence matcher into converse's REAL fused-pillar graph and re-measure cross-pillar. HONEST finding: it does NOT earn 5 — the real graph is too sparse, so high-cosine matches are sparsity artifacts (learned lift == random lift). The SAME matcher earns 5 on a rich-synonym graph, so the matcher is sound; the real graph's synonymy is the limit.",
     "real_graph": {
@@ -2237,7 +2313,7 @@
     "same_matcher_earns_5_on_rich_synonyms": true,
     "cross_pillar_honestly_capped_at_4": true,
     "verdict": "DOCUMENTED CEILING (not EARNED-5): the real fused graph is sparse and topologically shallow — no 5-distinct-pillar path exists, and co-occurrence cannot find reliable synonyms (learned==random). Earning 5 needs the GIVEN embedder's real semantic vectors to merge true synonym islands (turn<->torque, goal<->target) — which the iron law permits (verified LLM latent knowledge) but a hand-authored bridge or an artifact-riding merge does NOT. Cross-pillar stays honestly at 4.",
-    "runtime_ms": 5298
+    "runtime_ms": 5728
    }
   },
   "ast_vec": {
