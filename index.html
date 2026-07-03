@@ -118,7 +118,7 @@
 const T = THREE;
 const CFG = {
   ARENA_R:840, EDGE_STEER:0.9,            // the whole GALAXY bound; systems are clusters inside it
-  N_SYSTEMS:3, SYSTEM_R:210, SUN_R:34,    // a galaxy of star systems; hyperspace hops between them burn lots of gas
+  N_SYSTEMS:3, SYSTEM_R:210, SUN_R:34,    // a galaxy of star systems; all travel is real-space (hyperspace removed for balance)
   THRUST:44, DRAG:0.7, VMAX:34, PITCH_RATE:1.7, YAW_RATE:1.5, BANK_MAX:0.7, BANK_LERP:3.5, SHIP_R:2.6, IFRAME:1.1,
   KP_YAW:1.5, KP_PITCH:1.5, ALIGN_FIRE:0.9, THR_TURN_EASE:0.55, GEM_EASE_R:16,
   STANDOFF_R:12, BRAKE_R:26, CRUISE_THR:0.5,   // CH7 fix: throttle brakes/coasts to a target's standoff range (was hardcoded always-on -> "full throttle, never stop")
@@ -131,6 +131,8 @@ const CFG = {
   EVADE_HP:0.32, THREAT_R:18, SENSE_R:95, UTTER_CD:2.6,
   // ---- ship-to-ship combat ----
   SHIP_BULLET_DMG:18,      // damage a bullet does to a rival ship (lethal when hits connect)
+  TRADER_HP_MULT:0.7,      // balance: merchant hulls are cargo-first — hull space is expensive, so less armor
+  TRADER_GUN_MULT:0.6,     // balance: merchants mount light guns (traders were too powerful in fights)
   HUNT_R:44,               // a pilot may opportunistically hunt a rival within this range
   HUNT_RATE:0.3,           // base per-second chance to start a hunt (× the pilot's aggression)
   HUNT_FIRE:0.85,          // wider fire cone when dogfighting a maneuvering ship
@@ -139,9 +141,9 @@ const CFG = {
   // ---- player commands (chat) ----
   CMD_DURATION:11,         // seconds an order from the player stays in force
   NSHIPS:8,
-  // ---- trading economy · planets · hyperspace (organic: prices EMERGE from stock; nothing scripted) ----
+  // ---- trading economy · planets (organic: prices EMERGE from stock; nothing scripted; hyperspace REMOVED) ----
   N_PLANETS:5, DOCK_R:44, TRADE_COOLDOWN:0.5, HOLD_CAP:40, TRADE_QTY:20, TRADER_FRAC:0.62, CREDIT_RESERVE:12,
-  FUEL_CAP:60, FUEL_START:60, WARP_MIN:120, WARP_SPEED:560, GAS_PER_DIST:0.02, FUEL_LOW:18,
+  FUEL_CAP:60, FUEL_START:60, FUEL_LOW:18,
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
@@ -304,6 +306,7 @@ function makeShip(i){
     cargo:{}, fuel:CFG.FUEL_START, tradePlan:null, tradeCd:0, warping:false,        // trading + hyperspace state
     holdCap:CFG.HOLD_CAP, fuelCap:CFG.FUEL_CAP, senseR:CFG.SENSE_R, warpEff:1, equip:{},   // installable equipment stats
     mode:'MINE', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(hue) };
+  if(s.role==='trader'){ s.maxHp=Math.round(s.maxHp*CFG.TRADER_HP_MULT); s.hp=s.maxHp; }     // merchant hulls: cargo-first, thin armor
   s.quat.setFromEuler(new T.Euler(rand(-0.5,0.5),rand(0,TAU),0)); scene.add(s.mesh); ships.push(s); shipById[s.id]=s; return s;
 }
 function rockMesh(scale,light){ const g=new T.IcosahedronGeometry(1,1),p=g.attributes.position,v=new T.Vector3(),sd=rand(0,100);
@@ -334,8 +337,16 @@ function spawnArtifactDrop(pos,key){ const col=new T.Color(0xff5ad0);           
 function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=null)?spec.col:0x9fd8ff, r=spec.r||2.2;
   const m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
   m.scale.set(r,r,1); m.position.copy(pos); scene.add(m);
-  bullets.push({ pos:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner,
-    dmg:(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null }); }
+  let dmg=(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG; const ow=shipById[owner];
+  if(ow && ow.role==='trader') dmg*=CFG.TRADER_GUN_MULT;                                     // merchants mount light guns
+  bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner,
+    dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null }); }
+// swept bullet collision: distance² from point p to the segment a→b (this frame's travel). A point-only test tunnels
+// through targets whenever bulletSpeed×dt exceeds the hit radius (e.g. autocannon 150u/s at <43fps) — the reported
+// "bullets don't collide". Testing the whole travel segment makes hits frame-rate independent.
+function segDistSq(a,b,p){ const abx=b.x-a.x, aby=b.y-a.y, abz=b.z-a.z; const L=abx*abx+aby*aby+abz*abz||1e-9;
+  let t=((p.x-a.x)*abx+(p.y-a.y)*aby+(p.z-a.z)*abz)/L; t=t<0?0:(t>1?1:t);
+  const cx=a.x+abx*t-p.x, cy=a.y+aby*t-p.y, cz=a.z+abz*t-p.z; return cx*cx+cy*cy+cz*cz; }
 function burst(pos,col,n,spd,sz){ for(let i=0;i<n;i++){ const m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
   const s=sz*rand(0.5,1.2); m.scale.set(s,s,1); m.position.copy(pos); scene.add(m);
   parts.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(spd*rand(0.3,1)), life:rand(0.3,0.8), max:0.8, mesh:m, s }); } }
@@ -466,12 +477,8 @@ function bestArbitrage(s){ const opts=[]; for(const g of GOODS){ if(g.k==='gas')
 function planTrade(s){ if(s.fuel<CFG.FUEL_LOW){ s.tradePlan={type:'refuel',planet:nearestPlanet(s.pos)}; return; }
   if(cargoTotal(s)>0){ let bg=null,bp=null,bv=-1; for(const k in s.cargo) for(const p of planets){ const v=priceOf(p,k); if(v>bv){bv=v;bg=k;bp=p;} } s.tradePlan={type:'sell',planet:bp,good:bg}; return; }
   const arb=bestArbitrage(s); s.tradePlan=arb?{type:'buy',planet:arb.buy,good:arb.good}:null; }
-function startWarp(s,targetPos){ const d=s.pos.distanceTo(targetPos), cost=Math.min(s.fuel,d*CFG.GAS_PER_DIST*(s.warpEff||1));
-  s.fuel-=cost; s.warpFrom=s.pos.clone(); s.warpTo=targetPos.clone().addScaledVector(targetPos.clone().sub(s.pos).normalize(),-(CFG.DOCK_R+6));
-  s.warpDur=Math.max(0.5,d/CFG.WARP_SPEED); s.warpT=s.warpDur; s.warping=true; say(s,`Hyperspacing to ${s.tradePlan&&s.tradePlan.planet?s.tradePlan.planet.name:'jump point'} (-${Math.round(cost)} gas)`); }
-function advanceWarp(s,dt){ s.warpT-=dt; const k=clamp(1-Math.max(0,s.warpT)/s.warpDur,0,1); s.pos.lerpVectors(s.warpFrom,s.warpTo,k); s.mesh.position.copy(s.pos);
-  const dir=_v.copy(s.warpTo).sub(s.warpFrom); if(dir.lengthSq()>0.01){ const q=new T.Quaternion().setFromUnitVectors(FWD,dir.normalize()); s.mesh.quaternion.slerp(q,0.35); s.quat.copy(s.mesh.quaternion); }
-  s.mesh.userData.eng.material.opacity=0.95; s.mesh.userData.eng.scale.setScalar(4.2); if(s.warpT<=0){ s.warping=false; s.vel.set(0,0,0); } }
+// startWarp/advanceWarp REMOVED (user balance directive 2026-07-03): hyperspace let traders teleport arbitrage routes and
+// made merchants too powerful — everyone flies real-space now. `s.warping` stays as an always-false field (guards inert).
 function doTrade(s,dt){ s.tradeCd=Math.max(0,s.tradeCd-dt); if(!s.tradePlan && s.tradeCd<=0) planTrade(s);
   if(!s.tradePlan||!s.tradePlan.planet||planets.indexOf(s.tradePlan.planet)<0){ s.tradePlan=null; return null; } const p=s.tradePlan.planet, d=s.pos.distanceTo(p.pos);
   if(d<=CFG.DOCK_R){ const pl=s.tradePlan;
@@ -479,8 +486,7 @@ function doTrade(s,dt){ s.tradeCd=Math.max(0,s.tradeCd-dt); if(!s.tradePlan && s
     else if(pl.type==='buy'){ const q=buy(s,p,pl.good,CFG.TRADE_QTY); say(s, q>0?`Bought ${q} ${GKEY[pl.good].n} @ ${p.name} (${Math.round(priceOf(p,pl.good))}c/u)`:`${p.name}: can't buy ${GKEY[pl.good].n}`); }
     else if(pl.type==='sell'){ const r=sell(s,p,pl.good,CFG.HOLD_CAP); say(s, r>0?`Sold ${GKEY[pl.good].n} @ ${p.name} · +${r}c`:`${p.name}: nothing to sell`); }
     s.tradePlan=null; s.tradeCd=CFG.TRADE_COOLDOWN; return {mode:'DOCK',target:null,aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }
-  if(d>CFG.WARP_MIN && s.fuel>=d*CFG.GAS_PER_DIST && !s.warping) startWarp(s,p.pos);
-  return {mode:'TRADE',target:null,aimDir:_v.copy(p.pos).sub(s.pos),ease:1}; }
+  return {mode:'TRADE',target:null,aimDir:_v.copy(p.pos).sub(s.pos),ease:1}; }   // hyperspace REMOVED (balance): traders fly real-space like everyone
 
 // ---------------------------------------------------------------- cargo drops (salvage pods)
 const cargoPods=[];
@@ -758,8 +764,7 @@ function think(s,dt){
   else if(s.role==='player'){ const o=s.obj;                                            // human-commanded ship (terminal)
     if(s.docked && s.pos.distanceTo(s.docked.pos)>CFG.DOCK_R+8) s.docked=null;
     if(!o){ mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0; }
-    else if(o.type==='goto'){ const p=o.planet; const d=s.pos.distanceTo(p.pos);
-      if(d>CFG.WARP_MIN && s.fuel>=d*CFG.GAS_PER_DIST && !s.warping) startWarp(s,p.pos);
+    else if(o.type==='goto'){ const p=o.planet; const d=s.pos.distanceTo(p.pos);   // hyperspace REMOVED (balance): the player flies real-space too
       if(p._base){ if(d<=CFG.BASE_R){ s.obj=null; term('Arrived at ⌂ Ranger Command. (base · hull · blackmarket · repair)','sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15; } else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }   // M8: dock the base (no rep/market)
       else if(d<=CFG.DOCK_R){ if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE — docking refused, defenders inbound.`,'err'); mode='FLEE'; aimDir=_v.copy(s.pos).sub(p.pos); ease=1; }
         else { s.docked=p; s.obj=null; contractDeliver(p);
@@ -869,19 +874,18 @@ function flyStep(s,dt){
 function step(dt){
   econTick(dt);
   for(const s of ships){
-    if(s.warping){ advanceWarp(s,dt); continue; }
     if(s.alive){ if(s===ships[0] && MAN.active){ manualControl(s,dt); } else { think(s,dt); } flyStep(s,dt); }
     else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null;
       const sys=systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()}; s.pos.copy(sys.center).add(new T.Vector3(rand(-1,1),rand(-0.5,0.5),rand(-1,1)).setLength(rand(30,CFG.SYSTEM_R*0.6)));
       s.vel.set(0,0,0); s.quat.setFromEuler(new T.Euler(rand(-0.4,0.4),rand(0,TAU),0)); say(s,'Respawned — back in.'); } } }
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i];
     if(b.homing>0 && b.target && b.target.alive){ const sp=b.vel.length(); if(sp>0.001){ _v.copy(b.target.pos).sub(b.pos); if(_v.lengthSq()>1e-4){ _v.normalize(); b.vel.addScaledVector(_v,b.homing*sp*dt).setLength(sp); } } }
-    b.pos.addScaledVector(b.vel,dt); b.life-=dt; b.mesh.position.copy(b.pos);
+    b.prev.copy(b.pos); b.pos.addScaledVector(b.vel,dt); b.life-=dt; b.mesh.position.copy(b.pos);
     if(b.life<=0||b.pos.length()>CFG.ARENA_R+8){ scene.remove(b.mesh); bullets.splice(i,1); } }
   // bullets vs rival ships (combat)
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner];
     for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||(owner&&owner.team===s.team)) continue;   // no friendly fire
-      if(b.pos.distanceTo(s.pos)<CFG.SHIP_R+CFG.BULLET_R){
+      const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
         s.hp-=dmg; noteHarm(s,owner); if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team)) continue;
@@ -893,11 +897,11 @@ function step(dt){
     p.hull-=CFG.PLANET_DMG; p.hullT=T0; if(shipById[b.owner]&&shipById[b.owner].role==='player') repAdd(p,-CFG.REP_BOMB);   // player bombing tanks rep
     burst(b.pos,0xff9a52,3,10,2.6); scene.remove(b.mesh); bullets.splice(i,1); if(p.hull<=0) destroyPlanet(p); break; } } }
   if(stronghold){ for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner]; if(owner&&owner.team==='pirate') continue;   // M12: coalition fire damages the stronghold (Hegemon fire doesn't)
-    if(b.pos.distanceTo(stronghold.pos)<13+CFG.BULLET_R){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }
+    const shr=13+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,stronghold.pos)<shr*shr){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }
   for(let i=asteroids.length-1;i>=0;i--){ const a=asteroids[i]; a.pos.addScaledVector(a.vel,dt);
     if(a.pos.length()>CFG.ARENA_R-a.scale){ a.pos.setLength(CFG.ARENA_R-a.scale); const n=a.pos.clone().normalize(); a.vel.addScaledVector(n,-2*a.vel.dot(n)); }
     a.mesh.position.copy(a.pos); a.mesh.rotation.x+=a.spin.x*dt; a.mesh.rotation.y+=a.spin.y*dt; a.mesh.rotation.z+=a.spin.z*dt;
-    for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; if(b.pos.distanceTo(a.pos)<a.scale+CFG.BULLET_R){ const owner=shipById[b.owner];
+    for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const ar=a.scale+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,a.pos)<ar*ar){ const owner=shipById[b.owner];
       a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1)); burst(b.pos,0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);
       if(a.hp<=0){ destroyAsteroid(i,owner); break; } } } }
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
@@ -1073,7 +1077,7 @@ function onChat(raw){ parseChat((raw||'').trim()); }
 function findPlanet(n){ if(!n) return null; return planets.find(p=>p.name.toLowerCase().startsWith(n)) || (parseInt(n)>=0?planets[parseInt(n)]:null); }
 function findGood(n){ if(!n) return null; return GOODS.find(g=>g.k===n||g.n.toLowerCase().startsWith(n)); }
 const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15}, fuel:{n:'Fuel Cell',cost:100,desc:'+25 fuel',apply:s=>s.fuelCap+=25},
-  scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, hyperdrive:{n:'Hyperdrive',cost:190,desc:'-22% warp gas',apply:s=>s.warpEff=Math.max(0.35,(s.warpEff||1)-0.22)},
+  scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive — buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}},
   droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5} };
 // M3: WEAPON TYPES — the arms race. energy=fast/cheap, ballistic=hard-hitting/long, missile=homing+splash.
 // dmg=base anti-ship damage · cd=fire cooldown · speed/life=projectile · range=×SENSE_R fire distance
@@ -1086,17 +1090,17 @@ const WEAPON_ORDER=['energy','ballistic','missile'];
 // M6: ARTIFACTS — rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
   core:   {n:'Hegemon Core',  desc:'+18% fire rate',  apply:s=>s.artFire=(s.artFire||0)+0.18},
-  lattice:{n:'Warp Lattice',  desc:'-18% warp gas',   apply:s=>s.warpEff=Math.max(0.3,(s.warpEff||1)-0.18)},
+  lattice:{n:'Inertial Lattice', desc:'+0.5 hull regen', apply:s=>s.regenBonus=(s.regenBonus||0)+0.5},
   aegis:  {n:'Aegis Plate',   desc:'+25% max hull',   apply:s=>{ s.maxHp*=1.25; s.hp=s.maxHp; }},
   optics: {n:'Seeker Optics', desc:'+40 sensor',      apply:s=>s.senseR+=40},
   matrix: {n:'Regen Matrix',  desc:'+3 hull/s regen', apply:s=>s.regenBonus=(s.regenBonus||0)+3} };
 const ARTIFACT_KEYS=Object.keys(ARTIFACTS);
 // M9: SHIP HULL CLASSES — swap chassis at the Ranger Base, trading hull ↔ cargo ↔ speed.
-const HULLS={
+const HULLS={   // balance law: hull space is EXPENSIVE (big hold = thin armor + higher price) and BIGGER = SLOWER
   scout:    {n:'Scout',     hp:70,  hold:12, speed:1.35, cost:0,   desc:'fast · fragile · tiny hold'},
   fighter:  {n:'Fighter',   hp:100, hold:40, speed:1.0,  cost:0,   desc:'balanced all-rounder (default)'},
-  freighter:{n:'Freighter', hp:120, hold:95, speed:0.72, cost:420, desc:'huge hold · slow · soft'},
-  cruiser:  {n:'Cruiser',   hp:210, hold:28, speed:0.82, cost:640, desc:'heavy hull · slow · small hold'} };
+  freighter:{n:'Freighter', hp:85,  hold:95, speed:0.55, cost:640, desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)'},
+  cruiser:  {n:'Cruiser',   hp:210, hold:18, speed:0.62, cost:820, desc:'heavy armor · slowest hull · cramped hold'} };
 const HULL_ORDER=['scout','fighter','freighter','cruiser'];
 // M10: CONTRABAND — illegal goods; buy cheap at the base black market, sell dear at HOSTILE worlds; scan risk at coalition docks.
 const CONTRABAND={ relics:{n:'Alien Relics',base:120}, narcotics:{n:'Spice',base:90}, arms:{n:'Black-market Arms',base:150} };
@@ -1365,7 +1369,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
     if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
     term(`Fitted ${W.n} (-${W.cost}c) — dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
-  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} — ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys')); term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · warp ×${(P.warpEff||1).toFixed(2)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys'); return; }
+  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} — ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys')); term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys'); return; }
   if(c==='install'||c==='fit'){ if(!need(dockedP,'must be docked')) return; const k=Object.keys(EQUIP).find(x=>x.startsWith(a[1]||'~')); if(!need(k,'install cargo|fuel|scanner|hyperdrive')) return; const cost=equipCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.equip[k]=(P.equip[k]||0)+1; EQUIP[k].apply(P); term(`Installed ${EQUIP[k].n} (-${cost}c) · ${EQUIP[k].desc}.`,'sys'); return; }
   if(c==='rep'||c==='reputation'||c==='standing'){ term('COALITION STANDING (by faction):','sys');
     systems.forEach(sy=>{ const ps=sy.planets.filter(p=>planets.indexOf(p)>=0); if(!ps.length) return; const avg=ps.reduce((a,p)=>a+(p.rep||0),0)/ps.length;
