@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tami.Core — the ACTUAL C# rules engine, running in your browser (WebAssembly)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="_framework/dotnet.o6jiqlzuxg.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-YFC9HoA7ml77ZvfSsazLZ7YgKReuozke+O/wD3X9q5k=" />
+  <!-- SDK importmap copied from the published index.html: the _framework assets are
+       fingerprinted, so the plain './_framework/dotnet.js' import below only resolves
+       through this map (see tami-cs/wasm/README.md, "Fingerprinting caveat"). -->
+  <script type="importmap">{
+  "imports": {
+    "./_framework/dotnet.native.js": "./_framework/dotnet.native.p374epng5h.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.o6jiqlzuxg.js",
+    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.zj9dll5ffg.js"
+  },
+  "scopes": {},
+  "integrity": {
+    "./_framework/dotnet.js": "sha256-YFC9HoA7ml77ZvfSsazLZ7YgKReuozke+O/wD3X9q5k=",
+    "./_framework/dotnet.native.js": "sha256-C8Gk/dcU86qQlfaTXy8HbV2bOW+yD2bV/R+Tod4pZJs=",
+    "./_framework/dotnet.native.p374epng5h.js": "sha256-C8Gk/dcU86qQlfaTXy8HbV2bOW+yD2bV/R+Tod4pZJs=",
+    "./_framework/dotnet.o6jiqlzuxg.js": "sha256-YFC9HoA7ml77ZvfSsazLZ7YgKReuozke+O/wD3X9q5k=",
+    "./_framework/dotnet.runtime.js": "sha256-YdXsn/a7hb+UMypOFCf8bmv3S6PbDPewiNWqmUM/1dk=",
+    "./_framework/dotnet.runtime.zj9dll5ffg.js": "sha256-YdXsn/a7hb+UMypOFCf8bmv3S6PbDPewiNWqmUM/1dk="
+  }
+}</script>
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b0e17; color: #cfd8ff; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+    h1 { color: #7fd4ff; font-size: 1.4em; }
+    p  { color: #8a93b8; line-height: 1.5; }
+    a  { color: #7fd4ff; }
+    code { background: #161b2c; padding: 0.1em 0.35em; border-radius: 4px; color: #ffd479; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { border: 1px solid #2a3352; padding: 0.5em 0.7em; text-align: left; font-size: 0.92em; }
+    th { background: #131829; color: #7fd4ff; }
+    td.pass { color: #6dff9e; font-weight: bold; }
+    td.fail { color: #ff6d6d; font-weight: bold; }
+    #status { margin-top: 1em; font-weight: bold; }
+    #verdict { font-size: 1.15em; margin-top: 0.8em; }
+  </style>
+</head>
+
+<body>
+  <h1>Tami.Core — actual C# battle rules compiled to WebAssembly</h1>
+  <p>
+    This page boots the .NET WebAssembly runtime and calls the real shipping
+    <code>Tami.Core</code> rules layer (branch <code>tami-core-headless</code>) — the same
+    <code>DamageModel</code> / <code>TypeEffectiveness</code> / <code>TechniqueDB</code> C# code the
+    game uses. No sidecar, no server, no JS re-implementation. Every expected value below
+    is checked in JS against what the wasm returns.
+  </p>
+  <div id="status">Booting .NET wasm runtime&hellip;</div>
+  <table>
+    <thead>
+      <tr><th>Check</th><th>Call</th><th>Expected</th><th>Actual</th><th>Result</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div id="verdict"></div>
+
+  <script type="module">
+    const statusEl = document.getElementById('status');
+    const rowsEl = document.getElementById('rows');
+    const verdictEl = document.getElementById('verdict');
+
+    function addRow(name, call, expected, actual, pass) {
+      const tr = document.createElement('tr');
+      const cells = [name, call, String(expected), String(actual)];
+      for (const c of cells) {
+        const td = document.createElement('td');
+        td.textContent = c;
+        tr.appendChild(td);
+      }
+      const td = document.createElement('td');
+      td.textContent = pass ? 'PASS' : 'FAIL';
+      td.className = pass ? 'pass' : 'fail';
+      tr.appendChild(td);
+      rowsEl.appendChild(tr);
+      return pass;
+    }
+
+    try {
+      const { dotnet } = await import('./_framework/dotnet.js');
+      const { getAssemblyExports, getConfig } = await dotnet.create();
+      const exports = await getAssemblyExports(getConfig().mainAssemblyName);
+      const core = exports.TamiCoreExports;
+      statusEl.textContent = '.NET wasm runtime up — Tami.Core exports live. Running checks:';
+
+      const EPS = 1e-4;
+      const results = [];
+
+      // 1. TechniqueDB really made it into the wasm (736 techniques, not a stub).
+      const count = core.TechniqueCount();
+      results.push(addRow('TechniqueDB in the wasm', 'TechniqueCount()', 736, count, count === 736));
+
+      // 2. Type chart — single-typed super-effective.
+      const m1 = core.TypeMult('Pyro', 'Botanical', '');
+      results.push(addRow('Type chart (single)', "TypeMult('Pyro','Botanical','')", 1.5, m1, Math.abs(m1 - 1.5) < EPS));
+
+      // 3. Type chart — dual-typed multiplies both slots: 0.66 * 0.66 = 0.4356.
+      const m2 = core.TypeMult('Pyro', 'Hydro', 'Mineral');
+      results.push(addRow('Type chart (dual = product)', "TypeMult('Pyro','Hydro','Mineral')", 0.4356, m2, Math.abs(m2 - 0.4356) < EPS));
+
+      // 4+5. HitRatio (dex*2)/(agi+dex) clamps to [0.5, 1.0].
+      const hHi = core.HitRatio(30, 25, 20);
+      results.push(addRow('HitRatio upper clamp', 'HitRatio(30,25,20)', 1.0, hHi, Math.abs(hHi - 1.0) < EPS));
+      const hLo = core.HitRatio(1, 100, 100);
+      results.push(addRow('HitRatio lower clamp', 'HitRatio(1,100,100)', 0.5, hLo, Math.abs(hLo - 0.5) < EPS));
+
+      // 6. Full damage spine: CalculateBase -> ApplyMultipliers (STAB 1.33, type 1.5, rng 1.0).
+      const dmg = core.Damage(12, 55, 40, 30, true, 'Pyro', 'Botanical', '', false, 1.0);
+      results.push(addRow('Damage formula', "Damage(12,55,40,30,STAB,'Pyro'>'Botanical',no-crit,rng 1.0)", 23, dmg, dmg === 23));
+
+      const passed = results.filter(Boolean).length;
+      const allPass = passed === results.length;
+      verdictEl.textContent = allPass
+        ? `ALL ${results.length} CHECKS PASS — the C# core is running in this browser.`
+        : `${passed}/${results.length} checks passed — FAIL.`;
+      verdictEl.style.color = allPass ? '#6dff9e' : '#ff6d6d';
+    } catch (err) {
+      statusEl.textContent = 'FAILED to boot the .NET wasm runtime: ' + err;
+      statusEl.style.color = '#ff6d6d';
+      verdictEl.textContent = 'FAIL';
+      verdictEl.style.color = '#ff6d6d';
+    }
+  </script>
+</body>
+
+</html>

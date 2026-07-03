@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-03T06:37:43.132Z",
+ "generated": "2026-07-03T07:44:01.603Z",
  "source": "spec-cache/tami-data CSVs + TypeEffectiveness.cs:21-128 + DamageModel.cs:17-105 (shipping code authoritative)",
  "types": [
   "Hydro",
@@ -440,7 +440,7 @@
    "moveH": 5,
    "moveV": 3,
    "bst": 48,
-   "evolvesFrom": "SONIKITTY",
+   "evolvesFrom": "SONICKITTY",
    "basicStrike": "RHYTHM",
    "moveType": null
   },
@@ -680,7 +680,7 @@
    "moveH": 5,
    "moveV": 2,
    "bst": 60,
-   "evolvesFrom": "REINABLOOM",
+   "evolvesFrom": "REINBLOOM",
    "basicStrike": "SHIMMER_SHOT",
    "moveType": null
   },
@@ -824,7 +824,7 @@
    "moveH": 5,
    "moveV": 2,
    "bst": 60,
-   "evolvesFrom": "HARPINI",
+   "evolvesFrom": "HARPED",
    "basicStrike": "BUBBLE_BUMP",
    "moveType": "Aquatic"
   },
@@ -1013,7 +1013,7 @@
    "moveH": 4,
    "moveV": 2,
    "bst": 60,
-   "evolvesFrom": "PLESIOBUB",
+   "evolvesFrom": "BUBASIO",
    "basicStrike": "ROLLING_WAVE",
    "moveType": "Aquatic"
   },
@@ -6676,7 +6676,7 @@
    "moveH": 5,
    "moveV": 2,
    "bst": 57,
-   "evolvesFrom": "BUFFALICE",
+   "evolvesFrom": "BICESON",
    "basicStrike": "GLACIAL_TACKLE",
    "moveType": null
   },
@@ -7175,7 +7175,7 @@
    "moveH": 4,
    "moveV": 2,
    "bst": 48,
-   "evolvesFrom": "HIPOPO",
+   "evolvesFrom": "HIPPOPO",
    "basicStrike": "WILD_TOOTH",
    "moveType": null
   },
@@ -7486,7 +7486,7 @@
    "moveH": 4,
    "moveV": 2,
    "bst": 72,
-   "evolvesFrom": "TORMOA",
+   "evolvesFrom": "TORTOA",
    "basicStrike": "ASH_BUMP",
    "moveType": null
   },
@@ -18862,7 +18862,7 @@
  ],
  "roster": [
   {
-   "species": "SONIKITTY",
+   "species": "SONICKITTY",
    "nickname": "Sonickitty",
    "level": 5,
    "basicStrike": "RHYTHM",
@@ -18879,7 +18879,7 @@
    "level": 5,
    "basicStrike": "SHADOW'S_EDGE",
    "techs": [
-    "PHASE_THROGH",
+    "PHASE_THROUGH",
     "SHADOW_STEP",
     "SPLASH_DOWN",
     "AQUA_BOMB"
@@ -18950,18 +18950,6 @@
    "level": 5,
    "basicStrike": "HAZE",
    "techs": []
-  },
-  {
-   "species": "Species",
-   "nickname": "Nickname",
-   "level": 5,
-   "basicStrike": "BasicStrike",
-   "techs": [
-    "Tech1",
-    "Tech2",
-    "Tech3",
-    "Tech4"
-   ]
   },
   {
    "species": "SONICKITTY",
@@ -19076,7 +19064,7 @@
    "techs": []
   },
   {
-   "species": "HARPINI",
+   "species": "HARPED",
    "nickname": "Harpini",
    "level": 1,
    "basicStrike": "WATER_PULSE",
@@ -19202,7 +19190,7 @@
    "techs": []
   },
   {
-   "species": "GRILLVER",
+   "species": "GRILVER",
    "nickname": "Grillver",
    "level": 1,
    "basicStrike": "EMBER",
@@ -20868,7 +20856,7 @@
    "techs": []
   },
   {
-   "species": "SHIMERA",
+   "species": "SHIMMERA",
    "nickname": "Shimera",
    "level": 1,
    "basicStrike": "MYSTIC_BLAST",
@@ -21274,14 +21262,14 @@
    "techs": []
   },
   {
-   "species": "RORION",
+   "species": "ROARION",
    "nickname": "Rorion",
    "level": 1,
    "basicStrike": "SONIC_STRIKE",
    "techs": []
   },
   {
-   "species": "PUPERN",
+   "species": "PUPPERN",
    "nickname": "Pupern",
    "level": 1,
    "basicStrike": "BEAST_STRIKE",
