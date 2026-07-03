@@ -1120,6 +1120,17 @@ let BENCHDATA=null; fetch('./bench_results.json').then(r=>r.ok?r.json():null).th
 // AWAY module keeps its legacy stand-in units (graceful fallback).
 let TAMIDATA=null; fetch('./tami_data.json').then(r=>r.ok?r.json():null).then(j=>{ TAMIDATA=j;
   if(j) console.log(`TAMIDATA loaded: ${j.species.length} species · ${j.techniques.length} techniques · ${j.types.length}x${j.types.length} matrix`); }).catch(()=>{});
+// AC4 (user directive: run the ACTUAL C#, no port): when the TamiRules sidecar is up (`dotnet run` in tami-cs/ — it
+// compiles the LITERAL shipping DamageModel.cs+TypeEffectiveness.cs via <Compile Link>), battle math calls the real C#
+// over localhost. When absent (e.g. the public GitHub Pages site), battles fall back to TAMIDATA — whose matrix and
+// constants are themselves verified cell-for-cell against the executing C# by tami_rules_test in the suite.
+const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false;
+  fetch(BASE+'/health').then(r=>r.ok?r.json():null).then(j=>{ alive=!!(j&&j.ok); if(alive) console.log('TAMI_CS sidecar connected — battle math runs the ACTUAL shipping C#'); }).catch(()=>{});
+  const get=async p=>{ const r=await fetch(BASE+p); return r.json(); };
+  return { get alive(){return alive;},
+    typemult:(atk,d1,d2)=>get(`/typemult?atk=${atk}&d1=${d1||'Null'}&d2=${d2||'Null'}`),
+    damage:(o)=>get(`/damage?level=${o.level}&power=${o.power}&atk=${o.atk}&def=${o.def}&stab=${o.stab?1:0}&atkType=${o.atkType}&d1=${o.d1||'Null'}&d2=${o.d2||'Null'}&crit=${o.crit?1:0}&rng=${o.rng??1}&elev=${o.elev??1}&strike=${o.strike??1}`),
+    hit:(adex,dagi,ddex)=>get(`/hit?adex=${adex}&dagi=${dagi}&ddex=${ddex}`) }; })();
 function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
   const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
 function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
