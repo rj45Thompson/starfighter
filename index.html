@@ -1130,7 +1130,12 @@ const TAMI_CS=(()=>{ const BASE='http://localhost:7877'; let alive=false;
   return { get alive(){return alive;},
     typemult:(atk,d1,d2)=>get(`/typemult?atk=${atk}&d1=${d1||'Null'}&d2=${d2||'Null'}`),
     damage:(o)=>get(`/damage?level=${o.level}&power=${o.power}&atk=${o.atk}&def=${o.def}&stab=${o.stab?1:0}&atkType=${o.atkType}&d1=${o.d1||'Null'}&d2=${o.d2||'Null'}&crit=${o.crit?1:0}&rng=${o.rng??1}&elev=${o.elev??1}&strike=${o.strike??1}`),
-    hit:(adex,dagi,ddex)=>get(`/hit?adex=${adex}&dagi=${dagi}&ddex=${ddex}`) }; })();
+    hit:(adex,dagi,ddex)=>get(`/hit?adex=${adex}&dagi=${dagi}&ddex=${ddex}`),
+    // BATTLE CONTRACT (sidecar lane): /battle/new -> {id,state}; /battle/state and /battle/act -> STATE.
+    // /battle/act resolves the player action then AUTO-RESOLVES enemy turns until a party unit is current or the battle ends.
+    battleNew:(seed,party,enemies)=>get(`/battle/new?seed=${seed}${party&&party.length?`&party=${party.join(',')}`:''}${enemies&&enemies.length?`&enemies=${enemies.join(',')}`:''}`),
+    battleState:(id)=>get(`/battle/state?id=${encodeURIComponent(id)}`),
+    battleAct:(id,unit,p)=>{ let q=`/battle/act?id=${encodeURIComponent(id)}&unit=${encodeURIComponent(unit)}`; for(const k in p) q+=`&${k}=${encodeURIComponent(p[k])}`; return get(q); } }; })();
 function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
   const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
 function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
@@ -2034,6 +2039,7 @@ const AWAY=(function(){
 
   // ================================ BATTLE: turn-based grid tactics (Tami-style) ================================
   let bScene,bCam,tiles=[],units=[],order=[],turnIx=0,cur=null,bt=0,bstate='',selTech=null,reach=new Set(),ray=new T.Raycaster(),pointer=new T.Vector2(),pendingFoe=null,acted=false,moved=false,aiTimer=0,blog=[];
+  let core=null, debugBattle=false;    // core!=null -> battle rendered from the C# sidecar STATE; debugBattle -> battle was started via the AWAY.debugStartBattle hook from orbit (exit fully when it ends)
   const TECHS={
     strike:{name:'Strike',power:16,range:1,kind:'phys',cd:0,desc:'melee'},
     cleave:{name:'Cleave',power:22,range:1,kind:'phys',aff:'Burn',cd:2,desc:'melee, may Burn'},
@@ -2055,7 +2061,8 @@ const AWAY=(function(){
   function tileFree(gx,gy,ignore){ if(gx<0||gy<0||gx>=G.GRID||gy>=G.GRID) return false; for(const u of units){ if(u.alive&&u!==ignore&&u.gx===gx&&u.gy===gy) return false; } return true; }
   function unitAt(gx,gy){ return units.find(u=>u.alive&&u.gx===gx&&u.gy===gy); }
   function w3(gx,gy){ return new T.Vector3((gx-(G.GRID-1)/2)*G.TILE, 0, (gy-(G.GRID-1)/2)*G.TILE); }
-  function buildBattle(foe){ pendingFoe=foe; phase='battle'; bstate='intro'; blog=[]; selTech=null; acted=false; moved=false;
+  function buildBattle(foe){ if(TAMI_CS.alive){ startCoreBattle(foe); } else { buildBattleLegacy(foe); } }   // CORE battle when the C# sidecar is up; legacy stand-ins otherwise (public site)
+  function buildBattleLegacy(foe){ pendingFoe=foe; phase='battle'; bstate='intro'; blog=[]; selTech=null; acted=false; moved=false; core=null;
     bScene=new T.Scene(); const sk=0x0c1220; bScene.background=new T.Color(sk); bScene.fog=new T.Fog(sk,50,130);
     bScene.add(new T.HemisphereLight(0xcfe0ff,0x10131c,1.0)); const sun=new T.DirectionalLight(0xffffff,0.9); sun.position.set(20,40,15); bScene.add(sun);
     tiles=[]; for(let y=0;y<G.GRID;y++) for(let x=0;x<G.GRID;x++){ const dark=(x+y)%2; const m=new T.Mesh(new T.BoxGeometry(G.TILE*0.96,0.4,G.TILE*0.96), new T.MeshStandardMaterial({color:dark?0x1b2740:0x223150,roughness:0.9}));
@@ -2135,25 +2142,139 @@ const AWAY=(function(){
           if(!inRange(cur,tgt,info.range)){ log(`${tgt.name} is out of range.`); return; } useTech(cur,selTech,tgt); selTech=null; endTurn(); return; } } return; }
     // else move
     const th=ray.intersectObjects(tiles); if(th.length){ const td=th[0].object.userData; const k=td.gx+','+td.gy; if(!moved && reach.has(k)){ cur.gx=td.gx; cur.gy=td.gy; const w=w3(cur.gx,cur.gy); cur.mesh.position.set(w.x,0,w.z); moved=true; reach=new Set(); } } }
-  function finishBattle(won){ // clear the engaged foe on victory; return to ground
+  function finishBattle(won){ // clear the engaged foe on victory; return to ground (shared by legacy + core battles)
     if(won && pendingFoe){ pendingFoe.alive=false; pendingFoe.mesh.visible=false; }
-    phase='ground'; bstate=''; ui.innerHTML=''; term(won?'Away team victorious — hostiles cleared.':'Away team routed — you fall back to the surface.', won?'sys':'err');
+    core=null; bstate=''; ui.innerHTML='';
+    if(debugBattle){ debugBattle=false; exit(); term(won?'[debugStartBattle] battle complete — victory.':'[debugStartBattle] battle complete — defeat.','sys'); return; }   // hook-started from orbit: no ground scene to return to
+    phase='ground'; term(won?'Away team victorious — hostiles cleared.':'Away team routed — you fall back to the surface.', won?'sys':'err');
     if(won && foes.every(f=>!f.alive)) say('Surface clear. Reach the launch pad and press F to return to orbit.'); }
+
+  // ================================ CORE BATTLE: rendered ENTIRELY from the C# sidecar STATE ================================
+  // Contract (localhost:7877): GET /battle/new?seed=N -> {id,state}; /battle/state?id= and /battle/act?id=&unit=&do=... -> STATE.
+  // ALL battle math (hit/damage/type/STAB/crit) runs in the shipping Tami C# core on the sidecar — this client only renders
+  // STATE and posts intents (move/strike/tech/pass). Enemy turns arrive already resolved. If the sidecar dies between the
+  // health-check and battle start, we fall back to the legacy local battle gracefully.
+  function coreW3(x,y){ const g=core.state.grid; return new T.Vector3((x-(g.w-1)/2)*G.TILE, 0, (y-(g.h-1)/2)*G.TILE); }
+  async function startCoreBattle(foe){ pendingFoe=foe; phase='battle'; bstate='';
+    core={ id:null, state:null, scene:null, cam:null, tiles:[], mesh:{}, arm:null, busy:true, note:'contacting battle core…', logSeen:0, logLines:[], rewarded:false, pollT:0 };
+    try{ const j=await TAMI_CS.battleNew((Date.now()%1000000)|0);                                   // seed drives ALL server-side rolls (reproducible)
+      if(!j||!j.state||!j.state.units) throw new Error((j&&j.error)||'bad /battle/new response');
+      core.id=j.id; coreScene(j.state); coreSync(j.state); core.busy=false; core.note=''; }
+    catch(e){ console.warn('core battle unavailable — legacy fallback:',e); core=null; buildBattleLegacy(foe); } }
+  function coreScene(st){ core.state=st; const gw=st.grid.w, gh=st.grid.h;
+    const sc=new T.Scene(); const sk=0x0c1220; sc.background=new T.Color(sk); sc.fog=new T.Fog(sk,50,130);
+    sc.add(new T.HemisphereLight(0xcfe0ff,0x10131c,1.0)); const sun=new T.DirectionalLight(0xffffff,0.9); sun.position.set(20,40,15); sc.add(sun);
+    core.tiles=[]; for(let y=0;y<gh;y++) for(let x=0;x<gw;x++){ const dark=(x+y)%2; const m=new T.Mesh(new T.BoxGeometry(G.TILE*0.96,0.4,G.TILE*0.96), new T.MeshStandardMaterial({color:dark?0x1b2740:0x223150,roughness:0.9}));
+      const w=coreW3(x,y); m.position.set(w.x,-0.2,w.z); m.userData={gx:x,gy:y,base:dark?0x1b2740:0x223150}; sc.add(m); core.tiles.push(m); }
+    core.scene=sc; core.cam=new T.PerspectiveCamera(52,innerWidth/innerHeight,0.1,600); core.cam.position.set(0,34,30); core.cam.lookAt(0,0,2); bCam=core.cam; }
+  function coreUnitMesh(u){ const g=new T.Group(); const col=u.side==='party'?0x46d6ff:0xff5a6e;
+    const b=new T.Mesh(new T.CylinderGeometry(0.9,1.1,2.2,12), new T.MeshStandardMaterial({color:col,emissive:new T.Color(col).multiplyScalar(0.18),roughness:0.5})); b.position.y=1.3; g.add(b);
+    const h=new T.Mesh(new T.SphereGeometry(0.7,14,10), new T.MeshStandardMaterial({color:0xeaf4ff,roughness:0.4})); h.position.y=2.7; g.add(h);
+    const lb=spriteText(u.name,22,'#eaf2ff',{bg:'rgba(9,16,28,0.7)',pad:5,r:6,align:'center',ws:0.07}); g.add(lb.sp); return g; }
+  function coreSync(st){ core.state=st;
+    for(const u of st.units){ let g=core.mesh[u.id]; if(!g){ g=coreUnitMesh(u); core.scene.add(g); core.mesh[u.id]=g; }
+      const w=coreW3(u.x,u.y); g.position.set(w.x,0,w.z); g.visible=!!u.alive; }
+    if(Array.isArray(st.log)){ if(st.log.length<core.logSeen) core.logSeen=0;                       // tolerate a server-side log reset/window
+      for(let i=core.logSeen;i<st.log.length;i++) core.logLines.push(st.log[i]); core.logSeen=st.log.length;
+      if(core.logLines.length>80) core.logLines=core.logLines.slice(-80); }
+    core.arm=null;
+    if(st.result && !core.rewarded){ core.rewarded=true;                                            // apply rewards ONCE, when the result first arrives
+      if(st.result==='victory' && st.rewards && st.rewards.credits && typeof ships!=='undefined' && ships[0]){ ships[0].credits+=st.rewards.credits; term(`Battle spoils: <span style="color:#ffcf52">+${st.rewards.credits}c</span>.`,'sys'); } } }
+  function coreCanMove(cu,x,y){ const st=core.state; if(x<0||y<0||x>=st.grid.w||y>=st.grid.h) return false;
+    if(x===cu.x&&y===cu.y) return false; if(Math.abs(cu.x-x)+Math.abs(cu.y-y)>(cu.moveH||1)) return false;
+    return !st.units.some(u=>u.alive&&u.x===x&&u.y===y); }                                          // Manhattan <= moveH, cell free, in bounds (mirrors server rule for the highlight)
+  function corePaintTiles(cu){ const st=core.state;
+    for(const m of core.tiles){ let c=m.userData.base; const x=m.userData.gx,y=m.userData.gy;
+      if(cu&&cu.side==='party'&&!st.result&&!core.busy){
+        if(core.arm){ const r=Math.max(1,core.arm.range||1); if(Math.abs(cu.x-x)+Math.abs(cu.y-y)<=r&&!(x===cu.x&&y===cu.y)) c=0x5c2a2a; }   // attack range preview
+        else if(coreCanMove(cu,x,y)) c=0x2f6a4a; }                                                                                            // movable cells
+      m.material.color.setHex(c); }
+    if(cu){ const t=core.tiles.find(m=>m.userData.gx===cu.x&&m.userData.gy===cu.y); if(t) t.material.color.setHex(cu.side==='party'?0x2a5b8c:0x7a2436); } }
+  function coreLogLine(l){ const esc=String(l).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    if(/super effective/i.test(l)) return `<b style="color:#7fdc8a">${esc}</b>`;
+    if(/resisted/i.test(l)) return `<span style="color:#c9a26a">${esc}</span>`;
+    if(/crit/i.test(l)) return `<span style="color:#ffcf52">${esc}</span>`;
+    if(/miss/i.test(l)) return `<span style="opacity:.65">${esc}</span>`;
+    return esc; }
+  function frameCore(dt){ bt+=dt;
+    if(!core.state||!core.scene){ ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px;color:#cfe2f5">⚔ ${core.note||'contacting battle core…'}</div>`; return; }
+    const st=core.state, cu=st.units.find(u=>u.id===st.current);
+    for(const u of st.units){ const g=core.mesh[u.id]; if(g&&g.visible) g.position.y=(cu&&u.id===cu.id&&!st.result)?Math.abs(Math.sin(bt*4))*0.5:0; }
+    if(!st.result&&!core.busy&&cu&&cu.side==='enemy'){ core.pollT+=dt; if(core.pollT>0.9){ core.pollT=0; coreRefresh(); } }   // defensive: act/new should already leave a party unit current
+    corePaintTiles(cu); drawCoreUI(cu); rend.render(core.scene,core.cam); }
+  function drawCoreUI(cu){ const st=core.state;
+    const rows=st.units.map(u=>{ const dead=!u.alive; const bar=Math.max(0,Math.min(20,Math.round(20*u.hp/Math.max(1,u.maxHp))));
+      const col=u.side==='party'?'#46d6ff':'#ff5a6e';
+      const affs=(u.afflictions||[]).filter(a=>a.turns>0).map(a=>`${a.name} ${a.turns}`).join(', ');
+      return `<div style="opacity:${dead?0.35:1};margin:2px 0"><span style="color:${col}">${u.id===st.current&&!st.result?'▶':'&nbsp;'} ${u.name}</span> <span style="opacity:.55">Lv${u.level} ${(u.types||[]).join('/')}</span> <span style="color:#7fdc8a">${'█'.repeat(bar)}</span><span style="opacity:.3">${'░'.repeat(20-bar)}</span> ${u.hp}/${u.maxHp} <span style="color:#9fd0ff">AP ${u.ap}</span>${affs?` <span style='color:#ffcf52'>[${affs}]</span>`:''}</div>`; }).join('');
+    const mkBtn=(key,body,on,dis)=>`<button data-core="${key}" ${dis?'disabled':''} style="pointer-events:auto;margin:3px;padding:6px 9px;border-radius:7px;border:1px solid ${on?'#9fe6ff':'#2a3f5c'};background:${on?'#173049':'#0e1a2a'};color:${dis?'#5a6a80':'#cfe2f5'};font:inherit;cursor:${dis?'default':'pointer'}">${body}</button>`;
+    const pretty=s=>String(s||'').replace(/_/g,' ');
+    let ctrl='';
+    if(st.result==='victory'){ ctrl=`<div style="margin-top:8px;color:#7fdc8a;font-size:16px">✔ VICTORY — the away team prevails.${st.rewards&&st.rewards.credits?` <span style="color:#ffcf52">+${st.rewards.credits}c</span>`:''}</div>${mkBtn('return','Back to the surface')}`; }
+    else if(st.result==='defeat'){ ctrl=`<div style="margin-top:8px;color:#ff6a6a;font-size:16px">✖ DEFEAT — you retreat to your ship.</div>${mkBtn('return','Retreat')}`; }
+    else if(core.busy){ ctrl=`<div style="margin-top:6px;opacity:.7">resolving…</div>`; }
+    else if(cu&&cu.side==='party'){
+      const sk=cu.strike, sOn=core.arm&&core.arm.kind==='strike';
+      let btns=sk?mkBtn('strike',`${pretty(sk.id)} <span style="opacity:.6">⚔ ${sk.element} r${Math.max(1,sk.range||1)}${sk.ap?` +${sk.ap}AP`:''}</span>`,sOn,false):'';
+      btns+=(cu.techs||[]).map(t=>{ const on=core.arm&&core.arm.kind==='tech'&&core.arm.id===t.id;
+        return mkBtn(`tech:${t.id}`,`${pretty(t.id)} <span style="opacity:.6">✦ ${t.element} ${t.ap}AP r${Math.max(1,t.range||1)}</span>`,on,cu.ap<t.ap); }).join('');
+      btns+=mkBtn('pass','Pass',false,false);
+      ctrl=`<div style="margin-top:6px"><span style="opacity:.7">click a green tile to MOVE, or</span> pick an action:</div>${btns}`;
+      if(core.arm) ctrl+=`<div style="margin-top:4px;color:#9fe6ff">${core.arm.kind==='strike'?pretty(sk&&sk.id):pretty(core.arm.id)} armed — click a red foe in range (${Math.max(1,core.arm.range||1)}).</div>`; }
+    else ctrl=`<div style="margin-top:6px;opacity:.7">${cu?cu.name+' (enemy) is acting…':'…'}</div>`;
+    if(core.note) ctrl+=`<div style="margin-top:4px;color:#ff9a9a">${core.note}</div>`;
+    ui.innerHTML=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:470px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
+      <div style="color:#8fd0ff;font-weight:bold;margin-bottom:4px">TURN-BASED BATTLE <span style="opacity:.5;font-weight:normal">— live Tami C# core${core.id?` · ${core.id}`:''}</span></div>${rows}${ctrl}</div>
+      <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${core.logLines.slice(-6).map(l=>'· '+coreLogLine(l)).join('<br>')}</div>`;
+    ui.querySelectorAll('button[data-core]').forEach(b=>b.onclick=()=>{ const k=b.getAttribute('data-core');
+      if(k==='return'){ finishBattle(st.result==='victory'); return; }
+      if(core.busy||st.result) return; core.note='';
+      if(k==='pass'){ core.arm=null; coreAct({do:'pass'}); }
+      else if(k==='strike'){ const s=cu&&cu.strike; core.arm=(core.arm&&core.arm.kind==='strike')?null:{kind:'strike',range:(s&&s.range)||1}; }
+      else if(k.indexOf('tech:')===0){ const id=k.slice(5); const t=(cu.techs||[]).find(t=>t.id===id);
+        core.arm=(core.arm&&core.arm.kind==='tech'&&core.arm.id===id)?null:{kind:'tech',id,range:(t&&t.range)||1}; } }); }
+  function onCoreClick(mx,my){ const st=core&&core.state; if(!st||core.busy||st.result) return;
+    const cu=st.units.find(u=>u.id===st.current); if(!cu||cu.side!=='party') return;
+    pointer.x=mx/innerWidth*2-1; pointer.y=-(my/innerHeight*2-1); ray.setFromCamera(pointer,core.cam);
+    if(core.arm){ const alive=st.units.filter(u=>u.alive&&core.mesh[u.id]);                          // strike/tech armed: click a foe
+      const hits=ray.intersectObjects(alive.map(u=>core.mesh[u.id]),true);
+      if(hits.length){ let m=hits[0].object; while(m.parent&&!alive.find(u=>core.mesh[u.id]===m)) m=m.parent; const tgt=alive.find(u=>core.mesh[u.id]===m);
+        if(tgt){ if(tgt.side!=='enemy'){ core.note='Invalid target — aim at a red foe.'; return; }
+          if(Math.abs(cu.x-tgt.x)+Math.abs(cu.y-tgt.y)>Math.max(1,core.arm.range||1)){ core.note=`${tgt.name} is out of range.`; return; }
+          if(core.arm.kind==='strike') coreAct({do:'strike',target:tgt.id}); else coreAct({do:'tech',tech:core.arm.id,target:tgt.id}); } }
+      return; }
+    const th=ray.intersectObjects(core.tiles); if(th.length){ const td=th[0].object.userData; if(coreCanMove(cu,td.gx,td.gy)) coreAct({do:'move',x:td.gx,y:td.gy}); } }
+  async function coreAct(p){ if(!core||core.busy||!core.state) return; const unit=core.state.current; core.busy=true; core.arm=null;
+    try{ const j=await TAMI_CS.battleAct(core.id,unit,p);
+      if(j&&j.error){ core.note=String(j.error); } else if(j&&j.units){ core.note=''; coreSync(j); } else core.note='bad /battle/act response'; }
+    catch(e){ core.note='battle core unreachable — '+e.message; }
+    if(core) core.busy=false; }                                                                      // core may have been nulled by finishBattle while awaiting
+  async function coreRefresh(){ if(!core||core.busy) return; core.busy=true;
+    try{ const j=await TAMI_CS.battleState(core.id); if(j&&j.units) coreSync(j); }catch(e){}
+    if(core) core.busy=false; }
+  // Test hook for the integrator: start a battle DIRECTLY (no walking needed) — core mode when the sidecar is alive, else
+  // the legacy local battle. Optional mode 'core'|'legacy' forces the path (headless tests can stub fetch + force 'core').
+  function debugStartBattle(mode){ if(phase==='battle') return 'already-in-battle';
+    const foe = phase==='ground' ? nearestFoe() : null;
+    if(!active){ active=true; debugBattle=true; wrap.style.display='block'; keys.clear(); }
+    const useCore = mode==='core' ? true : mode==='legacy' ? false : TAMI_CS.alive;
+    if(useCore) startCoreBattle(foe); else buildBattleLegacy(foe);
+    size(); return useCore?'core':'legacy'; }
 
   // ================================ enter / exit / input / frame ================================
   function enter(pl){ if(active) return; active=true; phase='ground'; worldName=pl&&pl.name||'the surface'; buildGround(pl); size(); wrap.style.display='block'; keys.clear();
     term(`Landed on <b>${worldName}</b>. You disembark — <b>on foot</b>. (W walk · A/D turn · Shift run · F interact · type <b>launch</b> or step on the pad to leave)`,'sys'); }
   function exit(){ active=false; phase=''; wrap.style.display='none'; ui.innerHTML=''; keys.clear();
     // dispose scenes lightly
-    gScene=null; bScene=null; }
+    gScene=null; bScene=null; core=null; }
   function interact(){ if(phase!=='ground') return; const foe=nearestFoe(); if(foe){ buildBattle(foe); return; } if(onPad()){ term('Launching back to orbit.','sys'); exit(); } }
   function key(e,down){ if(down){ if(e.code==='Escape'){ if(phase==='battle'){ /* stay */ } else exit(); return; }
       if(e.code==='KeyF'&&phase==='ground'){ interact(); return; } keys.add(e.code); }
     else keys.delete(e.code); }
-  cv.addEventListener('mousedown',e=>{ if(phase==='battle') onBattleClick(e.clientX,e.clientY); });
-  cv.addEventListener('touchstart',e=>{ if(phase==='battle'&&e.touches[0]){ onBattleClick(e.touches[0].clientX,e.touches[0].clientY); } },{passive:true});
-  function frame(dt){ if(phase==='ground') frameGround(dt); else if(phase==='battle') frameBattle(dt); }
-  return { active:()=>active, enter, exit, key, frame };
+  cv.addEventListener('mousedown',e=>{ if(phase==='battle'){ core?onCoreClick(e.clientX,e.clientY):onBattleClick(e.clientX,e.clientY); } });
+  cv.addEventListener('touchstart',e=>{ if(phase==='battle'&&e.touches[0]){ const t=e.touches[0]; core?onCoreClick(t.clientX,t.clientY):onBattleClick(t.clientX,t.clientY); } },{passive:true});
+  function frame(dt){ if(phase==='ground') frameGround(dt); else if(phase==='battle'){ if(core) frameCore(dt); else frameBattle(dt); } }
+  return { active:()=>active, enter, exit, key, frame, debugStartBattle };
 })();
 
 let last=performance.now(), mktAcc=0;
