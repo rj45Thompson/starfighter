@@ -1114,11 +1114,69 @@ let BENCHDATA=null; fetch('./bench_results.json').then(r=>r.ok?r.json():null).th
 function benchBadge(f){ const b=BENCHDATA&&BENCHDATA.benches&&BENCHDATA.benches[f]; if(!b) return '';
   const t=(b.runtime_ms!=null)?` ${b.runtime_ms}ms`:''; return ` <span style="opacity:.45">[suite ${b.flags_true}/${b.flags_total}✓${t}]</span>`; }
 function suiteLine(){ return BENCHDATA?` <span style="opacity:.5">· LIVE suite ${BENCHDATA.suite} green · ${BENCHDATA.claims_total} pass-flags · baked ${String(BENCHDATA.generated).slice(0,10)}</span>`:''; }
+// ===== WATCHABLE AGI (Round 10, AC2+) — live ANIMATED runs of the REAL bench algorithms =====
+// Honesty: each watcher ports its bench's mechanics VERBATIM (same CONFIG constants, bench file cited in a comment).
+// The pillar CLAIM lives in the Node bench (suite-audited); this overlay is a labeled visualizer whose numbers are
+// computed by the live run on screen. Own RAF loop; independent of the game and the terminal log (which re-renders).
+const WATCH=(()=>{ let panel=null, cv=null, ctx=null, raf=0, title=null, sub=null, btnA=null, btnX=null;
+  function mulberry32(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return((t^t>>>14)>>>0)/4294967296; }; }
+  function ensure(){ if(panel) return;
+    panel=document.createElement('div'); panel.style.cssText='position:fixed;right:12px;top:52px;z-index:8;background:#0a1522ee;border:1px solid #3a6a8a;border-radius:10px;padding:10px;width:392px;pointer-events:auto;font:12px/1.45 ui-monospace,monospace;color:#cfe6f5;display:none';
+    title=document.createElement('div'); title.style.cssText='font-weight:800;margin-bottom:3px;color:#ffd9a0;font-size:12px';
+    sub=document.createElement('div'); sub.style.cssText='opacity:.8;margin-bottom:6px;min-height:28px';
+    cv=document.createElement('canvas'); cv.width=372; cv.height=300; cv.style.cssText='display:block;background:#050b12;border-radius:6px'; ctx=cv.getContext('2d');
+    const bar=document.createElement('div'); bar.style.cssText='display:flex;gap:6px;margin-top:7px';
+    const mkBtn=t=>{ const b=document.createElement('button'); b.textContent=t; b.style.cssText='flex:1;background:#14283c;border:1px solid #3a6a8a;border-radius:6px;color:#cfe6f5;font:700 11px ui-monospace,monospace;padding:5px 0;cursor:pointer'; return b; };
+    btnA=mkBtn('toggle'); btnX=mkBtn('close'); btnX.onclick=()=>WATCH.stop(); bar.append(btnA,btnX);
+    panel.append(title,sub,cv,bar); document.body.appendChild(panel); }
+  function stop(){ if(raf) cancelAnimationFrame(raf); raf=0; if(panel) panel.style.display='none'; }
+  function show(t,s){ ensure(); panel.style.display='block'; title.innerHTML=t; sub.innerHTML=s; ctx.clearRect(0,0,cv.width,cv.height); }
+  let curFn=null;
+  function loop(fn){ curFn=fn; if(raf) cancelAnimationFrame(raf); const tick=()=>{ const go=fn(); if(go!==false) raf=requestAnimationFrame(tick); else raf=0; }; raf=requestAnimationFrame(tick); }
+  function step(n){ for(let i=0;i<(n||1);i++) if(curFn) curFn(); }                 // manual drive (headless verify / hidden tab, where rAF is paused)
+  return { mulberry32, stop, show, loop, step, setSub:s=>{ if(sub) sub.innerHTML=s; }, setToggle:(label,fn)=>{ btnA.textContent=label; btnA.onclick=fn; }, get cv(){return cv;}, get ctx(){return ctx;} };
+})();
+let WATCH_SEED_BUMP=0;   // each fresh `watch X` uses the next seed -> different (but deterministic) run; shows arbitrariness
+// --- watch convention: LIVE naming game. Mechanics ported VERBATIM from convention_vec.js (CFG POP:30; speaker utters a
+// name from its inventory or INVENTS if empty; SUCCESS -> BOTH delete their other names (alignment); FAILURE -> listener
+// adds it). Ablation toggle = no delete-on-success (the bench's reinforce=false arm): visibly NEVER converges.
+function watchConvention(ablation){ const POP=30, STEPS_PER_FRAME=4, CAP=9000;   // POP == convention_vec.js CFG.POP
+  const seed=5+(WATCH_SEED_BUMP++);
+  const rng=WATCH.mulberry32(seed);
+  const inv=Array.from({length:POP},()=>new Set()); let nextName=0, steps=0, lastPair=null, done=false;
+  WATCH.show('WATCH: emergent convention — the naming game (LIVE run of convention_vec.js mechanics)',
+    (ablation?'<b style="color:#ff9a9a">ABLATION: no delete-on-success</b> — inventories only grow; no shared name can win.':'success → BOTH agents keep only the agreed name; failure → listener learns it.')+' seed '+seed);
+  WATCH.setToggle(ablation?'run NORMAL dynamics':'run ABLATION (no reinforcement)', ()=>watchConvention(!ablation));
+  const hue=n=>(n*137.508)%360;                                                   // golden-angle name->colour
+  function interact(){ let s=(rng()*POP)|0, l=(rng()*POP)|0; while(l===s) l=(rng()*POP)|0;
+    const arr=[...inv[s]]; const name=arr.length?arr[(rng()*arr.length)|0]:(inv[s].add(nextName), nextName++);
+    let ok=false; if(inv[l].has(name)){ ok=true; if(!ablation){ inv[s].clear(); inv[s].add(name); inv[l].clear(); inv[l].add(name); } }
+    else inv[l].add(name);
+    lastPair=[s,l,ok]; steps++; }
+  function consensus(){ const tally=new Map(); let committed=0; for(const s of inv){ if(s.size===1){ committed++; const n=[...s][0]; tally.set(n,(tally.get(n)||0)+1); } }
+    let best=0; for(const [,c] of tally) if(c>best) best=c; return { frac:best/POP, committed }; }
+  const ctx=WATCH.ctx, W=WATCH.cv.width, H=WATCH.cv.height, cx=W/2, cy=H/2-14, R=110;
+  const pos=i=>[cx+R*Math.cos(2*Math.PI*i/POP-Math.PI/2), cy+R*Math.sin(2*Math.PI*i/POP-Math.PI/2)];
+  WATCH.loop(()=>{ if(!done) for(let k=0;k<STEPS_PER_FRAME;k++) interact();
+    const c=consensus();
+    ctx.clearRect(0,0,W,H);
+    if(lastPair){ const [s,l,ok]=lastPair; const [x1,y1]=pos(s),[x2,y2]=pos(l); ctx.strokeStyle=ok?'#42d97c':'#d94a4a'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
+    for(let i=0;i<POP;i++){ const [x,y]=pos(i); const s=inv[i];
+      ctx.fillStyle = s.size===1 ? `hsl(${hue([...s][0])},85%,60%)` : '#5a6a78';
+      ctx.beginPath(); ctx.arc(x,y,s.size===1?7:5,0,7); ctx.fill();
+      if(s.size>1){ ctx.fillStyle='#9fb0bf'; ctx.font='8px monospace'; ctx.fillText(String(s.size), x-2, y+3); } }
+    ctx.fillStyle='#cfe6f5'; ctx.font='11px monospace'; ctx.fillText(`step ${steps}   committed ${c.committed}/${POP}`, 10, H-26);
+    ctx.fillStyle='#14283c'; ctx.fillRect(10,H-18,W-20,10); ctx.fillStyle=c.frac>=1?'#42d97c':'#7fb2d8'; ctx.fillRect(10,H-18,(W-20)*c.frac,10);
+    ctx.fillStyle='#cfe6f5'; ctx.fillText(`consensus ${(c.frac).toFixed(2)}`, W-110, H-26);
+    if(!done && !ablation && c.frac>=1){ done=true; WATCH.setSub(`<b style="color:#42d97c">CONVERGED at step ${steps}</b> — the population symmetry-broke onto ONE arbitrary name (seed ${seed}; rerun → a different winner). Bench: convention_vec.js${benchBadge('convention_vec')}`); }
+    if(!done && ablation && steps>=CAP){ done=true; WATCH.setSub(`<b style="color:#ff9a9a">NO CONVERGENCE after ${steps} steps</b> — committed ${c.committed}/${POP}: without delete-on-success, inventories only grow. The alignment dynamic is load-bearing. Bench: convention_vec.js${benchBadge('convention_vec')}`); }
+    return true; });
+}
 function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="color:#8fd0ff">&gt;</b> '+t.replace(/</g,'&lt;'),'');
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
-  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
+  if(c==='help'||c==='?'||c==='h'){ term('MOVE: go &lt;planet&gt; · dock · hold · flee   INFO: status · scan · map · galaxy · market · rep · war · warmap · contracts · rank · artifacts · think &lt;pilot&gt; · <b>ask &lt;pilot&gt; &lt;question&gt;</b> (grounded — answers only from what it knows, else abstains) · <b>story [text]</b> (crush a short story) · <b>discuss</b> (factions take sides on it) · lang · tom · steer · rays · sense · discover · signals · <b>society</b> · <b>agent</b> · <b>dynamics</b> (open-endedness) · <b>autonomy</b> (open-ended agency) · <b>worldmodel</b> (world models & deliberation) · <b>grounded</b> (grounded language & reasoning) · <b>dialogue</b> (multi-agent language & dialogue) · <b>watch convention</b> (LIVE animated naming game)   AWAY: <b>land</b> (dock a planet then walk its surface on foot — turn-based battles) · <b>launch</b>   JOBS: accept &lt;id&gt; · abandon &lt;id&gt;   TRADE: buy &lt;good&gt; &lt;n&gt; · sell &lt;good&gt; &lt;n&gt; · refuel   ACT: mine · trade · attack &lt;ship&gt; · upgrade &lt;weapon|engine|hull&gt; · weapon &lt;type&gt; · outfit · terraform · bombard · assault   BASE: go base · base · hull &lt;class&gt; · blackmarket · fence · repair   or type plain English to order the AI squadron (e.g. "everyone attack ORION").','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1226,6 +1284,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🔵 grounded semantics','ground_vec','ground each predicate then COMPOSE to judge "a red object left-of a blue one" → NOVEL predicate combinations 1.0; a holistic classifier that can\'t compose falls to 0.66']];
     L.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> — ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>worldmodel</code> for world models & deliberative agency, <code>autonomy</code> for open-ended agency.</span>','sys'); return; }
+  if(c==='watch'){   // AC2+ (Round 10, WATCHABLE AGI): live animated runs of the REAL bench algorithms — labeled visualizers
+    const w=(a[1]||'').toLowerCase();
+    if(w==='convention'||w==='naming'){ watchConvention(false); term('WATCH panel opened (top-right): 30 agents, no coordinator — pairwise naming interactions; colour = an agent\'s single committed name, grey = uncommitted. Watch the population symmetry-break onto ONE colour. Button toggles the no-reinforcement ABLATION (never converges).','sys'); return; }
+    term('watch what? available: <b>watch convention</b> (live naming game). More coming: curious, worldmodel, jury, dialogue.','sys'); return; }
   if(c==='dialogue'||c==='society2'||c==='round9'){   // AB9: surface the MULTI-AGENT LANGUAGE GAMES & GROUNDED DIALOGUE pillars (Round 9) — labeled visualizer of real audited bench numbers
     term('<b style="color:#ffd9a0">MULTI-AGENT LANGUAGE GAMES & GROUNDED DIALOGUE — reason, teach & argue with other minds</b> <span style="opacity:.6">— LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const Dg=[['🎯 pragmatic reference','refer_vec','pick the message that UNIQUELY identifies the target in context → listener 1.0 vs a literal (context-blind) speaker 0.66; when NO distinguishing message exists pragmatics honestly can\'t help (0.5 = 0.5)'],
