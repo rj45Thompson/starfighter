@@ -2352,19 +2352,27 @@ function loreAnswer(s,question){
   const ents=[...new Set(loreToks(qn).concat(fu?(st.lastEnts||[]):[]).filter(w=>idx.ents.has(w)&&w!==selfStem))];
   const docs=idx.docs.concat(loreLiveDocs(s,idx));
   const byText=new Set(idx.byText); docs.forEach(d=>byText.add(d.text));
-  const qv=loreQVec(qtoks,topics,idx), cand=[];
+  const qv=loreQVec(qtoks,topics,idx), cand=[], weak=[];
   for(const d of docs){ if(st.said.has(d.id)) continue;
     const entHit=ents.length&&ents.some(e=>d.tf.has(e));   // literally names an asked entity -> it IS on-topic
+    let covOk=true;
     if(content.length&&!entHit){ const cov=content.filter(t=>loreTokDocMatch(t,d,ents)).length,
-      covNeed=content.length<=2?1:Math.ceil(content.length/2); if(cov<covNeed) continue; }   // must actually touch the question
+      covNeed=content.length<=2?1:Math.ceil(content.length/2); if(cov<covNeed) covOk=false; }   // touches the question?
     let sc=loreCos(qv,d,idx);
     if(topics.length&&d.topics.some(t=>topics.includes(t))) sc+=LORE_CFG.TOPIC_BOOST;
     if(entHit) sc+=LORE_CFG.ENTITY_BOOST;
     if(fu&&((st.lastTopic&&d.topics.includes(st.lastTopic))||(st.lastEnts||[]).some(e=>d.tf.has(e)))) sc+=LORE_CFG.CONV_BOOST;
     if(d.src.startsWith('world:')) sc-=LORE_CFG.WORLD_PEN;   // shared world blurbs rank below the pilot's own lines — voice stays personal
     sc+=LORE_CFG.ORD_EPS*(1-Math.min(1,d.ord/4000));   // stable tie-break toward earlier bio sentences
-    if(sc>=LORE_CFG.MIN_SCORE) cand.push({d,sc}); }
-  cand.sort((a,b)=>b.sc-a.sc);
+    if(covOk&&sc>=LORE_CFG.MIN_SCORE) cand.push({d,sc});
+    else if(!d.src.startsWith('world:')) weak.push({d,sc});   // BEST-EFFORT pool: the pilot's own lines that half-match — better than a blunt "I can't speak to that"
+  }
+  cand.sort((a,b)=>b.sc-a.sc); weak.sort((a,b)=>b.sc-a.sc);
+  // GRACEFUL DEGRADE (fix 2026-07-07: pilots "barely worked" vs the Passenger because a near-miss question hit a
+  // blunt decline). If nothing cleared the bar but the pilot HAS relevant-ish lines, answer with its best one or two
+  // — still 100% grounded corpus (never invented), just a lower confidence. A real decline only when it truly has
+  // nothing unsaid to say. This mirrors the Passenger always having something in-voice to offer.
+  if(!cand.length && weak.length && weak[0].sc>0) for(const w of weak.slice(0,LORE_CFG.MAX_SENT)) cand.push(w);
   const picks=cand.slice(0,LORE_CFG.MAX_SENT).sort((a,b)=>a.d.ord-b.d.ord);   // compose in bio-order
   if(picks.length){
     const sents=picks.map(p=>p.d.text);
