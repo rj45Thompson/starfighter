@@ -1,6 +1,14 @@
 {
   "version": 1,
   "note": "50 characters = 50 pilots. rel types: kin|friend|ally|rival|hates|debt|betrayed|mentor|ward. Every relationship must be justified by a scene by the close of its part (outline canon rule 2). The first 10 are the existing game pilots (lore_bios.json canon).",
+  "canon_rulings": {
+    "RHEA": "Roster RHEA is the COALITION refugee count-keeper (Tamsin's ward; MIRA mentor; SIRIN betrayed her via a denied prisoner-exchange) — dramatized in ch-010 + ch-012. She is a DIFFERENT person from lore_bios ORION's Synod sister, who is named RAEL in the novel (ch-007) so the graph's capitalised-mention matcher never conflates them. 'Rhea' in prose = this roster character; ORION's sister is only ever written 'Rael'.",
+    "JUNO-6": "Roster JUNO-6 is the Free-Trader salvage broker (the '-6' is her guild broker-roll registry suffix; ch-008). Lyra's sister at Ranger Command (lore_bios worlds/Ranger Command) is a DIFFERENT person, spelled JUNA in the novel (ch-008) and explicitly distinguished. Bare 'Juno' happens to be collision-clean (roster token is literal 'JUNO-6'); 'Juna' is used for reader clarity.",
+    "ORION_defection": "ch-002 timeline fixed 'nine'->'fifteen more years' so the defection lands in-war (PART II, ~ch-001+4y), consistent with ORION's active-shooting-war bios. Slowness dramatized from Sable's side in ch-007.",
+    "MIRA_nine_seconds": "ch-005's hatch-hold nine-count softened to a deliberate working count that foreshadows a SEPARATE later Halcyon FREEZE (bios secret) as the lifelong count. Two distinct nine-counts, no longer double-booked.",
+    "ch003_broadcast": "ch-003 set broadcast:false (private dorm/loft/name-secret no longer leaks to all 50 segments). The open-band radio moment the fleet heard is split into ch-013 (broadcast:true), carrying only the sixty-name reading + the 'slower' turn; the private name-secret is withheld there.",
+    "second_sundering": "Outline PART III renamed THE SECOND SUNDERING (in-war lane-collapse the Watch is founded around). The ORIGINAL Sundering is back-story a generation earlier (lore_bios + ch-006), shown only in flashback."
+  },
   "characters": [
     {"name":"VEGA",    "faction":"coalition","temperament":"grieving idealist","rel":{"MIRA":"friend","ORION":"ally","KAINE":"hates","KESTREL":"kin","HALE":"mentor"}},
     {"name":"ORION",   "faction":"coalition","temperament":"haunted defector","rel":{"VALE":"debt","VEGA":"ally","DRACO":"friend","MOROS":"hates","SABLE":"kin","MIRA":"debt"}},

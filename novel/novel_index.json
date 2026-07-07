@@ -1,20 +1,22 @@
 {
  "version": 1,
  "title": "THE LANES THAT BURNED",
- "chapters": 6,
- "words": 8464,
- "pages": 24.2,
+ "chapters": 13,
+ "words": 17851,
+ "pages": 51,
  "target_pages": 1000,
  "characters": 50,
  "pov_map": {
   "VEGA": [
-   "ch-001"
+   "ch-001",
+   "ch-009"
   ],
   "ORION": [
    "ch-002"
   ],
   "KESTREL": [
-   "ch-003"
+   "ch-003",
+   "ch-013"
   ],
   "DRACO": [
    "ch-004"
@@ -24,7 +26,22 @@
   ],
   "HALE": [
    "ch-006"
+  ],
+  "SABLE": [
+   "ch-007"
+  ],
+  "JUNO-6": [
+   "ch-008"
+  ],
+  "SIRIN": [
+   "ch-010"
+  ],
+  "CORVUS": [
+   "ch-011"
+  ],
+  "TAMSIN": [
+   "ch-012"
   ]
  },
- "updated": "2026-07-07T03:47:31.959Z"
+ "updated": "2026-07-07T04:36:56.089Z"
 }
