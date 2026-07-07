@@ -198,6 +198,7 @@ const CFG = {
   // POWER_DEFAULT*3 == POWER_TOTAL so a fresh ship's baseline multiplier is exactly 1.0 (today's balance, untouched).
   POWER_TOTAL:150, POWER_MIN:0, POWER_MAX:100, POWER_DEFAULT:50, POWER_MULT_MIN:0.4, POWER_MULT_MAX:1.6,
   SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
+  NITRO_RATE:70,   // %/s the power pool dumps into engines while holding Shift (drains weapons+shields to feed it)
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
@@ -209,7 +210,7 @@ const CFG = {
   REP_HOSTILE:-6, REP_ALLIED:6, REP_TRADE:0.12, REP_TERRA:0.6, REP_BOMB:0.5, REP_MAX:12, REP_DISCOUNT:0.15,
   REP_KILL_HEG:0.4, REP_LIBERATE:3,          // M2: coalition standing - fight the Hegemon, planets warm to you
   // ---- weak enemy pirates (farm targets) + inter-agent communication ----
-  PIRATE_MAX:11, PIRATE_HP:62, PIRATE_DMG:9, PIRATE_HUNT_R:170, PIRATE_SPAWN_CD:6, PIRATE_LOOT:14,
+  PIRATE_MAX:11, PIRATE_HP:62, PIRATE_DMG:9, PIRATE_HUNT_R:170, PIRATE_SPAWN_CD:6, PIRATE_LOOT:14, FLAME_CRUISER_CHANCE:0.3,
   COMM_R:190, COMM_CD:3.5,          // radio range for agent-to-agent messages + per-agent cooldown
   COMM_EPS:0.12, COMM_LR:0.5, COMM_LEARN_CD:0.22,   // A1: Lewis-game exploration ε, learning rate, episode cadence
   CHAIN_SPEAK_CD:7.5,                                // A0: how often the focused pilot narrates its full reasoning chain to radio
@@ -318,6 +319,7 @@ const texLoader=new T.TextureLoader();
 const rockTex=[ texLoader.load('assets/asteroid_dark.png'), texLoader.load('assets/asteroid_light.png') ];
 rockTex.forEach(t=>{ t.wrapS=t.wrapT=T.RepeatWrapping; t.encoding=T.sRGBEncoding; });
 const PLANET_TEX=texLoader.load('assets/planet_skin.jpg'); PLANET_TEX.wrapS=T.RepeatWrapping; PLANET_TEX.encoding=T.sRGBEncoding;   // the real Starfighter2 planet skin, tinted per economy type via material.color
+const FLAME_TEX=texLoader.load('assets/flame1.png');   // the real Starfighter2 (Cartoon FX) fire sprite - the Incinerator's stream
 
 const ring=new T.Mesh(new T.SphereGeometry(CFG.ARENA_R,32,24),
   new T.MeshBasicMaterial({ color:0x2a557a, wireframe:true, transparent:true, opacity:0.08 })); scene.add(ring);
@@ -491,6 +493,9 @@ function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=nu
     m.scale.set(1,spec.boltLen||3.2,1); m.quaternion.setFromUnitVectors(UPL,dir);
     const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.55}));
     halo.scale.set(r,r,1); m.add(halo); }
+  else if(spec.shape==='flame'){                                               // Incinerator: a real fire-sprite gout, flickering size + a fast fade
+    m=new T.Sprite(new T.SpriteMaterial({map:FLAME_TEX,color:0xffffff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.92,rotation:rand(0,TAU)}));
+    m.scale.set(r*rand(0.8,1.3),r*rand(0.8,1.3),1); }
   else{ m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
     m.scale.set(r,r,1); if(spec.shape==='orb') m.scale.multiplyScalar(1.25); } // Seeker: a fat slow orb (its smoke trail is drawn in-flight)
   m.position.copy(pos); scene.add(m);
@@ -746,7 +751,9 @@ function addPirate(){ if(ships.filter(s=>s.team==='pirate').length>=enemyCap()) 
   const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:HT.hp, maxHp:HT.hp, credits:0, score:0,
     lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
-    huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:99, role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty, weaponType:WEAPON_ORDER[ti], backstory:BACKSTORY.hegemon[nextId%BACKSTORY.hegemon.length],
+    huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:99, role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty,
+    weaponType:(ti===2?'flame':(ti===1&&rand(0,1)<CFG.FLAME_CRUISER_CHANCE?'flame':WEAPON_ORDER[ti])),   // INCINERATOR (user 2026-07-07): the Hegemon's own terror weapon - every Warlord carries it, some Cruisers too
+    backstory:BACKSTORY.hegemon[nextId%BACKSTORY.hegemon.length],
     cargo:{}, fuel:0, tradePlan:null, tradeCd:0, warping:false, holdCap:0, fuelCap:0, senseR:CFG.SENSE_R, warpEff:1,
     mode:'HUNT', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(0.0) };
   novelShipHook(s);   // N3 (GIVEN-from-canon): synod temperament biases aggr (role stays 'pirate' - hook only re-roles squad ships)
@@ -1286,6 +1293,21 @@ function spriteText(text,fs,col,opts){ opts=opts||{}; const ws=opts.ws||1,weight
     tex.image=c; tex.needsUpdate=true; sp.scale.set(w/SS*ws,h/SS*ws,1); sp.userData.w=w/SS*ws; sp.userData.h=h/SS*ws; }
   set(text,col); return { sp, set, get w(){return sp.userData.w;}, get h(){return sp.userData.h;} };
 }
+// TARGETING COMPUTER RETICLE (user 2026-07-07): a square at the LEAD point - where a hostile will BE by the time
+// your shot arrives (distance / bullet speed, projected along its current velocity) - not where it is now. Only
+// resolves with the equipment bought AND enough weapons power routed, so it stays tied to the X-Wing power system
+// rather than being a free always-on aimbot.
+const RETICLE_CFG={ POWER_THRESH:60, PULSE_HZ:3.2 };
+const reticleMesh=(function(){ const g=new T.EdgesGeometry(new T.PlaneGeometry(1,1)); const m=new T.LineSegments(g,new T.LineBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.9})); m.visible=false; m.renderOrder=25; scene.add(m); return m; })();
+function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!P.targetingComputer){ reticleMesh.visible=false; return; }
+  const wPct=shipPower(P).weapons; if(wPct<RETICLE_CFG.POWER_THRESH){ reticleMesh.visible=false; return; }
+  let best=null,bd=P.senseR; for(const o of ships){ if(o===P||!o.alive||o.team!=='pirate') continue; const d=P.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} }
+  if(!best){ reticleMesh.visible=false; return; }
+  const W=WEAPONS[P.weaponType||'energy']||WEAPONS.energy, speed=W.speed||CFG.BULLET_SPEED;
+  const tImpact=bd/speed, lead=_v.copy(best.pos).addScaledVector(best.vel,tImpact);
+  reticleMesh.position.copy(lead); reticleMesh.lookAt(P.pos);
+  const pulse=1+0.12*Math.sin(T0*RETICLE_CFG.PULSE_HZ*TAU); reticleMesh.scale.setScalar((2.2+bd*0.015)*pulse);
+  reticleMesh.visible=true; }
 const SPEAK=[]; const transcript=[];
 function buildSpeech(){ for(const s of ships){ const o=spriteText('',26,'#fff',{bg:'rgba(9,16,28,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS});
   o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o; } }
@@ -1569,15 +1591,27 @@ function findPlanet(n){ if(!n) return null; return planets.find(p=>p.name.toLowe
 function findGood(n){ if(!n) return null; return GOODS.find(g=>g.k===n||g.n.toLowerCase().startsWith(n)); }
 const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15}, fuel:{n:'Fuel Cell',cost:100,desc:'+25 fuel',apply:s=>s.fuelCap+=25},
   scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive - buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}},
-  droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5} };
+  droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5},
+  // TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help
+  // you target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of
+  // power"): expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties
+  // it honestly into the X-Wing power system instead of a bolted-on always-on freebie.
+  targeting:{n:'Targeting Computer',cost:900,desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve',apply:s=>s.targetingComputer=true} };
 // M3: WEAPON TYPES - the arms race. energy=fast/cheap, ballistic=hard-hitting/long, missile=homing+splash.
 // dmg=base anti-ship damage · cd=fire cooldown · speed/life=projectile · range=×SENSE_R fire distance
 // twin=two muzzles · homing=seek turn-rate (0=dumb) · splash=AoE radius on hit (0=none) · cost=install price
 const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT vs cannon TRACER+sparks vs missile ORB+smoke trail
   energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:true,  homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6},
   ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', trail:0xffd27a, trailCd:0.045, flash:2.6},
-  missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2} };
-const WEAPON_ORDER=['energy','ballistic','missile'];
+  missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2},
+  // FLAMETHROWER (user 2026-07-07: "the enemies of starfighter originally had flame thrower, can you copy that").
+  // Honest note: the actual Unity project has no coded flamethrower weapon anywhere in its scripts (checked every
+  // .cs file) - only a generic third-party "Cartoon FX" fire VFX pack used for explosions. There is nothing to
+  // port. Built fresh here using that REAL fire texture (assets/flame1.png) for an authentic look: short range,
+  // rapid weak hits (simulates a continuous stream within the existing discrete-shot architecture), no homing.
+  // Not player-purchasable (not in WEAPON_ORDER) - it is the Hegemon's own signature close-range terror weapon.
+  flame:    {n:'Incinerator',    dmg:7,  cd:0.09, speed:46,  life:0.42, range:0.30, col:0xff7a2a, r:3.4, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.8} };
+const WEAPON_ORDER=['energy','ballistic','missile'];   // player-purchasable, in `weapon` shop order - flame is Hegemon-only, see addPirate()
 // M6: ARTIFACTS - rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
   core:   {n:'Hegemon Core',  desc:'+18% fire rate',  apply:s=>s.artFire=(s.artFire||0)+0.18},
@@ -3065,10 +3099,16 @@ document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
-const MAN={ thr:0, pitch:0, yaw:0, fire:false, active:false };
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false };
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
   s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
+  // NITRO BURST (user 2026-07-07: "holding shift should use nitro burst which uses power rapidly from shields
+  // and lasers"): dumps the X-Wing power pool into engines, draining weapons+shields to feed it - reuses the
+  // SAME setPower reroute the power panel/terminal use, so it is one honest mechanic, not a bespoke side-system.
+  // The drain does not auto-restore on release - a burst has a real cost you have to manage afterward.
+  if(MAN.nitro){ const pw=shipPower(s); if(pw.engines<CFG.POWER_MAX-0.5){ setPower(s,'engines',pw.engines+CFG.NITRO_RATE*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } } }
+  else s._nitroSounded=false;
   s.fire-=dt;
   if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
     s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
@@ -3083,7 +3123,8 @@ function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
   MAN.yaw=(keysDown.has('KeyD')||keysDown.has('ArrowRight')?1:0)-(keysDown.has('KeyA')||keysDown.has('ArrowLeft')?1:0);
   MAN.pitch=(keysDown.has('ArrowDown')||keysDown.has('KeyS')?1:0)-(keysDown.has('ArrowUp')?1:0);
   MAN.fire=keysDown.has('Space');
-  if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire) manOn(); }
+  MAN.nitro=keysDown.has('ShiftLeft')||keysDown.has('ShiftRight');
+  if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire||MAN.nitro) manOn(); }
 addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
   if(AWAY.active()){ if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyF','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault(); AWAY.key(e,true); return; }
   if(e.key==='Enter'){ e.preventDefault(); const c=document.getElementById('chat'); if(c) c.focus(); return; }   // user 2026-07-07: "hitting enter will focus the typing terminal" - from anywhere in flight, not just while already typing
@@ -3597,7 +3638,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick();
+  step(dt); updateCamera(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); updateTargetingReticle(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
