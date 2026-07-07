@@ -42,6 +42,11 @@
   #logbody .tl{ opacity:.94; margin:1px 0; }
   #logbody .tl b{ font-weight:800; }
   #logbody .sys{ color:#7fd0b0; } #logbody .err{ color:#ff8a8a; } #logbody .ev{ color:#b7a6ff; }
+  /* message-triage: important lines get a highlighted, bordered block so they stand out from routine output */
+  #logbody .imp{ display:block; margin:3px 0; padding:3px 8px; border-radius:3px; border-left:3px solid #888; background:rgba(255,255,255,.035); font-weight:600; }
+  #logbody .imp.lv-flag{ border-left-color:#ffd27a; color:#ffe4a6; }
+  #logbody .imp.lv-alert{ border-left-color:#ff7a8a; color:#ffb4bc; background:rgba(255,80,92,.08); }
+  #logbody .imp .dc{ opacity:.6; font-weight:700; }
   #ticker.big{ max-height:76vh; width:52%; max-width:720px; }
   #ticker::-webkit-scrollbar{ width:7px; } #ticker::-webkit-scrollbar-thumb{ background:#243c52; border-radius:4px; }
   #chat{ position:fixed; z-index:7; bottom:12px; left:14px; height:34px; padding:0 12px; border-radius:9px;
@@ -208,6 +213,7 @@ const CFG = {
   MAX_ENCOUNTERS:4, ENCOUNTER_CD:13, ENCOUNTER_R:17, ENCOUNTER_LIFE:70, NEWS_CD:22,   // M11: roaming derelicts/caches/distress + galaxy news that shocks prices
   CAM_BACK:18, CAM_UP:7.5, CAM_AHEAD:20, CAM_LAG:3.0, CAM_UP_LERP:2.4,
   SPEAK_SHOW:2.4, SPEECH_WS:0.03,                  // 3D speech bubble: only for meaningful events now, smaller
+  NOTIFY_DEDUPE_S:2.5, TOAST_MAX:4, TOAST_LIFE_S:3.2,   // message-triage: collapse identical bursts; cap the corner toast stack
   RIGHT_FRAC:0.4, RIGHT_MIN:340, RIGHT_MAX:600,    // right column width
   TOP_ZOOM:1.08,                                   // top-down ortho margin past the arena
 };
@@ -440,7 +446,7 @@ function makeBase(){ if(!systems.length) return; const c=systems[0].center.clone
 function atBase(s){ return base && s.pos.distanceTo(base.pos)<CFG.BASE_R; }
 function contraCount(s){ let n=0; for(const k in (s.contraband||{})) n+=s.contraband[k]||0; return n; }
 function scanBust(s,p){ let val=0; for(const k in s.contraband) val+=CONTRABAND[k].base*s.contraband[k]; const fine=Math.round(val*CFG.SCAN_FINE);   // M10: caught smuggling
-  s.contraband={}; s.credits=Math.max(0,s.credits-fine); repAdd(p,-CFG.REP_BOMB*2); term(`⚠ CUSTOMS SCAN at ${p.name} — contraband seized, fined ${fine}c, standing dropped.`,'err'); ev(`${p.name} customs busted a smuggler.`); }
+  s.contraband={}; s.credits=Math.max(0,s.credits-fine); repAdd(p,-CFG.REP_BOMB*2); notify(`⚠ CUSTOMS SCAN at ${p.name} — contraband seized, fined ${fine}c, standing dropped.`,'flag'); }
 // M11: RANDOM ENCOUNTERS (derelict/cache/distress) + galaxy NEWS events that shock the (organic) economy
 const encounters=[]; let encounterCd=8, newsCd=16;
 function spawnEncounter(){ if(encounters.length>=CFG.MAX_ENCOUNTERS||!systems.length) return;
@@ -453,9 +459,9 @@ function spawnEncounter(){ if(encounters.length>=CFG.MAX_ENCOUNTERS||!systems.le
   ev(`A <b>${kind}</b> signal appears in ${sy.name}.`); }
 function removeEncounter(i){ const e=encounters[i]; scene.remove(e.mesh); if(e.label) scene.remove(e.label.sp); if(e.blip) scene.remove(e.blip); encounters.splice(i,1); }
 function resolveEncounter(e){ const P=ships[0];
-  if(e.kind==='derelict'){ const c=randi(30,90); P.credits+=c; if(rand(0,1)<0.4) spawnArtifactDrop(e.pos,ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]); term(`Salvaged a derelict: +${c}c.`,'sys'); ev(`YOU salvaged a derelict (+${c}c).`); }
-  else if(e.kind==='cache'){ const c=randi(60,170); P.credits+=c; term(`Cracked a treasure cache: +${c}c!`,'sys'); ev(`YOU cracked a cache (+${c}c).`); }
-  else { const c=randi(40,110); P.credits+=c; const np=nearestPlanet(e.pos); if(np) repAdd(np,CFG.REP_TERRA); P.score+=2; checkRankUp(P); term(`Answered a distress call — rescued the crew: +${c}c, +standing.`,'sys'); ev(`YOU answered a distress call (+${c}c, +rep).`); } }
+  if(e.kind==='derelict'){ const c=randi(30,90); P.credits+=c; if(rand(0,1)<0.4) spawnArtifactDrop(e.pos,ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]); notify(`Salvaged a derelict: +${c}c.`,'log'); }
+  else if(e.kind==='cache'){ const c=randi(60,170); P.credits+=c; notify(`Cracked a treasure cache: +${c}c!`,'log'); }
+  else { const c=randi(40,110); P.credits+=c; const np=nearestPlanet(e.pos); if(np) repAdd(np,CFG.REP_TERRA); P.score+=2; checkRankUp(P); notify(`Answered a distress call — rescued the crew: +${c}c, +standing.`,'log'); } }
 function encounterTick(dt){ encounterCd-=dt; if(encounterCd<=0){ encounterCd=CFG.ENCOUNTER_CD; spawnEncounter(); }
   const P=ships[0]; for(let i=encounters.length-1;i>=0;i--){ const e=encounters[i]; e.age+=dt; e.mesh.rotation.y+=dt*1.2; e.mesh.rotation.x+=dt*0.6; e.blip.position.copy(e.pos);
     if(P&&P.alive&&!P.warping&&P.pos.distanceTo(e.pos)<CFG.ENCOUNTER_R){ resolveEncounter(e); removeEncounter(i); continue; }
@@ -479,7 +485,7 @@ function makeContract(){ const issuer=planets[randi(0,planets.length-1)]; if(!is
   ct.id=nextContractId++; ct.issuer=issuer; ct.accepted=false; ct.done=false; ct.born=T0; return ct; }
 function refillContracts(){ contracts=contracts.filter(c=>!c.done); while(contracts.length<CFG.CONTRACT_MAX){ const c=makeContract(); if(!c) break; contracts.push(c); ev(`Contract posted @ ${c.issuer.name}: ${c.desc} — ${c.reward}c`); } }
 function completeContract(ct){ if(ct.done) return; ct.done=true; const P=ships[0]; P.credits+=ct.reward; repAdd(ct.issuer,ct.rep); P.score+=Math.max(3,Math.round(ct.reward/25)); checkRankUp(P);   // M5: contracts advance rank
-  term(`✔ CONTRACT COMPLETE: ${ct.desc} — +${ct.reward}c, +${ct.rep} rep @ ${ct.issuer.name}.`,'sys'); ev(`Contract fulfilled: ${ct.desc} (+${ct.reward}c).`); }
+  notify(`✔ CONTRACT COMPLETE: ${ct.desc} — +${ct.reward}c, +${ct.rep} rep @ ${ct.issuer.name}.`,'flag'); }
 function contractKill(){ for(const c of contracts) if(c.accepted&&!c.done&&c.type==='bounty'){ c.got++; if(c.got>=c.need) completeContract(c); } }
 function contractLiberate(sy){ for(const c of contracts) if(c.accepted&&!c.done&&c.type==='defense'&&c.sysId===sy.id) completeContract(c); }
 function contractDeliver(p){ const P=ships[0]; for(const c of contracts) if(c.accepted&&!c.done&&c.type==='supply'&&c.issuer===p){ const have=P.cargo[c.good]||0; if(have>=c.need){ P.cargo[c.good]-=c.need; if(P.cargo[c.good]<=0) delete P.cargo[c.good]; completeContract(c); } } }
@@ -1001,7 +1007,7 @@ function step(dt){
     for(const s of ships){ if(!s.alive||s.warping) continue; const d=s.pos.distanceTo(g.pos);
       if(d<CFG.GEM_MAGNET && (!g.artifact || s.role==='player')) g.vel.addScaledVector(_v.copy(s.pos).sub(g.pos).setLength(1),(CFG.GEM_MAGNET-d)*0.9*dt*8);
       if(d<CFG.GEM_PICK_R){
-        if(g.artifact){ if(s.role!=='player') continue; (s.artifacts=s.artifacts||[]).push(g.artifact); term(`Recovered artifact: <b>${ARTIFACTS[g.artifact].n}</b> — ${ARTIFACTS[g.artifact].desc}. (equip: artifacts)`,'sys'); ev(`You recovered ${ARTIFACTS[g.artifact].n}.`); }
+        if(g.artifact){ if(s.role!=='player') continue; (s.artifacts=s.artifacts||[]).push(g.artifact); notify(`Recovered artifact: <b>${ARTIFACTS[g.artifact].n}</b> — ${ARTIFACTS[g.artifact].desc}. (equip: artifacts)`,'flag'); }
         else { s.credits+=g.credits; s.hp=Math.min(s.maxHp,s.hp+CFG.GEM_FOOD); if(s.role==='player'&&window.SOUND) SOUND.play('pickup'); }
         burst(g.pos,g.mesh.material.color.getHex(),9,11,2.6); scene.remove(g.mesh); gems.splice(i,1); taken=true; break; } }
     if(taken) continue;
@@ -1059,7 +1065,7 @@ function destroyAsteroid(i,owner){ const a=asteroids[i]; if(owner) owner.score+=
     for(let k=0;k<n;k++){ const dir=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.AST_SPLIT_KICK*rand(0.6,1.2)).add(a.vel);
       spawnAsteroid(a.pos.clone().addScaledVector(dir,0.05),cs,dir); } }
   scene.remove(a.mesh); asteroids.splice(i,1); }
-function destroyPlanet(p){ ev(`<b>${p.name} DESTROYED</b> — a market hub is gone.`);
+function destroyPlanet(p){ notify(`<b>${p.name} DESTROYED</b> — a market hub is gone.`,'alert');
   burst(p.pos,0xff7040,60,42,p.radius*0.7); burst(p.pos,0xffd890,30,26,p.radius*0.5);
   for(const g of GOODS){ const q=Math.min(Math.round(p.stock[g.k]*0.12),10); if(q>0) spawnCargoPod(p.pos.clone().add(new T.Vector3(rand(-8,8),rand(-8,8),rand(-8,8))),g.k,q); }
   const ng=Math.min(6,Math.round(p.wealth/70)); for(let k=0;k<ng;k++) spawnGem(p.pos.clone().add(new T.Vector3(rand(-10,10),rand(-10,10),rand(-10,10))),rand(3,5));
@@ -1126,6 +1132,31 @@ function log(kind,html){ const L=LOGS[kind]; if(!L) return; L.push('<div class="
   if(activeTab===kind) renderLog(); else { UNREAD[kind]=(UNREAD[kind]||0)+1; buildTabs(); } }                     // unread badge on inactive tabs
 function term(html,cls){ log('terminal', cls?`<span class="${cls}">${html}</span>`:html); }
 function ev(html){ log('events', `<span class="ev">${html}</span>`); }
+// ---- MESSAGE TRIAGE (user 2026-07-07: "clean up the terminal messages to be less noisy and highlight important") ----
+// three severities keep the terminal for command output + things that matter, and push the running chatter elsewhere:
+//   'log'   routine rewards / minor gains → a FADING CORNER TOAST + the EVENTS log; the terminal stays clean.
+//   'flag'  notable (promotion, customs, contract, artifact) → a HIGHLIGHTED terminal line + toast + EVENTS.
+//   'alert' campaign-scale (a world lost, a hub destroyed) → highlighted terminal + toast + EVENTS + a centered banner.
+// Identical bursts inside NOTIFY_DEDUPE_S collapse (a ×N counter on the toast) so repeated pickups never spam.
+const NTF={ el:null, lastKey:'', lastT:-99, lastToast:null, lastN:1 };
+function _toast(html,color){ let el=NTF.el; if(!el){ el=document.createElement('div'); el.id='toaststack';
+    el.style.cssText='position:fixed;right:14px;bottom:92px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;pointer-events:none;z-index:55;max-width:40vw'; (document.body||document.documentElement).appendChild(el); NTF.el=el; }
+  const t=document.createElement('div'); t._html=html; NTF.lastToast=t; NTF.lastN=1; t.innerHTML=html;
+  t.style.cssText='font:600 12.5px/1.35 ui-monospace,monospace;color:'+(color||'#bfe6d6')+';background:rgba(9,15,25,.86);border-left:3px solid '+(color||'#5fd0a0')+';padding:5px 9px;border-radius:3px;opacity:0;transform:translateX(14px);transition:opacity .25s,transform .25s;text-shadow:0 1px 3px #000;box-shadow:0 2px 10px rgba(0,0,0,.4)';
+  el.appendChild(t); requestAnimationFrame(function(){ t.style.opacity='1'; t.style.transform='none'; });
+  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(14px)'; setTimeout(function(){ t.remove(); }, 420); }, CFG.TOAST_LIFE_S*1000);
+  while(el.children.length>CFG.TOAST_MAX) el.firstChild.remove(); }
+const NLEVEL={ log:{c:'#8fd0b0'}, flag:{c:'#ffd27a'}, alert:{c:'#ff7a8a'} };
+function notify(html, level, bannerColor){
+  level=level||'log'; const L=NLEVEL[level]||NLEVEL.log; const key=level+'|'+html;
+  if(key===NTF.lastKey && (T0-NTF.lastT)<CFG.NOTIFY_DEDUPE_S){                 // identical burst → bump ×N on the live toast, no new lines
+    NTF.lastT=T0; if(NTF.lastToast){ NTF.lastN++; NTF.lastToast.innerHTML=NTF.lastToast._html+' <span style="opacity:.6">×'+NTF.lastN+'</span>'; } return; }
+  NTF.lastKey=key; NTF.lastT=T0;
+  ev(html);                                                                   // the running record, always
+  _toast(html, L.c);                                                          // ephemeral corner feedback for every severity
+  if(level==='log') return;                                                   // routine → toast + events only; terminal stays clean
+  term('<span class="imp lv-'+level+'">'+html+'</span>','');                  // notable/critical → highlighted terminal line
+  if(level==='alert') flashBanner(html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,110), bannerColor||L.c); }
 // ship radio: drop the movement/throttle/no-gas spam; keep meaningful events; only useful lines get a 3D bubble
 const NOISE=/thr \d|throttle|pitch [+\-]|yaw [+\-]|Scanning|coming about|no gas|banking (left|right) to scoop|On .*wing/;
 function say(s,text){ s.lastLine=text; if(NOISE.test(text)) return;
@@ -1352,7 +1383,7 @@ const CONTRA_KEYS=Object.keys(CONTRABAND);
 const RANKS=[ {pts:0,n:'Recruit'},{pts:25,n:'Ranger'},{pts:70,n:'Veteran'},{pts:150,n:'Ace'},{pts:300,n:'Commander'},{pts:550,n:'Legend'} ];
 function rankIdx(sc){ let i=0; for(let k=0;k<RANKS.length;k++) if(sc>=RANKS[k].pts) i=k; return i; }
 function rankOf(sc){ return RANKS[rankIdx(sc)]; }
-function checkRankUp(s){ const i=rankIdx(s.score||0); if(s.rankShown==null){ s.rankShown=i; return; } if(i>s.rankShown){ s.rankShown=i; if(s.role==='player'){ term(`★ PROMOTED to ${RANKS[i].n} (rank ${i+1}/${RANKS.length}).`,'sys'); ev(`You made ${RANKS[i].n}.`);} else say(s,`Promoted — ${RANKS[i].n}.`); } }
+function checkRankUp(s){ const i=rankIdx(s.score||0); if(s.rankShown==null){ s.rankShown=i; return; } if(i>s.rankShown){ s.rankShown=i; if(s.role==='player'){ notify(`★ PROMOTED to ${RANKS[i].n} (rank ${i+1}/${RANKS.length}).`,'flag'); if(window.SOUND) SOUND.play('levelup'); } else say(s,`Promoted — ${RANKS[i].n}.`); } }
 function equipCost(s,k){ return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip&&s.equip[k])||0)); }
 // AC1 (Round 10): live bench numbers. bench_results.json is BAKED by `node run_all.js --json` — the game only READS it,
 // so every badge below is a real suite number, never hand-typed. If the fetch fails (file://, offline, not yet deployed)
