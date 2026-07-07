@@ -356,6 +356,23 @@ function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
   for(const [pat,file] of TEX_MAP) if(u.includes(pat)) return ASSET_CFG.DIR+file;
   if(/\.(tif|tga|psd|bmp)$/.test(u)) return PIXEL_URI;                          // unmapped Unity refs → 1px, never 404
   return url; }
+// BUG FIX (user report "player ship appears black"): the old Unity FBX files never had their textures actually
+// EMBEDDED — Unity assigns materials via separate .mat files outside the mesh, so FBXLoader hands back a
+// MeshPhongMaterial whose `map` slot is a Texture object with NO `.image` ever resolved. A material that
+// declares a map but never uploads one samples pure black in the shader — hence the silhouette rendering solid
+// black regardless of the URL-modifier above (confirmed: zero PNG fetches ever fired for the ship materials).
+// Fix: load OUR OWN textures directly and force-assign them after the FBX loads, instead of trusting its baked
+// material. flipY=false matches how three.js's own FBXLoader treats FBX-sourced UVs.
+const SHIP_TEX_LOADER=new T.TextureLoader();
+function shipTex(file){ const t=SHIP_TEX_LOADER.load(ASSET_CFG.DIR+file); t.flipY=false; t.encoding=T.sRGBEncoding; t.wrapS=t.wrapT=T.RepeatWrapping; return t; }
+const SHIP_TEX={ player:shipTex('playerShip_dff.png'), playerNrm:shipTex('playerShip_nrm.png'),
+  enemyRed:shipTex('enemyShip_red_dff.png'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png') };
+function fixShipMaterial(o, map, nrm, tintHex){
+  const ms=Array.isArray(o.material)?o.material:[o.material];
+  for(let i=0;i<ms.length;i++){ const m=ms[i]=ms[i].clone();
+    m.map=map; if(nrm && 'normalMap' in m) m.normalMap=nrm; m.color.set(0xffffff); if(tintHex!=null) m.color.lerp(new T.Color(tintHex),0.35);
+    if('emissive' in m) m.emissive=new T.Color(tintHex!=null?tintHex:0x000000).multiplyScalar(tintHex!=null?0.22:0);
+    m.needsUpdate=true; if(Array.isArray(o.material)) o.material[i]=m; else o.material=m; } }
 function normalizeModel(grp,targetLen){ const box=new T.Box3().setFromObject(grp), size=box.getSize(new T.Vector3()), c=box.getCenter(new T.Vector3());
   const len=Math.max(size.x,size.y,size.z)||1, k=targetLen/len;
   const inner=new T.Group(); inner.add(grp); grp.position.sub(c);              // recenter…
@@ -384,10 +401,11 @@ function shipModelKey(s){ if(s.team==='pirate') return 'enemy'; if(s.role==='tra
 function applyShipModel(s){ const key=shipModelKey(s), base=ASSETS.ships[key]; if(!base||!s.mesh) return false;
   const grp=base.clone(true);                                                  // clone shares geometry; clone materials only where tinted
   if(s.team==='pirate'){ const HT=HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)];
-    const tint=(m)=>{ m=m.clone(); if(m.color) m.color.lerp(new T.Color(HT.col),0.35); if('emissive' in m) m.emissive=new T.Color(HT.col).multiplyScalar(0.22); return m; };
-    grp.traverse(o=>{ if(o.isMesh) o.material=Array.isArray(o.material)?o.material.map(tint):tint(o.material); });   // FBX meshes can carry material ARRAYS
+    const rMap=(s.id%2===0)?SHIP_TEX.enemyRed:SHIP_TEX.enemyPurple;             // alternate skins for visual variety across the Synod fleet
+    grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, rMap, SHIP_TEX.enemyNrm, HT.col); });
     grp.scale.setScalar(HT.scale); }
-  else if(s.hullClass && ASSET_CFG.VIS_SCALE[s.hullClass]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[s.hullClass]);
+  else{ grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, SHIP_TEX.player, SHIP_TEX.playerNrm, s.role==='trader'?0x9fb0c0:null); });   // traders: a cool grey wash on the same good texture (their own bundled skin was a broken 32x32)
+    if(s.hullClass && ASSET_CFG.VIS_SCALE[s.hullClass]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[s.hullClass]); }
   const eng=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:new T.Color().setHSL(s.hue,0.9,0.62),blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
   eng.scale.set(1.7,1.7,1); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;   // step() dereferences userData.eng UNGUARDED — always present
   grp.position.copy(s.pos); grp.quaternion.copy(s.quat); grp.visible=s.mesh.visible;
@@ -1150,7 +1168,7 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
   dropCargo(s);                                                     // spill the hold as salvage pods
   spawnGem(_v2.copy(s.pos).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))), CFG.SCRAP_GEM);   // ALWAYS drop some loot
   dropCredits(s.pos, s.credits); s.credits=0;                        // DEATH DROPS ALL YOUR MONEY — a persistent stash for the next ship
-  if(window.SOUND) SOUND.play('explode');
+  if(window.SOUND) SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'});
   burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); say(s,'Hull breach! Punching out.');
   if(s.team==='pirate' && rand(0,1) < CFG.ART_DROP_BASE+(s.tier||0)*CFG.ART_DROP_PER_TIER) spawnArtifactDrop(s.pos, ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]);   // M6: Hegemon wrecks drop artifacts
   if(s.role==='defender'||s.role==='pirate') s.despawn=true;        // defenders/pirates don't respawn; they're removed
@@ -1167,6 +1185,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
       if(killer.team==='squad'){ const np=nearestPlanet(victim.pos); if(np) repAdd(np,CFG.REP_KILL_HEG); if(killer.role==='player') contractKill(); } }   // M2 standing + M4 bounty
     else say(killer,`Splashed ${victim.name}!`); } }
 function destroyAsteroid(i,owner){ const a=asteroids[i]; if(owner) owner.score+=a.level;
+  if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
   if(a.scale>=CFG.AST_NOSPLIT && asteroids.length<CFG.AST_MAX){ const n=randi(CFG.AST_SPLIT_MIN,CFG.AST_SPLIT_MAX),cs=a.scale*CFG.AST_CHILD_FRAC;
     for(let k=0;k<n;k++){ const dir=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.AST_SPLIT_KICK*rand(0.6,1.2)).add(a.vel);

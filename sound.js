@@ -37,7 +37,11 @@
     COMPRESS_THRESH: -10,     // dB
     COMPRESS_RATIO: 12,       // :1
     COMPRESS_ATTACK: 0.003,   // s
-    COMPRESS_RELEASE: 0.25    // s
+    COMPRESS_RELEASE: 0.25,   // s
+    SAMPLE_DIR: 'assets/',    // real Starfighter2 Unity audio (user 2026-07-07: "annoying, use the sounds from the
+                              // spacefighter unity game as PRIMARY... fallback is generated") — decoded once, played
+    SAMPLE_GAIN: 0.55,        // real samples were mixed louder than the FM bank's headroom; scale to match
+    SAMPLE_RATE_JITTER: 0.06  // +/- playbackRate randomization so rapid-fire samples don't phase-cancel into a buzz
   };
 
   // ---- tiny storage shim (works in node where localStorage is absent) ---
@@ -98,6 +102,48 @@
     noiseBuf = buf;
   }
 
+  // ---- REAL SAMPLES (primary) with the FM bank as fallback --------------
+  // Starfighter2's own Unity audio (weapon_player/weapon_enemy/explosion_*) decoded once into AudioBuffers via
+  // the SAME context (so they share master volume/mute/compressor with the FM voices). A sample that hasn't
+  // finished loading yet (or 404s / decode-fails, e.g. running from file:// or node) silently falls through to
+  // its FM twin below — the game must never depend on these files existing.
+  var SAMPLE_FILES = {
+    weapon_player: 'weapon_player.wav', weapon_enemy: 'weapon_enemy.wav',
+    explosion_player: 'explosion_player.wav', explosion_enemy: 'explosion_enemy.wav', explosion_asteroid: 'explosion_asteroid.wav'
+  };
+  var samples = {};        // key -> AudioBuffer once decoded (absent/undefined = not ready or failed)
+  var samplesLoading = false;
+  function loadSamples() {
+    if (samplesLoading || !ctx || typeof fetch === 'undefined') return;
+    samplesLoading = true;
+    for (var key in SAMPLE_FILES) (function (key, file) {
+      try {
+        // fetch() on a relative URL can throw SYNCHRONOUSLY outside a browser document (e.g. Node's own fetch,
+        // reached here because init() is also exercised by the node self-test) — this must never escape and
+        // disable init()'s caller; sample loading is best-effort, the FM bank is the always-safe fallback.
+        fetch(CFG.SAMPLE_DIR + file).then(function (r) { return r.ok ? r.arrayBuffer() : null; })
+          .then(function (buf) { return buf ? ctx.decodeAudioData(buf) : null; })
+          .then(function (decoded) { if (decoded) samples[key] = decoded; })
+          .catch(function () { /* offline / blocked / no decodeAudioData (node self-test) — FM fallback covers it */ });
+      } catch (e) { /* synchronous fetch() rejection (invalid/relative URL outside a document) — non-fatal */ }
+    })(key, SAMPLE_FILES[key]);
+  }
+  // Play a decoded sample through the master bus; returns true if it actually played (so callers know NOT to
+  // also fire the FM fallback). A small random playbackRate keeps rapid-fire shots from lining up into a buzz.
+  function playSample(key, extraVol) {
+    var buf = samples[key]; if (!buf || !ctx || !master) return false;
+    if (voices >= CFG.MAX_VOICES) return true;                 // still "handled" — don't double up with FM
+    try {
+      var src = ctx.createBufferSource(); src.buffer = buf;
+      src.playbackRate.value = 1 + (Math.random() * 2 - 1) * CFG.SAMPLE_RATE_JITTER;
+      var g = ctx.createGain(); g.gain.value = CFG.SAMPLE_GAIN * (extraVol != null ? extraVol : 1);
+      src.connect(g); g.connect(master);
+      voices++; src.onended = function () { voices = Math.max(0, voices - 1); };
+      src.start(now());
+      return true;
+    } catch (e) { return false; }
+  }
+
   // Lazily create the AudioContext + master chain. Safe to call repeatedly.
   function init() {
     if (ctx) { resume(); return ctx; }
@@ -122,6 +168,7 @@
         master.connect(ctx.destination);
       }
       buildNoise();
+      loadSamples();
     } catch (e) {
       initFailed = true; ctx = null; master = null;
       return null;
@@ -262,8 +309,11 @@
   // (or a small sequence).  Tuned by ear for an 8-bit arcade feel.
   // ---------------------------------------------------------------------
   var BANK = {
-    // Laser: short square blip that sweeps UP fast with light FM shimmer.
+    // Laser: the REAL Starfighter2 weapon sample (user: "the FM laser is annoying"), player/enemy variants;
+    // the old FM square-wave blip only fires as a fallback if the sample hasn't decoded yet (or 404s).
     shoot: function (opt) {
+      var key = (opt.variant === 'enemy') ? 'weapon_enemy' : 'weapon_player';
+      if (playSample(key, opt.vol)) return;
       voice({ wave: 'square', freq: 760, f2: 1500, mWave: 'square', mRatio: 1.5, mDepth: 240, mDepthEnd: 0,
               a: 0.004, d: 0.02, r: 0.06, dur: 0.11, gain: 0.34 }, opt.vol, opt.when);
     },
@@ -273,8 +323,11 @@
               a: 0.003, d: 0.06, r: 0.07, dur: 0.16, gain: 0.4, lp: 1200, lpEnd: 340 }, opt.vol, opt.when);
       voice({ type: 'noise', a: 0.002, d: 0.04, r: 0.05, dur: 0.1, gain: 0.16, lp: 900, lpEnd: 200 }, opt.vol, opt.when);
     },
-    // Explosion: filtered noise burst + a downward FM sweep tail.
+    // Explosion: the REAL Starfighter2 sample (player/enemy/asteroid variants pick the right recording); the
+    // FM noise-burst + downward sweep is the fallback for whichever variant hasn't decoded yet.
     explode: function (opt) {
+      var key = opt.variant === 'player' ? 'explosion_player' : opt.variant === 'asteroid' ? 'explosion_asteroid' : 'explosion_enemy';
+      if (playSample(key, opt.vol)) return;
       voice({ type: 'noise', a: 0.004, d: 0.18, r: 0.4, dur: 0.62, gain: 0.5, lp: 2600, lpEnd: 120 }, opt.vol, opt.when);
       voice({ wave: 'sawtooth', freq: 340, f2: 46, mWave: 'square', mRatio: 0.5, mDepth: 200, mDepthEnd: 10,
               a: 0.005, d: 0.12, r: 0.3, dur: 0.6, gain: 0.32, lp: 1400, lpEnd: 200 }, opt.vol, opt.when);
