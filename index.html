@@ -1521,11 +1521,15 @@ const ARTIFACTS={
 const ARTIFACT_KEYS=Object.keys(ARTIFACTS);
 // M9: SHIP HULL CLASSES — swap chassis at the Ranger Base, trading hull ↔ cargo ↔ speed.
 const HULLS={   // balance law: hull space is EXPENSIVE (big hold = thin armor + higher price) and BIGGER = SLOWER
-  scout:    {n:'Scout',     hp:70,  hold:12, speed:1.35, cost:0,   desc:'fast · fragile · tiny hold'},
-  fighter:  {n:'Fighter',   hp:100, hold:40, speed:1.0,  cost:0,   desc:'balanced all-rounder (default)'},
-  freighter:{n:'Freighter', hp:85,  hold:95, speed:0.55, cost:640, desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)'},
-  cruiser:  {n:'Cruiser',   hp:210, hold:18, speed:0.62, cost:820, desc:'heavy armor · slowest hull · cramped hold'} };
-const HULL_ORDER=['scout','fighter','freighter','cruiser'];
+  // 2026-07-07: rounded out to all 6 classes hullmodels.js already sculpts (was missing interceptor/dreadnought) —
+  // the Space-Rangers-style loadout screen needs a real progression, not just 4 stops.
+  scout:      {n:'Scout',       hp:70,  hold:12, speed:1.35, cost:0,    desc:'fast · fragile · tiny hold'},
+  fighter:    {n:'Fighter',     hp:100, hold:40, speed:1.0,  cost:0,    desc:'balanced all-rounder (default)'},
+  interceptor:{n:'Interceptor', hp:130, hold:28, speed:1.12, cost:520,  desc:'strike cruiser · more bite than a Fighter, still nimble'},
+  freighter:  {n:'Freighter',   hp:85,  hold:95, speed:0.55, cost:640,  desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)'},
+  cruiser:    {n:'Cruiser',     hp:210, hold:18, speed:0.62, cost:820,  desc:'heavy armor · slowest hull · cramped hold'},
+  dreadnought:{n:'Dreadnought', hp:340, hold:30, speed:0.42, cost:1450, desc:'flagship-grade armor · glacial · the strongest hull in the fleet'} };
+const HULL_ORDER=['scout','fighter','interceptor','freighter','cruiser','dreadnought'];
 // M10: CONTRABAND — illegal goods; buy cheap at the base black market, sell dear at HOSTILE worlds; scan risk at coalition docks.
 const CONTRABAND={ relics:{n:'Alien Relics',base:120}, narcotics:{n:'Spice',base:90}, arms:{n:'Black-market Arms',base:150} };
 const CONTRA_KEYS=Object.keys(CONTRABAND);
@@ -2896,7 +2900,7 @@ function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,
 makePlanets();
 makeBase();   // M8: the Ranger Command hub
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
-(function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=320; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull
+(function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=500; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull; 500c (was 320 — user: "free units to spare" for testing hulls/gear
 INH.awaken();   // I1/I2/I8: the Inhabitant wakes — deterministic (first alive non-player squad ship); restores INH_STATE_v1 if present
 passengerInit();   // 🜏 the Passenger wakes in YOU — registry+telemetry+speech wired; first boot shows the awakening
 // 🜁 the shared, PERSISTENT knowledge store — one for all pilots; survives page reloads + sim resets (localStorage);
