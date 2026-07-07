@@ -1422,21 +1422,38 @@ function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.
   const threats=ships.filter(x=>x.alive&&x!==P&&x.team==='pirate'&&x.pos.distanceTo(P.pos)<=P.senseR)
     .map(x=>({name:x.name, dist:P.pos.distanceTo(x.pos), wpn:(x.lvl&&x.lvl.weapon)||1})).sort((a,b)=>a.dist-b.dist);
   const npNear=nearestPlanet(P.pos);
+  const pw=shipPower(P);
   return { hull:Math.round(P.hp), maxHull:Math.round(P.maxHp), fuel:Math.round(P.fuel), maxFuel:P.fuelCap,
     credits:P.credits, place:np?np.name:null, docked:!!P.docked, weaponLvl:(P.lvl&&P.lvl.weapon)||1,
     cargoCount:cargoTotal(P), holdCap:P.holdCap,
     near:ships.filter(x=>x.alive&&x!==P&&x.pos.distanceTo(P.pos)<=P.senseR).map(x=>x.name).slice(0,8),
     threats, nearestPlanet: npNear?{name:npNear.name, dist:P.pos.distanceTo(npNear.pos)}:null,
     nearestBase: (typeof base!=='undefined'&&base)?{name:base.name, dist:P.pos.distanceTo(base.pos)}:null,
-    cargo:Object.keys(P.cargo||{}).filter(k=>P.cargo[k]>0).map(k=>`${GKEY[k].n} ${P.cargo[k]}`) }; }
+    cargo:Object.keys(P.cargo||{}).filter(k=>P.cargo[k]>0).map(k=>`${GKEY[k].n} ${P.cargo[k]}`),
+    // X-WING POWER (user 2026-07-07): "the parasite is like R2D2, it will try to reroute power if it feels you need it"
+    power:{weapons:Math.round(pw.weapons),engines:Math.round(pw.engines),shields:Math.round(pw.shields)},
+    shieldPct:Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100) }; }
 // 🜏 THE WORM ADVISES — unprompted, rate-capped: it watches your telemetry and tells you the single most important
 // thing to do, in the PARASITE tab (aloud too if voices on). Speaks only when the advice CHANGES or an urgent
 // threat appears + a cooldown has passed — guidance, not nagging.
 let _advClock=0, _advLastKey=null, _advLastT=-1e9;
+let _pwrLastSys=null, _pwrLastT=-1e9;
+function passengerPowerTick(t){   // R2D2 MOMENT (user 2026-07-07): the parasite TRIES to help — reroutes power itself, then tells you why
+  if(!window.PASSENGER||!PASSENGER.powerAdvice) return;
+  const p=PASSENGER.powerAdvice(t); if(!p) return;
+  const now=(typeof T0!=='undefined')?T0:0, cooldown=p.urgency>=2?6:(p.urgency>=1?14:26);
+  if(p.sys===_pwrLastSys && (now-_pwrLastT)<cooldown) return;            // don't nag with the same reroute over and over
+  _pwrLastSys=p.sys; _pwrLastT=now;
+  const P=ships[0]; if(P) setPower(P, p.sys, p.target);                  // the ACTUAL reroute — not just talk
+  const col = p.urgency>=2?'#ff9a9a':(p.urgency>=1?'#ffcf8a':'#7fd0ff');
+  paraLine('worm', `<span style="color:${col}">⚡ ${String(p.reason).replace(/</g,'&lt;')}</span>`);
+  if(window.CHATTER && CHATTER.voiceOn && CHATTER.voiceOn() && CHATTER.speakAloud) CHATTER.speakAloud('PASSENGER', p.reason);
+  if(window.SOUND) SOUND.play(p.urgency>=2?'alarm':'thought'); }
 function passengerAdviseTick(dt){
   if(!window.PASSENGER||!PASSENGER.adviceOn||!PASSENGER.adviceOn()) return;
   _advClock+=dt||0; if(_advClock<3) return; _advClock=0;                 // assess ~every 3s
-  const a=PASSENGER.advise(passengerTelemetry()); if(!a) return;
+  const t0=passengerTelemetry(); passengerPowerTick(t0);                 // R2D2: try to help with power BEFORE the spoken-advice gate below (its own cooldown/urgency, independent of the advice text cadence)
+  const a=PASSENGER.advise(t0); if(!a) return;
   const now=(typeof T0!=='undefined')?T0:0;
   const cooldown = a.urgency>=2? 8 : (a.urgency>=1? 16 : 30);            // urgent threats repeat sooner
   if(a.key===_advLastKey && (now-_advLastT)<cooldown*3) return;         // don't repeat the same advice too often

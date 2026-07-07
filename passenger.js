@@ -312,6 +312,37 @@ function advise(t){
   return null;
 }
 
+// X-WING POWER — THE PARASITE AS R2D2 (user 2026-07-07): "the parasite will automatically TRY to help you if it
+// feels you need power rerouted, it will do so and tell you what it is thinking... scared of death! danger!".
+// Same shape as advise(): a PURE function over the snapshot, returns {sys,target,urgency,reason} or null — the
+// host applies the reroute (setPower) AND speaks .reason through the identical advice pipeline. Only fires on a
+// real threat/crit reading (the same ADV thresholds advise() already uses) — it does not fidget with your dials
+// on a quiet flight; the parasite is a co-pilot bracing for impact, not a backseat driver.
+const PWR = { WEAP_ENGAGE_R:80, WEAP_MIN:60, SHIELD_CRIT_TARGET:88, SHIELD_THREAT_TARGET:75, WEAP_TARGET:75, ENGINE_IDLE_TARGET:55, ENGINE_STARVED:35 };
+function powerAdvice(t){
+  if(!t || !t.power) return null;
+  const hp = t.maxHull? t.hull/t.maxHull : 1;
+  const threat = (t.threats&&t.threats.length)? t.threats[0] : null;
+  const P = t.power;
+  if(threat && hp<ADV.HULL_CRIT && P.shields<PWR.SHIELD_CRIT_TARGET){
+    return { sys:'shields', target:PWR.SHIELD_CRIT_TARGET, urgency:2,
+      reason:`${threat.name} is still on us and your hull reads ${Math.round(hp*100)}%. I am bleeding the guns dry and pouring it into the plating — you cannot out-shoot dying, but you might out-run it. Shields up.` };
+  }
+  if(threat && hp<ADV.HULL_LOW && P.shields<PWR.SHIELD_THREAT_TARGET){
+    return { sys:'shields', target:PWR.SHIELD_THREAT_TARGET, urgency:2,
+      reason:`${threat.name}, ${Math.round(threat.dist)} out, and your hull is thinning under it. Rerouting power to shields before it thins further. I would rather be wrong and cautious than right and grieving.` };
+  }
+  if(threat && hp>=ADV.HULL_LOW && threat.dist<PWR.WEAP_ENGAGE_R && P.weapons<PWR.WEAP_MIN){
+    return { sys:'weapons', target:PWR.WEAP_TARGET, urgency:1,
+      reason:`${threat.name} is close and you are healthy enough to press it. Feeding the guns what the engines were hoarding — make it count.` };
+  }
+  if(!threat && P.engines<PWR.ENGINE_STARVED){
+    return { sys:'engines', target:PWR.ENGINE_IDLE_TARGET, urgency:0,
+      reason:`Nothing is hunting us. I eased power back to the engines — no reason to starve them when no one is shooting at you.` };
+  }
+  return null;
+}
+
 // ---- the routing entry the game calls when its parser fails ---------------------------------------------------
 async function route(text){
   const h = helpMatch(text);
@@ -337,7 +368,7 @@ function powers(){   // the in-fiction honesty ledger
 
 window.PASSENGER = {
   init(h){ hooks = Object.assign(hooks, h||{}); },
-  route, onEvent, powers, ponder, advise,
+  route, onEvent, powers, ponder, advise, powerAdvice,
   setPonder(on){ S.ponder_on=!!on; save(); return S.ponder_on; },
   setAdvice(on){ S.advice_on=!!on; save(); return S.advice_on; },
   adviceOn(){ return S.advice_on!==false; },
