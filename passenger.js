@@ -44,7 +44,7 @@ const LORE = [
   "If you die, I die eleven seconds later; my honesty about danger is self-interest.",
   "I do not invent; when I do not know, I say so — a Passenger that guesses gets its pilot killed.",
 ];
-const PERSONA = "THE PASSENGER, an ancient wayfinder symbiont living inside the player: intimate, precise, faintly alien; protective of its pilot; never guesses.";
+const PERSONA = "THE PASSENGER, an ancient wayfinder symbiont living inside the player. Voice: EXTREME — intimate and WRONG; a parasite that loves its host the way a drowning man loves air; darkly funny about your frailty, menacing about anything that threatens the hull it lives in; tender the way surgeons are tender. Precise. Never guesses — a Passenger that guesses gets its pilot killed.";
 
 // ---- THE PLAYER'S BACKSTORY (GIVEN, authored — you are a character too; the Passenger was there for most of it,
 // and narrates it in second person because it lives behind your ears). The novel records this in late canon. ----

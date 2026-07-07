@@ -51,7 +51,18 @@ var TAMI_SPEAK=(()=>{ const BASE='http://localhost:7876'; let alive=false, info=
 function lorePersona(s){ const P=(((LOREDATA||{}).pilots)||{})[s.name]||{}, ch=NOVEL_ROSTER&&NOVEL_ROSTER.byName[s.name];
   const first=(P.bio&&P.bio[0])||(s.backstory?s.backstory+'.':'A starfighter pilot.');   // roster ships carry temperament as backstory (novelShipHook)
   const fac=(ch&&ch.faction==='traders')?'Free Trader':(s.team==='pirate'?'Iron Synod':'Coalition Warden');
-  return `${s.name}, ${fac} pilot. ${first}`; }
+  return `${s.name}, ${fac} pilot. ${first} ${loreExtremity(s,ch)}`; }
+// EXTREME register (user 2026-07-06: "characters should be extreme — funny, creepy, menacing"): a voice DIRECTIVE
+// derived from the character's own canon temperament. It shapes TONE only — the grounding guard is unchanged, so
+// the theatrics can never invent facts, only style them.
+function loreExtremity(s,ch){ const t=((ch&&ch.temperament)||s.backstory||'').toLowerCase();
+  if(/executioner|blockade|tribunal|raider|mine layer|counts the tithed|unforgiven/.test(t))
+    return 'Voice: MENACING and extreme — velvet threat, patient as a closing airlock; you enjoy letting silence do the last word.';
+  if(/priest|witch|superstitious|unsleeping|half machine|chaplain|reads ruin|no records/.test(t))
+    return 'Voice: CREEPY and extreme — you speak like an omen, tender about terrible things; you notice what should not be noticeable.';
+  if(/card cheat|poet|cocky|sardonic|racer|salvage broker|counts everything|news-runner/.test(t))
+    return 'Voice: DARKLY FUNNY and extreme — fast, wicked, one eyebrow permanently raised; jokes with teeth in them.';
+  return 'Voice: EXTREME and theatrical — heightened, unforgettable, never bland; every line costs somebody something.'; }
 // GROUNDING POST-CHECK: every Capitalized token in the LLM reply must already exist in the supplied facts ∪ the
 // pilot's indexed corpus (bio + own factions + worlds, which carries all PILOTS/faction/world names via idx.ents).
 // A new named entity = fabrication -> the reply is DISCARDED and the verbatim composer takes the turn.

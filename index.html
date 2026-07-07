@@ -118,6 +118,7 @@
 <script src="speech_tier.js"></script>
 <script src="inhabitant.js"></script>
 <script src="passenger.js"></script>
+<script src="gamemod.js"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -798,7 +799,7 @@ function think(s,dt){
         else { s.docked=p; s.obj=null; contractDeliver(p);
           if(s.role==='player' && p.rep>CFG.REP_HOSTILE && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
           term(`Docked at ${p.name}${p.rep>=CFG.REP_ALLIED?' (ALLIED — best prices)':''}. (market · buy · sell · refuel · outfit · upgrade · terraform · contracts · <b>land</b> to walk the surface)`,'sys'); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
-          if(s.role==='player'){ marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } if(window.PASSENGER) PASSENGER.onEvent('docked'); }   // auto-open the market on docking (discoverable on phone)
+          if(s.role==='player'){ marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } }   // auto-open the market on docking (discoverable on phone)
         } }
       else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }
     else if(o.type==='hunt'){ if(o.target&&o.target.alive){ mode='HUNT'; target=o.target; aimDir=_v.copy(o.target.pos).sub(s.pos); } else { s.obj=null; term('Target down / lost.','sys'); } }
@@ -948,7 +949,7 @@ function step(dt){
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
         s.hp-=dmg; noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors — bullets outrange senseR, so a shot from the dark is src 'unknown'
-        if(s.role==='player'&&window.PASSENGER) PASSENGER.onEvent('damaged');   // the symbiont feels every hit you take
+        if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
             if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors)
@@ -998,6 +999,7 @@ function step(dt){
   rwCd-=dt; if(rwCd<=0){ rwCd=CFG.RAY_ADAPT_CD; if(CFG.RAY_LEARN) adaptRayWeights(); }   // A9: adapt learned ray-weights
   encounterTick(dt);   // M11: derelicts / caches / distress + galaxy news
   INH.tick(dt);   // I8 skeleton: the Inhabitant senses + remembers on its OWN cadence (INH_TICK), never prodded
+  if(window.GAMEMOD) GAMEMOD.tick(dt);   // 🜏 self-modification: rules fire, pilots take mutation turns, watchdog watches
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
@@ -1012,7 +1014,7 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
 }
 // killed by another pilot -> victim's credits scatter as bounty gems; killer earns score
 function killByShip(victim,killer){ const bounty=victim.credits; victim.credits=0; const wasPirate=victim.team==='pirate';
-  if(window.PASSENGER&&ships[0]&&ships[0].alive&&victim.pos.distanceTo(ships[0].pos)<=ships[0].senseR) PASSENGER.onEvent('kill_seen');   // the symbiont witnesses only what YOUR sensors touch
+  if(window.PASSENGER&&ships[0]&&ships[0].alive&&victim.pos.distanceTo(ships[0].pos)<=ships[0].senseR){ PASSENGER.onEvent('kill_seen'); if(window.GAMEMOD) GAMEMOD.emit('kill_seen'); }   // the symbiont witnesses only what YOUR sensors touch
   const n=clamp(Math.round(bounty/6),wasPirate?2:0,5); for(let k=0;k<n;k++) spawnGem(victim.pos.clone().add(new T.Vector3(rand(-4,4),rand(-4,4),rand(-4,4))),rand(3,5));
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
@@ -1179,7 +1181,26 @@ async function parasiteRoute(text){
   if(activeTab!=='parasite'){ activeTab='parasite'; UNREAD.parasite=0; buildTabs(); } renderLog();
   if(paraBusy){ paraLine('worm','One thought at a time. Finish asking me the last thing.'); return; }
   paraBusy=true;
-  try{ const r=await PASSENGER.route(text); paraLine('worm', String(r.reply||'…').replace(/</g,'&lt;')); }
+  try{
+    // THE PEN: an imperative goes to the mutation API first — the worm ATTEMPTS whatever you speak to it
+    const m=(window.GAMEMOD)?GAMEMOD.intent(text,'PASSENGER'):null;
+    if(m){ if(m.ok){ paraLine('worm', String(m.narr).replace(/</g,'&lt;')); paraBusy=false; return; }
+      // recognized as an order but unmapped: if the LLM is awake, let it write a CONSTRAINED program (validated, never blind-eval'd)
+      if(TAMI_SPEAK.alive){
+        try{ const j=await TAMI_SPEAK.speak({ pilot:'PASSENGER', persona:'You translate a pilot\'s wish into ONE JSON program for the ship-mod API. Output ONLY JSON, no prose.',
+          facts:[ 'API: {"kind":"set","path":"CFG.<KEY>","value":<number>} — numeric tunables. Valid keys: '+GAMEMOD.tunables().slice(0,40).join(', '),
+                  'API: {"kind":"rule","spec":{"when":"tick|kill_seen|docked|trade|damaged","then":[{"action":"say","text":"..."}]}}',
+                  'API: {"kind":"js","code":"G.set(path,value); G.tint(0,\'#hex\'); G.say(text)"} — small scripts only' ],
+          history:[], question:'Wish: '+text+' — reply with ONE json object.' });
+          const prog=j&&j.reply?JSON.parse(String(j.reply).replace(/^[^{]*/,'').replace(/[^}]*$/,'')):null;
+          const res=GAMEMOD.runProgram(prog,'PASSENGER(llm)');
+          paraLine('worm', res&&res.ok?'It is done. I wrote it into the ship myself. Check the mods ledger if you doubt me.':('I tried to write it and the ship refused: '+String((res&&res.why)||'malformed program').replace(/</g,'&lt;')));
+          paraBusy=false; return;
+        }catch(e){ /* fall through to the plain refusal */ }
+      }
+      paraLine('worm', String(m.why).replace(/</g,'&lt;')); paraBusy=false; return; }
+    const r=await PASSENGER.route(text); paraLine('worm', String(r.reply||'…').replace(/</g,'&lt;'));
+  }
   catch(e){ paraLine('worm','Something in me misfired. Say it again.'); console.warn('PASSENGER.route',e); }
   finally{ paraBusy=false; }
 }
@@ -1494,6 +1515,17 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`&nbsp;&nbsp;LEARNED: witnessed ${st.counts.kills_seen} kills · ${st.counts.trades_seen} trades · ${st.counts.docks} dockings · took ${st.counts.damage_taken} hits · answered ${st.counts.asks} of your questions${Object.keys(st.prices).length?` · prices tasted: ${Object.keys(st.prices).map(k=>`${k}≈${st.prices[k]}`).join(', ')}`:''}`,'sys');
     term('&nbsp;&nbsp;'+pw.note+' &nbsp;<span style="opacity:.55">(replay the awakening: <b>intro</b> · talk to it: type anything that is not a command)</span>','sys'); return; }
   if(c==='intro'||c==='awaken'){ if(window.PASSENGER) maybeAwaken(true); return; }
+  if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
+    const L=GAMEMOD.list();
+    term(`<b style="color:#c9a0ff">🜏 ACTIVE MUTATIONS</b> — ${L.length}/${GAMEMOD.MODCFG.MAX_ACTIVE} <span style="opacity:.55">(the AGIs hold the pen; session-local — reload = vanilla; watchdog auto-reverts anything that hurts the frame)</span>`,'sys');
+    if(!L.length) term('&nbsp;&nbsp;none yet — speak an order to the Passenger ("make the bullets faster", "tint my ship violet") or wait: the pilots take mutation turns on their own.','sys');
+    L.forEach(m=>term(`&nbsp;&nbsp;#${m.id} <b>${m.author}</b> [${m.kind}] ${String(m.desc).replace(/</g,'&lt;')}${m.fired?` · fired ${m.fired}×`:''}${m.disabled?' · <span style="color:#ff9a9a">disabled</span>':''}`,'sys'));
+    term('&nbsp;&nbsp;revert &lt;id&gt; · revert all · modlog','sys'); return; }
+  if(c==='revert'){ if(!window.GAMEMOD) return; if((a[1]||'')==='all'){ GAMEMOD.revertAll(); term('all mutations reverted — the ship is as it was written.','sys'); }
+    else { const ok=GAMEMOD.revert(parseInt(a[1])); term(ok?`mutation #${a[1]} reverted.`:'no such mod id (see: mods)', ok?'sys':'err'); } return; }
+  if(c==='modlog'){ if(!window.GAMEMOD) return; const L=GAMEMOD.log().slice(-14);
+    term('<b style="color:#c9a0ff">🜏 MUTATION LOG</b> — what the minds did to the world:','sys');
+    L.forEach(l=>term('&nbsp;&nbsp;'+String(l).replace(/</g,'&lt;'),'sys')); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
@@ -1671,8 +1703,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='mine'){ P.obj={type:'mine'}; term('Mining nearby rocks.','sys'); return; }
   if(c==='trade'){ P.obj={type:'trade'}; term('Auto-trading best routes.','sys'); return; }
   if(c==='attack'||c==='hunt'){ const o=ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith(a[1]||'')); if(!need(o,'no such ship — try: scan')) return; P.obj={type:'hunt',target:o}; term(`Engaging ${o.name}.`,'sys'); return; }
-  if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER) PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
-  if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER) PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
+  if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
+  if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
   if(c==='upgrade'||c==='up'){ if(!need(dockedP,'must be docked')) return; const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return; const cost=upCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.lvl[k]++; if(k==='hull'){P.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(P.lvl.hull-1));P.hp=P.maxHp;} term(`Upgraded ${k} to Lv${P.lvl[k]} (-${cost}c).`,'sys'); return; }
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
