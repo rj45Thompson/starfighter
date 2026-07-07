@@ -223,6 +223,7 @@ const CFG = {
   // A10: de-hardcoded behavioral tunables (were magic numbers baked into decision logic - see AGI_AUDIT F3)
   RAY_SEARCH_MUL:1.3, RAY_FIRE_MUL:1.6, RAY_FLEE_MUL:1.5, HPADV_MAX:3, SIT_SENSE_MUL:0.85, SIT_GEM_MIN:2,
   UPGRADE_HULL_DEATHS:2, WAR_CONTEST_FRAC:0.5, NAV_MIN_SAMPLES:6, TOM_FACE_W:3, CMD_MINE_MUL:1.6,
+  UP_HULLCLASS_MINLVL:3, UP_HULLCLASS_CHANCE:0.08,   // AI hull-CLASS swap (user 2026-07-07 "AI don't upgrade their hulls"): only rolled once hull level is already maxed-feeling; rare per-tick chance so capital-ship progression stays a rare late-game outcome
   // ---- M1: the HEGEMON rises (escalating machine invader + galactic war) ----
   ESC_RATE:0.5, ESC_PER_TIER:40, INVADE_THRESHOLD:3, LIBERATE_GRACE:6, CONTESTED_PROD:0.4,
   WIN_THRESHOLD:6, WAR_DRIFT:0.2, ESC_LIBERATE_CUT:14, WIN_REWARD:400, WIN_ESC_CUT:60,   // M7: war-front tug-of-war + win/lose
@@ -357,7 +358,7 @@ function fighterMesh(hue){
 // =================================================================================================
 const ASSET_CFG={ DIR:'assets/', SHIP_LEN:6.0, SHIP_YAW:Math.PI, ENG_Z:0.46,   // nose→-Z (Unity fwd is +Z), length-normalized; engine glow at the tail
   GEM_SIZE:3.0, AST_UNIT:1.0, TRADER_LEN:6.6, PIRATE_LEN:6.4,
-  VIS_SCALE:{scout:0.8,fighter:1.0,interceptor:1.05,freighter:1.5,cruiser:1.62,dreadnought:1.95} };  // hull-class silhouette scale
+  VIS_SCALE:{scout:0.8,fighter:1.0,interceptor:1.05,freighter:1.5,cruiser:1.62,dreadnought:1.95,capital:2.6} };  // hull-class silhouette scale (2026-07-07: existing 6 already read scout<fighter/interceptor<freighter/cruiser<dreadnought - kept as-is; capital added noticeably larger than dreadnought)
 const ASSETS={ ready:false, ships:{}, astGeos:[], gemGeos:[] };
 const TEX_MAP=[ ['playership_orange_dff','playerShip_dff.png'], ['playership_orange_nrm','playerShip_nrm.png'],
   ['enemyship_red_dff','enemyShip_red_dff.png'], ['enemyship_purple_dff','enemyShip_purple_dff.png'],
@@ -616,11 +617,39 @@ function scanBust(s,p){ let val=0; for(const k in s.contraband) val+=CONTRABAND[
   s.contraband={}; s.credits=Math.max(0,s.credits-fine); repAdd(p,-CFG.REP_BOMB*2); notify(`⚠ CUSTOMS SCAN at ${p.name} - contraband seized, fined ${fine}c, standing dropped.`,'flag'); }
 // M11: RANDOM ENCOUNTERS (derelict/cache/distress) + galaxy NEWS events that shock the (organic) economy
 const encounters=[]; let encounterCd=8, newsCd=16;
+// derelict = a dead ship hulk, not a rock: a scorched, lopsided wreck welded from a few boxes/wedges so it
+// reads as "something blew a chunk out of this" rather than a clean primitive. Dark charcoal hull + the
+// game's existing scorch/impact orange (0xff9a52, see burst() calls above) picking out the torn edges.
+function derelictHulkMesh(){
+  const grp=new T.Group();
+  const hullCol=0x2b2e33, hullColB=0x24262a, scorchCol=0xff9a52, rustCol=0x8a5a3a;
+  const hullMat=(c)=>new T.MeshStandardMaterial({color:c,emissive:0x0a0806,roughness:0.9,metalness:0.35,flatShading:true});
+  // main body: two unequal-length tapered boxes offset from each other so the hull reads bent/asymmetric,
+  // not a single clean box - like the midsection buckled.
+  const fore=new T.Mesh(new T.BoxGeometry(1.7,1.35,2.6), hullMat(hullCol)); fore.position.set(0.15,0.05,-0.7); fore.rotation.z=0.09; grp.add(fore);
+  const aft=new T.Mesh(new T.BoxGeometry(1.3,1.05,2.0), hullMat(hullColB)); aft.position.set(-0.2,-0.1,1.5); aft.rotation.z=-0.14; aft.rotation.y=0.1; grp.add(aft);
+  // angled nose wedge, canted off-axis (looks torn/knocked crooked rather than a symmetric prow)
+  const nose=new T.Mesh(new T.ConeGeometry(0.95,1.8,4), hullMat(hullCol)); nose.position.set(0.05,0.15,-2.15); nose.rotation.x=-Math.PI/2; nose.rotation.z=0.5; grp.add(nose);
+  // a chunk blown out of one flank: an inverted dark wedge biting into the fore hull, rimmed with scorch below
+  const wound=new T.Mesh(new T.ConeGeometry(0.7,1.0,3), hullMat(0x17181a)); wound.position.set(0.9,0.35,-0.9); wound.rotation.z=Math.PI*0.6; wound.rotation.x=0.4; grp.add(wound);
+  const scorchRing=new T.Mesh(new T.TorusGeometry(0.55,0.11,6,10), new T.MeshStandardMaterial({color:scorchCol,emissive:scorchCol,emissiveIntensity:0.85,roughness:0.6,metalness:0.1}));
+  scorchRing.position.copy(wound.position); scorchRing.rotation.set(0.3,0.6,0.2); grp.add(scorchRing);
+  // greebles: a couple of small broken antenna/strut stubs and a snapped engine nub, jutting at odd angles
+  const strutMat=hullMat(rustCol);
+  const strut1=new T.Mesh(new T.BoxGeometry(0.12,0.12,0.9), strutMat); strut1.position.set(-0.75,0.55,-0.2); strut1.rotation.set(0.6,0.3,0.9); grp.add(strut1);
+  const strut2=new T.Mesh(new T.BoxGeometry(0.16,0.16,0.6), strutMat); strut2.position.set(0.55,-0.6,0.6); strut2.rotation.set(-0.4,0.8,0.2); grp.add(strut2);
+  const engineNub=new T.Mesh(new T.CylinderGeometry(0.4,0.5,0.7,8), hullMat(hullColB)); engineNub.position.set(-0.15,-0.05,2.6); engineNub.rotation.x=Math.PI/2; grp.add(engineNub);
+  // dying engine flicker: a dim guttering glow instead of the game's usual bright thruster sprite
+  const emberMat=new T.SpriteMaterial({map:GLOW,color:scorchCol,blending:T.AdditiveBlending,transparent:true,opacity:0.5,depthWrite:false});
+  const ember=new T.Sprite(emberMat); ember.scale.set(1.1,1.1,1); ember.position.set(-0.15,-0.05,3.05); grp.add(ember);
+  grp.userData.ember=ember; grp.userData.emberT=rand(0,6.28);
+  grp.scale.setScalar(1.15);
+  return grp; }
 function spawnEncounter(){ if(encounters.length>=CFG.MAX_ENCOUNTERS||!systems.length) return;
   const r=rand(0,1), kind=r<0.4?'derelict':(r<0.7?'cache':'distress'), sy=systems[randi(0,systems.length-1)];
   const pos=sy.center.clone().add(new T.Vector3(rand(-1,1),rand(-0.4,0.4),rand(-1,1)).setLength(rand(CFG.SYSTEM_R*0.5,CFG.SYSTEM_R*0.95)));
   const col=kind==='distress'?0xff9a52:kind==='cache'?0xffcf52:0x9fb0c0;
-  const m=new T.Mesh(kind==='cache'?new T.BoxGeometry(4,4,4):new T.IcosahedronGeometry(3.6,0), new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.55,metalness:0.5,roughness:0.5})); m.position.copy(pos); scene.add(m);
+  const m=kind==='derelict'?derelictHulkMesh():new T.Mesh(kind==='cache'?new T.BoxGeometry(4,4,4):new T.IcosahedronGeometry(3.6,0), new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.55,metalness:0.5,roughness:0.5})); m.position.copy(pos); scene.add(m);
   const lab=spriteText('✦ '+kind,24,'#eaf2ff',{bg:'rgba(9,16,28,0.6)',pad:6,r:6,align:'center',ws:0.07}); lab.sp.position.copy(pos); lab.sp.position.y+=7; lab.sp.renderOrder=9; scene.add(lab.sp);
   const e={ kind, pos, mesh:m, label:lab, blip:topBlip('#'+new T.Color(col).getHexString(),10,1), age:0 }; e.blip.position.copy(pos); encounters.push(e);
   ev(`A <b>${kind}</b> signal appears in ${sy.name}.`); }
@@ -631,6 +660,7 @@ function resolveEncounter(e){ const P=ships[0];
   else { const c=randi(40,110); P.credits+=c; const np=nearestPlanet(e.pos); if(np) repAdd(np,CFG.REP_TERRA); P.score+=2; checkRankUp(P); notify(`Answered a distress call - rescued the crew: +${c}c, +standing.`,'log'); } }
 function encounterTick(dt){ encounterCd-=dt; if(encounterCd<=0){ encounterCd=CFG.ENCOUNTER_CD; spawnEncounter(); }
   const P=ships[0]; for(let i=encounters.length-1;i>=0;i--){ const e=encounters[i]; e.age+=dt; e.mesh.rotation.y+=dt*1.2; e.mesh.rotation.x+=dt*0.6; e.blip.position.copy(e.pos);
+    if(e.kind==='derelict' && e.mesh.userData.ember){ e.mesh.userData.emberT+=dt*3; e.mesh.userData.ember.material.opacity=0.3+0.25*Math.sin(e.mesh.userData.emberT)+0.15*Math.sin(e.mesh.userData.emberT*3.7); }   // dying-engine flicker, derelict-only
     if(P&&P.alive&&!P.warping&&P.pos.distanceTo(e.pos)<CFG.ENCOUNTER_R){ resolveEncounter(e); removeEncounter(i); continue; }
     if(e.age>CFG.ENCOUNTER_LIFE) removeEncounter(i); }
   newsCd-=dt; if(newsCd<=0){ newsCd=CFG.NEWS_CD; if(planets.length){ const p=planets[randi(0,planets.length-1)], g=GOODS[randi(0,GOODS.length-1)];   // shock STOCK only - prices stay emergent (organic)
@@ -838,6 +868,20 @@ function upCost(s,k){ return Math.round(CFG.UP_COST_BASE*Math.pow(CFG.UP_COST_GR
 function cheapestUp(s){ return Math.min(upCost(s,'weapon'),upCost(s,'engine'),upCost(s,'hull')); }
 function chooseUpgrade(s){ if(s.deaths>=CFG.UPGRADE_HULL_DEATHS && s.lvl.hull<=Math.min(s.lvl.weapon,s.lvl.engine)) return 'hull';
   return ['weapon','engine','hull'].sort((a,b)=> s.lvl[a]-s.lvl[b] || (a==='weapon'?-1:1))[0]; }
+// AI hull-CLASS upgrade (user 2026-07-07: "AI don't upgrade their hulls/ships") - chooseUpgrade above only ever bumps a
+// NUMERIC s.lvl.hull tier; it never swaps the ship into a bigger HULL_ORDER class the way the player's own `hull <class>`
+// command does. Gated so this is a RARE late-game event, not every upgrade tick: only worth rolling once hull level is
+// already maxed-feeling (UP_HULLCLASS_MINLVL), then a small per-tick chance (UP_HULLCLASS_CHANCE). Reuses applyHull(s,key)
+// - the SAME function the player's `hull` command calls - so there is no duplicated hull-swap logic. Instant, no travel
+// requirement, matching how AI numeric upgrades already apply instantly (AI ships have no "go to base" objective type).
+function tryHullClassUpgrade(s){
+  if(s.lvl.hull<CFG.UP_HULLCLASS_MINLVL) return false;
+  if(rand(0,1)>=CFG.UP_HULLCLASS_CHANCE) return false;
+  const cur=HULL_ORDER.indexOf(s.hullClass||'fighter'), next=HULL_ORDER[cur+1];
+  if(!next) return false;                          // already at 'capital', top of the line
+  const cost=HULLS[next].cost;
+  if(s.credits<cost) return false;
+  s.credits-=cost; applyHull(s,next); return next; }
 function pickTarget(s,list){ if(s.lock && list.indexOf(s.lock)>=0 && s.pos.distanceTo(s.lock.pos)<CFG.SENSE_R) return s.lock;
   let best=null,bd=1e9; for(const o of list){ const d=s.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} } s.lock=best; return best; }
 function aimAt(s,dir){ const D=new T.Vector3().copy(dir).normalize(); const fwd=FWD.clone().applyQuaternion(s.quat); const dot=fwd.dot(D);
@@ -1069,7 +1113,9 @@ function think(s,dt){
   if(mode==='UPGRADE'){ const k=chooseUpgrade(s),c=upCost(s,k); if(s.credits>=c){ s.credits-=c; s.lvl[k]+=1; bought=k;
     if(k==='hull'){ s.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(s.lvl.hull-1)); s.hp=s.maxHp; }
     if(k==='weapon'){ const nt=WEAPON_ORDER[Math.min(WEAPON_ORDER.length-1, Math.floor((s.lvl.weapon-1)/2))]; if(nt!==(s.weaponType||'energy')){ s.weaponType=nt; say(s,`Refit → ${WEAPONS[nt].n}.`); } }   // M3: arms race
-    burst(s.pos,0x86ff9d,12,12,3.2); } }
+    burst(s.pos,0x86ff9d,12,12,3.2); }
+    const gotHull=tryHullClassUpgrade(s);                                       // rare: swap to the NEXT HULL_ORDER class (scout…capital), same applyHull() the player's `hull` command uses
+    if(gotHull){ say(s,`${(s.credits)|0}c left → HULL REFIT: ${HULLS[gotHull].n}`); burst(s.pos,0x86ff9d,20,16,4.2); } }
   s.brain={ mode, target, dot:aim.dot, ctrl:s.ctrl, threat:!!threat, bought };
   s.utter-=dt;
   if(bought){ say(s,`${(s.credits)|0}c left → ${bought==='weapon'?'LASERS':bought==='engine'?'THRUSTERS':'HULL'} Lv${s.lvl[bought]}`); s.utter=CFG.UTTER_CD; }
@@ -1628,8 +1674,13 @@ const HULLS={   // balance law: hull space is EXPENSIVE (big hold = thin armor +
   interceptor:{n:'Interceptor', hp:130, hold:28, speed:1.12, cost:520,  desc:'strike cruiser · more bite than a Fighter, still nimble'},
   freighter:  {n:'Freighter',   hp:85,  hold:95, speed:0.55, cost:640,  desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)'},
   cruiser:    {n:'Cruiser',     hp:210, hold:18, speed:0.62, cost:820,  desc:'heavy armor · slowest hull · cramped hold'},
-  dreadnought:{n:'Dreadnought', hp:340, hold:30, speed:0.42, cost:1450, desc:'flagship-grade armor · glacial · the strongest hull in the fleet'} };
-const HULL_ORDER=['scout','fighter','interceptor','freighter','cruiser','dreadnought'];
+  dreadnought:{n:'Dreadnought', hp:340, hold:30, speed:0.42, cost:1450, desc:'flagship-grade armor · glacial · the strongest hull in the fleet'},
+  // 2026-07-07 (user "capital ships can't move but have high defense and high attack"): a 7th, end-of-progression class.
+  // ~2.7x dreadnought hp, low-moderate hold (combat platform not a hauler), near-zero speed (0.06, never exactly 0 to
+  // avoid any divide-by-zero on code elsewhere that assumes a nonzero speed multiplier), most expensive hull by a wide margin.
+  // No separate hull-damage-bonus field: this game's damage comes from weapon fitting (WEAPONS/s.lvl.weapon), not the hull.
+  capital:    {n:'Capital Ship',hp:920, hold:22, speed:0.06, cost:3200, desc:'planetary-defense platform · nearly immobile · the toughest hull in the fleet'} };
+const HULL_ORDER=['scout','fighter','interceptor','freighter','cruiser','dreadnought','capital'];
 // M10: CONTRABAND - illegal goods; buy cheap at the base black market, sell dear at HOSTILE worlds; scan risk at coalition docks.
 const CONTRABAND={ relics:{n:'Alien Relics',base:120}, narcotics:{n:'Spice',base:90}, arms:{n:'Black-market Arms',base:150} };
 const CONTRA_KEYS=Object.keys(CONTRABAND);

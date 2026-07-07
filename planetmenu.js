@@ -16,6 +16,8 @@ var CFG = {
   LOG_MAX: 12,                  // ring-buffer length for pushEvent
   QTY_STEPS: [1, 10],           // per-click trade quantities
   DEF_PIPS_MAX: 5,              // defense pips shown in header + ground tab
+  EQUIP_BAY_VISUAL_MAX: 8,      // HANGAR loadout equipment-bay grid box count - purely presentational
+                                 //   cap (the host's P.equip is an uncapped stacking count, not real slots)
   INFRA_PCT_PER_DEV: 10,        // derived infra% per planet dev level when no explicit infra field
   PROFIT_RATIO: 1.0,            // sell price > base*ratio -> highlighted green (profitable sell)
   STOCK_RESERVE: 4,             // the game keeps this many units unbuyable (host buy() floor)
@@ -45,7 +47,8 @@ var COL = { HEAD:'#8fd0ff', GOOD:'#7fd0b0', BAD:'#ff8a8a', AMBER:'#ffd27a', VIOL
 
 /* ------------------------------------------------ STATE */
 var S = { built:false, keysBound:false, open:false, planet:null, isBase:false,
-          tab:'market', tHead:0, tBody:0, log:[], el:{} };
+          tab:'market', tHead:0, tBody:0, log:[], el:{},
+          slotOpen:{ hull:false, weapon:false, equip:false } };   /* HANGAR loadout-slot expand/collapse (presentation only) */
 
 /* ------------------------------------------------ SAFE HOST ACCESS */
 function H(){ return window.HOST || null; }
@@ -151,6 +154,11 @@ function cssText(){
   '.pm-pip.on{background:'+COL.GOOD+';border-color:'+COL.GOOD+';box-shadow:0 0 5px '+COL.GOOD+'}',
   '.pm-row{display:flex;align-items:center;gap:10px;border:1px solid '+COL.BORDER+';border-radius:5px;background:rgba(11,18,30,.85);padding:9px 12px;margin-bottom:8px}',
   '.pm-row .pm-grow{flex:1;min-width:0}',
+  '.pm-row.pm-slot{font:inherit;transition:background .12s,border-color .12s}',
+  '.pm-row.pm-slot:hover{border-color:'+COL.HEAD+'}',
+  '.pm-eqbox{display:inline-block;width:15px;height:15px;line-height:15px;text-align:center;font-size:11px;',
+  '  border:1px dashed '+COL.BORDER+';border-radius:3px;margin-right:3px;color:'+COL.GOOD+'}',
+  '.pm-eqbox.on{border-style:solid;border-color:'+COL.GOOD+';background:rgba(127,208,176,.14)}',
   '.pm-note{color:'+COL.DIM+';padding:8px 2px}',
   '.pm-board{white-space:pre-wrap;border:1px solid '+COL.BORDER+';border-radius:5px;background:rgba(11,18,30,.85);padding:10px 12px;margin-bottom:10px}',
   '.pm-log{border-bottom:1px solid #16233a;padding:5px 2px}',
@@ -206,7 +214,12 @@ function onClick(e){
   if(act==='land'){ closeMenu(); runCmd('land'); return; }              /* AWAY overlay sits below ours -> close first */
   if(act==='depart'){ doDepart(); return; }
   if(act==='accept'){ tryAccept(parseInt(b.getAttribute('data-i'),10)); sfx('ui'); renderBody(); return; }
-  if(act==='defense'){ tryAddDefense(); sfx('ui'); renderAll(); return; } }
+  if(act==='defense'){ tryAddDefense(); sfx('ui'); renderAll(); return; }
+  if(act==='slot'){ toggleSlot(b.getAttribute('data-slot')); return; } }
+
+function toggleSlot(k){
+  if(!S.slotOpen.hasOwnProperty(k)) return;
+  S.slotOpen[k] = !S.slotOpen[k]; sfx('ui'); renderBody(); }
 
 function tryAccept(i){ var M=window.MISSIONS;
   if(!M || typeof M.accept!=='function' || !isFinite(i)) return;
@@ -364,11 +377,12 @@ function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
 /* Space-Rangers-style loadout data: equipment is stable game data, not exposed on HOST (unlike
    HULLS/WEAPONS/ARTIFACTS which the host DOES expose) - hardcoded here to mirror EQUIP in the host. */
 var EQUIP_SHOP = [
-  { k:'cargo',   n:'Cargo Pod',      desc:'+15 hold',                 cost:120 },
-  { k:'fuel',    n:'Fuel Cell',      desc:'+25 fuel cap',             cost:100 },
-  { k:'scanner', n:'Scanner',        desc:'+35 sensor range',         cost:150 },
-  { k:'plating', n:'Armor Plating',  desc:'+20 max hull',             cost:190 },
-  { k:'droid',   n:'Repair Droid',   desc:'+2.5 hull/s regen',        cost:170 } ];
+  { k:'cargo',     n:'Cargo Pod',          desc:'+15 hold',                                cost:120 },
+  { k:'fuel',      n:'Fuel Cell',          desc:'+25 fuel cap',                            cost:100 },
+  { k:'scanner',   n:'Scanner',            desc:'+35 sensor range',                        cost:150 },
+  { k:'plating',   n:'Armor Plating',      desc:'+20 max hull',                            cost:190 },
+  { k:'droid',     n:'Repair Droid',       desc:'+2.5 hull/s regen',                       cost:170 },
+  { k:'targeting', n:'Targeting Computer', desc:'predictive lead reticle (needs 60%+ wpn power)', cost:900 } ];
 
 function atBase(P){ var h=H(); if(h && typeof h.atBase==='function' && P){ try{ return !!h.atBase(P); }catch(e){} } return false; }
 
@@ -428,6 +442,56 @@ function equipSectionHtml(P){
       + '<button class="pm-b pm-go" data-act="cmd" data-cmd="install '+eq.k+'"'+(afford?'':' disabled')+'>BUY</button></div>'; }
   return rows; }
 
+/* -- LOADOUT: Star-Control-2/Space-Rangers style slot header over the buy sections above. HULL and
+   WEAPON are genuinely single-slot in the host model (P.hullClass / P.weaponType are scalars), so
+   those two render as real 1-slot fittings. Equipment is NOT slot-based in the host model (P.equip
+   is a stacking count-bag, install() just increments it) - the bay below is a PRESENTATIONAL grid
+   only: it fills however many boxes are actually owned and caps the visual grid at
+   CFG.EQUIP_BAY_VISUAL_MAX purely so the row doesn't run unbounded, it does not mean the game
+   enforces that many slots. */
+function loadoutSlotHtml(kind, label, filledLabel, filledSub, isOpen){
+  var arrow = isOpen ? '&#9660;' : '&#9654;';
+  return '<button class="pm-row pm-slot" data-act="slot" data-slot="'+kind+'" style="width:100%;text-align:left;cursor:pointer;background:'
+    + (isOpen?'rgba(143,208,255,.07)':'rgba(11,18,30,.85)') + ';border-color:'+(isOpen?COL.HEAD:COL.BORDER)+'">'
+    + '<div class="pm-grow"><b style="color:'+COL.HEAD+';letter-spacing:.08em;font-size:11px">'+esc(label)+'</b>'
+    + '<div style="margin-top:2px">'+filledLabel+'</div>'
+    + (filledSub?('<div class="pm-sub">'+filledSub+'</div>'):'')
+    + '</div><div style="color:'+COL.DIM+';font-size:13px">'+arrow+'</div></button>'; }
+
+function equipBayHtml(P){
+  var owned=[], i, total=0;
+  for(i=0;i<EQUIP_SHOP.length;i++){ var eq=EQUIP_SHOP[i], n=num(P&&P.equip&&P.equip[eq.k],0);
+    if(n>0){ owned.push(eq.n+' x'+n); total+=n; } }
+  var boxes='', shown=Math.min(total, CFG.EQUIP_BAY_VISUAL_MAX);
+  for(i=0;i<shown;i++) boxes += '<span class="pm-eqbox on" title="installed">&#9642;</span>';
+  for(i=shown;i<CFG.EQUIP_BAY_VISUAL_MAX;i++) boxes += '<span class="pm-eqbox" title="empty"></span>';
+  var overflow = total>CFG.EQUIP_BAY_VISUAL_MAX ? (' <span class="pm-sub">(+'+(total-CFG.EQUIP_BAY_VISUAL_MAX)+' more)</span>') : '';
+  var listLine = owned.length ? esc(owned.join(', ')) : '<span class="pm-sub">bay empty - nothing installed</span>';
+  return loadoutSlotHtml('equip', 'EQUIPMENT BAY',
+    '<div style="letter-spacing:.12em">'+boxes+'</div>'+overflow,
+    listLine + (owned.length?' <span class="pm-sub">- installed count, not a slot limit</span>':''),
+    S.slotOpen.equip); }
+
+function loadoutHeaderHtml(P){
+  var h=H(); var HULLS=h&&h.HULLS, WEAPONS=h&&h.WEAPONS;
+  var hu = (HULLS && P) ? HULLS[P.hullClass||'fighter'] : null;
+  var w  = (WEAPONS && P) ? WEAPONS[P.weaponType||'energy'] : null;
+  var hullFilled = hu
+    ? '<b style="color:'+COL.VIOLET+'">'+esc(hu.n)+'</b>'
+    : '<span class="pm-sub">(hull registry offline)</span>';
+  var hullSub = hu ? ('hull '+Math.round(num(P&&P.maxHp,0))+' - hold '+Math.round(num(P&&P.holdCap,0))+' - speed x'+num(hu.speed,1)) : '';
+  var wpnFilled = w
+    ? '<b style="color:'+COL.HEAD+'">'+esc(w.n)+'</b>'
+    : '<span class="pm-sub">(weapon registry offline)</span>';
+  var wpnSub = w ? ('dmg '+num(w.dmg,0)+(w.homing?' - homing':'')+(w.splash?' - splash '+num(w.splash,0):'')) : '';
+  return '<div class="pm-panel"><h4>SHIP LOADOUT</h4>'
+    + loadoutSlotHtml('hull',   'HULL (1 fitted)',   hullFilled, hullSub, S.slotOpen.hull)
+    + loadoutSlotHtml('weapon', 'WEAPON (1 fitted)', wpnFilled,  wpnSub,  S.slotOpen.weapon)
+    + equipBayHtml(P)
+    + '<div class="pm-note" style="margin-top:2px">click a slot to open its buy list below - HULL and WEAPON hold exactly one fitting each; '
+    +   'the EQUIPMENT BAY grid is presentational (fills to how many you own), the game itself has no fixed equipment-slot count.</div>'
+    + '</div>'; }
+
 function hangarHtml(){
   var p=S.planet, P=player();
   if(!P) return '<div class="pm-note">(no ship telemetry)</div>';
@@ -461,13 +525,17 @@ function hangarHtml(){
       + '<div style="color:'+COL.AMBER+'">'+fmtC(cost)+'</div>'
       + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford)?' disabled':'')+'>UPGRADE</button></div>'; }
   h += '<div class="pm-note">'+(S.isBase
-      ? 'Hull, weapons and equipment now buy right below - <b style="color:'+COL.AMBER+'">blackmarket</b> and <b style="color:'+COL.AMBER+'">fence</b> are still terminal-only. Upgrades are planetside.'
-      : 'Weapons and equipment now buy right below - <b style="color:'+COL.AMBER+'">terraform</b> is still terminal-only.')
+      ? 'Hull, weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">blackmarket</b> and <b style="color:'+COL.AMBER+'">fence</b> are still terminal-only. Upgrades are planetside.'
+      : 'Weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">terraform</b> is still terminal-only.')
     + '</div>';
-  /* -- Space-Rangers-style loadout shop: HULL / WEAPONS / EQUIPMENT -- */
-  h += '<div class="pm-panel"><h4>HULL - SHIP CLASS</h4>'+hullSectionHtml(P)+'</div>';
-  h += '<div class="pm-panel"><h4>WEAPONS</h4>'+weaponSectionHtml(P)+'</div>';
-  h += '<div class="pm-panel"><h4>EQUIPMENT</h4>'+equipSectionHtml(P)+'</div>';
+  /* -- Star-Control-2/Space-Rangers-style loadout screen: slot header, then the (unchanged) buy
+     lists for whichever slot is expanded. hullSectionHtml/weaponSectionHtml/equipSectionHtml and
+     the HOST.runCmd('hull '+key) / ('weapon '+key) / ('install '+key) calls inside them are
+     untouched - this only reframes how the player reaches them. -- */
+  h += loadoutHeaderHtml(P);
+  if(S.slotOpen.hull)   h += '<div class="pm-panel"><h4>HULL - CHOOSE REPLACEMENT</h4>'+hullSectionHtml(P)+'</div>';
+  if(S.slotOpen.weapon) h += '<div class="pm-panel"><h4>WEAPON - CHOOSE REPLACEMENT</h4>'+weaponSectionHtml(P)+'</div>';
+  if(S.slotOpen.equip)  h += '<div class="pm-panel"><h4>EQUIPMENT - INSTALL MORE</h4>'+equipSectionHtml(P)+'</div>';
   return h; }
 
 /* ------------------------------------------------ TAB: MISSIONS */

@@ -64,13 +64,16 @@
   // freighter/cruiser (HULL_ORDER); interceptor + dreadnought are provided so
   // the orchestrator can map richer tiers. Unknown keys fall back to 'fighter'.
   // wt = weapon tier shown on the scan badge (escalating firepower read).
+  // capital (2026-07-07): end-of-progression class HULL_ORDER now includes --
+  // AI ships can rarely refit into one late-game; scan badge needs its own tier/label.
   var CLASSES = {
     scout:      { tier: 0, wt: 1, label: 'SCOUT' },
     fighter:    { tier: 1, wt: 2, label: 'FIGHTER' },
     interceptor:{ tier: 2, wt: 3, label: 'INTERCEPTOR' },
     freighter:  { tier: 2, wt: 2, label: 'FREIGHTER' },
     cruiser:    { tier: 3, wt: 4, label: 'CRUISER' },
-    dreadnought:{ tier: 4, wt: 5, label: 'DREADNOUGHT' }
+    dreadnought:{ tier: 4, wt: 5, label: 'DREADNOUGHT' },
+    capital:    { tier: 5, wt: 6, label: 'CAPITAL SHIP' }
   };
   var DEFAULT_KEY = 'fighter';
 
@@ -411,13 +414,87 @@
     return finalize(T, grp, col, 'dreadnought', 4.5 * S, CFG.ENG_SCALE * 1.9);
   }
 
+  // CAPITAL -- planetary-defense platform: a broad multi-tier citadel with FOUR
+  // outrigger hulls (dreadnought has two), a heavier armored prow, a tiered
+  // command superstructure, and more turret batteries -- reads as bigger AND
+  // more heavily detailed than the dreadnought, not just scaled up.
+  function buildCapital(T, col) {
+    var S = CFG.UNIT * 1.45;
+    var grp = new T.Group();
+    var darkCol = col.clone().offsetHSL(0, -0.14, -0.09);
+    var plateCol = col.clone().offsetHSL(0, -0.06, -0.03);
+    // central citadel hull (the paintable body) -- longer + taller than dreadnought's core
+    var core = part(T, new T.BoxGeometry(2.1 * S, 1.7 * S, 8.6 * S), col);
+    grp.add(core);
+    // belt of hull plating segments along the citadel flanks (extra greeble reading as heavy armor)
+    var plateG = new T.BoxGeometry(2.24 * S, 0.32 * S, 0.85 * S);
+    for (var pz = -3.6; pz <= 3.6; pz += 1.15) {
+      var pl = part(T, plateG, plateCol);
+      pl.position.set(0, 0.86 * S, pz * S); grp.add(pl);
+      var plB = part(T, plateG, plateCol);
+      plB.position.set(0, -0.86 * S, pz * S); grp.add(plB);
+    }
+    // heavy armored prow (broader + longer than dreadnought's)
+    var prow = part(T, new T.ConeGeometry(1.4 * S, 3.1 * S, 6), col);
+    prow.position.set(0, 0, -5.3 * S); prow.rotation.x = -Math.PI / 2;
+    grp.add(prow);
+    // FOUR outrigger hulls (dreadnought has two) -- inner pair tucked close, outer pair flared wide
+    var outG = new T.BoxGeometry(0.95 * S, 0.95 * S, 5.8 * S);
+    var strutG = new T.BoxGeometry(1.7 * S, 0.28 * S, 0.5 * S);
+    var outerStrutG = new T.BoxGeometry(3.6 * S, 0.3 * S, 0.5 * S);
+    var riggerX = [1.55, 3.35];
+    for (var side = -1; side <= 1; side += 2) {
+      for (var ri = 0; ri < riggerX.length; ri++) {
+        var rx = riggerX[ri] * side;
+        var out = part(T, outG, darkCol);
+        out.position.set(rx * S, -0.12 * S, 0.5 * S);
+        grp.add(out);
+        // outrigger nose
+        var on = part(T, new T.ConeGeometry(0.58 * S, 1.5 * S, 5), darkCol);
+        on.position.set(rx * S, -0.12 * S, -2.9 * S); on.rotation.x = -Math.PI / 2;
+        grp.add(on);
+        // spinal main gun on each outrigger
+        var barrel = part(T, new T.CylinderGeometry(0.15 * S, 0.15 * S, 2.3 * S, 8), darkCol);
+        barrel.rotation.x = Math.PI / 2;
+        barrel.position.set(rx * S, 0.6 * S, -2.4 * S);
+        grp.add(barrel);
+      }
+      // struts bridging citadel -> inner rigger -> outer rigger (fore + aft each hop)
+      var s1 = part(T, strutG, darkCol); s1.position.set(riggerX[0] * 0.55 * side * S, 0, -1.6 * S); grp.add(s1);
+      var s2 = part(T, strutG, darkCol); s2.position.set(riggerX[0] * 0.55 * side * S, 0, 2.1 * S); grp.add(s2);
+      var s3 = part(T, outerStrutG, darkCol); s3.position.set((riggerX[0] + riggerX[1]) * 0.5 * side * S, -0.05 * S, -0.6 * S); grp.add(s3);
+    }
+    // dorsal battery turrets down the spine (more of them, denser, than dreadnought)
+    for (var z = -3.4; z <= 3.4; z += 1.35) {
+      var t = part(T, new T.CylinderGeometry(0.38 * S, 0.45 * S, 0.55 * S, 8), darkCol);
+      t.position.set(0, 1.15 * S, z * S); grp.add(t);
+      var tb = part(T, new T.CylinderGeometry(0.1 * S, 0.1 * S, 1.3 * S, 6), darkCol);
+      tb.rotation.x = Math.PI / 2; tb.position.set(0, 1.15 * S, z * S - 0.75 * S); grp.add(tb);
+    }
+    // tiered command superstructure -- three stacked blocks (dreadnought has one)
+    var towerLo = part(T, new T.BoxGeometry(1.3 * S, 0.9 * S, 2.3 * S), plateCol);
+    towerLo.position.set(0, 1.55 * S, -0.2 * S); grp.add(towerLo);
+    var towerMid = part(T, new T.BoxGeometry(1.0 * S, 0.9 * S, 1.7 * S), darkCol);
+    towerMid.position.set(0, 2.25 * S, -0.35 * S); grp.add(towerMid);
+    var towerHi = part(T, new T.BoxGeometry(0.7 * S, 0.7 * S, 1.1 * S), darkCol);
+    towerHi.position.set(0, 2.85 * S, -0.5 * S); grp.add(towerHi);
+    var ck = cockpit(T, 0.46 * S); ck.position.set(0, 3.3 * S, -0.9 * S); grp.add(ck);
+    // stern engine bank -- widest of any class, split into paired blocks
+    for (var eside = -1; eside <= 1; eside += 2) {
+      var eblk = part(T, new T.BoxGeometry(1.15 * S, 1.2 * S, 1.15 * S), plateCol);
+      eblk.position.set(eside * 0.75 * S, 0, 4.6 * S); grp.add(eblk);
+    }
+    return finalize(T, grp, col, 'capital', 5.7 * S, CFG.ENG_SCALE * 2.3);
+  }
+
   var BUILDERS = {
     scout: buildScout,
     fighter: buildFighter,
     interceptor: buildInterceptor,
     freighter: buildFreighter,
     cruiser: buildCruiser,
-    dreadnought: buildDreadnought
+    dreadnought: buildDreadnought,
+    capital: buildCapital
   };
 
   // ---------------------------------------------------------------- build()
