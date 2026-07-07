@@ -1,22 +1,21 @@
-// vision.js — THE ARC3 EYE ON THE SPACE LEVEL + FOG OF WAR. Per the user (2026-07-07): "let the creativity center
-// access the space level data — they should SEE it; look at the arc3 work (same repo family): use that so the agi
+// vision.js - THE ARC3 EYE ON THE SPACE LEVEL + FOG OF WAR. Per the user (2026-07-07): "let the creativity center
+// access the space level data - they should SEE it; look at the arc3 work (same repo family): use that so the agi
 // can SEE. And give it fog of war on its vision of the tree until he moves position."
 //
 // PORTED FROM arc3_unified_v2.py / arc3_perception (D:/code/arcWelderPro/state/): the agent sees a GRID of OPAQUE
 // colour codes (never labeled types), segments it into connected-component OBJECTS {code,size,bbox,centroid}, and
-// groups them by SAMENESS (code + size-class) — the arc3 SEE+SORT prior ("go toward things that look the same").
+// groups them by SAMENESS (code + size-class) - the arc3 SEE+SORT prior ("go toward things that look the same").
 // Nothing is handed: what code 3 MEANS is learnable only by acting on it (discover_vec already learns type-blind
 // values; this gives that machinery a spatial retina).
 //
-// FOG OF WAR (the user's rule — vision is positional):
-//   • UNKNOWN  — never seen: the agent's view literally contains no value (structural, not cosmetic).
-//   • LIVE     — within senseR of the CURRENT position: true current values.
-//   • STALE    — seen before, not currently in range: the LAST-SEEN value is remembered (may be wrong now — honest
+// FOG OF WAR (the user's rule - vision is positional):
+//   • UNKNOWN - never seen: the agent's view literally contains no value (structural, not cosmetic).
+//   • LIVE - within senseR of the CURRENT position: true current values.
+//   • STALE - seen before, not currently in range: the LAST-SEEN value is remembered (may be wrong now - honest
 //                memory, exactly like INH's decaying world model). Moving is the only way to refresh.
 //   The world's truth lives INSIDE this module (blackbox_env.py structure: privileged snapshot in, narrow fogged
-//   channel out). Agents can only call view()/see()/describe() — there is no handle to the unfogged world.
-// WHO LOOKS THROUGH IT: ORION (the Inhabitant) and the player's Passenger each get their own retina (factory —
-// separate fog per mind). The creativity/goal machinery reads see(): same-group salience (arc3 SORT) + FRONTIER
+//   channel out). Agents can only call view()/see()/describe() - there is no handle to the unfogged world.
+// WHO LOOKS THROUGH IT: ORION (the Inhabitant) and the player's Passenger each get their own retina (factory - separate fog per mind). The creativity/goal machinery reads see(): same-group salience (arc3 SORT) + FRONTIER
 // cells (edge of the fog = curiosity goals). The worm's describe() is grounded in see() stats only.
 'use strict';
 (function(){
@@ -44,10 +43,10 @@ function create(opts){
     const p=opts.pos(); if(!p) return;
     const sr=Math.max(1,opts.senseR?opts.senseR():60);
     const es=opts.entities()||[];
-    // 1. rasterize the PRIVILEGED snapshot (module-internal only — never exposed raw)
+    // 1. rasterize the PRIVILEGED snapshot (module-internal only - never exposed raw)
     const frame=new Int16Array(N);                    // 0 = empty space
     for(const e of es){ const gx=w2g(e.x), gz=w2g(e.z); frame[gz*G+gx]=e.code|0; }
-    // 2. reveal the senseR disc around the CURRENT position — fog of war: move to see more
+    // 2. reveal the senseR disc around the CURRENT position - fog of war: move to see more
     liveMask.fill(0);
     const cgx=w2g(p.x), cgz=w2g(p.z), cr=Math.ceil(sr/(2*R)*G);
     for(let dz=-cr;dz<=cr;dz++) for(let dx=-cr;dx<=cr;dx++){
@@ -84,7 +83,7 @@ function create(opts){
     for(const o of objs){ const k=o.code+':'+o.sizeClass; (groups[k]=groups[k]||{key:k,code:o.code,sizeClass:o.sizeClass,n:0,mass:0,members:[]});
       groups[k].n++; groups[k].mass+=o.size; groups[k].members.push(o); }
     const same=Object.values(groups).filter(g=>g.n>=2).sort((a,b)=>b.mass-a.mass);
-    // FRONTIER: revealed cells adjacent to UNKNOWN — the edge of the fog = curiosity goals ("move to see the tree")
+    // FRONTIER: revealed cells adjacent to UNKNOWN - the edge of the fog = curiosity goals ("move to see the tree")
     const frontier=[];
     for(let i=0;i<N && frontier.length<VCFG.FRONTIER_MAX*8;i++){
       if(cells[i]===VCFG.UNKNOWN) continue; const x=i%G,z=(i/G)|0;
@@ -96,14 +95,14 @@ function create(opts){
     return { objects:objs, sameGroups:same, frontier:frontier.filter((_,i)=>i%step===0).slice(0,VCFG.FRONTIER_MAX), explored:view().explored };
   }
 
-  // grounded description for the worm (facts from see() only — no invention surface)
+  // grounded description for the worm (facts from see() only - no invention surface)
   function describe(){
     const s=see(); const parts=[];
     parts.push(`I have seen ${Math.round(s.explored*100)}% of this space; the rest is dark to me until you move, and I see nothing there.`);
     if(s.objects.length){ const live=s.objects.filter(o=>o.live).length;
-      parts.push(`My retina holds ${s.objects.length} shapes — ${live} live on the lattice now, ${s.objects.length-live} remembered from where we have been.`); }
+      parts.push(`My retina holds ${s.objects.length} shapes - ${live} live on the lattice now, ${s.objects.length-live} remembered from where we have been.`); }
     if(s.sameGroups.length){ const g=s.sameGroups[0];
-      parts.push(`The largest kinship on the map: ${g.n} things of the same make (code ${g.code}); like calls to like — worth a look.`); }
+      parts.push(`The largest kinship on the map: ${g.n} things of the same make (code ${g.code}); like calls to like - worth a look.`); }
     if(s.frontier.length) parts.push(`The fog has ${s.frontier.length} edges I can name; pick one and fly at it.`);
     return parts;
   }

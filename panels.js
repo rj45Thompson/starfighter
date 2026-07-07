@@ -1,20 +1,20 @@
-// panels.js — THE WINDOW STANDARD (user 2026-07-07): "make the market window have a slide in and out pin, same
+// panels.js - THE WINDOW STANDARD (user 2026-07-07): "make the market window have a slide in and out pin, same
 // as chat... semi-transparent so I can drive... a window standard to have them slide to the sides or top so we
 // can have them not overlap... user don't know to hit M to lose the menu... a slider for the transparency top-right".
 //
-// A small reusable chrome layer applied to EXISTING panel elements (market, terminal/"chat") — no new wrapper
+// A small reusable chrome layer applied to EXISTING panel elements (market, terminal/"chat") - no new wrapper
 // nodes, no game-logic changes. Each registered panel gets, as an appended child (so it survives the panel's own
-// innerHTML rebuilds only if we target the RIGHT node — callers must register the OUTER persistent element, not
+// innerHTML rebuilds only if we target the RIGHT node - callers must register the OUTER persistent element, not
 // one that gets replaced wholesale):
 //   - a PIN toggle: pinned = stays open until you close it; unpinned = auto-hides a moment after your mouse
 //     leaves (the standard IDE "auto-hide docked panel" pattern) and slides back on hover/click of its edge tab.
-//   - an always-visible EDGE TAB (title + chevron) so closing/opening never depends on knowing a hotkey — this
+//   - an always-visible EDGE TAB (title + chevron) so closing/opening never depends on knowing a hotkey - this
 //     directly fixes "user don't know to hit M".
 //   - a small opacity slider, top-right, so a panel that "takes up a lot of screen" can be driven through.
-//   - slide in/out via transform (an edge: 'top'|'bottom'|'left'|'right' — the direction it slides toward when
+//   - slide in/out via transform (an edge: 'top'|'bottom'|'left'|'right' - the direction it slides toward when
 //     hidden), and a same-edge STACKING reflow so multiple panels never overlap (offsets accumulate along the
-//     cross-axis) — the "standard" multiple windows share, extensible to future panels.
-// Persists {pinned, open, opacity} per id to localStorage (lazy load once, save on change — never wipes).
+//     cross-axis) - the "standard" multiple windows share, extensible to future panels.
+// Persists {pinned, open, opacity} per id to localStorage (lazy load once, save on change - never wipes).
 'use strict';
 (function(){
 const CFG = {
@@ -22,7 +22,7 @@ const CFG = {
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
   SLIDE_MS:320,                // slide transition duration
   GAP:8,                       // px between stacked panels on the same edge
-  OP_MIN:0.16, OP_MAX:0.97, OP_STEP:0.01,
+  OP_MIN:0.16, OP_MAX:0.97, OP_STEP:0.01, TEXT_OP_FLOOR:0.38,   // TEXT_OP_FLOOR: the text fades with the same slider but never past this, so a panel dragged to minimum still has a way back
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
 };
@@ -37,7 +37,7 @@ load();
 if(!document.getElementById('pnl-style')){
   const st=document.createElement('style'); st.id='pnl-style';
   st.textContent=
-    // ctl is position:FIXED and appended to <body> (not a child of the panel) — a panel with overflow-y:auto
+    // ctl is position:FIXED and appended to <body> (not a child of the panel) - a panel with overflow-y:auto
     // (the terminal) would otherwise drag an absolutely-positioned child along as its log content scrolls.
     '.pnl-ctl{ position:fixed; display:flex; gap:5px; align-items:center; z-index:'+(CFG.Z+1)+'; pointer-events:auto; }'+
     '.pnl-btn{ font:700 10px/1 ui-monospace,monospace; color:'+COL.dim+'; background:#0c1623dd; border:1px solid '+COL.border+'; border-radius:5px; width:20px; height:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }'+
@@ -67,7 +67,7 @@ function closedTransform(edge, centerX){
 function openTransform(centerX){ return centerX?'translateX(-50%)':'none'; }
 
 function tabPosition(rec){
-  // the tab sits just outside the panel's own footprint on its edge — a fixed, always-findable handle. Vertical
+  // the tab sits just outside the panel's own footprint on its edge - a fixed, always-findable handle. Vertical
   // (top/bottom edge) position is a CONSTANT so it stays put even while its panel is slid off-screen; horizontal
   // (left/right edge) reads the panel's live top since that's unaffected by its own horizontal slide.
   const r=rec.el.getBoundingClientRect(); const s={};
@@ -78,19 +78,23 @@ function tabPosition(rec){
   return s;
 }
 function ctlPosition(rec){
-  // top-right corner of the panel's OWN current rect (only meaningful while open — hidden otherwise).
+  // top-right corner of the panel's OWN current rect (only meaningful while open - hidden otherwise).
   const r=rec.el.getBoundingClientRect();
   return { top:(r.top+4)+'px', left:'', right:(window.innerWidth-r.right+6)+'px' };
 }
 
+function textOpacityFor(v){   // user 2026-07-07: "we want the text to be semi-transparent as well based on that slider" - tracks the same slider, with a soft floor (TEXT_OP_FLOOR) so a panel dragged to minimum never becomes fully unreadable/stuck.
+  const frac=(clamp01(v)-CFG.OP_MIN)/(CFG.OP_MAX-CFG.OP_MIN||1);
+  return CFG.TEXT_OP_FLOOR+frac*(1-CFG.TEXT_OP_FLOOR); }
 function applyVisual(rec){
   rec.el.style.transition='transform '+CFG.SLIDE_MS+'ms ease, opacity .18s ease';
   rec.el.style.transform = rec.open ? openTransform(rec.centerX) : closedTransform(rec.edge, rec.centerX);
   rec.el.style.backgroundColor = rgba(rec.rgb, rec.opacity);
+  rec.el.style.opacity = textOpacityFor(rec.opacity);   // fades the panel's OWN text/content - the header controls (.pnl-ctl/.pnl-tab) live outside `el` so they stay fully legible
   const chev = rec.edge==='top'?(rec.open?'▴':'▾') : rec.edge==='bottom'?(rec.open?'▾':'▴') : rec.edge==='left'?(rec.open?'◂':'▸') : (rec.open?'▸':'◂');
   rec.tab.innerHTML = rec.title+' '+chev+(rec.pinned?' <span class="pnl-pinned">● pinned</span>':'');
   rec.pinBtn.classList.toggle('on', rec.pinned);
-  rec.pinBtn.textContent = rec.pinned ? '📌' : '📍';   // filled pin (pinned) vs outline-ish (unpinned) — both render fine, distinct glyphs
+  rec.pinBtn.textContent = rec.pinned ? '📌' : '📍';   // filled pin (pinned) vs outline-ish (unpinned) - both render fine, distinct glyphs
   const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   rec.ctl.style.display = rec.open ? 'flex' : 'none';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; }
@@ -104,7 +108,7 @@ function armAutoHide(rec){
   rec.hideT=setTimeout(()=>{
     if(rec.pinned) return;
     if(rec.keepOpenWhile && rec.keepOpenWhile()) { armAutoHide(rec); return; }   // e.g. the chat input still has focus
-    if(rec.hovering) return;                                                     // still under the mouse — recheck won't fire til leave
+    if(rec.hovering) return;                                                     // still under the mouse - recheck won't fire til leave
     setOpen(rec, false);
   }, CFG.AUTO_HIDE_MS);
 }
@@ -118,10 +122,10 @@ function setPinned(rec, pinned){
   rec.pinned=pinned; applyVisual(rec); persist(rec);
   if(pinned) clearTimeout(rec.hideT); else if(rec.open) armAutoHide(rec);
 }
-function setOpacity(rec, v){ rec.opacity=clamp01(v); rec.el.style.backgroundColor=rgba(rec.rgb,rec.opacity); persist(rec); }
+function setOpacity(rec, v){ rec.opacity=clamp01(v); rec.el.style.backgroundColor=rgba(rec.rgb,rec.opacity); rec.el.style.opacity=textOpacityFor(rec.opacity); persist(rec); }
 
 function reflowEdge(edge){
-  // STACKING: open panels sharing an edge offset along the cross-axis so they never overlap — the "window
+  // STACKING: open panels sharing an edge offset along the cross-axis so they never overlap - the "window
   // standard" the user asked for. With one panel per edge today this is a no-op; it's ready for more.
   const members=EDGE_MEMBERS[edge].filter(r=>r.open);
   let cross=CFG.GAP;
@@ -134,7 +138,7 @@ function reflowEdge(edge){
 }
 
 // -------------------------------------------------------------------------------------------------------------
-// register(id, el, opts) — el must be a persistent element (never wholesale innerHTML-replaced by the caller;
+// register(id, el, opts) - el must be a persistent element (never wholesale innerHTML-replaced by the caller;
 // content that DOES get rebuilt should live in a child, e.g. #marketBody inside #market).
 // opts: {title, edge:'top'|'bottom'|'left'|'right', centerX, rgb:[r,g,b], defaultOpacity, defaultOpen,
 //        defaultPinned, hotkeyLabel, onOpenChange(open), keepOpenWhile()->bool}
@@ -167,7 +171,7 @@ function register(id, el, opts){
   const mayDoze=()=>{ rec.hovering=false; if(rec.open&&!rec.pinned) armAutoHide(rec); };
   el.addEventListener('mouseenter',stayAwake); el.addEventListener('mouseleave',mayDoze);
   tab.addEventListener('mouseenter',stayAwake); tab.addEventListener('mouseleave',mayDoze);
-  ctl.addEventListener('mouseenter',stayAwake); ctl.addEventListener('mouseleave',mayDoze);   // the controls float outside `el` now — count hovering them too
+  ctl.addEventListener('mouseenter',stayAwake); ctl.addEventListener('mouseleave',mayDoze);   // the controls float outside `el` now - count hovering them too
 
   PANELS_[id]=rec; (EDGE_MEMBERS[rec.edge]=EDGE_MEMBERS[rec.edge]||[]).push(rec);
   applyVisual(rec); reflowEdge(rec.edge);

@@ -1,36 +1,35 @@
-// deliberate.js — THE DELIBERATION ENGINE: generalized reflective chain reasoning for EVERYTHING the AGI does.
-// Per the user (2026-07-07): "for whatever it is currently working on it's going to do chain reasoning to think —
-// how does this affect me, why am I doing this, what should I do. How/What/Why/When on each step of a decision,
+// deliberate.js - THE DELIBERATION ENGINE: generalized reflective chain reasoning for EVERYTHING the AGI does.
+// Per the user (2026-07-07): "for whatever it is currently working on it's going to do chain reasoning to think - how does this affect me, why am I doing this, what should I do. How/What/Why/When on each step of a decision,
 // which breaks into large chains we fully explore. Time doesn't matter. We need a system to determine what is
-// important — use GEOMETRY. This must be for ALL the AGI does and it must be GENERALIZED (not the space game)."
+// important - use GEOMETRY. This must be for ALL the AGI does and it must be GENERALIZED (not the space game)."
 //
-// The engine is DOMAIN-AGNOSTIC: it reasons over a typed graph — the ONE substrate everything here already speaks
-// (novel graph, mind-games graph, a plan graph, a math graph — all the same {nodes, edges{s,r,o}} shape). Given a
+// The engine is DOMAIN-AGNOSTIC: it reasons over a typed graph - the ONE substrate everything here already speaks
+// (novel graph, mind-games graph, a plan graph, a math graph - all the same {nodes, edges{s,r,o}} shape). Given a
 // DECISION (state node + goal node), it expands the decision along the four reflective axes, each a concrete graph
 // operation, and each answer spawns sub-questions → the large chain:
-//   WHAT  — the OPTIONS: action-edges out of the current state (each option recurses into its own sub-decision).
-//   HOW   — the MECHANISM: the shortest verified action-path state→goal (the concrete plan).
-//   WHY   — the JUSTIFICATION: the serves/enables chain from the goal up to a root value ("why reach it").
-//   WHEN  — the ORDERING: dependency (requires/before) order over the plan's waypoints.
+//   WHAT - the OPTIONS: action-edges out of the current state (each option recurses into its own sub-decision).
+//   HOW - the MECHANISM: the shortest verified action-path state→goal (the concrete plan).
+//   WHY - the JUSTIFICATION: the serves/enables chain from the goal up to a root value ("why reach it").
+//   WHEN - the ORDERING: dependency (requires/before) order over the plan's waypoints.
 // GEOMETRY DECIDES IMPORTANCE (the user's axis/angle idea, made exact + verifiable): a branch's importance =
-//   w_pull * goalPull   (how much it shortens the graph-distance to the goal — the "angle toward the goal")
-// + w_cent * centrality (how many state→goal shortest paths run through it — structural betweenness)
-// + w_nov  * novelty    (graph-distance from the already-explored frontier — don't re-walk known ground).
-// Branches expand in importance order until the frontier is empty or MAX_NODES (large — depth is cheap, per the
+//   w_pull * goalPull   (how much it shortens the graph-distance to the goal - the "angle toward the goal")
+// + w_cent * centrality (how many state→goal shortest paths run through it - structural betweenness)
+// + w_nov  * novelty    (graph-distance from the already-explored frontier - don't re-walk known ground).
+// Branches expand in importance order until the frontier is empty or MAX_NODES (large - depth is cheap, per the
 // user's "time doesn't matter"). 0-FABRICATION: every answer is a real edge/path; a chain is VALID only if every
 // leaf grounds in the graph, so the engine reasons over THIS world, not a memorized one (shuffle the graph and the
-// same chain goes invalid — the bench proves it). window.DELIBERATE + node module.exports.
+// same chain goes invalid - the bench proves it). window.DELIBERATE + node module.exports.
 'use strict';
 (function(){
 const CFG = {
   W_PULL: 3.0,        // importance weight: distance-to-goal reduction (the geometric goal-pull)
   W_CENT: 1.5,        // importance weight: betweenness (on-route-ness)
   W_NOV: 0.8,         // importance weight: novelty vs the explored frontier
-  MAX_NODES: 4000,    // exploration ceiling (large — full exploration is the point; this is a runaway backstop)
+  MAX_NODES: 4000,    // exploration ceiling (large - full exploration is the point; this is a runaway backstop)
   BEAM: 8,            // branches expanded per frontier layer (priority by importance)
   MAX_DEPTH: 12,      // recursion depth cap for sub-decisions (deep chains, bounded)
 };
-// relation roles (a domain maps its own relations onto these four — the ONLY thing a domain must declare):
+// relation roles (a domain maps its own relations onto these four - the ONLY thing a domain must declare):
 const DEFAULT_ROLES = { action:['action','moves','goes','leads'], serves:['serves','enables','for','because'],
   requires:['requires','before','needs','after'] };
 
@@ -110,7 +109,7 @@ function deliberate(graph, decision, opts){
   let rng = (function(s){ let a=(s>>>0)||1; return ()=>{ a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296; }; })((opts.seed||7));
   const steps=[]; let nodesUsed=0;
   // importance of expanding option-node `n`: geometric goal-pull + centrality + novelty. In the UNIFORM ablation
-  // this signal is discarded (random order) — the control that proves the GEOMETRY, not the search, does the work.
+  // this signal is discarded (random order) - the control that proves the GEOMETRY, not the search, does the work.
   function importance(n){
     const pull = (dist[state]!==undefined && dist[n]!==undefined) ? (dist[goal]!==undefined ? (dist[goal]-dist[n]) : 0) : 0;
     const nov = explored.has(n)? 0 : 1;
@@ -131,7 +130,7 @@ function deliberate(graph, decision, opts){
       WHY:{axis:'WHY', question:`why reach ${goal}?`, chain:why},
       WHEN:{axis:'WHEN', question:`in what order?`, order:when} });
     if(cur===goal) return;
-    // choose which options to explore fully. GEOMETRY: rank by importance. UNIFORM (ablation): random order — the
+    // choose which options to explore fully. GEOMETRY: rank by importance. UNIFORM (ablation): random order - the
     // engine still explores, but blind to the goal-pull/centrality signal, so at a bounded budget it wanders.
     let picks=what.slice();
     if(order==='geometry') picks=what.map(o=>({o, imp:importance(o.option)})).sort((a,b)=>b.imp-a.imp).map(x=>x.o);
@@ -141,16 +140,16 @@ function deliberate(graph, decision, opts){
   expand(state, 0);
   // the DECISION comes ONLY from what was actually EXPLORED (you may reason only over ground you walked): shortest
   // action-path to the goal within the explored subgraph. Not explored far enough → ABSTAIN. This is what makes the
-  // geometry load-bearing — geometry spends the budget toward the goal and reaches a justified recommendation;
+  // geometry load-bearing - geometry spends the budget toward the goal and reaches a justified recommendation;
   // uniform spends it on distractors and abstains at the same budget.
   const exIdx={ actionOut:{}, servesOut:idx.servesOut, requiresEdge:idx.requiresEdge, roles:idx.roles, isRole:idx.isRole };
   for(const e of exploredEdges) if(explored.has(e.s)&&explored.has(e.o)) (exIdx.actionOut[e.s]=exIdx.actionOut[e.s]||[]).push(e);
   const treePath = explored.has(goal)? shortestPath(exIdx, state, goal) : null;
   const firstAction = treePath && treePath.length? treePath[0] : null;
   const flat=[]; for(const s of steps){ flat.push(s.HOW, s.WHAT, s.WHY); }
-  // CONVERGENCE — the four axes MEET (user 2026-07-07: "how/what/why/when chains should all meet up and the geometry
+  // CONVERGENCE - the four axes MEET (user 2026-07-07: "how/what/why/when chains should all meet up and the geometry
   // comes to a conclusion"). Each axis either ENDORSES a confident next step toward a justified goal, or it DISSENTS
-  // — and the dissenting axis NAMES the gap: HOW→unreachable, WHY→unjustified, WHAT→no options, WHEN→order conflict.
+  // - and the dissenting axis NAMES the gap: HOW→unreachable, WHY→unjustified, WHAT→no options, WHEN→order conflict.
   // A 4/4 meeting is a confident conclusion; anything less is a KNOWLEDGE GAP the agent should go fill (see seek()).
   const whenOrder = treePath? axisWHEN(idx, [state, ...treePath.map(e=>e.o)]) : [state];
   const conv = {
@@ -166,7 +165,7 @@ function deliberate(graph, decision, opts){
     recommended: firstAction? {action:firstAction.o, via:firstAction.r, first_edge:firstAction} : null,
     reached_goal_in_tree: !!treePath, justified: conv.WHY,
     convergence:{ axes:conv, agreement, converged:agreement===4, dissent, gap:gapType },
-    conclusion: (agreement===4 && firstAction)? {take:firstAction.o, via:firstAction.r, because:'all four axes meet — reachable, justified, ordered, and an available option'}
+    conclusion: (agreement===4 && firstAction)? {take:firstAction.o, via:firstAction.r, because:'all four axes meet - reachable, justified, ordered, and an available option'}
               : { abstain:true, gap:gapType, need: gapDescription(gapType, decision) } };
   chain.grounded = verifyChain(graph, chain);
   return chain;
@@ -176,7 +175,7 @@ function deliberate(graph, decision, opts){
 function transcript(graph, decision, opts){
   const c=deliberate(graph, decision, opts);
   const L=[];
-  L.push(`DECISION: from "${decision.state}" — should I pursue "${decision.goal}"?  (${decision.question||''})`);
+  L.push(`DECISION: from "${decision.state}" - should I pursue "${decision.goal}"?  (${decision.question||''})`);
   const root=c.steps[0]; // first HOW/WHAT/WHY of the start state
   const start=c.steps.filter(s=>true);
   // render the start-state tetrad + the recommended action + the deepest justified branch
@@ -204,10 +203,10 @@ function gapDescription(gap, decision){
 
 // ---- SEEK: aggressive knowledge acquisition on ABSTAIN (user 2026-07-07: "it should be finding things it doesn't
 // know and pulling those out; if we abstain we seek knowledge for it AGGRESSIVELY"). The agent holds a PARTIAL known
-// graph and can query a WORLD (the ground truth it hasn't fully revealed). On a gap it does NOT stop — it forms a
+// graph and can query a WORLD (the ground truth it hasn't fully revealed). On a gap it does NOT stop - it forms a
 // TARGETED query from the dissenting axis and reveals exactly the world-edges that could close it, then re-deliberates,
 // escalating each round until it converges or the seek budget is spent. 0-FABRICATION: revealed edges are COPIED from
-// the world (real, verified) — never invented; and if the world itself has no answer, seek exhausts its budget and
+// the world (real, verified) - never invented; and if the world itself has no answer, seek exhausts its budget and
 // STILL abstains honestly (it never hallucinates a conclusion just to avoid saying "I don't know yet").
 function seek(known, decision, world, opts){
   opts=opts||{}; const cfg=Object.assign({}, CFG, opts.cfg||{});
@@ -226,7 +225,7 @@ function seek(known, decision, world, opts){
     if(gap==='justify'){                                       // pull the goal's serves-chain from the world
       let cur=decision.goal, guard=0; while(guard++<12){ const outs=wIdx.servesOut[cur]; if(!outs||!outs.length) break; for(const e of outs) if(!known_edge(e)) toReveal.push(e); cur=outs[0].o; }
     } else if(gap==='reach' || gap==='order'){                 // pull the WORLD route from the STATE toward the goal
-      // BFS in the world from the STATE (not the whole known region — a goal-side fragment wouldshort-circuit the BFS and
+      // BFS in the world from the STATE (not the whole known region - a goal-side fragment wouldshort-circuit the BFS and
       // leave the middle unrevealed, stalling forever). Reveal the route's missing edges FRONT-TO-BACK so the known
       // frontier extends contiguously toward the goal each round (this is also what makes escalation real).
       const prev={[decision.state]:'root'}; let ring=[decision.state]; let hit=null; const seen=new Set(ring);

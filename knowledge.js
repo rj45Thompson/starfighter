@@ -1,18 +1,18 @@
-// knowledge.js — THE PERSISTENT TWO-TIER KNOWLEDGE STORE. Per the user (2026-07-07): "we don't want to wipe that
-// knowledge away — if it is GENERIC knowledge then ALL of the AGI should share it and persist it across runs.
+// knowledge.js - THE PERSISTENT TWO-TIER KNOWLEDGE STORE. Per the user (2026-07-07): "we don't want to wipe that
+// knowledge away - if it is GENERIC knowledge then ALL of the AGI should share it and persist it across runs.
 // Knowledge that others can't know might be kept SECRET to only that AGI, but it should persist since there is a lot
 // of processing here across runs. Lazy load and save."
 //
 // TWO TIERS, principled by PROVENANCE (not guessed):
-//   SHARED  — generic world-truth any agent could independently verify (source = latent library, or a SOUND
+//   SHARED - generic world-truth any agent could independently verify (source = latent library, or a SOUND
 //             deduction/extrapolation whose premises are ALL shared). Global, one copy, every AGI reads it.
-//   PRIVATE — knowledge that depends on one agent's unique vantage: a WITNESSED observation, or anything derived
+//   PRIVATE - knowledge that depends on one agent's unique vantage: a WITNESSED observation, or anything derived
 //             using a private premise. Kept to that agent (its secret), never leaked to others.
 //   The tier of a derived fact = SHARED iff every premise it used is shared AND its source is generic; else PRIVATE.
-//   That is a provenance rule, computed, not asserted — so classification can't be fudged.
+//   That is a provenance rule, computed, not asserted - so classification can't be fudged.
 // PERSISTENCE (the "lot of processing across runs" the user wants saved): lazy-load once at init, save on commit.
-// Backend is pluggable — node: a JSON file; browser: localStorage KNOWLEDGE_v1. A fact committed in one run is a
-// free STORE HIT the next (no recompute). Nothing is wiped on reset of the SIM — only an explicit forget() clears it.
+// Backend is pluggable - node: a JSON file; browser: localStorage KNOWLEDGE_v1. A fact committed in one run is a
+// free STORE HIT the next (no recompute). Nothing is wiped on reset of the SIM - only an explicit forget() clears it.
 // A fact is an EDGE {s,r,o} (the same graph currency deliberate.js/seek reason over) + provenance {source, premises}.
 'use strict';
 (function(){

@@ -1,4 +1,4 @@
-// sound.js — Web Audio FM CHIPTUNE engine for Starfighter 3D.
+// sound.js - Web Audio FM CHIPTUNE engine for Starfighter 3D.
 // Self-contained, dependency-free, no samples: every sound is synthesized live
 // from oscillators (a carrier + an FM modulator) shaped by short ADSR envelopes.
 // Waveforms are square / triangle / sawtooth for an 8-bit character.
@@ -18,7 +18,7 @@
 // init()/play(), after a `typeof` guard.
 //
 // Self-test: `node sound.js` stubs an AudioContext, constructs the engine,
-// plays every sound, and prints the sound list — asserting nothing throws.
+// plays every sound, and prints the sound list - asserting nothing throws.
 
 (function () {
   'use strict';
@@ -30,7 +30,7 @@
   var CFG = {
     MASTER_VOL: 0.5,          // default master volume 0..1
     MUTED: false,             // default mute state
-    MAX_VOICES: 14,           // polyphony cap — rapid shots past this are dropped (no clip)
+    MAX_VOICES: 14,           // polyphony cap - rapid shots past this are dropped (no clip)
     RAMP: 0.006,              // click-free attack/decay ramp floor (s)
     NOISE_SECONDS: 1.0,       // length of the pre-baked white-noise buffer (s)
     COMPRESS: true,           // insert a soft limiter on the master bus
@@ -39,7 +39,7 @@
     COMPRESS_ATTACK: 0.003,   // s
     COMPRESS_RELEASE: 0.25,   // s
     SAMPLE_DIR: 'assets/',    // real Starfighter2 Unity audio (user 2026-07-07: "annoying, use the sounds from the
-                              // spacefighter unity game as PRIMARY... fallback is generated") — decoded once, played
+                              // spacefighter unity game as PRIMARY... fallback is generated") - decoded once, played
     SAMPLE_GAIN: 0.55,        // real samples were mixed louder than the FM bank's headroom; scale to match
     SAMPLE_RATE_JITTER: 0.06  // +/- playbackRate randomization so rapid-fire samples don't phase-cancel into a buzz
   };
@@ -62,11 +62,11 @@
       var p = JSON.parse(raw);
       if (p && typeof p.vol === 'number' && isFinite(p.vol)) CFG.MASTER_VOL = clamp(p.vol, 0, 1);
       if (p && typeof p.muted === 'boolean') CFG.MUTED = p.muted;
-    } catch (e) { /* corrupt/blocked storage — fall back to defaults */ }
+    } catch (e) { /* corrupt/blocked storage - fall back to defaults */ }
   }
   function savePrefs() {
     try { _store().setItem(LS_KEY, JSON.stringify({ vol: CFG.MASTER_VOL, muted: CFG.MUTED })); }
-    catch (e) { /* storage blocked — non-fatal */ }
+    catch (e) { /* storage blocked - non-fatal */ }
   }
 
   function clamp(x, lo, hi) { return x < lo ? lo : (x > hi ? hi : x); }
@@ -106,7 +106,7 @@
   // Starfighter2's own Unity audio (weapon_player/weapon_enemy/explosion_*) decoded once into AudioBuffers via
   // the SAME context (so they share master volume/mute/compressor with the FM voices). A sample that hasn't
   // finished loading yet (or 404s / decode-fails, e.g. running from file:// or node) silently falls through to
-  // its FM twin below — the game must never depend on these files existing.
+  // its FM twin below - the game must never depend on these files existing.
   var SAMPLE_FILES = {
     weapon_player: 'weapon_player.wav', weapon_enemy: 'weapon_enemy.wav',
     explosion_player: 'explosion_player.wav', explosion_enemy: 'explosion_enemy.wav', explosion_asteroid: 'explosion_asteroid.wav'
@@ -119,20 +119,20 @@
     for (var key in SAMPLE_FILES) (function (key, file) {
       try {
         // fetch() on a relative URL can throw SYNCHRONOUSLY outside a browser document (e.g. Node's own fetch,
-        // reached here because init() is also exercised by the node self-test) — this must never escape and
+        // reached here because init() is also exercised by the node self-test) - this must never escape and
         // disable init()'s caller; sample loading is best-effort, the FM bank is the always-safe fallback.
         fetch(CFG.SAMPLE_DIR + file).then(function (r) { return r.ok ? r.arrayBuffer() : null; })
           .then(function (buf) { return buf ? ctx.decodeAudioData(buf) : null; })
           .then(function (decoded) { if (decoded) samples[key] = decoded; })
-          .catch(function () { /* offline / blocked / no decodeAudioData (node self-test) — FM fallback covers it */ });
-      } catch (e) { /* synchronous fetch() rejection (invalid/relative URL outside a document) — non-fatal */ }
+          .catch(function () { /* offline / blocked / no decodeAudioData (node self-test) - FM fallback covers it */ });
+      } catch (e) { /* synchronous fetch() rejection (invalid/relative URL outside a document) - non-fatal */ }
     })(key, SAMPLE_FILES[key]);
   }
   // Play a decoded sample through the master bus; returns true if it actually played (so callers know NOT to
   // also fire the FM fallback). A small random playbackRate keeps rapid-fire shots from lining up into a buzz.
   function playSample(key, extraVol) {
     var buf = samples[key]; if (!buf || !ctx || !master) return false;
-    if (voices >= CFG.MAX_VOICES) return true;                 // still "handled" — don't double up with FM
+    if (voices >= CFG.MAX_VOICES) return true;                 // still "handled" - don't double up with FM
     try {
       var src = ctx.createBufferSource(); src.buffer = buf;
       src.playbackRate.value = 1 + (Math.random() * 2 - 1) * CFG.SAMPLE_RATE_JITTER;
@@ -161,7 +161,7 @@
           comp.ratio.value = CFG.COMPRESS_RATIO;
           comp.attack.value = CFG.COMPRESS_ATTACK;
           comp.release.value = CFG.COMPRESS_RELEASE;
-        } catch (e) { /* stubs may lack AudioParam objects — harmless */ }
+        } catch (e) { /* stubs may lack AudioParam objects - harmless */ }
         master.connect(comp);
         comp.connect(ctx.destination);
       } else {
@@ -186,8 +186,7 @@
 
   // ---------------------------------------------------------------------
   // Core FM voice.  A modulator oscillator feeds a gain (the modulation
-  // depth in Hz) which is summed into the carrier's frequency AudioParam —
-  // classic 2-operator FM.  An ADSR-ish gain envelope shapes the amplitude.
+  // depth in Hz) which is summed into the carrier's frequency AudioParam - classic 2-operator FM.  An ADSR-ish gain envelope shapes the amplitude.
   //   o = {
   //     wave, freq,            carrier waveform + start frequency
   //     f2, f2end,             frequency glide target(s) for chiptune sweeps
@@ -240,7 +239,7 @@
     var nodes = [];
 
     if (o.type === 'noise') {
-      // Noise source (explosions, thuds) — routed through the filter if present.
+      // Noise source (explosions, thuds) - routed through the filter if present.
       var ns = ctx.createBufferSource();
       ns.buffer = noiseBuf || (buildNoise(), noiseBuf);
       if (ns.buffer && ns.buffer.length) ns.loop = true;
@@ -317,7 +316,7 @@
       voice({ wave: 'square', freq: 760, f2: 1500, mWave: 'square', mRatio: 1.5, mDepth: 240, mDepthEnd: 0,
               a: 0.004, d: 0.02, r: 0.06, dur: 0.11, gain: 0.34 }, opt.vol, opt.when);
     },
-    // Bullet-on-hull: dull, short, downward — a body thud, not a ring.
+    // Bullet-on-hull: dull, short, downward - a body thud, not a ring.
     hit: function (opt) {
       voice({ wave: 'triangle', freq: 300, f2: 120, mWave: 'sine', mRatio: 0.5, mDepth: 90,
               a: 0.003, d: 0.06, r: 0.07, dur: 0.16, gain: 0.4, lp: 1200, lpEnd: 340 }, opt.vol, opt.when);
@@ -332,7 +331,7 @@
       voice({ wave: 'sawtooth', freq: 340, f2: 46, mWave: 'square', mRatio: 0.5, mDepth: 200, mDepthEnd: 10,
               a: 0.005, d: 0.12, r: 0.3, dur: 0.6, gain: 0.32, lp: 1400, lpEnd: 200 }, opt.vol, opt.when);
     },
-    // Pickup / gem: bright two-note "coin" — the classic up-a-fifth blip.
+    // Pickup / gem: bright two-note "coin" - the classic up-a-fifth blip.
     pickup: function (opt) {
       seq([
         { freq: 988, dur: 0.07, r: 0.04 },
@@ -356,14 +355,14 @@
     ui: function (opt) {
       voice({ wave: 'square', freq: 1500, f2: 1400, a: 0.001, d: 0.008, r: 0.02, dur: 0.04, gain: 0.16 }, opt.vol, opt.when);
     },
-    // Alarm: urgent two-tone (hi/lo) square siren — for threats.
+    // Alarm: urgent two-tone (hi/lo) square siren - for threats.
     alarm: function (opt) {
       seq([
         { freq: 880, dur: 0.12, r: 0.03 },
         { freq: 620, when: 0.13, dur: 0.14, r: 0.04 }
       ], { wave: 'square', mWave: 'square', mRatio: 1, mDepth: 30, a: 0.004, d: 0.0, s: 0.9, gain: 0.24 }, opt.vol);
     },
-    // Thought: soft, short, high sine-ish blip — an AGI reasoning tick.
+    // Thought: soft, short, high sine-ish blip - an AGI reasoning tick.
     thought: function (opt) {
       voice({ wave: 'triangle', freq: 1760, f2: 2093, mWave: 'sine', mRatio: 4, mDepth: 24,
               a: 0.006, d: 0.03, r: 0.06, dur: 0.13, gain: 0.12 }, opt.vol, opt.when);

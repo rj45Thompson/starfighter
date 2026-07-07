@@ -1,63 +1,62 @@
-// thoughts.js — N5 THOUGHT REWARDS (NOVEL_SOCIETY.md pillar N5 + SCORECARD_SPEC.md §5 advisor rules).
+// thoughts.js - N5 THOUGHT REWARDS (NOVEL_SOCIETY.md pillar N5 + SCORECARD_SPEC.md §5 advisor rules).
 // Per-pilot REASONING CHAINS over the baked novel graph (novel_graph.json), walked FROM THE PILOT'S OWN SEGMENT
-// (canon rule 5 knowledge law: pov chapters + present scenes + broadcast scenes — nothing else is walkable).
+// (canon rule 5 knowledge law: pov chapters + present scenes + broadcast scenes - nothing else is walkable).
 //
-// THE WALK — a chain is a sequence of connected triples (hop[i].s === hop[i-1].o) drawn ONLY from triples that are:
+// THE WALK - a chain is a sequence of connected triples (hop[i].s === hop[i-1].o) drawn ONLY from triples that are:
 //   (1) inside the pilot's segment (t.sIdx ∈ segments[name].sentenceIdx), and
 //   (2) MENTION-GROUNDED: the sIdx sentence LITERALLY contains the subject name. This excludes the documented
 //       pattern-SVO noise per the NOVEL_SOCIETY backlog (tick-1 + tick-2 puppet audits):
-//       (2a) pov-fallback triples (subject attributed to the chapter pov when no mention precedes the verb —
-//            e.g. the old `VEGA tithe Halcyon Station` from "The tithe ships came to Halcyon…"), and
-//       (2b) place-alias wrong-agent triples (a character word inside a multi-word PLACE name — the historical
+//       (2a) pov-fallback triples (subject attributed to the chapter pov when no mention precedes the verb -            e.g. the old `VEGA tithe Halcyon Station` from "The tithe ships came to Halcyon…"), and
+//       (2b) place-alias wrong-agent triples (a character word inside a multi-word PLACE name - the historical
 //            ch-009 case `EMBER send/unfinish/wait CRUX` minted from "When the Ember Vigil sent for its
 //            navigation master…"): a subject match inside a known multi-word place span does NOT ground, and as
 //            a data-independent backstop a match immediately followed by another Capitalised word (a longer
 //            proper-noun phrase: "Ember Vigil", "Meridian Yards") does not ground either. The tick-3 baker
 //            landed its own PLACE_WORD_ALIASES guard, so the current bake mints the CORRECT place agent
-//            (`The Ember Vigil send CRUX`) — this walk-layer law stays as defense in depth (the backlog rule:
+//            (`The Ember Vigil send CRUX`) - this walk-layer law stays as defense in depth (the backlog rule:
 //            N5 must never reward wrong-agent edges, whatever the baker's state). Measured before the baker fix:
 //            the guards excluded exactly the 3 EMBER wrong-agent triples at ZERO cost in legitimate triples.
 //       Grounding accepts the baker's leading-"The" place convention: a subject like "The Sundering"/"The Ember
 //       Vigil" also grounds at its article-stripped variant ("the Sundering" mid-sentence), provided the variant
 //       is not preceded by a different Capitalised word (so the future SECOND Sundering never grounds the first).
 //
-// THE REWARD (advisor rule, SCORECARD_SPEC §5: verified-usefulness, NOT length — "a tiny correct inference must
+// THE REWARD (advisor rule, SCORECARD_SPEC §5: verified-usefulness, NOT length - "a tiny correct inference must
 // beat a 100-step ramble"). For a chain scored for pilot NAME:
 //   - base credit  W_BASE   per hop, ONLY if the WHOLE chain verifies (every hop re-derivable from the graph,
 //     mention-grounded, inside the segment, connected s→o). One fabricated/tampered/foreign hop ⇒ total 0 (0-fab).
-//   - novelty      W_NOVEL  per FRESH edge — semantic edge key s|r|o not in the pilot's own persisted chain
+//   - novelty      W_NOVEL  per FRESH edge - semantic edge key s|r|o not in the pilot's own persisted chain
 //     history and not already counted earlier in this same chain.
 //   - bridge       W_BRIDGE per FRESH hop that CROSSES chapters (hop[i].chapter ≠ hop[i-1].chapter) and lands in
-//     an EARNED sentence — one whose chapter the pilot knows through broadcast or a shared scene, NOT own pov
+//     an EARNED sentence - one whose chapter the pilot knows through broadcast or a shared scene, NOT own pov
 //     (cross-segment knowledge must be EARNED, pillar N3). Bridge is novelty-gated on purpose: re-crossing a
 //     known bridge is stale news, which keeps the stale ceiling exact (below).
-//   - frontier     W_FRONTIER per FRESH hop whose sentence the pilot's attached GRAPHFOG (graphfog.js — an
+//   - frontier     W_FRONTIER per FRESH hop whose sentence the pilot's attached GRAPHFOG (graphfog.js - an
 //     OPTIONAL soft dependency, see attachFog) revealed SINCE the fog's last mark(): thinking through
 //     NEWLY-opened territory pays. Chains entirely inside the pre-revealed HOMELAND (the segment) earn ZERO
-//     frontier bonus — homeland sentences are never "newly revealed" (anti-puppet). Frontier is novelty-gated
+//     frontier bonus - homeland sentences are never "newly revealed" (anti-puppet). Frontier is novelty-gated
 //     exactly like bridge (a stale re-walk through opened territory is stale news), so the stale ceiling stays
 //     MAX_HOPS·W_BASE and the advisor law below is untouched. With a fog attached the pilot's KNOWABLE set
-//     (verification + walk pool) extends from the segment to segment ∪ fog.revealed — the node-vision law: fog
+//     (verification + walk pool) extends from the segment to segment ∪ fog.revealed - the node-vision law: fog
 //     opens ONLY along the knowledge-law edges graphfog.js enforces structurally. No fog attached ⇒ behaviour
 //     is unchanged (frontier terms 0; the knowable set is the segment). Note the two bonuses are disjoint by
 //     the knowledge law itself: an EARNED (broadcast/shared-scene) sentence is already in the segment, so a
-//     bridge landing is never frontier territory and vice versa — no double-dip.
+//     bridge landing is never frontier territory and vice versa - no double-dip.
 //   - scoring counts at most MAX_HOPS hops (the builder never exceeds it; over-long hand-fed chains truncate).
 // ANTI-RAMBLE BY CONSTRUCTION: a stale chain earns exactly counted·W_BASE (novelty 0, bridges 0 since bridges
 // require freshness), so its ceiling is MAX_HOPS·W_BASE; the smallest all-fresh 2-hop chain earns at least
 // 2·(W_BASE+W_NOVEL). The CFG law 2·(W_BASE+W_NOVEL) > MAX_HOPS·W_BASE therefore guarantees a tiny fresh chain
-// outscores ANY stale ramble — advisorLawHolds() exports the inequality; thoughts_test.js proves it numerically.
+// outscores ANY stale ramble - advisorLawHolds() exports the inequality; thoughts_test.js proves it numerically.
 //
-// FITNESS LEDGER — per pilot accumulated reward + chain count + the semantic-edge history that drives novelty.
+// FITNESS LEDGER - per pilot accumulated reward + chain count + the semantic-edge history that drives novelty.
 // Persisted under STORE_KEY in window.localStorage when running as a browser script; plain in-memory in node.
 // Edge history is self-bounded: keys only ever come from verified hops, so it can never exceed the graph's own
 // distinct s|r|o set (no eviction logic needed). wipe() is the puppet test: a wiped ledger restarts novelty; a
 // pilot whose SEGMENT is wiped from the graph builds no chain and scores 0 (anti-puppet, proven in the bench).
 //
-// SELF-WIRING — attaches window.THOUGHTS in a browser (script tag after the graph is fetchable; call
+// SELF-WIRING - attaches window.THOUGHTS in a browser (script tag after the graph is fetchable; call
 // THOUGHTS.load() to fetch novel_graph.json + novel/characters.json, or THOUGHTS.init({graph, roster}) with
 // already-loaded JSON) AND exports module.exports for node (lazy-loads both files from __dirname on first use).
-// HONESTY LEDGER — GIVEN: the baked graph (authored novel), the roster places list. LEARNED/EMERGENT: which
+// HONESTY LEDGER - GIVEN: the baked graph (authored novel), the roster places list. LEARNED/EMERGENT: which
 // chains each pilot walks, novelty, fitness ranking. Labeled honestly: GRAPH-WALK reward now; a trained GNN
 // scorer is a later tier (pillar N5 text). Every number traces to the graph + the persisted ledger.
 'use strict';
@@ -72,7 +71,7 @@ const CFG = {
   W_NOVEL: 6,                    // per FRESH semantic edge (s|r|o not in the pilot's history nor earlier in chain)
   W_BRIDGE: 3,                   // per fresh hop crossing chapters through an EARNED (broadcast/shared) sentence
   W_FRONTIER: 4,                 // per fresh hop through territory the pilot's GRAPHFOG revealed since its last mark()
-  // ADVISOR LAW BY CONSTRUCTION: 2*(W_BASE+W_NOVEL)=14 > MAX_HOPS*W_BASE=10 — see advisorLawHolds().
+  // ADVISOR LAW BY CONSTRUCTION: 2*(W_BASE+W_NOVEL)=14 > MAX_HOPS*W_BASE=10 - see advisorLawHolds().
   // W_FRONTIER is fresh-gated, so a stale ramble still caps at MAX_HOPS*W_BASE and the law is unaffected.
   MIN_VARIANT_LEN: 4,            // leading-"The" place variant minimum length (mirrors the baker's MIN_ALIAS_LEN)
   GRAPH_FILE: 'novel_graph.json',          // node lazy-load / browser load() default
@@ -99,8 +98,8 @@ let GROUNDED = null;     // triples passing the mention-grounded law, in graph o
 let TKEY = null;         // Map instance-key -> {t, grounded} for verification lookups
 let SEGSET = null;       // {name: Set(sentenceIdx)}
 let POOLS = null;        // {name: grounded triples inside the knowable set} (lazy per pilot)
-let FOGS = {};           // {name: GRAPHFOG instance} — the optional frontier-bonus soft dependency (attachFog)
-let POOLS_REV = {};      // {name: fog.revealed.size at pool-bake time} — invalidates the pool when fog moves
+let FOGS = {};           // {name: GRAPHFOG instance} - the optional frontier-bonus soft dependency (attachFog)
+let POOLS_REV = {};      // {name: fog.revealed.size at pool-bake time} - invalidates the pool when fog moves
 
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const instKey = (t) => t.s + '|' + t.r + '|' + t.o + '|' + t.chapter + '|' + t.sIdx;   // one baked triple instance
@@ -108,8 +107,8 @@ const edgeKey = (t) => t.s + '|' + t.r + '|' + t.o;                             
 
 // ---- THE MENTION-GROUNDED LAW (backlog rule: sIdx sentence literally contains the subject) -------------------
 // A subject match grounds iff: word-boundary + Capitalised-in-prose (baker's own rule), NOT inside a known
-// multi-word place span (other than the subject itself), and NOT immediately followed — across an optional
-// possessive ('s) — by another Capitalised word (part of a longer proper-noun phrase, e.g. "Ember Vigil").
+// multi-word place span (other than the subject itself), and NOT immediately followed - across an optional
+// possessive ('s) - by another Capitalised word (part of a longer proper-noun phrase, e.g. "Ember Vigil").
 // Subjects starting with "The " also try their article-stripped VARIANT ("the Sundering" mid-sentence grounds
 // "The Sundering"), guarded backward: a different Capitalised word right before the variant rejects the match
 // (so "Second Sundering" never grounds "The Sundering").
@@ -159,7 +158,7 @@ function mentionGrounded(subject, text) {
 // ---- graph wiring --------------------------------------------------------------------------------------------
 function setGraph(graph, roster) {
   if (!graph || !Array.isArray(graph.sentences) || !Array.isArray(graph.triples) || !graph.segments)
-    throw new Error('THOUGHTS: graph must be the RAW bake (sentences[], triples[], segments{}) — got something else');
+    throw new Error('THOUGHTS: graph must be the RAW bake (sentences[], triples[], segments{}) - got something else');
   G = graph;
   PLACES = (roster && Array.isArray(roster.places) && roster.places.length)
     ? roster.places.map(String)
@@ -183,20 +182,20 @@ function ensureGraph() {
     setGraph(graph, roster);
     return;
   }
-  throw new Error('THOUGHTS: no graph loaded — call THOUGHTS.init({graph, roster}) or await THOUGHTS.load()');
+  throw new Error('THOUGHTS: no graph loaded - call THOUGHTS.init({graph, roster}) or await THOUGHTS.load()');
 }
 function poolFor(name) {
   ensureGraph();
   if (!(name in SEGSET)) throw new Error('THOUGHTS: unknown pilot "' + name + '" (not in the graph segments)');
   const fog = FOGS[name];
-  if (fog && POOLS_REV[name] !== fog.revealed.size) delete POOLS[name];    // fog moved (reveal/wipe) — pool is stale
+  if (fog && POOLS_REV[name] !== fog.revealed.size) delete POOLS[name];    // fog moved (reveal/wipe) - pool is stale
   if (!POOLS[name]) { const seg = SEGSET[name];
     POOLS[name] = GROUNDED.filter(t => seg.has(t.sIdx) || (fog && fog.revealed.has(t.sIdx)));
     POOLS_REV[name] = fog ? fog.revealed.size : -1; }
   return POOLS[name];
 }
 
-// ---- ledger (LEARNED — persisted; wiping visibly resets novelty + fitness) -----------------------------------
+// ---- ledger (LEARNED - persisted; wiping visibly resets novelty + fitness) -----------------------------------
 function blankLedger() { return { version: CFG.LEDGER_VERSION, tick: 0, cursor: 0, pilots: {} }; }
 let L = blankLedger();
 (function loadLedger() {
@@ -230,7 +229,7 @@ function verifyChain(name, hops) {
   return { ok: true, why: 'verified', at: hops.length };
 }
 
-// ---- scoring (PURE — no ledger mutation; commitChain records) ------------------------------------------------
+// ---- scoring (PURE - no ledger mutation; commitChain records) ------------------------------------------------
 function scoreChain(name, hops) {
   const v = verifyChain(name, hops);
   const zero = { verified: v.ok, why: v.why, counted: 0, base: 0, fresh_edges: 0, novelty: 0, bridges: 0, bridge_bonus: 0,

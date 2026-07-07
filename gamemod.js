@@ -1,38 +1,37 @@
-// gamemod.js — SELF-MODIFICATION: the AGIs get the pen. Per the user (2026-07-06): "your agi should attempt to do
-// WHATEVER you speak to it — give it an api so it can change the ast/code of the entire game if possible. give ALL
-// the agis the ability to write ast and see what they do with it — but with crash guards; anything that doesn't
+// gamemod.js - SELF-MODIFICATION: the AGIs get the pen. Per the user (2026-07-06): "your agi should attempt to do
+// WHATEVER you speak to it - give it an api so it can change the ast/code of the entire game if possible. give ALL
+// the agis the ability to write ast and see what they do with it - but with crash guards; anything that doesn't
 // fully break the game is okay."
 //
 // THE API (three powers, ascending):
-//   1. SET    — bounded writes to the game's tunable surface (every numeric CFG key + curated live paths). Clamped
+//   1. SET - bounded writes to the game's tunable surface (every numeric CFG key + curated live paths). Clamped
 //               to [ORIG/20, ORIG*20] so no single write can zero or explode the sim.
-//   2. RULE   — a real AST: {when:event, cond?, then:[actions]} JSON node-trees run by an interpreter (no eval).
+//   2. RULE - a real AST: {when:event, cond?, then:[actions]} JSON node-trees run by an interpreter (no eval).
 //               Events: tick/kill_seen/docked/trade/damaged. Actions: set/say/credit/tint/spawn_gem.
-//   3. JS     — the full-power path: arbitrary code compiled via new Function against the SAME game the page runs.
+//   3. JS - the full-power path: arbitrary code compiled via new Function against the SAME game the page runs.
 //               Guards: syntax pre-check · brace-required loops · loop-budget injection (2e6 iterations → throw) ·
 //               try/catch at every call · one-strike auto-disable on exception.
 // CRASH GUARDS (the contract "anything that doesn't fully break the game is okay"):
 //   • every mod snapshots what it touches → revert(id)/revert all;   • frame WATCHDOG: 3 consecutive slow frames
 //     (>WATCH_MS) with mods active → auto-revert the newest mod and say so;   • window error hook does the same;
-//   • MAX_ACTIVE cap (oldest auto-reverted — churn, not accumulation);   • NOTHING persists: mods are session-local
+//   • MAX_ACTIVE cap (oldest auto-reverted - churn, not accumulation);   • NOTHING persists: mods are session-local
 //     by design, so a reload is always a vanilla game. Breaking it permanently is structurally impossible.
 // WHO HOLDS THE PEN:
 //   • THE PASSENGER: speak an imperative ("make the bullets faster", "tint my ship violet", "double gem value") →
 //     deterministic intent→mutation mapping over the tunable index; if the speech sidecar is up and the intent is
 //     unmapped, Qwen may emit a JSON program CONSTRAINED to this API (validated; invalid = rejected, never run).
-//   • EVERY PILOT: a rate-capped mutation turn — temperament-biased picks from the same API (tints, rules, nudges).
-//     HONESTY: v1 pilot choice is a BIASED MENU, not learned — labeled GIVEN in the ledger. v2 (evolution.js): the
-//     menu weights are inherited+mutated+selected (genome.gamemodMenuWeights, EVOLUTION.menuWeightsFor(name)) —
-//     LEARNED-BY-SELECTION when EVOLUTION is active; the GIVEN label applies only standalone.
+//   • EVERY PILOT: a rate-capped mutation turn - temperament-biased picks from the same API (tints, rules, nudges).
+//     HONESTY: v1 pilot choice is a BIASED MENU, not learned - labeled GIVEN in the ledger. v2 (evolution.js): the
+//     menu weights are inherited+mutated+selected (genome.gamemodMenuWeights, EVOLUTION.menuWeightsFor(name)) -     LEARNED-BY-SELECTION when EVOLUTION is active; the GIVEN label applies only standalone.
 'use strict';
 (function(){
 const MODCFG = {
   CLAMP_LO: 0.05, CLAMP_HI: 20,      // numeric writes stay within [orig*LO, orig*HI]
   LOOP_BUDGET: 2e6,                   // injected iteration ceiling for js() loops
   ALLOC_LIT_CAP: 1e6,                 // js() rejects numeric literals >= this (heuristic allocation-bomb guard: the
-                                      // tick-3 adversary froze the renderer with new Array(1e9).fill(0) — a sync
+                                      // tick-3 adversary froze the renderer with new Array(1e9).fill(0) - a sync
                                       // densify the frame watchdog cannot catch because it starves rAF itself; legit
-                                      // mods never need million-scale literals — set() clamps at 20x orig anyway)
+                                      // mods never need million-scale literals - set() clamps at 20x orig anyway)
   WATCH_MS: 250, WATCH_STRIKES: 3,    // frame watchdog: this slow, this many in a row → revert newest
   MAX_ACTIVE: 24,                     // active-mod cap; oldest reverted first
   RULE_FIRE_CAP: 200,                 // a rule may fire at most this many times (runaway guard)
@@ -61,7 +60,7 @@ function listTunables(){ const out=[]; const R=roots();
 function setPath(path,value,author){
   const r=resolve(path); if(!r) return {ok:false,why:'no such path '+path};
   const cur=r.obj[r.key];
-  if(typeof value==='number'&&!Number.isFinite(value)) return {ok:false,why:'non-finite value (NaN/Infinity poisons physics — tick-3 adversary: Math.min/max pass NaN through the clamp)'};
+  if(typeof value==='number'&&!Number.isFinite(value)) return {ok:false,why:'non-finite value (NaN/Infinity poisons physics - tick-3 adversary: Math.min/max pass NaN through the clamp)'};
   if(typeof cur==='number'&&typeof value==='number'){
     if(!(path in ORIG)) ORIG[path]=cur;
     const o=ORIG[path]; const lo=Math.min(o*MODCFG.CLAMP_LO,o/MODCFG.CLAMP_LO), hi=Math.max(o*MODCFG.CLAMP_HI,o/MODCFG.CLAMP_HI);
@@ -80,7 +79,7 @@ function tint(shipIdx,color,author){ if(typeof ships==='undefined') return {ok:f
   trim(); logmod(`${author} tinted ${s.name} ${color}`); return {ok:true,id};
 }
 
-// ---- RULE AST: {when, cond:{path,op,value}?, then:[{action,...}]} — interpreted, never eval'd -------------------
+// ---- RULE AST: {when, cond:{path,op,value}?, then:[{action,...}]} - interpreted, never eval'd -------------------
 const RULE_EVENTS=['tick','kill_seen','docked','trade','damaged'];
 function checkCond(c){ if(!c) return true; const r=resolve(c.path); if(!r) return false; const v=r.obj[r.key];
   switch(c.op){ case '>':return v>c.value; case '<':return v<c.value; case '>=':return v>=c.value; case '<=':return v<=c.value; case '==':return v===c.value; default:return false; } }
@@ -88,11 +87,11 @@ function runActions(rule){
   for(const a of rule.then||[]){
     try{
       if(a.action==='set') setPath(a.path,a.value,rule.author+'(rule)');
-      else if(a.action==='say'&&typeof term==='function') term(`<span style="color:#c9a0ff">◈ ${String(a.text||'').replace(/</g,'&lt;').slice(0,140)}</span> <span style="opacity:.4">— ${rule.author}'s rule</span>`,'');
+      else if(a.action==='say'&&typeof term==='function') term(`<span style="color:#c9a0ff">◈ ${String(a.text||'').replace(/</g,'&lt;').slice(0,140)}</span> <span style="opacity:.4"> - ${rule.author}'s rule</span>`,'');
       else if(a.action==='credit'&&typeof ships!=='undefined'&&ships[0]) ships[0].credits=Math.max(0,ships[0].credits+Math.max(-200,Math.min(200,a.amount|0)));
       else if(a.action==='tint') tint(a.ship|0,a.color,rule.author+'(rule)');
       else if(a.action==='spawn_gem'&&typeof spawnGemAt==='function'&&typeof ships!=='undefined'&&ships[0]) spawnGemAt(ships[0].pos,1);
-    }catch(e){ rule.disabled=true; logmod(`rule #${rule.id} (${rule.author}) threw — disabled: ${e.message}`); }
+    }catch(e){ rule.disabled=true; logmod(`rule #${rule.id} (${rule.author}) threw - disabled: ${e.message}`); }
   }
 }
 function defineRule(spec,author){
@@ -111,7 +110,7 @@ function emit(event){ for(const m of MODS){ if(m.kind!=='rule'||m.disabled||m.wh
 // shieldArr: protective proxy over ships/planets handed to js() code (tick-3 adversary: delete G.ships[0].pos broke
 // step() beyond revert). Element objects are shallow-proxied: deleteProperty always refused; set allows only FINITE
 // numbers / strings / booleans. Nested writes (pos.x=NaN) and bound-method writes (pos.set(_,_,NaN)) still reach RAW
-// fields the shallow proxy cannot membrane — but that hole is now SEALED downstream by finiteSweep() (tick-4): the
+// fields the shallow proxy cannot membrane - but that hole is now SEALED downstream by finiteSweep() (tick-4): the
 // tick repairs any non-finite ship pos/vel/hp every frame, so poison self-heals regardless of the write route. The
 // proxy stops the easy routes; the sweep guards the INVARIANT (ships stay finite) that actually keeps the game alive.
 const _shieldCache=new WeakMap();
@@ -133,7 +132,7 @@ function shieldArr(arr){
 }
 function guardCode(code){
   if(/\b(while|for|do)\b[^{]*[^\s{]\s*(;|$)/m.test(code) && !/\{/.test(code)) return {err:'loops need braces'};
-  if(/\bdelete\b/.test(code)) return {err:'delete blocked (tick-3 adversary: deleting a ship field kills step() beyond revert — mutate values, never remove structure)'};
+  if(/\bdelete\b/.test(code)) return {err:'delete blocked (tick-3 adversary: deleting a ship field kills step() beyond revert - mutate values, never remove structure)'};
   // allocation-bomb heuristic: any numeric literal at ALLOC_LIT_CAP scale is rejected outright (see MODCFG note)
   const lits=code.match(/\d+(?:\.\d+)?(?:e\+?\d+)?/gi)||[];
   for(const l of lits) if(parseFloat(l)>=MODCFG.ALLOC_LIT_CAP) return {err:'literal '+l+' >= '+MODCFG.ALLOC_LIT_CAP+' blocked (allocation-guard heuristic; use G.set with clamps for big values)'};
@@ -158,11 +157,11 @@ function revert(id){ const i=MODS.findIndex(m=>m.id===id); if(i<0) return false;
   if(m.undo){ try{ m.undo(); }catch(e){} } m.disabled=true; MODS.splice(i,1); logmod(`reverted #${id} (${m.desc})`); return true; }
 function revertAll(){ for(let i=MODS.length-1;i>=0;i--) revert(MODS[i].id); }
 function trim(){ while(MODS.length>MODCFG.MAX_ACTIVE) revert(MODS[0].id); }
-// FINITE SWEEP — guard the INVARIANT, not each attack path (tick-4 burn-down; the sound fix for the nested-write
+// FINITE SWEEP - guard the INVARIANT, not each attack path (tick-4 burn-down; the sound fix for the nested-write
 // hole: G.ships[0].pos.x=0/0 and bound-method writes like pos.set(_,_,NaN) reach RAW nested fields the shieldArr
 // proxy + delete-block cannot membrane without breaking three.js. Rather than enumerate every poison route, we
 // enforce the property that keeps the game alive: ships stay FINITE. Any non-finite pos/vel/hp is repaired to a
-// safe value each tick, so poison self-heals within one frame — "fully break the game" stays structurally
+// safe value each tick, so poison self-heals within one frame - "fully break the game" stays structurally
 // impossible even against unknown future write routes.). Only sweeps when mods are active (zero cost otherwise).
 const _lastGood=new WeakMap();
 function finiteSweep(){
@@ -181,7 +180,7 @@ function tick(dt){
   const now=performance.now();
   if(lastT){ const gap=now-lastT;
     if(gap>MODCFG.WATCH_MS && MODS.length){ if(++strikes>=MODCFG.WATCH_STRIKES){ const m=MODS[MODS.length-1];
-      logmod(`WATCHDOG: frames at ${Math.round(gap)}ms — auto-reverting newest mod #${m.id} (${m.desc})`);
+      logmod(`WATCHDOG: frames at ${Math.round(gap)}ms - auto-reverting newest mod #${m.id} (${m.desc})`);
       if(typeof paraLine==='function') paraLine('worm','The ship rejected that last change. I have undone it. We do not speak of it.');
       revert(m.id); strikes=0; } }
     else strikes=0; }
@@ -195,7 +194,7 @@ addEventListener('error', ()=>{ if(MODS.length){ const m=MODS[MODS.length-1]; lo
 const SCALES=[[/\b(double|twice)\b/,2],[/\b(triple)\b/,3],[/\b(halve|half)\b/,0.5],[/\b(way|much|massively|crazy)\b/,3],[/\b(slightly|little|bit)\b/,1.2]];
 const DIRS=[[/\b(faster|quicker|speed|boost|stronger|bigger|more|raise|increase|buff)\b/,1],[/\b(slower|weaker|smaller|less|lower|decrease|nerf)\b/,-1]];
 // INVERSE-KEY semantics (live-test backlog): keys naming a TIME-BETWEEN-EVENTS quantity mean the OPPOSITE of their
-// number — "make the bullets faster" must SHRINK FIRE_CD (divide), never grow it. Named constant, applies wherever
+// number - "make the bullets faster" must SHRINK FIRE_CD (divide), never grow it. Named constant, applies wherever
 // the intent mapper scales a tunable family.
 const INVERSE_KEY_RE=/CD|COOLDOWN|INTERVAL|DELAY|PERIOD/;
 const TARGETS=[ [/\bbullet|shot|laser|fire\b/i,/BULLET|SHOT|FIRE/i], [/\bgem|loot|drop\b/i,/GEM/i], [/\bfuel|gas\b/i,/FUEL|GAS/i],
@@ -222,7 +221,7 @@ function intent(text,author){
       const res=setPath(p, r.obj[r.key]*eff, author); if(res.ok) changed.push(`${p.replace('CFG.','')} ${fmt(res.prev)}→${fmt(res.value)}`); }
     return changed.length?{ok:true,narr:`Done. I reached into the code and turned ${changed.length} screws: ${changed.join(' · ')}. Reload and it never happened.`}:{ok:false,why:'the levers refused me.'};
   }
-  return {ok:false,why:'Say it plainer: name a thing (bullets, gems, engine, fuel, damage, sensors, prices, hull) and a direction (faster, double, half, weaker) — or a color for your ship.'};
+  return {ok:false,why:'Say it plainer: name a thing (bullets, gems, engine, fuel, damage, sensors, prices, hull) and a direction (faster, double, half, weaker) - or a color for your ship.'};
 }
 // Qwen fallback: constrained JSON program (validated; invalid never runs). Called by the wiring when sidecar is up.
 function validateProgram(p){ if(!p||typeof p!=='object') return null;
@@ -236,11 +235,11 @@ function runProgram(p,author){ const v=validateProgram(p); if(!v) return {ok:fal
   if(v.kind==='js') return runJS(v.code,author);
 }
 
-// ---- EVERY PILOT holds the pen: rate-capped, temperament-biased mutation turns (GIVEN menu — labeled) ----------
-// MUTATION TURNS SPEAK (live-test backlog): when a pilot mutates the world it SAYS so — a short in-character line
+// ---- EVERY PILOT holds the pen: rate-capped, temperament-biased mutation turns (GIVEN menu - labeled) ----------
+// MUTATION TURNS SPEAK (live-test backlog): when a pilot mutates the world it SAYS so - a short in-character line
 // via the game's say() (lands in the RADIO tab + 3D bubble; voiced when `voices on`). The line templates are
 // authored GIVEN flavor (same class as the biased menu itself) but always QUOTE the actual mutation performed
-// (path/values/color/rule desc) — grounded in the real change, never a claim about anything else.
+// (path/values/color/rule desc) - grounded in the real change, never a claim about anything else.
 let mutClock=0, mutIdx=0;
 function mutSay(s,line){ if(typeof say==='function'&&s&&s.alive) say(s,line); }
 function pilotTurn(dt){

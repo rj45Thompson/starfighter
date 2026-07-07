@@ -1,17 +1,17 @@
-// acquire.js — THE MULTI-STRATEGY ACQUISITION CASCADE. Per the user (2026-07-07): "in the how/what/why part if it
+// acquire.js - THE MULTI-STRATEGY ACQUISITION CASCADE. Per the user (2026-07-07): "in the how/what/why part if it
 // abstains it should ALSO continue to try to (a) load it from latent knowledge (b) extrapolate with geometry, modal
-// logic, X/Y/Z — whatever works to make the chain, such that it is constantly growing."
+// logic, X/Y/Z - whatever works to make the chain, such that it is constantly growing."
 //
 // On a deliberation GAP, the cascade tries strategies IN ORDER until one yields VERIFIED knowledge that closes it:
-//   STORE    — is it already known? (a free hit from the persistent store — no recompute across runs)
-//   LATENT   — pull it from the latent library (generic knowledge → SHARED tier)
-//   MODAL    — sound deduction: (goal isa TYPE) + (TYPE serves V)  ⊢  (goal serves V)  [premise-tiered]
-//   GEOMETRIC— extrapolate by structure: a node whose known neighborhood matches a solved one likely shares its edges
-//   REVEAL   — go look at the world directly (a WITNESSED observation → PRIVATE tier)
-// EVERY proposal is a CANDIDATE that must be VERIFIED before it commits (0-fabrication — the whole project's law:
+//   STORE - is it already known? (a free hit from the persistent store - no recompute across runs)
+//   LATENT - pull it from the latent library (generic knowledge → SHARED tier)
+//   MODAL - sound deduction: (goal isa TYPE) + (TYPE serves V)  ⊢  (goal serves V)  [premise-tiered]
+//   GEOMETRIC - extrapolate by structure: a node whose known neighborhood matches a solved one likely shares its edges
+//   REVEAL - go look at the world directly (a WITNESSED observation → PRIVATE tier)
+// EVERY proposal is a CANDIDATE that must be VERIFIED before it commits (0-fabrication - the whole project's law:
 // propose freely, verify against the world, commit or abstain; a strategy that lies produces nothing). Verified
 // facts are written to the persistent two-tier store (knowledge.js), tier-classified by provenance, and folded into
-// the working graph — so the graph, and the mind, are CONSTANTLY GROWING and never recomputed. window.ACQUIRE + node.
+// the working graph - so the graph, and the mind, are CONSTANTLY GROWING and never recomputed. window.ACQUIRE + node.
 'use strict';
 (function(){
 const D = (typeof require!=='undefined') ? require('./deliberate.js') : window.DELIBERATE;
@@ -39,7 +39,7 @@ function proposeModal(gap, K, decision, world, ctx){
 }
 function proposeGeometric(gap, K, decision, world, ctx){
   // EXTRAPOLATE by structure: find a node M (fully solved, reaches goal) structurally analogous to the state, and
-  // propose the state inherits M's first action toward the goal. A proposal — verified against the world downstream.
+  // propose the state inherits M's first action toward the goal. A proposal - verified against the world downstream.
   if(gap!=='reach') return [];
   const idx=D.buildIndex(K); const out=[];
   // any known node that reaches the goal in K: propose an action edge from state to that node's predecessor-of-goal
@@ -48,7 +48,7 @@ function proposeGeometric(gap, K, decision, world, ctx){
   return out.slice(0,6);
 }
 function proposeReveal(gap, K, decision, world, ctx){
-  // GO LOOK: reveal from the world directly. A witnessed observation — PRIVATE knowledge.
+  // GO LOOK: reveal from the world directly. A witnessed observation - PRIVATE knowledge.
   const wIdx=D.buildIndex(world); const out=[];
   if(gap==='reach'||gap==='order'){
     const prev={[decision.state]:'root'}; let ring=[decision.state], hit=null; const seen=new Set(ring);
@@ -61,7 +61,7 @@ function proposeReveal(gap, K, decision, world, ctx){
 const STRATEGIES = { latent:proposeLatent, modal:proposeModal, geometric:proposeGeometric, reveal:proposeReveal };
 const DEFAULT_ORDER = ['latent','modal','geometric','reveal'];
 
-// verify a candidate against the world (0-fab arbiter). MODAL deductions are ALSO checked — a sound deduction over
+// verify a candidate against the world (0-fab arbiter). MODAL deductions are ALSO checked - a sound deduction over
 // true premises yields a true fact, which the world confirms; anything else is rejected.
 function verify(edge, world){ return has(world, edge); }
 

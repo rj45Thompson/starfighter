@@ -1,23 +1,23 @@
-// chatter.js — N4 AUDIBLE CHATTER (NOVEL_SOCIETY pillar N4): the radio band comes alive + the pilots get VOICES.
+// chatter.js - N4 AUDIBLE CHATTER (NOVEL_SOCIETY pillar N4): the radio band comes alive + the pilots get VOICES.
 // Two subsystems, one module (lane B owns this file; loaded as a plain <script src> global AFTER gamemod.js, BEFORE
-// the main game script — every game symbol below (ships/say/loreIndex/loreSpeak/novelSegOf/...) is referenced only
+// the main game script - every game symbol below (ships/say/loreIndex/loreSpeak/novelSegOf/...) is referenced only
 // at CALL time from tick()/onEvent()/command handlers, long after the main script has parsed. Same load-order
 // contract as speech_tier.js / inhabitant.js).
 //
-// 1. CHATTER — ambient + event radio lines. Pilots that carry a NOVEL SEGMENT occasionally speak IN CHARACTER:
+// 1. CHATTER - ambient + event radio lines. Pilots that carry a NOVEL SEGMENT occasionally speak IN CHARACTER:
 //    retrieval over their OWN segment picks the fact (the same loreIndex/loreQVec/loreCos machinery the ask path
-//    uses — the knowledge law survives verbatim: a pilot's chatter can only draw on ITS OWN segment docs), the
+//    uses - the knowledge law survives verbatim: a pilot's chatter can only draw on ITS OWN segment docs), the
 //    speech tier voices it (loreSpeak → lorePersona's EXTREME register + grounding post-check), and when the
 //    sidecar is down the composer fallback emits the retrieved sentence VERBATIM (0-fab by construction).
 //    Event lines (kill_seen / docked / damaged) are grounded in the LIVE event (an authored template carrying the
-//    real names/numbers — same honesty class as the existing ACK/replyChatter canned lines + loreLiveDocs live
+//    real names/numbers - same honesty class as the existing ACK/replyChatter canned lines + loreLiveDocs live
 //    facts) plus a segment sentence when one matches. Lines land in the RADIO tab via say(); the worm's
 //    parasiteRoute replies stay PARASITE (this module never routes passenger text).
 //    SERIALIZED QUEUE + RATE CAP: at most ONE line per CHATTER_PERIOD_S sim-seconds, MAX_QUEUE pending events
-//    (oldest dropped), one speech-tier call in flight at a time — no spam; ambient fills every idle slot
-//    round-robin over eligible pilots — no starvation.
-// 2. VOICES — browser speechSynthesis, DEFAULT OFF (the user opts in with `voices on`). Per-pilot rate/pitch
-//    seeded from the BAKED voiceprint stats (voiceprints.json — `node voiceprint_vec.js > voiceprints.json`;
+//    (oldest dropped), one speech-tier call in flight at a time - no spam; ambient fills every idle slot
+//    round-robin over eligible pilots - no starvation.
+// 2. VOICES - browser speechSynthesis, DEFAULT OFF (the user opts in with `voices on`). Per-pilot rate/pitch
+//    seeded from the BAKED voiceprint stats (voiceprints.json - `node voiceprint_vec.js > voiceprints.json`;
 //    fetched soft-fail like NOVELDATA) where a character is modeled, else a deterministic temperament hash.
 //    THE WORM (the Passenger) gets a distinct LOW/SLOW voice; its paraLine replies speak too when voices are on.
 //    One utterance at a time (queue serialized); `voices off` cancels mid-word and clears the queue.
@@ -26,18 +26,18 @@
 // facts are minted here; the loreSpeak grounding guard applies unchanged on the LLM tier.
 'use strict';
 (function(){
-// ---- CONFIG (every tunable named — no magic numbers in logic) --------------------------------------------------
+// ---- CONFIG (every tunable named - no magic numbers in logic) --------------------------------------------------
 const CHATTER_CFG={
   CHATTER_PERIOD_S:14,     // RATE CAP: at most one radio line per this many sim-seconds (N4 "no spam")
   MAX_QUEUE:4,             // pending event jobs beyond this DROP OLDEST (freshest events win; never a backlog dump)
   START_DELAY_S:8,         // sim-seconds after boot before the band opens (lets NOVELDATA/roster fetches land)
-  EVENT_COOLDOWN_S:20,     // per-event-TYPE cooldown — a bullet-storm can't flood the queue with 'damaged' jobs
+  EVENT_COOLDOWN_S:20,     // per-event-TYPE cooldown - a bullet-storm can't flood the queue with 'damaged' jobs
   AMBIENT_SEG_FACTS:2,     // segment sentences retrieved per ambient line
   EVENT_SEG_FACTS:1,       // segment sentences accompanying an event line
   LINE_MAX_CHARS:200,      // radio line hard cap (keeps bubbles + utterances sane)
 };
 const VOICE_CFG={
-  DEFAULT_ON:false,        // DEFAULT OFF — the user opts in with `voices on` (mission contract)
+  DEFAULT_ON:false,        // DEFAULT OFF - the user opts in with `voices on` (mission contract)
   QUEUE_MAX:6,             // pending utterances beyond this are dropped (the ear can only take so much)
   UTTER_TIMEOUT_MS:14000,  // belt: engines that never fire onend/onerror must not deadlock the queue
   RATE_MIN:0.72, RATE_MAX:1.35, PITCH_MIN:0.55, PITCH_MAX:1.65,   // hard clamps on any derived voice
@@ -54,24 +54,23 @@ const VOICE_CFG={
 // ---- module state ----------------------------------------------------------------------------------------------
 let clock=0, boot=0, busy=false, rr=0, nEmit=0, last=null;
 const Q=[];                       // pending chatter jobs {kind,s,query,eventFacts,liveFact,question}
-const SAID={};                    // per-pilot chatter said-set (doc ids) — separate from the ask path's st.said
+const SAID={};                    // per-pilot chatter said-set (doc ids) - separate from the ask path's st.said
 const lastEvT={};                 // per-event-type sim-clock of last accepted job (EVENT_COOLDOWN_S)
-let simT=0;                       // our own sim clock (fed by tick dt — headless pump drives it)
+let simT=0;                       // our own sim clock (fed by tick dt - headless pump drives it)
 
 // VOICEPRINTS: baked stylometry stats (voiceprint_vec.js output saved to voiceprints.json). Soft-fail like
 // NOVELDATA: absent file → every pilot uses the temperament hash; nothing else changes.
 let VP=null;
 try{ fetch('./voiceprints.json').then(r=>r.ok?r.json():null).then(j=>{ VP=(j&&(j.voiceprints||null))||null;
-  if(VP) console.log(`VOICEPRINTS loaded: ${Object.keys(VP).length} modeled characters (voiceprint_vec bake) — speech rate/pitch seeded from novel-dialogue stats; unmodeled pilots hash their temperament`); }).catch(()=>{}); }catch(e){}
+  if(VP) console.log(`VOICEPRINTS loaded: ${Object.keys(VP).length} modeled characters (voiceprint_vec bake) - speech rate/pitch seeded from novel-dialogue stats; unmodeled pilots hash their temperament`); }).catch(()=>{}); }catch(e){}
 
-// ---- eligibility + retrieval (REUSES the ask-path machinery — nothing re-implemented) ---------------------------
+// ---- eligibility + retrieval (REUSES the ask-path machinery - nothing re-implemented) ---------------------------
 function segOf(name){ return (typeof novelSegOf==='function')?novelSegOf(name):null; }
 function eligible(){ if(typeof ships==='undefined'||!Array.isArray(ships)) return [];
   return ships.filter(s=>s&&s.alive&&s.role!=='player'&&(segOf(s.name)||[]).length); }
 function nearestTo(list,pos){ if(!list.length) return null; if(!pos) return list[0];
   let best=null,bd=Infinity; for(const s of list){ const d=s.pos.distanceTo(pos); if(d<bd){ bd=d; best=s; } } return best; }
-// retrieval over the pilot's OWN segment: score its novel docs against a state/event query (loreQVec/loreCos —
-// the ask path's exact scorer); zero-overlap falls back to unsaid-rotation in ord order (variety, no starvation).
+// retrieval over the pilot's OWN segment: score its novel docs against a state/event query (loreQVec/loreCos - the ask path's exact scorer); zero-overlap falls back to unsaid-rotation in ord order (variety, no starvation).
 function pickSegDocs(s,queryText,n){
   if(typeof loreIndex!=='function') return null;
   const idx=loreIndex(s); if(!idx) return null;
@@ -112,7 +111,7 @@ function onEvent(type,data){ data=data||{};
     const wit=el.filter(x=>x!==v&&x!==k);                       // prefer a WITNESS (the killer already has its splash line)
     s=nearestTo(wit.length?wit:el, v.pos);
     if(!s) return;
-    fact=`${v.name} just went down${k?(' — '+(k===s?'my guns':k.name+"'s guns")):''}. The whole band heard it.`;
+    fact=`${v.name} just went down${k?(' - '+(k===s?'my guns':k.name+"'s guns")):''}. The whole band heard it.`;
     query='kill guns down burn dead '+v.name+(k?(' '+k.name):'');
   } else if(type==='docked'){
     s=nearestTo(el, player&&player.pos);
@@ -122,11 +121,11 @@ function onEvent(type,data){ data=data||{};
   } else if(type==='damaged'){
     s=nearestTo(el, player&&player.pos);
     if(!s) return;
-    fact=`YOU just took a hit${data.hull!=null?(' — hull reading '+data.hull):''}. The band saw the flash.`;
+    fact=`YOU just took a hit${data.hull!=null?(' - hull reading '+data.hull):''}. The band saw the flash.`;
     query='hit hull damage burn wound';
   } else return;
   lastEvT[type]=simT;
-  if(Q.length>=CHATTER_CFG.MAX_QUEUE) Q.shift();                // DROP OLDEST — freshest events win, no backlog dump
+  if(Q.length>=CHATTER_CFG.MAX_QUEUE) Q.shift();                // DROP OLDEST - freshest events win, no backlog dump
   Q.push({ kind:'event:'+type, s, query, eventFacts:[fact], liveFact:null,
     question:`React on the open radio band, in one short line, to this: ${fact}` });
 }
@@ -138,12 +137,12 @@ async function runJob(job){ busy=true;
     const facts=(job.eventFacts||[]).concat(job.liveFact?[job.liveFact]:[]).concat(segTexts);
     if(!facts.length) return;
     let line=null, tier='composer';
-    // TOP tier: the ask path's exact voicer — lorePersona EXTREME register + grounding post-check inside loreSpeak.
+    // TOP tier: the ask path's exact voicer - lorePersona EXTREME register + grounding post-check inside loreSpeak.
     if(picked && typeof TAMI_SPEAK!=='undefined' && TAMI_SPEAK.alive && typeof loreSpeak==='function'){
       try{ const st=(typeof loreState==='function')?loreState(s):{history:[]};
         line=await loreSpeak(s, job.question, facts, st, picked.idx); if(line) tier='qwen'; }catch(e){ line=null; }
     }
-    if(!line){ // composer fallback: VERBATIM — the retrieved segment sentence (ambient) / the live event line (event)
+    if(!line){ // composer fallback: VERBATIM - the retrieved segment sentence (ambient) / the live event line (event)
       line=(job.kind==='ambient') ? (segTexts[0]||'') : ((job.eventFacts&&job.eventFacts[0])||segTexts[0]||'');
     }
     line=String(line||'').replace(/</g,'&lt;').slice(0,CHATTER_CFG.LINE_MAX_CHARS);
@@ -158,7 +157,7 @@ function tick(dt){ if(!(dt>0)) return; simT+=dt;
   clock+=dt;
   if(busy||clock<CHATTER_CFG.CHATTER_PERIOD_S) return;
   const job=Q.shift()||makeAmbient();
-  if(!job){ clock=CHATTER_CFG.CHATTER_PERIOD_S; return; }       // nobody eligible yet — retry next tick, cap the clock
+  if(!job){ clock=CHATTER_CFG.CHATTER_PERIOD_S; return; }       // nobody eligible yet - retry next tick, cap the clock
   clock=0; runJob(job);
 }
 
@@ -188,7 +187,7 @@ function speakText(name,text,params,force){
   const plain=String(text||'').replace(/<[^>]*>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')
     .replace(/\s+/g,' ').trim().slice(0,CHATTER_CFG.LINE_MAX_CHARS);
   if(!plain) return false;
-  if(SQ.length>=VOICE_CFG.QUEUE_MAX) return false;                     // ear saturated — drop, never backlog
+  if(SQ.length>=VOICE_CFG.QUEUE_MAX) return false;                     // ear saturated - drop, never backlog
   SQ.push({name,plain,params:params||voiceParams(name,'')}); pump(); return true;
 }
 function pump(){ if(uttering||!SQ.length) return;
@@ -209,7 +208,7 @@ function setVoices(v){ voicesOn=!!v;
 // hooks the game calls (one line each in starfighter.html):
 function voiceSay(s,text){ if(!voicesOn||!s) return; speakText(s.name,text,voiceParams(s.name,s.backstory||'')); }
 function voiceWorm(html){ if(!voicesOn) return; speakText(VOICE_CFG.WORM_NAME,html,voiceParams(VOICE_CFG.WORM_NAME)); }
-// `voice test <pilot>` — an explicit user action counts as opt-in for that single utterance (force), even when off.
+// `voice test <pilot>` - an explicit user action counts as opt-in for that single utterance (force), even when off.
 function voiceTest(shipOrName){
   let name=null, temper='', text='';
   if(shipOrName&&typeof shipOrName==='object'){ name=shipOrName.name; temper=shipOrName.backstory||'';

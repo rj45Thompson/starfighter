@@ -1,28 +1,28 @@
-// knowledge_hud.js — THE AGI-TEST DEBUG HUD. Per the user (2026-07-07): "I want a hud just to debug the knowledge
+// knowledge_hud.js - THE AGI-TEST DEBUG HUD. Per the user (2026-07-07): "I want a hud just to debug the knowledge
 // graph.. I want it to be apparent this is an AGI test not a game per se."
 //
 // This is a READ-ONLY overlay. It never mutates the sim; it snapshots the LIVE reasoning substrate every tick and
-// draws it, so a viewer can SEE the AGI thinking under the space game — not play the game, but watch the mind.
-// What it surfaces (each source is OPTIONAL — the HUD degrades gracefully to "pillar offline" when a global is
+// draws it, so a viewer can SEE the AGI thinking under the space game - not play the game, but watch the mind.
+// What it surfaces (each source is OPTIONAL - the HUD degrades gracefully to "pillar offline" when a global is
 // absent, so it is safe to mount before any of them load):
-//   window.GAME_KNOW   — the persistent two-tier knowledge store (knowledge.js). GAME_KNOW.stats() gives the live
+//   window.GAME_KNOW - the persistent two-tier knowledge store (knowledge.js). GAME_KNOW.stats() gives the live
 //                        counters {shared, agents, private_total}; GAME_KNOW._state() gives the raw
 //                        {shared:{edgeKey:prov}, priv:{agent:{edgeKey:prov}}} we parse into the node-edge viz.
-//   window.DELIBERATE  — the deliberation engine (deliberate.js). Presence = the "deliberate" pillar is online.
-//   window.THOUGHTS    — the N5 fitness ledger (thoughts.js). THOUGHTS.fitness() gives per-mind reasoning fitness.
-//   window.ACQUIRE     — the multi-strategy acquisition cascade (acquire.js). Presence = the "acquire" pillar.
-//   window.SEEK / DELIBERATE.seek — the goal-seek pillar (best-effort presence probe).
+//   window.DELIBERATE - the deliberation engine (deliberate.js). Presence = the "deliberate" pillar is online.
+//   window.THOUGHTS - the N5 fitness ledger (thoughts.js). THOUGHTS.fitness() gives per-mind reasoning fitness.
+//   window.ACQUIRE - the multi-strategy acquisition cascade (acquire.js). Presence = the "acquire" pillar.
+//   window.SEEK / DELIBERATE.seek - the goal-seek pillar (best-effort presence probe).
 // An edgeKey is the store's currency: "s|r|o". We parse the most-recent ~20 SHARED facts (plus a few PRIVATE, drawn
 // violet) into nodes+edges and lay them out radially (deterministic, no physics tick needed) so the graph reads as a
-// growing web of facts, cyan=shared (all minds), violet=private (one mind's secret) — exactly the two-tier split the
+// growing web of facts, cyan=shared (all minds), violet=private (one mind's secret) - exactly the two-tier split the
 // store enforces by provenance. Counters show SHARED growing / PRIVATE per-mind / which pillars are online, and a
 // one-line "what the AGI is doing" status. Pure DOM + <canvas>, zero deps, lazy-init on first mount, ASCII only.
 //
 // PUBLIC API (attaches window.KHUD): { mount(parentEl?), update(), toggle(), visible() }.
-//   mount(parentEl?) — build the panel once (idempotent) under parentEl (default document.body); returns the root el.
-//   update()         — re-snapshot the live globals and redraw. Wire this on a ~2/s timer (see wiring notes).
-//   toggle()         — show/hide the panel (starts HIDDEN). Returns the new visibility bool.
-//   visible()        — is the panel currently shown.
+//   mount(parentEl?) - build the panel once (idempotent) under parentEl (default document.body); returns the root el.
+//   update() - re-snapshot the live globals and redraw. Wire this on a ~2/s timer (see wiring notes).
+//   toggle() - show/hide the panel (starts HIDDEN). Returns the new visibility bool.
+//   visible() - is the panel currently shown.
 // SYNTAX-CLEAN under node: every browser-only ref (window/document/AudioContext/requestAnimationFrame) is guarded, so
 // `require('./knowledge_hud.js')` loads without throwing. A self-test under require.main stubs a minimal DOM, mounts,
 // updates against a stub store, and prints the API surface.
@@ -38,9 +38,9 @@ var CFG = {
   CANVAS_H: 190,             // logical canvas height
   NODE_R: 4.5,               // node dot radius (px, logical)
   PANEL_W: 330,              // panel width (px)
-  COL_SHARED: '#37e0ff',     // cyan  — SHARED knowledge (every AGI holds it)
+  COL_SHARED: '#37e0ff',     // cyan - SHARED knowledge (every AGI holds it)
   COL_SHARED_DIM: '#1c6f80', // dim cyan for shared edges
-  COL_PRIV: '#b98cff',       // violet — PRIVATE knowledge (one mind's secret)
+  COL_PRIV: '#b98cff',       // violet - PRIVATE knowledge (one mind's secret)
   COL_PRIV_DIM: '#5b466f',   // dim violet for private edges
   COL_NODE_TXT: '#8fb8cc',   // node label colour
   COL_ONLINE: '#7fdc8a',     // pillar online (green)
@@ -66,7 +66,7 @@ var STATUS = {
   steady:   'DELIBERATING: chain-reasoning how/what/why/when over the live graph; store steady.',
   seeking:  'SEEKING: goal-decode active; deliberation looking for the next gap to close.',
   cold:     'IDLE: reasoning substrate loaded, awaiting the next decision to deliberate over.',
-  nostore:  'BOOT: knowledge store not attached yet — pillars initializing.',
+  nostore:  'BOOT: knowledge store not attached yet - pillars initializing.',
 };
 
 // ---- tiny DOM helpers (guarded; no-op-ish when document is absent) -------------------------------------------
@@ -90,7 +90,7 @@ var H = {
   dpr: 1,
 };
 
-// read the live knowledge store defensively — returns null if not present / not a store
+// read the live knowledge store defensively - returns null if not present / not a store
 function readStore() {
   var w = win(); if (!w || !w.GAME_KNOW) return null;
   var K = w.GAME_KNOW;
@@ -160,7 +160,7 @@ function buildGraph(state) {
   return { nodes: nodes, edges: edges };
 }
 
-// Deterministic RADIAL layout — no physics tick required, stable frame-to-frame for the same node set.
+// Deterministic RADIAL layout - no physics tick required, stable frame-to-frame for the same node set.
 // Nodes are placed on concentric rings by insertion order; a light per-id hash jitters the angle so the web
 // doesn't look like a clock. Coordinates are in logical canvas space.
 function layout(graph, w, h) {
@@ -296,7 +296,7 @@ function build(parentEl) {
   // header
   var head = el('div', 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px');
   var title = el('div', 'font-weight:800;letter-spacing:.02em;color:' + CFG.COL_ACCENT + ';text-shadow:0 0 12px ' + CFG.COL_ACCENT + '66');
-  title.innerHTML = '◈ AGI TEST — <span style="color:#dff2ff">reasoning substrate</span> ' +
+  title.innerHTML = '◈ AGI TEST - <span style="color:#dff2ff">reasoning substrate</span> ' +
     '<span style="color:' + CFG.COL_ONLINE + ';font-size:9px;letter-spacing:.14em">LIVE</span>';
   var closeBtn = el('div',
     'cursor:pointer;color:#7fa6bd;font-weight:800;padding:0 4px;line-height:1', '✕');
@@ -305,7 +305,7 @@ function build(parentEl) {
   head.appendChild(title); head.appendChild(closeBtn);
   root.appendChild(head);
 
-  // sub-caption: makes the intent explicit — this is a probe, not a game panel
+  // sub-caption: makes the intent explicit - this is a probe, not a game panel
   var sub = el('div', 'font-size:9px;color:#6f93a8;margin-bottom:7px;letter-spacing:.02em');
   sub.innerHTML = 'watching the mind under the game · <span style="color:' + CFG.COL_SHARED + '">cyan=shared</span> ' +
     '<span style="color:' + CFG.COL_PRIV + '">violet=private</span> knowledge';
@@ -358,7 +358,7 @@ var API = { mount: mount, update: update, toggle: toggle, visible: visible, CFG:
 if (typeof window !== 'undefined') window.KHUD = API;
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 
-// ---- self-test (node) — stub a minimal DOM, mount, update against a stub store, print the API ----------------
+// ---- self-test (node) - stub a minimal DOM, mount, update against a stub store, print the API ----------------
 if (typeof require !== 'undefined' && require.main === module) {
   // minimal DOM stub so build()/update() exercise their real paths without a browser
   function stubEl() {
