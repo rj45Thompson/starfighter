@@ -54,7 +54,8 @@
   #chat::placeholder{ color:#5f7a98; font-weight:500; }
   #chat:focus{ border-color:var(--cyan); box-shadow:0 0 0 1px #46d6ff44 inset; }
   #market{ position:fixed; top:10px; transform:translateX(-50%); z-index:6; pointer-events:none;
-    background:#0a1420dd; border:1px solid #223span; border:1px solid #22344a; border-radius:9px; padding:8px 10px; }
+    background:#0a1420dd; border:1px solid #223span; border:1px solid #22344a; border-radius:9px; padding:8px 10px;
+    max-width:min(94vw,860px); max-height:80vh; overflow:auto; }   /* SR wave grew to 16 planets — the table now exceeds the main viewport; scroll rather than run off-screen unreachably */
   #market .mkt-h{ font:700 10px/1.3 ui-monospace,monospace; letter-spacing:.06em; color:#8fb0cc; margin-bottom:6px; }
   #market .mkt-k{ color:#5f7a98; font-weight:500; }
   #market table{ border-collapse:collapse; font:600 11px/1 ui-monospace,monospace; }
@@ -98,7 +99,7 @@
 <div class="hud" id="pillars"></div>
 <div class="hud" id="roster"></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
-<div id="market"></div>
+<div id="market"><div id="marketBody"></div></div>
 <div class="vlabel" id="lblTop">TOP-DOWN <span>· scroll zoom · drag pan · click select · dbl-click reset</span></div>
 <div class="vlabel" id="lblBrain">REASONING <span>· scroll zoom · drag pan</span></div>
 <div id="vdiv"></div><div id="hdiv"></div>
@@ -135,6 +136,7 @@
 <script src="hullmodels.js"></script>
 <script src="knowledge_hud.js"></script>
 <script src="thoughts.js"></script>
+<script src="panels.js"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy — 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
 <script src="starmap.js"></script>
@@ -916,7 +918,7 @@ function think(s,dt){
         else { s.docked=p; s.obj=null; contractDeliver(p);
           if(s.role==='player' && p.rep>CFG.REP_HOSTILE && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
           dockMenu(p,false); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
-          if(s.role==='player'){ marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
+          if(s.role==='player'){ if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
         } }
       else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }
     else if(o.type==='hunt'){ if(o.target&&o.target.alive){ mode='HUNT'; target=o.target; aimDir=_v.copy(o.target.pos).sub(s.pos); } else { s.obj=null; term('Target down / lost.','sys'); } }
@@ -2769,11 +2771,23 @@ function updateRoster(){ ships.forEach((s,i)=>{ const hp=document.getElementById
 
 // -------- market panel (galaxy price grid + focused ship status) --------
 let marketOn=true;
-function buildMarket(){ const el=document.getElementById('market'); if(!planets.length){ el.style.display='none'; return; }
-  let h='<div class="mkt-h">GALAXY MARKET · price/unit <span class="mkt-k">green=cheap (buy) · red=dear (sell) · [M] toggle</span></div><table><tr><th>good</th>';
+// THE WINDOW STANDARD (user 2026-07-07): market + the terminal share one pin/slide/opacity chrome (panels.js).
+// Pinned (default) behaves exactly as before — always visible. Unpin and the panel auto-hides a moment after
+// your mouse leaves, and a small edge tab (title + chevron) always sits there so closing/reopening never needs
+// the M hotkey — that fixes "user don't know to hit M to lose the menu". A slider top-right drives transparency.
+if(window.PANELS){
+  PANELS.register('market', document.getElementById('market'), { title:'MARKET', edge:'top', centerX:true, rgb:[10,20,32],
+    defaultOpacity:0.86, hotkeyLabel:'M',
+    onOpenChange:(open)=>{ marketOn=open; if(open) updateMarket(); } });
+  PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
+    defaultOpacity:0.91, hotkeyLabel:'`',
+    keepOpenWhile:()=>document.activeElement && document.activeElement.id==='chat' });   // don't yank it away mid-type
+}
+function buildMarket(){ const el=document.getElementById('market'), body=document.getElementById('marketBody'); if(!planets.length){ el.style.display='none'; return; }
+  let h='<div class="mkt-h">GALAXY MARKET · price/unit <span class="mkt-k">green=cheap (buy) · red=dear (sell) · drag the pin ▾ to keep this open</span></div><table><tr><th>good</th>';
   for(const p of planets) h+=`<th>${p.name}<br><span class="mkt-t">${p.type.t}</span></th>`; h+='</tr>';
   for(const g of GOODS){ h+=`<tr><td class="mkt-g">${g.n}</td>`; for(let pi=0;pi<planets.length;pi++) h+=`<td id="mk_${g.k}_${pi}">–</td>`; h+='</tr>'; }
-  h+='</table><div class="mkt-s" id="mkt-war"></div><div class="mkt-s" id="mkt-planets"></div><div class="mkt-s" id="mkt-ship"></div>'; el.innerHTML=h; }
+  h+='</table><div class="mkt-s" id="mkt-war"></div><div class="mkt-s" id="mkt-planets"></div><div class="mkt-s" id="mkt-ship"></div>'; body.innerHTML=h; }
 function updateMarket(){ if(!marketOn||!planets.length) return;
   for(const g of GOODS) for(let pi=0;pi<planets.length;pi++){ const pr=priceOf(planets[pi],g.k), c=document.getElementById(`mk_${g.k}_${pi}`);
     if(c){ c.textContent=Math.round(pr); const rel=pr/g.base; c.style.color= rel<0.82?'#7dffa6':rel>1.25?'#ff8a8a':'#cfe2f5'; } }
@@ -2934,7 +2948,7 @@ function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
 addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
   if(AWAY.active()){ if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyF','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault(); AWAY.key(e,true); return; }
   if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[focus].name; return; }
-  if(e.code==='KeyM'){ marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); return; }
+  if(e.code==='KeyM'){ if(window.PANELS) PANELS.toggle('market'); else { marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); } return; }
   if(e.code==='Backquote'){ document.getElementById('ticker').classList.toggle('big'); return; }
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
 addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if(keysDown.delete(e.code)) applyKeys(); });
@@ -2977,7 +2991,7 @@ canvas.addEventListener('dblclick',e=>{ const vp=viewAt(e.clientX,e.clientY);
     if(base && dB<=dP){ P.obj={type:'goto',planet:{pos:base.pos.clone(),name:'Ranger Command',_base:true}}; term('⌂ course set for Ranger Command.','sys'); }
     else if(np){ P.obj={type:'goto',planet:np}; term('Course set for '+np.name+' — auto-docking.','sys'); } };
   const pb=$('tbPilot'); if(pb) pb.onclick=()=>{ focus=(focus+1)%CFG.NSHIPS; buildRoster(); $('lblBrain').textContent='REASONING · '+ships[focus].name; };
-  const mb=$('tbMkt'); if(mb) mb.onclick=()=>{ marketOn=!marketOn; $('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); };
+  const mb=$('tbMkt'); if(mb) mb.onclick=()=>{ if(window.PANELS) PANELS.toggle('market'); else { marketOn=!marketOn; $('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); } };
   const lb=$('tbLog'); if(lb) lb.onclick=()=>{ $('ticker').classList.toggle('big'); };
   let td=null, pinchD=0;
   canvas.addEventListener('touchstart',e=>{ if(e.touches.length===1){ const t=e.touches[0], vp=viewAt(t.clientX,t.clientY);
