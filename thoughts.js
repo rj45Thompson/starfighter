@@ -31,6 +31,17 @@
 //     an EARNED sentence — one whose chapter the pilot knows through broadcast or a shared scene, NOT own pov
 //     (cross-segment knowledge must be EARNED, pillar N3). Bridge is novelty-gated on purpose: re-crossing a
 //     known bridge is stale news, which keeps the stale ceiling exact (below).
+//   - frontier     W_FRONTIER per FRESH hop whose sentence the pilot's attached GRAPHFOG (graphfog.js — an
+//     OPTIONAL soft dependency, see attachFog) revealed SINCE the fog's last mark(): thinking through
+//     NEWLY-opened territory pays. Chains entirely inside the pre-revealed HOMELAND (the segment) earn ZERO
+//     frontier bonus — homeland sentences are never "newly revealed" (anti-puppet). Frontier is novelty-gated
+//     exactly like bridge (a stale re-walk through opened territory is stale news), so the stale ceiling stays
+//     MAX_HOPS·W_BASE and the advisor law below is untouched. With a fog attached the pilot's KNOWABLE set
+//     (verification + walk pool) extends from the segment to segment ∪ fog.revealed — the node-vision law: fog
+//     opens ONLY along the knowledge-law edges graphfog.js enforces structurally. No fog attached ⇒ behaviour
+//     is unchanged (frontier terms 0; the knowable set is the segment). Note the two bonuses are disjoint by
+//     the knowledge law itself: an EARNED (broadcast/shared-scene) sentence is already in the segment, so a
+//     bridge landing is never frontier territory and vice versa — no double-dip.
 //   - scoring counts at most MAX_HOPS hops (the builder never exceeds it; over-long hand-fed chains truncate).
 // ANTI-RAMBLE BY CONSTRUCTION: a stale chain earns exactly counted·W_BASE (novelty 0, bridges 0 since bridges
 // require freshness), so its ceiling is MAX_HOPS·W_BASE; the smallest all-fresh 2-hop chain earns at least
@@ -60,7 +71,9 @@ const CFG = {
   W_BASE: 1,                     // verified-usefulness base credit per hop (chain must verify or total = 0)
   W_NOVEL: 6,                    // per FRESH semantic edge (s|r|o not in the pilot's history nor earlier in chain)
   W_BRIDGE: 3,                   // per fresh hop crossing chapters through an EARNED (broadcast/shared) sentence
+  W_FRONTIER: 4,                 // per fresh hop through territory the pilot's GRAPHFOG revealed since its last mark()
   // ADVISOR LAW BY CONSTRUCTION: 2*(W_BASE+W_NOVEL)=14 > MAX_HOPS*W_BASE=10 — see advisorLawHolds().
+  // W_FRONTIER is fresh-gated, so a stale ramble still caps at MAX_HOPS*W_BASE and the law is unaffected.
   MIN_VARIANT_LEN: 4,            // leading-"The" place variant minimum length (mirrors the baker's MIN_ALIAS_LEN)
   GRAPH_FILE: 'novel_graph.json',          // node lazy-load / browser load() default
   CHARS_FILE: 'novel/characters.json',     // roster (places list feeds the place-span guard)
@@ -85,7 +98,9 @@ let PLACES = [];         // roster places (multi-word ones feed the span guard);
 let GROUNDED = null;     // triples passing the mention-grounded law, in graph order
 let TKEY = null;         // Map instance-key -> {t, grounded} for verification lookups
 let SEGSET = null;       // {name: Set(sentenceIdx)}
-let POOLS = null;        // {name: grounded triples inside segment} (lazy per pilot)
+let POOLS = null;        // {name: grounded triples inside the knowable set} (lazy per pilot)
+let FOGS = {};           // {name: GRAPHFOG instance} — the optional frontier-bonus soft dependency (attachFog)
+let POOLS_REV = {};      // {name: fog.revealed.size at pool-bake time} — invalidates the pool when fog moves
 
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const instKey = (t) => t.s + '|' + t.r + '|' + t.o + '|' + t.chapter + '|' + t.sIdx;   // one baked triple instance
@@ -149,7 +164,7 @@ function setGraph(graph, roster) {
   PLACES = (roster && Array.isArray(roster.places) && roster.places.length)
     ? roster.places.map(String)
     : [...new Set((graph.chapters || []).map(c => c && c.place).filter(Boolean))];      // honest weaker fallback
-  GROUNDED = []; TKEY = new Map(); POOLS = {};
+  GROUNDED = []; TKEY = new Map(); POOLS = {}; FOGS = {}; POOLS_REV = {};
   for (const t of G.triples) {
     const ok = mentionGrounded(t.s, G.sentences[t.sIdx].text);
     TKEY.set(instKey(t), { t, grounded: ok });
@@ -173,7 +188,11 @@ function ensureGraph() {
 function poolFor(name) {
   ensureGraph();
   if (!(name in SEGSET)) throw new Error('THOUGHTS: unknown pilot "' + name + '" (not in the graph segments)');
-  if (!POOLS[name]) { const seg = SEGSET[name]; POOLS[name] = GROUNDED.filter(t => seg.has(t.sIdx)); }
+  const fog = FOGS[name];
+  if (fog && POOLS_REV[name] !== fog.revealed.size) delete POOLS[name];    // fog moved (reveal/wipe) — pool is stale
+  if (!POOLS[name]) { const seg = SEGSET[name];
+    POOLS[name] = GROUNDED.filter(t => seg.has(t.sIdx) || (fog && fog.revealed.has(t.sIdx)));
+    POOLS_REV[name] = fog ? fog.revealed.size : -1; }
   return POOLS[name];
 }
 
@@ -204,7 +223,8 @@ function verifyChain(name, hops) {
     const rec = h && TKEY.get(instKey(h));
     if (!rec) return { ok: false, why: 'hop not a baked triple (fabricated or tampered)', at: i };
     if (!rec.grounded) return { ok: false, why: 'hop subject not mention-grounded (documented SVO noise)', at: i };
-    if (!SEGSET[name].has(h.sIdx)) return { ok: false, why: 'hop outside the pilot segment (knowledge law)', at: i };
+    if (!SEGSET[name].has(h.sIdx) && !(FOGS[name] && FOGS[name].revealed.has(h.sIdx)))
+      return { ok: false, why: 'hop outside the pilot segment' + (FOGS[name] ? ' + revealed fog' : '') + ' (knowledge law)', at: i };
     if (i > 0 && h.s !== hops[i - 1].o) return { ok: false, why: 'hops not connected (s must equal previous o)', at: i };
   }
   return { ok: true, why: 'verified', at: hops.length };
@@ -213,12 +233,15 @@ function verifyChain(name, hops) {
 // ---- scoring (PURE — no ledger mutation; commitChain records) ------------------------------------------------
 function scoreChain(name, hops) {
   const v = verifyChain(name, hops);
-  const zero = { verified: v.ok, why: v.why, counted: 0, base: 0, fresh_edges: 0, novelty: 0, bridges: 0, bridge_bonus: 0, total: 0 };
+  const zero = { verified: v.ok, why: v.why, counted: 0, base: 0, fresh_edges: 0, novelty: 0, bridges: 0, bridge_bonus: 0,
+    frontier_hops: 0, frontier_bonus: 0, total: 0 };
   if (!v.ok || hops.length === 0) return zero;
   const known = pilotLedger(name).edges;
+  const fog = FOGS[name];                                            // frontier soft dependency (absent ⇒ terms 0)
+  const newly = fog ? new Set(fog.newlyRevealed()) : null;           // opened since the fog's last mark()
   const seenInChain = new Set();
   const counted = Math.min(hops.length, CFG.MAX_HOPS);
-  let base = 0, freshN = 0, bridges = 0;
+  let base = 0, freshN = 0, bridges = 0, frontierN = 0;
   const annotated = [];
   for (let i = 0; i < counted; i++) {
     const h = hops[i];
@@ -226,17 +249,19 @@ function scoreChain(name, hops) {
     const ek = edgeKey(h);
     const fresh = !(ek in known) && !seenInChain.has(ek);
     seenInChain.add(ek);
-    let bridge = false;
+    let bridge = false, frontier = false;
     if (fresh) {
       freshN++;
       if (i > 0 && h.chapter !== hops[i - 1].chapter && earned(name, G.sentences[h.sIdx])) { bridge = true; bridges++; }
+      if (newly && newly.has(h.sIdx)) { frontier = true; frontierN++; }        // novelty-gated, like bridge
     }
-    annotated.push({ s: h.s, r: h.r, o: h.o, chapter: h.chapter, sIdx: h.sIdx, fresh, bridge,
+    annotated.push({ s: h.s, r: h.r, o: h.o, chapter: h.chapter, sIdx: h.sIdx, fresh, bridge, frontier,
       text: G.sentences[h.sIdx].text.slice(0, CFG.HOP_TEXT_CHARS) });
   }
-  const novelty = freshN * CFG.W_NOVEL, bridge_bonus = bridges * CFG.W_BRIDGE;
+  const novelty = freshN * CFG.W_NOVEL, bridge_bonus = bridges * CFG.W_BRIDGE,
+    frontier_bonus = frontierN * CFG.W_FRONTIER;
   return { verified: true, why: 'verified', counted, base, fresh_edges: freshN, novelty, bridges, bridge_bonus,
-    total: base + novelty + bridge_bonus, annotated };
+    frontier_hops: frontierN, frontier_bonus, total: base + novelty + bridge_bonus + frontier_bonus, annotated };
 }
 
 // ---- commit: accrue fitness + record semantic edges into the pilot's history --------------------------------
@@ -248,7 +273,8 @@ function commitChain(name, hops, score) {
   P.fitness += s.total;
   P.chains += 1;
   L.tick += 1;
-  P.last = { tick: L.tick, hops: s.counted, total: s.total, fresh: s.fresh_edges, bridges: s.bridges };
+  P.last = { tick: L.tick, hops: s.counted, total: s.total, fresh: s.fresh_edges, bridges: s.bridges,
+    frontier: s.frontier_hops || 0 };
   persist();
   return s;
 }
@@ -313,6 +339,16 @@ function wipe() { L = blankLedger(); persist(); }
 function advisorLawHolds() {                    // tiny-fresh-chain > any-stale-ramble, BY CONSTRUCTION
   return 2 * (CFG.W_BASE + CFG.W_NOVEL) > CFG.MAX_HOPS * CFG.W_BASE;
 }
+function attachFog(name, fog) {                 // GRAPHFOG soft dependency (graphfog.js): the pilot's node-vision
+  ensureGraph();                                // fog. Revealed fog extends the knowable set; FRESH hops through
+  if (!(name in SEGSET)) throw new Error('THOUGHTS: unknown pilot "' + name + '" (not in the graph segments)');
+  if (!fog || !fog.revealed || typeof fog.revealed.has !== 'function' || typeof fog.newlyRevealed !== 'function')
+    throw new Error('THOUGHTS: attachFog needs a GRAPHFOG instance ({revealed:Set, newlyRevealed()})');
+  if (fog.pilot && fog.pilot !== name) throw new Error('THOUGHTS: fog/pilot mismatch (' + fog.pilot + ' vs ' + name + ')');
+  FOGS[name] = fog; delete POOLS[name]; delete POOLS_REV[name];       // territory opened since mark() earns W_FRONTIER
+  return true;
+}
+function detachFog(name) { const had = !!FOGS[name]; delete FOGS[name]; delete POOLS[name]; delete POOLS_REV[name]; return had; }
 function init(opts) {
   const o = opts || {};
   if (o.storage) { STORE = o.storage; L = blankLedger();
@@ -333,7 +369,7 @@ async function load(base) {                     // browser convenience: fetch gr
 }
 
 const API = { CFG, init, load, tick, chainFor, scoreChain, commitChain, buildChain, verifyChain, fitness, pilots,
-  wipe, advisorLawHolds, mentionGrounded, earned, groundedPoolFor: poolFor,
+  wipe, advisorLawHolds, mentionGrounded, earned, groundedPoolFor: poolFor, attachFog, detachFog,
   _ledger: () => L, _grounded: () => (ensureGraph(), GROUNDED) };
 
 if (typeof window !== 'undefined') window.THOUGHTS = API;           // browser script tag (self-wiring)

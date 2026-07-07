@@ -21,8 +21,9 @@
 //     deterministic intent→mutation mapping over the tunable index; if the speech sidecar is up and the intent is
 //     unmapped, Qwen may emit a JSON program CONSTRAINED to this API (validated; invalid = rejected, never run).
 //   • EVERY PILOT: a rate-capped mutation turn — temperament-biased picks from the same API (tints, rules, nudges).
-//     HONESTY: v1 pilot choice is a BIASED MENU, not learned — labeled GIVEN in the ledger; wiring mutation choice
-//     to N5 fitness (learn which mutations pay) is the follow-up tier.
+//     HONESTY: v1 pilot choice is a BIASED MENU, not learned — labeled GIVEN in the ledger. v2 (evolution.js): the
+//     menu weights are inherited+mutated+selected (genome.gamemodMenuWeights, EVOLUTION.menuWeightsFor(name)) —
+//     LEARNED-BY-SELECTION when EVOLUTION is active; the GIVEN label applies only standalone.
 'use strict';
 (function(){
 const MODCFG = {
@@ -109,9 +110,10 @@ function emit(event){ for(const m of MODS){ if(m.kind!=='rule'||m.disabled||m.wh
 // ---- JS: the full-power path, guarded --------------------------------------------------------------------------
 // shieldArr: protective proxy over ships/planets handed to js() code (tick-3 adversary: delete G.ships[0].pos broke
 // step() beyond revert). Element objects are shallow-proxied: deleteProperty always refused; set allows only FINITE
-// numbers / strings / booleans (a NaN written to a live field poisons physics). Best-effort by design — nested
-// objects (pos.x) are not deep-wrapped; the static delete-block + finite set() + error-hook + session-locality are
-// the remaining layers. Documented hole, honest ledger.
+// numbers / strings / booleans. Nested writes (pos.x=NaN) and bound-method writes (pos.set(_,_,NaN)) still reach RAW
+// fields the shallow proxy cannot membrane — but that hole is now SEALED downstream by finiteSweep() (tick-4): the
+// tick repairs any non-finite ship pos/vel/hp every frame, so poison self-heals regardless of the write route. The
+// proxy stops the easy routes; the sweep guards the INVARIANT (ships stay finite) that actually keeps the game alive.
 const _shieldCache=new WeakMap();
 function shieldObj(o){
   if(o===null||typeof o!=='object') return o;
@@ -156,6 +158,24 @@ function revert(id){ const i=MODS.findIndex(m=>m.id===id); if(i<0) return false;
   if(m.undo){ try{ m.undo(); }catch(e){} } m.disabled=true; MODS.splice(i,1); logmod(`reverted #${id} (${m.desc})`); return true; }
 function revertAll(){ for(let i=MODS.length-1;i>=0;i--) revert(MODS[i].id); }
 function trim(){ while(MODS.length>MODCFG.MAX_ACTIVE) revert(MODS[0].id); }
+// FINITE SWEEP — guard the INVARIANT, not each attack path (tick-4 burn-down; the sound fix for the nested-write
+// hole: G.ships[0].pos.x=0/0 and bound-method writes like pos.set(_,_,NaN) reach RAW nested fields the shieldArr
+// proxy + delete-block cannot membrane without breaking three.js. Rather than enumerate every poison route, we
+// enforce the property that keeps the game alive: ships stay FINITE. Any non-finite pos/vel/hp is repaired to a
+// safe value each tick, so poison self-heals within one frame — "fully break the game" stays structurally
+// impossible even against unknown future write routes.). Only sweeps when mods are active (zero cost otherwise).
+const _lastGood=new WeakMap();
+function finiteSweep(){
+  if(typeof ships==='undefined'||!MODS.length) return;
+  for(const s of ships){ if(!s) continue;
+    let good=_lastGood.get(s); if(!good) _lastGood.set(s, good={hp:s.hp});
+    const p=s.pos;
+    if(p){ for(const k of ['x','y','z']) if(typeof p[k]==='number'&&!Number.isFinite(p[k])){ p[k]=0; logmod(`finite-sweep: repaired ${s.name||'ship'}.pos.${k} (was non-finite)`); } }
+    const v=s.vel; if(v){ for(const k of ['x','y','z']) if(typeof v[k]==='number'&&!Number.isFinite(v[k])){ v[k]=0; logmod(`finite-sweep: repaired ${s.name||'ship'}.vel.${k}`); } }
+    if(typeof s.hp==='number'&&!Number.isFinite(s.hp)){ s.hp=Number.isFinite(good.hp)?good.hp:1; logmod(`finite-sweep: repaired ${s.name||'ship'}.hp`); }
+    else if(typeof s.hp==='number') good.hp=s.hp;
+  }
+}
 let lastT=0, strikes=0;
 function tick(dt){
   const now=performance.now();
@@ -166,6 +186,7 @@ function tick(dt){
       revert(m.id); strikes=0; } }
     else strikes=0; }
   lastT=now;
+  finiteSweep();
   emit('tick'); pilotTurn(dt);
 }
 addEventListener('error', ()=>{ if(MODS.length){ const m=MODS[MODS.length-1]; logmod(`ERROR HOOK: auto-reverting newest mod #${m.id}`); revert(m.id); } });
