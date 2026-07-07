@@ -192,6 +192,10 @@ const CFG = {
   N_PLANETS:16, DOCK_R:44, TRADE_COOLDOWN:0.5, HOLD_CAP:40, TRADE_QTY:20, TRADER_FRAC:0.62, CREDIT_RESERVE:12,
   FUEL_CAP:60, FUEL_START:60, FUEL_LOW:18,
   JUMP_FUEL_BASE:8, JUMP_DIST_PER_FUEL:85, JUMP_SAME_SYS_R_MULT:1.3,   // HYPERSPACE (user 2026-07-07, Space-Rangers style): fuel is for CROSSING systems, not flying within one
+  // X-WING POWER MANAGEMENT: one shared pool (POWER_TOTAL) split across weapons/engines/shields, each 0-100;
+  // POWER_DEFAULT*3 == POWER_TOTAL so a fresh ship's baseline multiplier is exactly 1.0 (today's balance, untouched).
+  POWER_TOTAL:150, POWER_MIN:0, POWER_MAX:100, POWER_DEFAULT:50, POWER_MULT_MIN:0.4, POWER_MULT_MAX:1.6,
+  SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
@@ -554,6 +558,32 @@ function makeBase(){ if(!systems.length) return; const c=systems[0].center.clone
   const lab=spriteText('⌂ RANGER COMMAND',26,'#bfeaff',{bg:'rgba(10,26,44,0.72)',pad:8,r:8,align:'center',ws:0.06}); lab.sp.position.copy(c); lab.sp.position.y+=13; lab.sp.renderOrder=9; scene.add(lab.sp);
   base.blip=topBlip('#9fd8ff',15,1); base.blip.position.copy(c); }
 function atBase(s){ return base && s.pos.distanceTo(base.pos)<CFG.BASE_R; }
+// =================================================================================================
+//  X-WING POWER MANAGEMENT (user 2026-07-07): "power reroute to shields engines or lasers all use the
+//  core power of the engine. you should be able to see the power levels and adjust them." One shared
+//  power-plant pool split across WEAPONS/ENGINES/SHIELDS (each 0-100, always summing to CFG.POWER_TOTAL);
+//  moving one system's slider proportionally drains/feeds the other two, exactly like the X-Wing ICS.
+// =================================================================================================
+function shipPower(s){ if(!s.power) s.power={weapons:CFG.POWER_DEFAULT,engines:CFG.POWER_DEFAULT,shields:CFG.POWER_DEFAULT}; return s.power; }
+function powerMult(level){ return CFG.POWER_MULT_MIN+(clamp(level,0,100)/100)*(CFG.POWER_MULT_MAX-CFG.POWER_MULT_MIN); }
+const POWER_SYS=['weapons','engines','shields'];
+function setPower(s, sys, target){   // reroute: set ONE system, the other two absorb the difference proportionally (never silently gain/lose total power)
+  if(POWER_SYS.indexOf(sys)<0) return shipPower(s);
+  const P=shipPower(s); target=clamp(target,CFG.POWER_MIN,CFG.POWER_MAX);
+  const others=POWER_SYS.filter(k=>k!==sys), otherSum=P[others[0]]+P[others[1]], remain=CFG.POWER_TOTAL-target;
+  if(otherSum<=0.001){ P[others[0]]=remain/2; P[others[1]]=remain/2; }
+  else{ P[others[0]]=clamp(remain*(P[others[0]]/otherSum),CFG.POWER_MIN,CFG.POWER_MAX); P[others[1]]=clamp(remain*(P[others[1]]/otherSum),CFG.POWER_MIN,CFG.POWER_MAX); }
+  P[sys]=target;
+  const sum=P.weapons+P.engines+P.shields; if(Math.abs(sum-CFG.POWER_TOTAL)>0.01) P[sys]=clamp(P[sys]+(CFG.POWER_TOTAL-sum),CFG.POWER_MIN,CFG.POWER_MAX);   // clamp slack -> the pool always stays honest
+  return P; }
+function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields); }
+function shieldTick(s,dt){ if(!s.alive) return; const max=shieldMaxFor(s);
+  if(s.shield==null) s.shield=max;
+  if(s.shield>max) s.shield=max;                                                      // power just rerouted AWAY from shields -> ceiling drops immediately
+  else if(!s.docked && T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*dt);
+  else if(s.docked) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*2*dt); }      // docked = a safe harbor, shields recharge fast too
+function drainShield(s,dmg){ if(s.shield==null) s.shield=shieldMaxFor(s); s.shieldHitT=T0;
+  if(s.shield>0){ const absorb=Math.min(s.shield,dmg); s.shield-=absorb; dmg-=absorb; } return dmg; }   // returns the LEFTOVER damage that spills to hull
 // AUTO-DOCK (user 2026-07-07: "if you fly into the planet auto dock to it"): physical proximity alone docks —
 // no go/dock command required. Returns the base or a planet if the ship is currently inside its dock radius.
 function autoDockTarget(s){ if(base && s.pos.distanceTo(base.pos)<=CFG.BASE_R) return base;
@@ -1013,7 +1043,7 @@ function think(s,dt){
   if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0){
     const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
     if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range){
-      s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0)));   // M6: Hegemon Core artifact boosts fire rate
+      s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
       const base=(s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1));
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
         shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };   // per-weapon visual signature
@@ -1049,9 +1079,10 @@ function flyStep(s,dt){
   _q.setFromAxisAngle(UPL,-s.ctrl.yaw*CFG.YAW_RATE*dt);    s.quat.multiply(_q); s.quat.normalize();
   s.bank=lerp(s.bank,-s.ctrl.yaw*CFG.BANK_MAX,1-Math.exp(-CFG.BANK_LERP*dt));
   const fwd=FWD.clone().applyQuaternion(s.quat);
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(s.hullSpeed||1)*s.ctrl.thr*dt);   // M9: hull class speed multiplier
+  const engMult=powerMult(shipPower(s).engines);                                                     // X-WING POWER: reroute into engines for a real speed boost
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(s.hullSpeed||1)*engMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1)); if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -1061,6 +1092,7 @@ function flyStep(s,dt){
       if(vn<0){ s.vel.addScaledVector(n,-vn);                                       // CANCEL the inward component (was *1.25 = an energy-ADDING fling; that was the janky "bounce off planets" physics)
         const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }   // soft 12% bounce + light surface friction on the tangent → you SLIDE along a planet, not pinball
   s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen
+  shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
   s.mesh.userData.eng.material.opacity=0.3+0.5*s.ctrl.thr; s.mesh.userData.eng.scale.setScalar(1.3+1.5*s.ctrl.thr);
 }
@@ -1088,8 +1120,8 @@ function shipCollisions(){
         a.vel.addScaledVector(_cn,-imp); c.vel.addScaledVector(_cn,imp);
         if(closing>CFG.SHIP_RAM_MIN_SPEED){ const dmg=closing*CFG.RAM_DMG_SCALE;                  // hull scrape on a hard ram (iframe respected)
           burst(_cv.copy(a.pos).addScaledVector(_cn,CFG.SHIP_R),0xffc07a,8,14,2.4);
-          if(a.iframe<=0&&!a.docked){ if(a.inhabitant) INH.onDamaged(c.name,dmg); a.hp-=dmg; a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }   // DOCKED = safe harbor (user 2026-07-07): no combat damage while docked
-          if(c.iframe<=0&&!c.docked){ if(c.inhabitant) INH.onDamaged(a.name,dmg); c.hp-=dmg; c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
+          if(a.iframe<=0&&!a.docked){ if(a.inhabitant) INH.onDamaged(c.name,dmg); a.hp-=drainShield(a,dmg); a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }   // DOCKED = safe harbor (user 2026-07-07): no combat damage while docked; shields absorb first
+          if(c.iframe<=0&&!c.docked){ if(c.inhabitant) INH.onDamaged(a.name,dmg); c.hp-=drainShield(c,dmg); c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
       a.mesh.position.copy(a.pos); c.mesh.position.copy(c.pos); } } }
 function step(dt){
   FRAME_N++;
@@ -1101,7 +1133,7 @@ function step(dt){
         s._thinkAcc=(s._thinkAcc||0)+dt;
         if((s.id+FRAME_N)%CFG.THINK_STRIDE===0 || s===ships[focus]){ think(s,s._thinkAcc); s._thinkAcc=0; } }
       flyStep(s,dt); }
-    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null;
+    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shield=shieldMaxFor(s);   // X-WING POWER: a fresh hull gets full shields too
       // RETREAT TO TERRITORY (user): the destroyed come back inside COALITION space — a held planet (via the
       // starmap's territory model when loaded), else the Ranger Base — never dumped into a random (possibly lost) system.
       let anchor=null;
@@ -1126,11 +1158,11 @@ function step(dt){
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire — except the player (and teammates returning fire at the player)
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=dmg; noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors — bullets outrange senseR, so a shot from the dark is src 'unknown'
+        s.hp-=drainShield(s,dmg); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors — bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
-            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=dmg*0.5; ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors)
+            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=drainShield(o2,dmg*0.5); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE — very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
@@ -1184,7 +1216,7 @@ function step(dt){
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
-function hurt(s,d){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=d; if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor — no combat damage while docked
+function hurt(s,d){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor — no combat damage while docked; X-WING POWER: shields absorb first
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   dropCargo(s);                                                     // spill the hold as salvage pods
@@ -1914,7 +1946,18 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`🔊 voice test — <b>${r.name}</b> [${r.params.src}] rate ${r.params.rate} · pitch ${r.params.pitch}${r.spoke?'':' · <span style="color:#ffb454">(no speechSynthesis in this browser)'}</span>`,'sys');
     term('&nbsp;&nbsp;“'+String(r.text).replace(/</g,'&lt;')+'”','sys'); return; }
   if(c==='status'||c==='st'||c==='s'){ const np=nearestPlanet(P.pos); const cg=Object.keys(P.cargo).map(k=>`${GKEY[k].n} ${P.cargo[k]}`).join(', ')||'empty';
-    term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''}`,'sys'); return; }
+    const smax=shieldMaxFor(P), spct=smax>0?Math.round(((P.shield==null?smax:P.shield)/smax)*100):0;
+    term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#7fd0ff">shield ${spct}%</span> · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':'—'))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''} · type <b>power</b> to see/reroute the power plant`,'sys'); return; }
+  if(c==='power'||c==='pwr'){   // X-WING POWER MANAGEMENT (user 2026-07-07): see + reroute weapons/engines/shields
+    const p0=shipPower(P);
+    if(!a[1]){ term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool — routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
+      for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
+      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max <span style="opacity:.55">· try: power weapons 80</span>`,'sys'); return; }
+    const sys=POWER_SYS.find(k=>k.startsWith(a[1].toLowerCase())); if(!need(sys,'power weapons|engines|shields &lt;0-100&gt;')) return;
+    const lvl=parseFloat(a[2]); if(!need(isFinite(lvl),'give a level 0-100, e.g. power shields 70')) return;
+    setPower(P,sys,lvl); const p1=shipPower(P);
+    term(`Rerouted — <b>${sys}</b> ${Math.round(p1[sys])}% · ${POWER_SYS.filter(k=>k!==sys).map(k=>k+' '+Math.round(p1[k])+'%').join(' · ')}.`,'sys');
+    if(window.SOUND) SOUND.play('ui'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot — try: scan')) return; t=o; }
     term(`<b>${t.name}</b> reasoning chain (TDRE-style, grounded):`,'sys'); reasonChain(t).forEach(l=>term('&nbsp;&nbsp;'+l,'sys')); return; }
   if(c==='lang'||c==='language'){ if((a[1]||'').indexOf('abl')>=0){ const base=langScore(LANG.sig,LANG.resp); let acc=0; const N=60;   // A1: ablation — shuffle the learned symbol→response map (avg many shuffles)
@@ -2046,7 +2089,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const inrange=ships.filter(o=>o!==P&&o.alive&&P.pos.distanceTo(o.pos)<CFG.SENSE_R*1.6).sort((a,b)=>P.pos.distanceTo(a.pos)-P.pos.distanceTo(b.pos));
     // the Passenger reads each hostile: hull %, weapon tier — and paints a scan BADGE (shield/hull bars) above them
     const sh=inrange.map(o=>{ const hp=Math.round((o.hp/o.maxHp)*100), threat=o.team==='pirate'?'☠':'·';
-      return `${threat} ${o.name} ${hp}% hull · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u`; }).join('<br>&nbsp;&nbsp;')||'none';
+      const smax=shieldMaxFor(o), spct=smax>0?Math.round(((o.shield==null?smax:o.shield)/smax)*100):null;   // X-WING POWER: scan now shows real shield%, not just hull
+      return `${threat} ${o.name} ${hp}% hull${spct!=null?` · <span style="color:#7fd0ff">${spct}% shield</span>`:''} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u`; }).join('<br>&nbsp;&nbsp;')||'none';
     if(window.HULLMODELS&&HULLMODELS.scanBadge){ for(const o of inrange.slice(0,6)){ try{ if(o._scanBadge){ o.mesh.remove(o._scanBadge); } o._scanBadge=HULLMODELS.scanBadge(T,o); o.mesh.add(o._scanBadge); o._scanBadgeT=(typeof T0!=='undefined'?T0:0)+8; }catch(e){} } }
     if(window.SOUND) SOUND.play('ui');
     term('<b style="color:#8fd0ff">◈ SCAN</b> <span style="opacity:.55">— the Passenger reads what your sensors touch; badges painted over live contacts for 8s</span>','sys');
@@ -2912,9 +2956,13 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 window.HOST={
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
-  CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS,
+  CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS, POWER_SYS,
   notify, term, ev, say, log, runCmd, atBase,
   nearestPlanet, planetByName:(n)=>findPlanet(n), repAdd, checkRankUp,
+  // X-WING POWER MANAGEMENT (user 2026-07-07): read the live pool + shield state, or reroute it directly (bypassing
+  // the `power` text command — same effect, for a UI panel / the parasite's own proactive reroutes).
+  powerOf:(s)=>shipPower(s||ships[0]), setPower:(s,sys,lvl)=>setPower(s||ships[0],sys,lvl), powerMult,
+  shieldOf:(s)=>{ s=s||ships[0]; const max=shieldMaxFor(s); return { cur:(s.shield==null?max:s.shield), max }; },
   priceOf:(p,k,buying)=>buying?priceOf(p,k)*repBuyFactor(p):priceOf(p,k),
   sound:(n)=>{ if(window.SOUND) try{ SOUND.play(n); }catch(e){} },
   get KNOW(){ return window.GAME_KNOW; },
@@ -2981,7 +3029,7 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
   s.fire-=dt;
   if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
-    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0)));
+    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
