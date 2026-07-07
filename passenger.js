@@ -76,11 +76,13 @@ const INTRO = [
 const REGREETING = "Still here. Still listening. Type when you want me.";
 
 // ---- state (LEARNED — persisted; wiping it visibly degrades what it can say) -----------------------------------
-function blankState(){ return { version:1, intro_shown:false, events:[], counts:{kills_seen:0,trades_seen:0,damage_taken:0,docks:0,asks:0,studied:0}, prices:{}, names_met:[], learned:{} }; }
+function blankState(){ return { version:1, intro_shown:false, events:[], counts:{kills_seen:0,trades_seen:0,damage_taken:0,docks:0,asks:0,studied:0}, prices:{}, names_met:[], learned:{}, host:{}, ponder_on:true }; }
 let S = blankState();
 try { const raw = localStorage.getItem(CFG.STATE_KEY); if(raw){ const p=JSON.parse(raw); if(p && p.version===1) S=p; } } catch(e){}
 if(!S.learned) S.learned={};                                          // migrate pre-latent states
 if(S.counts.studied==null) S.counts.studied=0;
+if(!S.host) S.host={};                                                // migrate pre-ponder states
+if(S.ponder_on==null) S.ponder_on=true;
 function save(){ try{ localStorage.setItem(CFG.STATE_KEY, JSON.stringify(S)); }catch(e){} }
 
 let hooks = { registry:[], telemetry:null, speak:null, say:null };   // injected at init by the game
@@ -222,6 +224,51 @@ async function speakAnswer(question){
   return { reply, tier };
 }
 
+// ---- THE PONDER (user 2026-07-07: "then ask a max chain on why are they asking this and how does that potentially
+// change the world for my benefit or loss"). After every exchange the worm reasons PRIVATELY about its host: WHY
+// this question, what could acting on it CHANGE, and what the worm stands to gain or lose (it dies eleven seconds
+// after its pilot — its curiosity about your motives IS self-interest). It also ACCUMULATES a host-model: the
+// topics you keep returning to become what it believes you want (persisted, decayed, visible in the ledger). ------
+const PONDER_PERSONA = "THE PASSENGER reasoning privately about its host. Voice: intimate, wrong, calculating-but-devoted. Build the LONGEST chain you can in 2-4 sentences: (1) WHY might your pilot be asking this — infer the motive from the pattern of what they keep asking; (2) what could acting on it CHANGE in the world; (3) what do YOU stand to gain or lose — you die eleven seconds after your pilot, their risk is your risk. Ground every step in the numbered facts; never invent named people, places, ships, or numbers.";
+function hostModelUpdate(question){
+  for(const w of toks(question)) if(!STOP.has(w)&&w.length>2) S.host[w]=(S.host[w]||0)+1;
+  const keys=Object.keys(S.host);
+  if(keys.length>120){ for(const k of keys){ S.host[k]=Math.floor(S.host[k]/2); if(!S.host[k]) delete S.host[k]; } }   // decay
+  save();
+}
+function hostModelSummary(){
+  const top=Object.entries(S.host).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(!top.length) return "I have no read on what my pilot wants yet; this is one of our first exchanges.";
+  return "My pilot keeps returning to: "+top.map(([w,n])=>w+" ("+n+"x)").join(", ")+" — that is the shape of what they want.";
+}
+async function ponder(question){
+  if(!S.ponder_on) return null;
+  hostModelUpdate(question);
+  const facts=[
+    'The pilot just asked me: "'+question.slice(0,140).replace(/"/g,"'")+'"',
+    hostModelSummary(),
+    "If my pilot dies, I die eleven seconds later; their risk is my risk, and their profit buys the hull I live in.",
+    "I can rewrite parts of this ship when asked; a question is often the shadow of an order that is coming.",
+  ].concat(telemetryFacts(), stateFacts().slice(0,2));
+  let out=null;
+  if(hooks.speak){
+    try{ out=await hooks.speak({ pilot:'PASSENGER', persona:PONDER_PERSONA, facts, history:[],
+      question:'Why did they ask this, what could it change, and what is my stake — benefit or loss?' }); }catch(e){}
+  }
+  if(!out){   // composer chain: motive → world-change → stake, grounded in the same facts (no LLM needed)
+    const t=' '+question.toLowerCase()+' ';
+    const motive=/price|trade|credit|buy|sell|profit|market/.test(t)?'they are hunting profit'
+      :(/danger|pirate|hull|damage|die|kill|attack|threat/.test(t)?'they are measuring a threat'
+      :(/make|change|faster|stronger|slower|tint|double|halve|rewrite/.test(t)?'they are about to reshape the ship'
+      :'they are mapping what they do not know'));
+    const stake=/danger|pirate|hull|damage|die|kill|attack|threat/.test(t)
+      ?'if they misjudge it, I get eleven seconds to regret their courage'
+      :'whatever they gain, I ride inside it; whatever it costs, I pay in the same hull';
+    out='Why ask this? My read: '+motive+'. '+hostModelSummary()+' Acting on it bends where we fly next — and '+stake+'.';
+  }
+  return out;
+}
+
 // ---- the routing entry the game calls when its parser fails ---------------------------------------------------
 async function route(text){
   const h = helpMatch(text);
@@ -239,13 +286,16 @@ function powers(){   // the in-fiction honesty ledger
     LEARNED: S.counts, prices: S.prices, names_met: S.names_met.length,
     studied_topics: Object.keys(S.learned).length,
     library: Object.keys(S.learned).slice(-6),
+    host_model: Object.entries(S.host).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([w,n])=>w+':'+n),
+    ponder_on: S.ponder_on,
     note: 'wipe my state and watch what I can no longer tell you — nothing I say is hardcoded, and what I studied is forgotten too.',
   };
 }
 
 window.PASSENGER = {
   init(h){ hooks = Object.assign(hooks, h||{}); },
-  route, onEvent, powers,
+  route, onEvent, powers, ponder,
+  setPonder(on){ S.ponder_on=!!on; save(); return S.ponder_on; },
   wipe(){ S=blankState(); save(); },     // for the removal/round-trip puppet test
   // awakening popup contract: game calls introLines() at boot — full monologue on a fresh symbiont, the short
   // re-greeting once it has been shown; markIntroShown() after the modal closes; `intro` command replays via force.

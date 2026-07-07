@@ -1195,7 +1195,7 @@ async function parasiteRoute(text){
   try{
     // THE PEN: an imperative goes to the mutation API first — the worm ATTEMPTS whatever you speak to it
     const m=(window.GAMEMOD)?GAMEMOD.intent(text,'PASSENGER'):null;
-    if(m){ if(m.ok){ paraLine('worm', String(m.narr).replace(/</g,'&lt;')); paraBusy=false; return; }
+    if(m){ if(m.ok){ paraLine('worm', String(m.narr).replace(/</g,'&lt;')); schedulePonder(text); paraBusy=false; return; }
       // recognized as an order but unmapped: if the LLM is awake, let it write a CONSTRAINED program (validated, never blind-eval'd)
       if(TAMI_SPEAK.alive){
         try{ const j=await TAMI_SPEAK.speak({ pilot:'PASSENGER', persona:'You translate a pilot\'s wish into ONE JSON program for the ship-mod API. Output ONLY JSON, no prose.',
@@ -1211,9 +1211,16 @@ async function parasiteRoute(text){
       }
       paraLine('worm', String(m.why).replace(/</g,'&lt;')); paraBusy=false; return; }
     const r=await PASSENGER.route(text); paraLine('worm', String(r.reply||'…').replace(/</g,'&lt;'));
+    schedulePonder(text);
   }
   catch(e){ paraLine('worm','Something in me misfired. Say it again.'); console.warn('PASSENGER.route',e); }
   finally{ paraBusy=false; }
+}
+// THE PONDER (max chain): fires AFTER the answer, never blocking it — the worm privately reasons why you asked,
+// what it could change, and its own stake (11 seconds behind yours). Dim line in the PARASITE tab; ponder on|off.
+function schedulePonder(text){
+  if(!window.PASSENGER||!PASSENGER.ponder) return;
+  PASSENGER.ponder(text).then(p=>{ if(p) paraLine('worm','<i style="opacity:.72">⌁ '+String(p).replace(/</g,'&lt;')+'</i>'); }).catch(()=>{});
 }
 function passengerInit(){ if(!window.PASSENGER) return;
   PASSENGER.init({ registry:PASSENGER_REGISTRY, telemetry:passengerTelemetry, speak:passengerSpeak, latent:(t)=>TAMI_SPEAK.latent(t) });   // the old-libraries study channel (labeled GIVEN)
@@ -1529,6 +1536,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`&nbsp;&nbsp;LEARNED: witnessed ${st.counts.kills_seen} kills · ${st.counts.trades_seen} trades · ${st.counts.docks} dockings · took ${st.counts.damage_taken} hits · answered ${st.counts.asks} of your questions${Object.keys(st.prices).length?` · prices tasted: ${Object.keys(st.prices).map(k=>`${k}≈${st.prices[k]}`).join(', ')}`:''}`,'sys');
     term('&nbsp;&nbsp;'+pw.note+' &nbsp;<span style="opacity:.55">(replay the awakening: <b>intro</b> · talk to it: type anything that is not a command)</span>','sys'); return; }
   if(c==='intro'||c==='awaken'){ if(window.PASSENGER) maybeAwaken(true); return; }
+  if(c==='ponder'){ if(!window.PASSENGER) return; const on=PASSENGER.setPonder((a[1]||'on')!=='off');
+    term(on?'the worm will ponder aloud after each exchange (why you asked · what it changes · its stake).':'the worm keeps its pondering to itself now.','sys'); return; }
   if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
     const L=GAMEMOD.list();
     term(`<b style="color:#c9a0ff">🜏 ACTIVE MUTATIONS</b> — ${L.length}/${GAMEMOD.MODCFG.MAX_ACTIVE} <span style="opacity:.55">(the AGIs hold the pen; session-local — reload = vanilla; watchdog auto-reverts anything that hurts the frame)</span>`,'sys');
