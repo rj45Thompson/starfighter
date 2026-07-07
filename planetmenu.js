@@ -361,6 +361,73 @@ function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
   if(!P || !P.lvl || !c || c.UP_COST_BASE==null || c.UP_COST_GROW==null) return NaN;
   return Math.round(c.UP_COST_BASE*Math.pow(c.UP_COST_GROW, num(P.lvl[k],1)-1)); }
 
+/* Space-Rangers-style loadout data: equipment is stable game data, not exposed on HOST (unlike
+   HULLS/WEAPONS/ARTIFACTS which the host DOES expose) - hardcoded here to mirror EQUIP in the host. */
+var EQUIP_SHOP = [
+  { k:'cargo',   n:'Cargo Pod',      desc:'+15 hold',                 cost:120 },
+  { k:'fuel',    n:'Fuel Cell',      desc:'+25 fuel cap',             cost:100 },
+  { k:'scanner', n:'Scanner',        desc:'+35 sensor range',         cost:150 },
+  { k:'plating', n:'Armor Plating',  desc:'+20 max hull',             cost:190 },
+  { k:'droid',   n:'Repair Droid',   desc:'+2.5 hull/s regen',        cost:170 } ];
+
+function atBase(P){ var h=H(); if(h && typeof h.atBase==='function' && P){ try{ return !!h.atBase(P); }catch(e){} } return false; }
+
+/* -- HULLS: swap chassis, Ranger Command only -- */
+function hullSectionHtml(P){
+  var h=H(); var HULLS=h&&h.HULLS, ORDER=h&&h.HULL_ORDER;
+  if(!HULLS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(hull registry offline)</div>';
+  var canRefit = atBase(P);
+  var rows='', i;
+  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], hu=HULLS[key]; if(!hu) continue;
+    var isCurrent = P && P.hullClass===key;
+    var afford = num(P&&P.credits,0) >= num(hu.cost,0);
+    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
+    rows += '<div class="pm-row"><div class="pm-grow">'
+      + '<b style="color:'+COL.VIOLET+'">'+esc(hu.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">CURRENT</span>':'')
+      + '<div class="pm-sub">hull '+num(hu.hp,0)+' - hold '+num(hu.hold,0)+' - speed x'+num(hu.speed,1)+'</div>'
+      + '<div class="pm-sub">'+esc(hu.desc||'')+'</div></div>'
+      + '<div style="color:'+costCol+'">'+(num(hu.cost,0)>0?fmtC(hu.cost):'free')+'</div>'
+      + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="hull '+key+'"'
+      + ((!canRefit||isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'CURRENT':'EQUIP')+'</button></div>'; }
+  var hint = canRefit
+    ? '<div class="pm-note">Hull swaps take effect immediately - hold and hull points come from the new chassis.</div>'
+    : '<div class="pm-note"><span style="color:'+COL.AMBER+'">Dock at Ranger Command to refit</span> - hull swaps are base-only. '
+      + 'Current: <b style="color:'+COL.VIOLET+'">'+esc((P&&HULLS[P.hullClass]&&HULLS[P.hullClass].n)||'Fighter')+'</b>'
+      + ' - hull '+Math.round(num(P&&P.maxHp,0))+' - hold '+Math.round(num(P&&P.holdCap,0))+'.</div>';
+  return rows+hint; }
+
+/* -- WEAPONS: buy at any dock, rank-gated -- */
+function weaponSectionHtml(P){
+  var h=H(); var WEAPONS=h&&h.WEAPONS, ORDER=h&&h.WEAPON_ORDER, RANKS=h&&h.RANKS;
+  if(!WEAPONS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(weapon registry offline)</div>';
+  var rows='', i;
+  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], w=WEAPONS[key]; if(!w) continue;
+    var isCurrent = P && (P.weaponType||'energy')===key;
+    var afford = num(P&&P.credits,0) >= num(w.cost,0);
+    var reqRank = (Array.isArray(RANKS) && RANKS[i] && RANKS[i].n) ? RANKS[i].n : '';
+    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
+    rows += '<div class="pm-row"><div class="pm-grow">'
+      + '<b style="color:'+COL.HEAD+'">'+esc(w.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">FITTED</span>':'')
+      + '<div class="pm-sub">dmg '+num(w.dmg,0)+(w.homing?' - homing':'')+(w.splash?' - splash '+num(w.splash,0):'')
+      +   ' - range '+Math.round(num(w.range,0)*100)+'%'+(reqRank?' - requires <b>'+esc(reqRank)+'</b> rank':'')+'</div></div>'
+      + '<div style="color:'+costCol+'">'+(num(w.cost,0)>0?fmtC(w.cost):'free')+'</div>'
+      + '<button class="pm-b" data-act="cmd" data-cmd="weapon '+key+'"'
+      + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
+  return rows; }
+
+/* -- EQUIPMENT: buy at any dock, cumulative (never disabled for "already owned") -- */
+function equipSectionHtml(P){
+  var rows='', i;
+  for(i=0;i<EQUIP_SHOP.length;i++){ var eq=EQUIP_SHOP[i];
+    var owned = num(P && P.equip && P.equip[eq.k], 0);
+    var afford = num(P&&P.credits,0) >= eq.cost;
+    rows += '<div class="pm-row"><div class="pm-grow">'
+      + '<b style="color:'+COL.GOOD+'">'+esc(eq.n)+'</b>'+(owned>0?' <span class="pm-sub">x'+owned+'</span>':'')
+      + '<div class="pm-sub">'+esc(eq.desc)+'</div></div>'
+      + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+'">'+fmtC(eq.cost)+'</div>'
+      + '<button class="pm-b pm-go" data-act="cmd" data-cmd="install '+eq.k+'"'+(afford?'':' disabled')+'>BUY</button></div>'; }
+  return rows; }
+
 function hangarHtml(){
   var p=S.planet, P=player();
   if(!P) return '<div class="pm-note">(no ship telemetry)</div>';
@@ -394,9 +461,13 @@ function hangarHtml(){
       + '<div style="color:'+COL.AMBER+'">'+fmtC(cost)+'</div>'
       + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford)?' disabled':'')+'>UPGRADE</button></div>'; }
   h += '<div class="pm-note">'+(S.isBase
-      ? 'Base services via terminal: <b style="color:'+COL.AMBER+'">hull &lt;class&gt;</b> (swap chassis) - <b style="color:'+COL.AMBER+'">blackmarket</b> - <b style="color:'+COL.AMBER+'">fence</b>. Upgrades are planetside.'
-      : 'More at the terminal: <b style="color:'+COL.AMBER+'">weapon &lt;type&gt;</b> (autocannon/missiles) - <b style="color:'+COL.AMBER+'">install &lt;equip&gt;</b> (pods/cells/plating) - <b style="color:'+COL.AMBER+'">terraform</b>.')
+      ? 'Hull, weapons and equipment now buy right below - <b style="color:'+COL.AMBER+'">blackmarket</b> and <b style="color:'+COL.AMBER+'">fence</b> are still terminal-only. Upgrades are planetside.'
+      : 'Weapons and equipment now buy right below - <b style="color:'+COL.AMBER+'">terraform</b> is still terminal-only.')
     + '</div>';
+  /* -- Space-Rangers-style loadout shop: HULL / WEAPONS / EQUIPMENT -- */
+  h += '<div class="pm-panel"><h4>HULL - SHIP CLASS</h4>'+hullSectionHtml(P)+'</div>';
+  h += '<div class="pm-panel"><h4>WEAPONS</h4>'+weaponSectionHtml(P)+'</div>';
+  h += '<div class="pm-panel"><h4>EQUIPMENT</h4>'+equipSectionHtml(P)+'</div>';
   return h; }
 
 /* ------------------------------------------------ TAB: MISSIONS */

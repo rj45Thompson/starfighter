@@ -136,6 +136,7 @@
 <script src="hullmodels.js"></script>
 <script src="knowledge_hud.js"></script>
 <script src="thoughts.js"></script>
+<script src="tami_battle_ui.js"></script>
 <script src="panels.js"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy — 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
@@ -2812,16 +2813,10 @@ function buildRoster(){ rosterEl.innerHTML=''; ships.slice(0,CFG.NSHIPS).forEach
   rosterEl.appendChild(el); }); }
 function updateRoster(){ ships.forEach((s,i)=>{ const hp=document.getElementById('rhp'+i),cr=document.getElementById('rcr'+i);
   if(hp) hp.style.width=(100*s.hp/s.maxHp).toFixed(0)+'%'; if(cr) cr.textContent=s.credits+'c'; }); }
-(function pillars(){ const el=document.getElementById('pillars');
-  // REAL BUTTONS now (user: "these at the top seem like buttons but do nothing helpful"): each pill OPENS its surface.
-  const DEF=[ ['EMBODIMENT','3D flight','status report + your ship', ()=>runCmd('status')],
-    ['NAVIGATION','starmap','the 2D galaxy starmap — systems, territory, click to set course', ()=>{ if(window.STARMAP&&STARMAP.toggle) STARMAP.toggle(); else runCmd('map'); }],
-    ['COMMUNICATION','radio', 'the squadron radio traffic', ()=>{ activeTab='radio'; UNREAD.radio=0; buildTabs(); renderLog(); }],
-    ['ECONOMY','market','galaxy market — best buy/sell routes', ()=>runCmd('market')],
-    ['◈ AGI TEST','substrate','this is an AGI testbed: the live knowledge-graph HUD', ()=>runCmd('agi')] ];
-  DEF.forEach(([a,b,tip,fn])=>{ const d=document.createElement('div'); d.className='pill'; d.innerHTML=`<b>${a}</b> ${b}`;
-    d.title=tip; d.style.cursor='pointer'; d.onclick=()=>{ fn(); if(window.SOUND) SOUND.play('ui'); };
-    d.onmouseenter=()=>d.style.filter='brightness(1.45)'; d.onmouseleave=()=>d.style.filter=''; el.appendChild(d); }); })();
+// PILLS BAR REMOVED (user 2026-07-07: "remove this menu that does nothing"). Everything it linked to is still
+// reachable directly: status, starmap (G key or `starmap`), radio (click the ticker's RADIO tab), market (M key
+// or `market`), agi (`agi` command). The market HUD panel itself (#market) is untouched — kept per the user's
+// explicit "keep the market menu".
 
 // -------- market panel (galaxy price grid + focused ship status) --------
 let marketOn=true;
@@ -3273,7 +3268,8 @@ const AWAY=(function(){
     if(bstate==='wait'){ aiTimer-=dt; if(aiTimer<=0){ nextTurn(); } }
     else if(bstate==='ai'){ aiTimer-=dt; if(aiTimer<=0){ aiAct(); } }
     paintTiles(); drawBattleUI(); rend.render(bScene,bCam); }
-  function drawBattleUI(){ const rows=units.map(u=>{ const dead=!u.alive; const bar=Math.round(20*u.hp/u.maxhp);
+  function legacyBattleHtml(){   // fallback if tami_battle_ui.js fails to load — the ORIGINAL bare-text renderer, never breaks the game
+    const rows=units.map(u=>{ const dead=!u.alive; const bar=Math.round(20*u.hp/u.maxhp);
       const affs=Object.keys(u.aff).filter(k=>u.aff[k]>0).map(k=>k[0]).join(''); const col=u.side==='ally'?'#46d6ff':'#ff5a6e';
       return `<div style="opacity:${dead?0.35:1};margin:2px 0"><span style="color:${col}">${u===cur?'▶':'&nbsp;'} ${u.name}</span> <span style="color:#7fdc8a">${'█'.repeat(bar)}</span><span style="opacity:.3">${'░'.repeat(20-bar)}</span> ${u.hp}/${u.maxhp} ${affs?`<span style='color:#ffcf52'>[${affs}]</span>`:''}</div>`; }).join('');
     let ctrl='';
@@ -3284,9 +3280,14 @@ const AWAY=(function(){
     else if(bstate==='win'){ ctrl=`<div style="margin-top:8px;color:#7fdc8a;font-size:16px">✔ VICTORY — the away team prevails.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #2f6a4a;background:#13251b;color:#9fe6b0;font:inherit;cursor:pointer">Back to the surface</button>`; }
     else if(bstate==='lose'){ ctrl=`<div style="margin-top:8px;color:#ff6a6a;font-size:16px">✖ DEFEAT — you retreat to your ship.</div><button data-act="return" style="pointer-events:auto;margin:6px;padding:7px 12px;border-radius:8px;border:1px solid #6a2f2f;background:#251313;color:#ffb3b3;font:inherit;cursor:pointer">Retreat</button>`; }
     else ctrl=`<div style="margin-top:6px;opacity:.7">${cur?cur.name:''}${bstate==='ai'?' (enemy) is acting…':'…'}</div>`;
-    const html=`<div style="position:absolute;top:12px;left:12px;right:12px;max-width:420px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
+    return `<div style="position:absolute;top:12px;left:12px;right:12px;max-width:420px;background:rgba(6,11,20,.82);border:1px solid #22344c;border-radius:10px;padding:10px 12px">
       <div style="color:#8fd0ff;font-weight:bold;margin-bottom:4px">TURN-BASED BATTLE <span style="opacity:.5;font-weight:normal">— a Tami-style away-team fight</span></div>${rows}${ctrl}</div>
-      <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${blog.map(l=>'· '+l).join('<br>')}</div>`;
+      <div style="position:absolute;bottom:12px;left:12px;right:12px;color:#9fb3cc">${blog.map(l=>'· '+l).join('<br>')}</div>`; }
+  function drawBattleUI(){
+    // TAMI-STYLED BATTLE HUD (user 2026-07-07: "the surface fighting still is not using the tami sprites and tami
+    // system... copy the tami menus closer"): real type/category icons (assets/tami_icons/, the actual Tami art)
+    // + gradient HP bars + affliction chips, via tami_battle_ui.js — a pure renderer, same data this file always had.
+    const html = (window.TAMIBATTLEUI ? TAMIBATTLEUI.render(units, cur, bstate, selTech, TECHS, blog, retreatArmed, {tamiData:TAMIDATA, moved}) : legacyBattleHtml());
     if(!setUI(html)) return;   // USER-REPORTED BUG FIX: rewriting innerHTML EVERY frame (60fps) destroyed the buttons
                                // between a real mousedown and mouseup, so no click event ever fired ("couldn't click
                                // anything to attack"). Synthetic .click() in headless tests fires atomically on a live
