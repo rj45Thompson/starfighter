@@ -384,7 +384,10 @@ function updateTip() {
       ' Lv' + num(p.dev, 1) + ' rep ' + (rep > 0 ? '+' : '') + (Math.round(rep * 10) / 10) + '</span></div>';
   }
   if (ps.length > n) html += '<div style="color:' + CFG.COL_DIM + '">+' + (ps.length - n) + ' more worlds</div>';
-  html += '<div style="color:' + CFG.COL_DIM + '">click: set course to nearest world</div>';
+  var h2 = H(), here = h2 ? currentSystemId(h2) : null;
+  html += '<div style="color:' + CFG.COL_DIM + '">' + (here != null && sys.id === here
+    ? 'click: set course to nearest world (in-system, free)'
+    : 'click: HYPERJUMP here (costs fuel)') + '</div>';
   tipEl.innerHTML = html;
   tipEl.style.display = 'block';
 }
@@ -396,18 +399,31 @@ function positionTip() {
   if (y + th > cssH - CFG.TIP_OFF) y = mouseY - th - CFG.TIP_OFF;
   tipEl.style.left = Math.max(0, x) + 'px'; tipEl.style.top = Math.max(0, y) + 'px';
 }
+function currentSystemId(h) {   // which system is the player physically in right now (nearest system center)
+  var P = h.P, pos = P && posOf(P); if (!pos || !h.systems) return null;
+  var best = null, bd = Infinity;
+  for (var i = 0; i < h.systems.length; i++) {
+    var c = posOf({ pos: h.systems[i].center }); if (!c) continue;
+    var d = dist2XZ(pos, c); if (d < bd) { bd = d; best = h.systems[i].id; }
+  }
+  return best;
+}
 function onClick(e) {
   try {
     if (!canvasEl) return;
     var r = canvasEl.getBoundingClientRect();
     var idx = hitTest(e.clientX - r.left, e.clientY - r.top);
     if (idx < 0 || !nodes[idx]) return;
-    var p = nearestPlanetOfSystem(nodes[idx].sys);
+    var sys = nodes[idx].sys;
+    var p = nearestPlanetOfSystem(sys);
     var h = H();
-    if (p && p.name && h && typeof h.runCmd === 'function') {
-      h.runCmd('go ' + String(p.name).toLowerCase());
-      if (typeof h.sound === 'function') h.sound('ui');
-    }
+    if (!p || !p.name || !h || typeof h.runCmd !== 'function') { api.close(); return; }
+    // HYPERSPACE (user 2026-07-07): a click on your OWN system is a free in-system course; any OTHER system is a
+    // fuel-gated hyperjump (starfighter.html's `jump` command owns the cost math + the actual teleport).
+    var here = currentSystemId(h);
+    if (here != null && sys && sys.id === here) h.runCmd('go ' + String(p.name).toLowerCase());
+    else h.runCmd('jump ' + String(sys.name).toLowerCase());
+    if (typeof h.sound === 'function') h.sound('ui');
     api.close();
   } catch (err) {}
 }
