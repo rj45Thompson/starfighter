@@ -28,6 +28,10 @@
 const MODCFG = {
   CLAMP_LO: 0.05, CLAMP_HI: 20,      // numeric writes stay within [orig*LO, orig*HI]
   LOOP_BUDGET: 2e6,                   // injected iteration ceiling for js() loops
+  ALLOC_LIT_CAP: 1e6,                 // js() rejects numeric literals >= this (heuristic allocation-bomb guard: the
+                                      // tick-3 adversary froze the renderer with new Array(1e9).fill(0) — a sync
+                                      // densify the frame watchdog cannot catch because it starves rAF itself; legit
+                                      // mods never need million-scale literals — set() clamps at 20x orig anyway)
   WATCH_MS: 250, WATCH_STRIKES: 3,    // frame watchdog: this slow, this many in a row → revert newest
   MAX_ACTIVE: 24,                     // active-mod cap; oldest reverted first
   RULE_FIRE_CAP: 200,                 // a rule may fire at most this many times (runaway guard)
@@ -56,6 +60,7 @@ function listTunables(){ const out=[]; const R=roots();
 function setPath(path,value,author){
   const r=resolve(path); if(!r) return {ok:false,why:'no such path '+path};
   const cur=r.obj[r.key];
+  if(typeof value==='number'&&!Number.isFinite(value)) return {ok:false,why:'non-finite value (NaN/Infinity poisons physics — tick-3 adversary: Math.min/max pass NaN through the clamp)'};
   if(typeof cur==='number'&&typeof value==='number'){
     if(!(path in ORIG)) ORIG[path]=cur;
     const o=ORIG[path]; const lo=Math.min(o*MODCFG.CLAMP_LO,o/MODCFG.CLAMP_LO), hi=Math.max(o*MODCFG.CLAMP_HI,o/MODCFG.CLAMP_HI);
@@ -102,8 +107,34 @@ function emit(event){ for(const m of MODS){ if(m.kind!=='rule'||m.disabled||m.wh
   if(checkCond(m.cond)){ m.fired++; runActions(m); } } }
 
 // ---- JS: the full-power path, guarded --------------------------------------------------------------------------
+// shieldArr: protective proxy over ships/planets handed to js() code (tick-3 adversary: delete G.ships[0].pos broke
+// step() beyond revert). Element objects are shallow-proxied: deleteProperty always refused; set allows only FINITE
+// numbers / strings / booleans (a NaN written to a live field poisons physics). Best-effort by design — nested
+// objects (pos.x) are not deep-wrapped; the static delete-block + finite set() + error-hook + session-locality are
+// the remaining layers. Documented hole, honest ledger.
+const _shieldCache=new WeakMap();
+function shieldObj(o){
+  if(o===null||typeof o!=='object') return o;
+  if(_shieldCache.has(o)) return _shieldCache.get(o);
+  const p=new Proxy(o,{
+    deleteProperty(){ return false; },
+    set(t,k,v){ if(typeof v==='number'&&!Number.isFinite(v)) return false; if(v!==null&&typeof v==='object') return false; t[k]=v; return true; },
+  });
+  _shieldCache.set(o,p); return p;
+}
+function shieldArr(arr){
+  return new Proxy(arr,{
+    deleteProperty(){ return false; },
+    set(){ return false; },                                   // no replacing/removing whole ships
+    get(t,k){ const v=t[k]; if(typeof k==='string'&&/^\d+$/.test(k)) return shieldObj(v); return typeof v==='function'?v.bind(t):v; },
+  });
+}
 function guardCode(code){
   if(/\b(while|for|do)\b[^{]*[^\s{]\s*(;|$)/m.test(code) && !/\{/.test(code)) return {err:'loops need braces'};
+  if(/\bdelete\b/.test(code)) return {err:'delete blocked (tick-3 adversary: deleting a ship field kills step() beyond revert — mutate values, never remove structure)'};
+  // allocation-bomb heuristic: any numeric literal at ALLOC_LIT_CAP scale is rejected outright (see MODCFG note)
+  const lits=code.match(/\d+(?:\.\d+)?(?:e\+?\d+)?/gi)||[];
+  for(const l of lits) if(parseFloat(l)>=MODCFG.ALLOC_LIT_CAP) return {err:'literal '+l+' >= '+MODCFG.ALLOC_LIT_CAP+' blocked (allocation-guard heuristic; use G.set with clamps for big values)'};
   // inject a loop budget into every braced loop body (crash guard: runaway sync loops throw instead of hanging)
   let n=0; const g=code.replace(/\b(for|while)\s*(\([^)]*\))\s*\{/g, (m,kw,head)=>{ n++; return `${kw} ${head} { if(++__lg>${MODCFG.LOOP_BUDGET}) throw new Error("loop budget");`; });
   return {code:'let __lg=0;\n'+g, loops:n};
@@ -113,7 +144,7 @@ function runJS(code,author){
   let fn; try{ fn=new Function('G', g.code); }catch(e){ return {ok:false,why:'syntax: '+e.message}; }   // pre-check
   const G={ set:(p,v)=>setPath(p,v,author+'(js)'), read:p=>{ const r=resolve(p); return r?r.obj[r.key]:undefined; },
     rule:s=>defineRule(s,author+'(js)'), tint:(i,c)=>tint(i,c,author+'(js)'), tunables:listTunables,
-    ships:(typeof ships!=='undefined')?ships:null, planets:(typeof planets!=='undefined')?planets:null,
+    ships:(typeof ships!=='undefined')?shieldArr(ships):null, planets:(typeof planets!=='undefined')?shieldArr(planets):null,
     say:t=>{ if(typeof term==='function') term(`<span style="color:#c9a0ff">◈ ${String(t).replace(/</g,'&lt;').slice(0,140)}</span>`,''); } };
   try{ const out=fn(G); const id=seq++; MODS.push({id,author,kind:'js',desc:'js: '+String(code).slice(0,60).replace(/\n/g,' '),undo:null});
     trim(); logmod(`${author} ran js (${g.loops} guarded loops)`); return {ok:true,id,out}; }
@@ -142,6 +173,10 @@ addEventListener('error', ()=>{ if(MODS.length){ const m=MODS[MODS.length-1]; lo
 // ---- THE PASSENGER's intent mapper: speak an imperative → mutation --------------------------------------------
 const SCALES=[[/\b(double|twice)\b/,2],[/\b(triple)\b/,3],[/\b(halve|half)\b/,0.5],[/\b(way|much|massively|crazy)\b/,3],[/\b(slightly|little|bit)\b/,1.2]];
 const DIRS=[[/\b(faster|quicker|speed|boost|stronger|bigger|more|raise|increase|buff)\b/,1],[/\b(slower|weaker|smaller|less|lower|decrease|nerf)\b/,-1]];
+// INVERSE-KEY semantics (live-test backlog): keys naming a TIME-BETWEEN-EVENTS quantity mean the OPPOSITE of their
+// number — "make the bullets faster" must SHRINK FIRE_CD (divide), never grow it. Named constant, applies wherever
+// the intent mapper scales a tunable family.
+const INVERSE_KEY_RE=/CD|COOLDOWN|INTERVAL|DELAY|PERIOD/;
 const TARGETS=[ [/\bbullet|shot|laser|fire\b/i,/BULLET|SHOT|FIRE/i], [/\bgem|loot|drop\b/i,/GEM/i], [/\bfuel|gas\b/i,/FUEL|GAS/i],
   [/\bengine|thrust|ship speed|my speed\b/i,/THRUST|SPEED|ACCEL/i], [/\bdamage|guns?\b/i,/DMG|DAMAGE/i], [/\bspawn|enemies|pirates?\b/i,/SPAWN|PIRATE|FOE/i],
   [/\bsense|sensor|radar\b/i,/SENSE/i], [/\btrade|price\b/i,/TRADE|PRICE/i], [/\bhull|health|hp\b/i,/HP|HULL/i] ];
@@ -161,14 +196,16 @@ function intent(text,author){
   let keyRe=null, tgtName=null; for(const [re,kre] of TARGETS) if(re.test(t)){ keyRe=kre; tgtName=String(re).slice(3,14); break; }
   if(keyRe && scale!=null){
     const keys=listTunables().filter(p=>keyRe.test(p)); if(!keys.length) return {ok:false,why:'I found no lever matching that in the ship\'s bones.'};
-    const changed=[]; for(const p of keys.slice(0,6)){ const r=resolve(p); const res=setPath(p, r.obj[r.key]*scale, author); if(res.ok) changed.push(`${p.replace('CFG.','')} ${fmt(res.prev)}→${fmt(res.value)}`); }
+    const changed=[]; for(const p of keys.slice(0,6)){ const r=resolve(p);
+      const eff=INVERSE_KEY_RE.test(p)?1/scale:scale;   // inverse keys: faster/stronger → DIVIDE the cooldown/delay
+      const res=setPath(p, r.obj[r.key]*eff, author); if(res.ok) changed.push(`${p.replace('CFG.','')} ${fmt(res.prev)}→${fmt(res.value)}`); }
     return changed.length?{ok:true,narr:`Done. I reached into the code and turned ${changed.length} screws: ${changed.join(' · ')}. Reload and it never happened.`}:{ok:false,why:'the levers refused me.'};
   }
   return {ok:false,why:'Say it plainer: name a thing (bullets, gems, engine, fuel, damage, sensors, prices, hull) and a direction (faster, double, half, weaker) — or a color for your ship.'};
 }
 // Qwen fallback: constrained JSON program (validated; invalid never runs). Called by the wiring when sidecar is up.
 function validateProgram(p){ if(!p||typeof p!=='object') return null;
-  if(p.kind==='set'&&typeof p.path==='string'&&typeof p.value==='number') return p;
+  if(p.kind==='set'&&typeof p.path==='string'&&Number.isFinite(p.value)) return p;   // NaN passed typeof==='number' (tick-3)
   if(p.kind==='rule'&&p.spec) return p;
   if(p.kind==='js'&&typeof p.code==='string'&&p.code.length<2000) return p;
   return null; }
@@ -179,21 +216,31 @@ function runProgram(p,author){ const v=validateProgram(p); if(!v) return {ok:fal
 }
 
 // ---- EVERY PILOT holds the pen: rate-capped, temperament-biased mutation turns (GIVEN menu — labeled) ----------
+// MUTATION TURNS SPEAK (live-test backlog): when a pilot mutates the world it SAYS so — a short in-character line
+// via the game's say() (lands in the RADIO tab + 3D bubble; voiced when `voices on`). The line templates are
+// authored GIVEN flavor (same class as the biased menu itself) but always QUOTE the actual mutation performed
+// (path/values/color/rule desc) — grounded in the real change, never a claim about anything else.
 let mutClock=0, mutIdx=0;
+function mutSay(s,line){ if(typeof say==='function'&&s&&s.alive) say(s,line); }
 function pilotTurn(dt){
   mutClock+=dt||0; if(mutClock<MODCFG.PILOT_MUT_PERIOD) return; mutClock=0;
   if(typeof ships==='undefined') return;
   const alive=ships.filter(s=>s&&s.alive&&s.role!=='player'); if(!alive.length) return;
   const s=alive[(mutIdx++)%alive.length];
-  const temper=(s.temperament||'')+' '+(s.name||'');
+  const temper=(s.temperament||'')+' '+(s.backstory||'')+' '+(s.name||'');
   const menace=/executioner|blockade|tribunal|raider|mine layer|hunts/i.test(temper);
   const creepy=/priest|witch|superstitious|unsleeping|half machine|chaplain|reads ruin/i.test(temper);
   const roll=Math.abs((s.name||'x').split('').reduce((a,c)=>a+c.charCodeAt(0),0)+mutIdx)%4;
-  if(roll===0){ tint(s, MODCFG.PILOT_TINTS[(mutIdx)%MODCFG.PILOT_TINTS.length], s.name); }
-  else if(roll===1&&menace){ defineRule({when:'kill_seen', then:[{action:'say', text:`${s.name}: Another one down. Count stays even as long as you fly straight.`}]}, s.name); }
-  else if(roll===1&&creepy){ defineRule({when:'damaged', then:[{action:'say', text:`${s.name}: I heard your hull cry out just now. It has a lovely voice.`}]}, s.name); }
-  else if(roll===2){ const keys=listTunables().filter(p=>/GEM|TRADE|SPAWN|SPEED/.test(p)); if(keys.length){ const p=keys[mutIdx%keys.length]; const r=resolve(p); if(r&&typeof r.obj[r.key]==='number'){ const f=1+(((mutIdx%2)?1:-1)*MODCFG.SAFE_NUDGE); setPath(p, r.obj[r.key]*f, s.name); } } }
-  else { defineRule({when:'docked', then:[{action:'say', text:`${s.name}: Welcome down. Everything in this port can be bought, including the welcome.`}]}, s.name); }
+  if(roll===0){ const col=MODCFG.PILOT_TINTS[(mutIdx)%MODCFG.PILOT_TINTS.length]; const r=tint(s, col, s.name);
+    if(r.ok) mutSay(s,`Repainting my hull ${col}. Learn the shade before you learn the name.`); }
+  else if(roll===1&&menace){ const r=defineRule({when:'kill_seen', then:[{action:'say', text:`${s.name}: Another one down. Count stays even as long as you fly straight.`}]}, s.name);
+    if(r.ok) mutSay(s,`I wrote a rule into the ship: when a kill lands, I speak. The world obeys it now.`); }
+  else if(roll===1&&creepy){ const r=defineRule({when:'damaged', then:[{action:'say', text:`${s.name}: I heard your hull cry out just now. It has a lovely voice.`}]}, s.name);
+    if(r.ok) mutSay(s,`I stitched a little rule into the code: every wound you take, I get to notice. Out loud.`); }
+  else if(roll===2){ const keys=listTunables().filter(p=>/GEM|TRADE|SPAWN|SPEED/.test(p)); if(keys.length){ const p=keys[mutIdx%keys.length]; const r=resolve(p); if(r&&typeof r.obj[r.key]==='number'){ const f=1+(((mutIdx%2)?1:-1)*MODCFG.SAFE_NUDGE); const res=setPath(p, r.obj[r.key]*f, s.name);
+    if(res.ok) mutSay(s,`I reached into the code and turned a screw: ${String(res.path).replace('CFG.','')} ${fmt(res.prev)}→${fmt(res.value)}. Small screws move big doors.`); } } }
+  else { const r=defineRule({when:'docked', then:[{action:'say', text:`${s.name}: Welcome down. Everything in this port can be bought, including the welcome.`}]}, s.name);
+    if(r.ok) mutSay(s,`New rule, my hand on the pen: every docking gets my greeting. You will tire of it before I do.`); }
 }
 
 window.GAMEMOD={ MODCFG, set:setPath, rule:defineRule, js:runJS, tint, emit, tick, revert, revertAll,

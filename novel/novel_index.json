@@ -1,9 +1,9 @@
 {
  "version": 1,
  "title": "THE LANES THAT BURNED",
- "chapters": 13,
- "words": 17851,
- "pages": 51,
+ "chapters": 19,
+ "words": 26491,
+ "pages": 75.7,
  "target_pages": 1000,
  "characters": 50,
  "pov_map": {
@@ -25,7 +25,8 @@
    "ch-005"
   ],
   "HALE": [
-   "ch-006"
+   "ch-006",
+   "ch-018"
   ],
   "SABLE": [
    "ch-007"
@@ -41,7 +42,22 @@
   ],
   "TAMSIN": [
    "ch-012"
+  ],
+  "ROOK": [
+   "ch-014"
+  ],
+  "WREN": [
+   "ch-015"
+  ],
+  "EMBER": [
+   "ch-016"
+  ],
+  "MOROS": [
+   "ch-017"
+  ],
+  "AURELIA": [
+   "ch-019"
   ]
  },
- "updated": "2026-07-07T04:36:56.089Z"
+ "updated": "2026-07-07T06:44:34.098Z"
 }

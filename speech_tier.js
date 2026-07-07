@@ -44,6 +44,15 @@ var TAMI_SPEAK=(()=>{ const BASE='http://localhost:7876'; let alive=false, info=
     speak:async(payload)=>{ const ac=new AbortController(), to=setTimeout(()=>ac.abort(),SPEAK_CFG.TIMEOUT_MS);
       try{ const r=await fetch(BASE+'/speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ac.signal});
         if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+      finally{ clearTimeout(to); } },
+    // LATENT LIBRARY channel (labeled GIVEN): extract compact general knowledge about a topic — the Passenger's
+    // lazy-load study call. Own generous timeout: extraction generates more tokens than a reply AND may pay the
+    // model's cold load (~45s); studying is rare (once per topic, ever) so the wait is worth it.
+    latent:async(topic)=>{ const LATENT_TIMEOUT_MS=60000; const ac=new AbortController(), to=setTimeout(()=>ac.abort(),LATENT_TIMEOUT_MS);
+      try{ const r=await fetch(BASE+'/speak',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({mode:'latent',question:topic,pilot:'LIBRARY',persona:'',facts:[],history:[]}),signal:ac.signal});
+        if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); return j.sentences||null; }
+      catch(e){ return null; }
       finally{ clearTimeout(to); } } }; })();
 
 // ---- LLM SPEECH TIER (TAMI_SPEAK) — voices the retrieval-selected facts; NEVER a source of facts itself ----

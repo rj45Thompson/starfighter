@@ -1,0 +1,213 @@
+{
+ "bench": "voiceprint",
+ "learned_from": "novel/chapters/*.md dialogue ONLY (no LLM anywhere in this file)",
+ "extraction": {
+  "total_quote_spans": 317,
+  "attributed": 157,
+  "coverage": 0.495,
+  "note": "unattributed quotes SKIPPED, never guessed"
+ },
+ "speakers_modeled": 6,
+ "speakers_too_small": 22,
+ "min_lines": 10,
+ "identification": {
+  "held_out_lines": 68,
+  "accuracy": 0.294,
+  "chance": 0.167,
+  "two_sigma_band": 0.09,
+  "shuffle_control_accuracy": 0.176
+ },
+ "voiceprints": {
+  "SIRIN": {
+   "lines": 15,
+   "avg_words_per_line": 19.5,
+   "question_rate": 0,
+   "dash_rate": 0,
+   "distinctive": [
+    {
+     "w": "requires",
+     "lo": 2.95
+    },
+    {
+     "w": "error",
+     "lo": 2.7
+    },
+    {
+     "w": "hegemon",
+     "lo": 2.36
+    },
+    {
+     "w": "problem",
+     "lo": 2.36
+    },
+    {
+     "w": "mercy",
+     "lo": 2.36
+    }
+   ],
+   "pastiche": [
+    "i read them you learn the sixty are not saved by it does not require your own hand somewhere",
+    "so they read them you that is the posted rate funds a sixty-first which is the fleet that and the two of the hegemon"
+   ]
+  },
+  "KESTREL": {
+   "lines": 11,
+   "avg_words_per_line": 11.9,
+   "question_rate": 0,
+   "dash_rate": 0.27,
+   "distinctive": [
+    {
+     "w": "brought",
+     "lo": 3.42
+    },
+    {
+     "w": "things",
+     "lo": 3.42
+    },
+    {
+     "w": "yard",
+     "lo": 3.42
+    },
+    {
+     "w": "roll",
+     "lo": 3.42
+    },
+    {
+     "w": "true",
+     "lo": 3.42
+    }
+   ],
+   "pastiche": [
+    "they told me",
+    "the location and i know that the fleet burned i know that much it was given to me you signal watch three"
+   ]
+  },
+  "MIRA": {
+   "lines": 11,
+   "avg_words_per_line": 10.3,
+   "question_rate": 0,
+   "dash_rate": 0.09,
+   "distinctive": [
+    {
+     "w": "wound",
+     "lo": 3.58
+    },
+    {
+     "w": "you're",
+     "lo": 3.58
+    },
+    {
+     "w": "entries",
+     "lo": 2.48
+    },
+    {
+     "w": "column",
+     "lo": 2.48
+    },
+    {
+     "w": "don't",
+     "lo": 2.48
+    }
+   ],
+   "pastiche": [
+    "today she's asking for you dare make me file you remember that the counter-book only beats them if you're alive to become entries in",
+    "sleep three hours i have a side"
+   ]
+  },
+  "VARGO": {
+   "lines": 11,
+   "avg_words_per_line": 11.6,
+   "question_rate": 0,
+   "dash_rate": 0.09,
+   "distinctive": [
+    {
+     "w": "note",
+     "lo": 3.42
+    },
+    {
+     "w": "officer",
+     "lo": 3.42
+    },
+    {
+     "w": "war",
+     "lo": 3.42
+    },
+    {
+     "w": "excellent",
+     "lo": 2.33
+    },
+    {
+     "w": "records",
+     "lo": 2.33
+    }
+   ],
+   "pastiche": [
+    "the day they weighed the levy",
+    "yours is not policy"
+   ]
+  },
+  "KAINE": {
+   "lines": 10,
+   "avg_words_per_line": 13.5,
+   "question_rate": 0,
+   "dash_rate": 0,
+   "distinctive": [
+    {
+     "w": "captain",
+     "lo": 3.7
+    },
+    {
+     "w": "captains",
+     "lo": 3.7
+    },
+    {
+     "w": "well",
+     "lo": 3.7
+    },
+    {
+     "w": "stolen",
+     "lo": 3.36
+    },
+    {
+     "w": "ships",
+     "lo": 3.36
+    }
+   ],
+   "pastiche": [
+    "not a purity i am no longer offered you",
+    "you"
+   ]
+  },
+  "DRACO": {
+   "lines": 10,
+   "avg_words_per_line": 11.7,
+   "question_rate": 0.1,
+   "dash_rate": 0,
+   "distinctive": [
+    {
+     "w": "you'd",
+     "lo": 3.86
+    },
+    {
+     "w": "ground",
+     "lo": 3.53
+    },
+    {
+     "w": "people",
+     "lo": 2.43
+    }
+   ],
+   "pastiche": [
+    "so ranger command tells me my court file has a shelf",
+    "log the ground"
+   ]
+  }
+ },
+ "extraction_found_dialogue": true,
+ "enough_speakers_for_id": true,
+ "identification_beats_chance_2sigma": true,
+ "shuffle_collapses_to_chance": true,
+ "generation_zero_fab_lexicon": true,
+ "VOICEPRINT_VALID": true,
+ "honest_ceiling": "small growing corpus; short lines make K-way attribution genuinely hard; pastiche is recombination of the character's own words, not fresh metaphor. This is a TRAJECTORY metric — accuracy and voiceprint sharpness should climb as the novel grows each tick."
+}

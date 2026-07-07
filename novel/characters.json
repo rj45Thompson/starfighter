@@ -7,7 +7,9 @@
     "ORION_defection": "ch-002 timeline fixed 'nine'->'fifteen more years' so the defection lands in-war (PART II, ~ch-001+4y), consistent with ORION's active-shooting-war bios. Slowness dramatized from Sable's side in ch-007.",
     "MIRA_nine_seconds": "ch-005's hatch-hold nine-count softened to a deliberate working count that foreshadows a SEPARATE later Halcyon FREEZE (bios secret) as the lifelong count. Two distinct nine-counts, no longer double-booked.",
     "ch003_broadcast": "ch-003 set broadcast:false (private dorm/loft/name-secret no longer leaks to all 50 segments). The open-band radio moment the fleet heard is split into ch-013 (broadcast:true), carrying only the sixty-name reading + the 'slower' turn; the private name-secret is withheld there.",
-    "second_sundering": "Outline PART III renamed THE SECOND SUNDERING (in-war lane-collapse the Watch is founded around). The ORIGINAL Sundering is back-story a generation earlier (lore_bios + ch-006), shown only in flashback."
+    "second_sundering": "Outline PART III renamed THE SECOND SUNDERING (in-war lane-collapse the Watch is founded around). The ORIGINAL Sundering is back-story a generation earlier (lore_bios + ch-006), shown only in flashback.",
+    "SABLE_age": "tick-3 ruling (backlog: SABLE age vs the 12-year creche anchor). KEPT ch-002's 'Twelve years before the Obedient Sum ever came to Halcyon' anchor (the ORION_defection ruling's arithmetic depends on it: Orion 11 at muster, +15 years to defect). RAISED Sable's stated age instead: she is 8 at the creche muster (ch-002, unchanged) -> ~20 at ch-001's tithe day -> 'twenty' the broadcast winter. Edits: ch-007 'seventeen'->'twenty' (2x), ch-010 'seventeen-year-old'->'twenty-year-old' (1x). Kestrel's 11->12 (ch-001/ch-003) untouched and consistent.",
+    "wayfinder_symbionts": "tick-3 canon seed (PASSENGER_SPEC sim->novel journalism). ch-019 (Aurelia's archive, Hale's eyewitness testimony) seeds the player-game's Passenger: wayfinder symbionts GROWN by the old Warden Order for its pilots a generation before this war; boarded through the ear while the pilot slept; lent senses/memory/lane-weather; most died with their pilots and the forebear fleet at the Sundering (a wayfinder outlives its pilot by exactly eleven seconds); the unpaired survivors SLEEP in derelicts and dead yards and wake only for pilots they choose, by no rule anyone found. Crews called one 'a Passenger'. Consistent with passenger.js PLAYER_STORY (the player wakes one in a forebear derelict decades later; it will not say why it chose them). PASSENGER added to offstage."
   },
   "characters": [
     {"name":"VEGA",    "faction":"coalition","temperament":"grieving idealist","rel":{"MIRA":"friend","ORION":"ally","KAINE":"hates","KESTREL":"kin","HALE":"mentor"}},
@@ -63,6 +65,6 @@
     {"name":"TALLOW",  "faction":"synod",    "temperament":"quartermaster who counts the tithed","rel":{"SIRIN":"friend","SORREL":"betrayed","KAINE":"debt"}},
     {"name":"AZURE",   "faction":"coalition","temperament":"last pilot of a dead squadron","rel":{"LARK":"friend","SELENE":"debt","HARROW":"hates"}}
   ],
-  "offstage": ["VALE","KAINE","MERCER","MAREN"],
+  "offstage": ["VALE","KAINE","MERCER","MAREN","PASSENGER"],
   "places": ["Halcyon Station","Meridian Yards","Ranger Command","The Ember Vigil","The Sundering","Cydon","Vantor","Ferrus","Relay Six","Draco's Watch","Ludo"]
 }

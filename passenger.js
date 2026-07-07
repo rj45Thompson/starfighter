@@ -28,6 +28,9 @@ const CFG = {
   HELP_MIN_SCORE: 2,                   // min token-overlap score to claim a help match
   PRICE_EWMA: 0.3,                     // learned price estimate blend
   SUMMARY_EVENTS: 4,                   // recent events quoted in speech facts
+  LATENT_KEEP: 5,                      // sentences stored per studied topic (the lazy-loaded library entry)
+  LEARNED_TOPICS_IN_FACTS: 8,          // most-recent studied topics folded into the grounding facts each turn
+  LEARNED_FACTS_CAP: 30,               // cap on library sentences in the fact list (prompt budget)
 };
 
 // ---- CANON LORE (GIVEN — authored, labeled; the novel will record it) ----------------------------------------
@@ -73,9 +76,11 @@ const INTRO = [
 const REGREETING = "Still here. Still listening. Type when you want me.";
 
 // ---- state (LEARNED — persisted; wiping it visibly degrades what it can say) -----------------------------------
-function blankState(){ return { version:1, intro_shown:false, events:[], counts:{kills_seen:0,trades_seen:0,damage_taken:0,docks:0,asks:0}, prices:{}, names_met:[] }; }
+function blankState(){ return { version:1, intro_shown:false, events:[], counts:{kills_seen:0,trades_seen:0,damage_taken:0,docks:0,asks:0,studied:0}, prices:{}, names_met:[], learned:{} }; }
 let S = blankState();
 try { const raw = localStorage.getItem(CFG.STATE_KEY); if(raw){ const p=JSON.parse(raw); if(p && p.version===1) S=p; } } catch(e){}
+if(!S.learned) S.learned={};                                          // migrate pre-latent states
+if(S.counts.studied==null) S.counts.studied=0;
 function save(){ try{ localStorage.setItem(CFG.STATE_KEY, JSON.stringify(S)); }catch(e){} }
 
 let hooks = { registry:[], telemetry:null, speak:null, say:null };   // injected at init by the game
@@ -155,18 +160,63 @@ function composerAnswer(question, facts){
   // grounded fallback (no LLM): rank facts by overlap, frame in the Passenger's voice. 0-fab by construction.
   const q=new Set(toks(question).filter(w=>!STOP.has(w)));
   if(!q.size) return LORE[0]+' '+LORE[6];   // pure smalltalk → who I am, how I speak
-  const scored=facts.map(f=>({f, s: toks(f).reduce((a,w)=>a+(q.has(w)?1:0),0)})).sort((a,b)=>b.s-a.s);
+  // ties break toward LATER facts: the fact list is ordered lore -> backstory -> learned state -> live telemetry ->
+  // retina, so on equal overlap the LIVE observation beats the static self-description ("what do you see" should
+  // answer with the retina, not the lattice poem)
+  const scored=facts.map((f,i)=>({f, s: toks(f).reduce((a,w)=>a+(q.has(w)?1:0),0) + i*1e-3})).sort((a,b)=>b.s-a.s);
   const picked=scored.filter(x=>x.s>0).slice(0,2).map(x=>x.f);
-  if(!picked.length) return "That is outside what my lattice has touched. Ask me about your ship, our lanes, the prices I have tasted, what I am — or who you are.";
+  if(!picked.length) return "That is outside what my lattice has touched, and the old libraries in me are asleep while my deeper mind is offline. Wake the speech sidecar and ask again — I will study it and remember.";
   return picked.join(' ');
+}
+// ---- THE LAZY-LOADED LIBRARY (user 2026-07-07): when nothing grounded touches the question, the worm STUDIES —
+// it pulls compact knowledge from the LLM's latent library ONCE, stores it in persistent state (S.learned), and
+// answers from what it just learned. Next time the topic comes up it already knows (no second study call). This is
+// the one permitted GIVEN (LLM latent knowledge) with its own labeled channel: study output becomes FACTS, and the
+// normal guarded voicing pass grounds against them — the label '«old libraries»' marks provenance in-fiction. -----
+function learnedFacts(){
+  const keys=Object.keys(S.learned).slice(-CFG.LEARNED_TOPICS_IN_FACTS);
+  const out=[]; for(const k of keys) out.push(...S.learned[k]);
+  return out.slice(-CFG.LEARNED_FACTS_CAP);
+}
+function bestOverlap(question, facts){
+  const q=new Set(toks(question).filter(w=>!STOP.has(w))); if(!q.size) return 1;
+  let best=0; for(const f of facts){ let s=0; for(const w of toks(f)) if(q.has(w)) s++; if(s>best) best=s; }
+  return best;
+}
+async function latentStudy(question){
+  const key=toks(question).filter(w=>!STOP.has(w)).sort().join('-').slice(0,60);
+  if(!key) return null;
+  if(S.learned[key]) return { sents:S.learned[key], fresh:false };    // lazy: already studied — answer from memory
+  if(!hooks.latent) return null;
+  try{
+    const sents=await hooks.latent(question);
+    if(sents&&sents.length){ S.learned[key]=sents.slice(0,CFG.LATENT_KEEP); S.counts.studied++; save();
+      return { sents:S.learned[key], fresh:true }; }
+  }catch(e){}
+  return null;
 }
 async function speakAnswer(question){
   const facts = LORE.concat(PLAYER_STORY, stateFacts(), telemetryFacts());
+  if(hooks.vision){ try{ facts.push(...(hooks.vision()||[])); }catch(e){} }   // the retina's grounded fragments (vision.js describe())
+  facts.push(...learnedFacts());                                              // everything it ever studied stays queryable
+  let studied=null;
+  if(bestOverlap(question, facts)===0){                                       // NOTHING grounded touches this → study first
+    studied=await latentStudy(question);
+    if(studied) facts.push(...studied.sents);
+  }
+  // rank facts by question-relevance BEFORE sending — the speech server truncates at its MAX_FACTS, and the
+  // freshly-studied sentences must survive that cut (they were being appended last and sliced off, so the model
+  // declined questions it had literally just studied). Ties keep the later=live bias.
+  const qset=new Set(toks(question).filter(w=>!STOP.has(w)));
+  const ranked=facts.map((f,i)=>({f, s: toks(f).reduce((a,w)=>a+(qset.has(w)?1:0),0) + i*1e-4}))
+                    .sort((a,b)=>b.s-a.s).map(x=>x.f);
   let reply=null, tier='composer';
   if(hooks.speak){
-    try{ reply = await hooks.speak({ pilot:'PASSENGER', persona:PERSONA, facts, history:conv.slice(-CFG.CONV_CAP), question }); tier='qwen'; }catch(e){ reply=null; }
+    try{ reply = await hooks.speak({ pilot:'PASSENGER', persona:PERSONA, facts:ranked, history:conv.slice(-CFG.CONV_CAP), question }); tier='qwen'; }catch(e){ reply=null; }
   }
-  if(!reply){ reply = composerAnswer(question, facts); tier='composer'; }
+  if(!reply){ reply = composerAnswer(question, ranked); tier='composer'; }
+  if(studied&&studied.fresh) reply='«I did not know this. I went into the old libraries and studied.» '+reply;   // provenance label, in-voice
+  else if(studied) reply='«from my studies» '+reply;
   conv.push({q:question, a:reply}); if(conv.length>CFG.CONV_CAP*2) conv.shift();
   S.counts.asks++; save();
   return { reply, tier };
@@ -185,9 +235,11 @@ async function route(text){
 
 function powers(){   // the in-fiction honesty ledger
   return {
-    GIVEN: 'my origin story (authored lore), and the borrowed mouth I speak through (a small language model when its sidecar is awake; my own plain composition otherwise)',
+    GIVEN: 'my origin story (authored lore), the borrowed mouth I speak through (a small language model when its sidecar is awake; my own plain composition otherwise), and the old libraries I study from (the model\'s latent knowledge — always labeled when I use it)',
     LEARNED: S.counts, prices: S.prices, names_met: S.names_met.length,
-    note: 'wipe my state and watch what I can no longer tell you — nothing I say is hardcoded.',
+    studied_topics: Object.keys(S.learned).length,
+    library: Object.keys(S.learned).slice(-6),
+    note: 'wipe my state and watch what I can no longer tell you — nothing I say is hardcoded, and what I studied is forgotten too.',
   };
 }
 
