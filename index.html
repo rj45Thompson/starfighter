@@ -1006,6 +1006,7 @@ function step(dt){
   encounterTick(dt);   // M11: derelicts / caches / distress + galaxy news
   INH.tick(dt);   // I8 skeleton: the Inhabitant senses + remembers on its OWN cadence (INH_TICK), never prodded
   if(window.GAMEMOD) GAMEMOD.tick(dt);   // 🜏 self-modification: rules fire, pilots take mutation turns, watchdog watches
+  passengerAdviseTick(dt);   // 🜏 the worm tells you what it thinks you should do (rate-capped, grounded in telemetry)
   if(VIS_PLAYER&&(_visFrame++%VIS_EVERY===0)){ VIS_PLAYER.tick(); if(VIS_ORION) VIS_ORION.tick(); }   // fog reveals only where the minds have BEEN
   if(window.CHATTER) CHATTER.tick(dt);   // 📻 N4: the radio band — ambient/event chatter, serialized + rate-capped
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
@@ -1184,9 +1185,35 @@ const PASSENGER_REGISTRY=[   // rich synonym descs — the help-matcher grounds 
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
-  return { hull:Math.round(P.hp), credits:P.credits, place:np?np.name:null,
+  // hostiles within sensors (senseR-gated so the worm only advises on what YOUR sensors touch), nearest by distance
+  const threats=ships.filter(x=>x.alive&&x!==P&&x.team==='pirate'&&x.pos.distanceTo(P.pos)<=P.senseR)
+    .map(x=>({name:x.name, dist:P.pos.distanceTo(x.pos), wpn:(x.lvl&&x.lvl.weapon)||1})).sort((a,b)=>a.dist-b.dist);
+  const npNear=nearestPlanet(P.pos);
+  return { hull:Math.round(P.hp), maxHull:Math.round(P.maxHp), fuel:Math.round(P.fuel), maxFuel:P.fuelCap,
+    credits:P.credits, place:np?np.name:null, docked:!!P.docked, weaponLvl:(P.lvl&&P.lvl.weapon)||1,
+    cargoCount:cargoTotal(P), holdCap:P.holdCap,
     near:ships.filter(x=>x.alive&&x!==P&&x.pos.distanceTo(P.pos)<=P.senseR).map(x=>x.name).slice(0,8),
+    threats, nearestPlanet: npNear?{name:npNear.name, dist:P.pos.distanceTo(npNear.pos)}:null,
+    nearestBase: (typeof base!=='undefined'&&base)?{name:base.name, dist:P.pos.distanceTo(base.pos)}:null,
     cargo:Object.keys(P.cargo||{}).filter(k=>P.cargo[k]>0).map(k=>`${GKEY[k].n} ${P.cargo[k]}`) }; }
+// 🜏 THE WORM ADVISES — unprompted, rate-capped: it watches your telemetry and tells you the single most important
+// thing to do, in the PARASITE tab (aloud too if voices on). Speaks only when the advice CHANGES or an urgent
+// threat appears + a cooldown has passed — guidance, not nagging.
+let _advClock=0, _advLastKey=null, _advLastT=-1e9;
+function passengerAdviseTick(dt){
+  if(!window.PASSENGER||!PASSENGER.adviceOn||!PASSENGER.adviceOn()) return;
+  _advClock+=dt||0; if(_advClock<3) return; _advClock=0;                 // assess ~every 3s
+  const a=PASSENGER.advise(passengerTelemetry()); if(!a) return;
+  const now=(typeof T0!=='undefined')?T0:0;
+  const cooldown = a.urgency>=2? 8 : (a.urgency>=1? 16 : 30);            // urgent threats repeat sooner
+  if(a.key===_advLastKey && (now-_advLastT)<cooldown*3) return;         // don't repeat the same advice too often
+  if(a.key!==_advLastKey || (now-_advLastT)>=cooldown){
+    _advLastKey=a.key; _advLastT=now;
+    const col = a.urgency>=2?'#ff9a9a':(a.urgency>=1?'#ffcf8a':'#c9a0ff');
+    paraLine('worm', `<span style="color:${col}">▸ ${String(a.text).replace(/</g,'&lt;')}</span>`);
+    if(window.CHATTER && CHATTER.voiceOn && CHATTER.voiceOn() && CHATTER.speakAloud) CHATTER.speakAloud('PASSENGER', a.text);
+  }
+}
 async function passengerSpeak(req){   // Qwen tier via the speech sidecar; server-side entity/number guard applies
   if(!TAMI_SPEAK.alive) return null; const j=await TAMI_SPEAK.speak(req); return j&&j.reply?j.reply:null; }
 let paraBusy=false;
@@ -1541,6 +1568,11 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='intro'||c==='awaken'){ if(window.PASSENGER) maybeAwaken(true); return; }
   if(c==='ponder'){ if(!window.PASSENGER) return; const on=PASSENGER.setPonder((a[1]||'on')!=='off');
     term(on?'the worm will ponder aloud after each exchange (why you asked · what it changes · its stake).':'the worm keeps its pondering to itself now.','sys'); return; }
+  if(c==='advice'||c==='advise'){ if(!window.PASSENGER) return;
+    if(a[1]&&(a[1].toLowerCase()==='now'||a[1].toLowerCase()==='what')){ const adv=PASSENGER.advise(passengerTelemetry());
+      if(activeTab!=='parasite'){ activeTab='parasite'; buildTabs(); } paraLine('worm', adv?('▸ '+String(adv.text).replace(/</g,'&lt;')):'Nothing pressing. Fly on — I will speak when it matters.'); renderLog(); return; }
+    const on=PASSENGER.setAdvice((a[1]||'on')!=='off'); _advLastKey=null;
+    term(on?'the worm will tell you what it thinks you should do, unprompted (threat › survival › opportunity › go-see). Type <b>advice now</b> for its read this instant.':'the worm will hold its counsel until you ask (advice on · advice now).','sys'); return; }
   // ---- DELIBERATE: watch the generalized reasoning engine run How/What/Why/When on a decision, converge, and — when
   // it hits a gap — run the acquisition cascade to pull the missing knowledge into the PERSISTENT store (shared/private).
   if(c==='deliberate'||c==='reason'||c==='think2'){ if(!window.DELIBERATE){ term('deliberate.js not loaded','err'); return; }

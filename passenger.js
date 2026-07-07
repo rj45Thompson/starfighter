@@ -83,6 +83,7 @@ if(!S.learned) S.learned={};                                          // migrate
 if(S.counts.studied==null) S.counts.studied=0;
 if(!S.host) S.host={};                                                // migrate pre-ponder states
 if(S.ponder_on==null) S.ponder_on=true;
+if(S.advice_on==null) S.advice_on=true;                               // the worm advises by default (user asked for it)
 function save(){ try{ localStorage.setItem(CFG.STATE_KEY, JSON.stringify(S)); }catch(e){} }
 
 let hooks = { registry:[], telemetry:null, speak:null, say:null };   // injected at init by the game
@@ -269,6 +270,48 @@ async function ponder(question){
   return out;
 }
 
+// ---- THE ADVISOR (user 2026-07-07: "make it so the parasite talks to you and tells you what it thinks you should
+// do"). The worm reads your LIVE telemetry (senseR-gated, so it only knows what your sensors touch) and picks the
+// single highest-priority thing you should do, unprompted, in its own voice. A grounded priority ladder — threat >
+// survival > opportunity > curiosity — every line uses REAL numbers/names from the snapshot (0-fabrication). Returns
+// {text, key, urgency} or null when nothing is worth saying (silence is not spam). The game speaks it rate-capped.
+const ADV = { FUEL_LOW:0.28, HULL_LOW:0.32, HULL_CRIT:0.18, HOLD_FULL:0.9, RICH:1200 };
+function advise(t){
+  if(!t) return null;
+  const hp = t.maxHull? t.hull/t.maxHull : 1;
+  const fuel = t.maxFuel? t.fuel/t.maxFuel : 1;
+  const threat = (t.threats&&t.threats.length)? t.threats[0] : null;   // nearest hostile within sensors
+  const safe = t.nearestBase||t.nearestPlanet;
+  // 1) THREAT — someone on us and we can't take it
+  if(threat && (hp<ADV.HULL_LOW || (t.weaponLvl!=null && threat.wpn!=null && threat.wpn>t.weaponLvl))){
+    return { key:'flee:'+threat.name, urgency:2,
+      text:`${threat.name} is on us, ${Math.round(threat.dist)} out, and your hull is at ${Math.round(hp*100)}%. Break off — run for ${safe?safe.name:'open space'} before this becomes an obituary. Mine, not yours — but mine follows yours by eleven seconds.` };
+  }
+  if(hp<ADV.HULL_CRIT){
+    return { key:'crit', urgency:2, text:`Your hull is at ${Math.round(hp*100)}%. I can hear it. Dock and repair — ${t.docked?'you are docked, say repair':(safe?('make for '+safe.name):'find a berth')} — anything else is bravado we cannot afford.` };
+  }
+  // 2) SURVIVAL — fuel / hull
+  if(fuel<ADV.FUEL_LOW){
+    return { key:'fuel', urgency:1, text:`We are down to ${Math.round(fuel*100)}% fuel. ${safe?('Make for '+safe.name+' and refuel'):'Find a planet and refuel'} before we drift dark and I have to watch you starve.` };
+  }
+  if(hp<ADV.HULL_LOW){
+    return { key:'hull', urgency:1, text:`Hull ${Math.round(hp*100)}%. ${t.docked?'You are docked — say repair.':(safe?('Limp to '+safe.name+' and repair'):'Get to a berth')} before the next fight finds the crack.` };
+  }
+  // 3) OPPORTUNITY — full hold, wealth to spend
+  if(t.holdCap && t.cargoCount/t.holdCap>=ADV.HOLD_FULL){
+    return { key:'sell', urgency:0, text:`Your hold is full — ${t.cargoCount}/${t.holdCap}. ${t.docked?'Sell here':'Dock and sell'}; the price will not be kinder where we are drifting.` };
+  }
+  if(t.credits>=ADV.RICH && t.weaponLvl!=null && t.weaponLvl<3){
+    return { key:'upgrade', urgency:0, text:`We are carrying ${t.credits} credits and flying a tin gun. A better weapon at ${t.nearestBase?t.nearestBase.name:'Ranger Command'} would keep us both breathing. Say the word.` };
+  }
+  // 4) CURIOSITY — nothing hunting us; go see, or earn
+  if(!threat){
+    if(t.near && t.near.length) return { key:'mine', urgency:0, text:`Nothing is hunting us right now. Good hour to mine, or push for ${t.nearestPlanet?t.nearestPlanet.name:'the next lane'} — the fog past it is thick and I want to see what it hides.` };
+    return { key:'explore', urgency:0, text:`Quiet. Too quiet for my taste. Pick a heading and fly it — I would rather map the dark than sit in it.` };
+  }
+  return null;
+}
+
 // ---- the routing entry the game calls when its parser fails ---------------------------------------------------
 async function route(text){
   const h = helpMatch(text);
@@ -294,8 +337,10 @@ function powers(){   // the in-fiction honesty ledger
 
 window.PASSENGER = {
   init(h){ hooks = Object.assign(hooks, h||{}); },
-  route, onEvent, powers, ponder,
+  route, onEvent, powers, ponder, advise,
   setPonder(on){ S.ponder_on=!!on; save(); return S.ponder_on; },
+  setAdvice(on){ S.advice_on=!!on; save(); return S.advice_on; },
+  adviceOn(){ return S.advice_on!==false; },
   wipe(){ S=blankState(); save(); },     // for the removal/round-trip puppet test
   // awakening popup contract: game calls introLines() at boot — full monologue on a fresh symbiont, the short
   // re-greeting once it has been shown; markIntroShown() after the modal closes; `intro` command replays via force.
