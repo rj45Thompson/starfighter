@@ -312,8 +312,11 @@ function makeShip(i){
     cargo:{}, fuel:CFG.FUEL_START, tradePlan:null, tradeCd:0, warping:false,        // trading + hyperspace state
     holdCap:CFG.HOLD_CAP, fuelCap:CFG.FUEL_CAP, senseR:CFG.SENSE_R, warpEff:1, equip:{},   // installable equipment stats
     mode:'MINE', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(hue) };
+  novelShipHook(s);   // N3 (GIVEN-from-canon): roster temperament -> aggr bias; traders faction -> trader role bias
   if(s.role==='trader'){ s.maxHp=Math.round(s.maxHp*CFG.TRADER_HP_MULT); s.hp=s.maxHp; }     // merchant hulls: cargo-first, thin armor
-  s.quat.setFromEuler(new T.Euler(rand(-0.5,0.5),rand(0,TAU),0)); scene.add(s.mesh); ships.push(s); shipById[s.id]=s; return s;
+  s.quat.setFromEuler(new T.Euler(rand(-0.5,0.5),rand(0,TAU),0)); scene.add(s.mesh); ships.push(s); shipById[s.id]=s;
+  novelSeedDispos();   // N3: canon relationship pairs seed where both endpoints are now alive (fills unset slots only)
+  return s;
 }
 function rockMesh(scale,light){ const g=new T.IcosahedronGeometry(1,1),p=g.attributes.position,v=new T.Vector3(),sd=rand(0,100);
   for(let i=0;i<p.count;i++){ v.fromBufferAttribute(p,i);
@@ -538,14 +541,17 @@ function addPirate(){ if(ships.filter(s=>s.team==='pirate').length>=enemyCap()) 
   const ti=Math.max(0, hegTier()-(rand(0,1)<0.4?1:0)), HT=HEG_TIERS[ti];   // mostly current tier, some lower
   const sys=systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()};
   const off=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.SYSTEM_R*rand(0.8,1.15));
-  const s={ id:nextId++, name:'HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
+  const rosterName=novelPirateName();   // N3: synod roster canon name when the novel roster is loaded; else legacy HEG tier name
+  const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:HT.hp, maxHp:HT.hp, credits:0, score:0,
     lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
     huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:99, role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty, weaponType:WEAPON_ORDER[ti], backstory:BACKSTORY.hegemon[nextId%BACKSTORY.hegemon.length],
     cargo:{}, fuel:0, tradePlan:null, tradeCd:0, warping:false, holdCap:0, fuelCap:0, senseR:CFG.SENSE_R, warpEff:1,
     mode:'HUNT', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(0.0) };
+  novelShipHook(s);   // N3 (GIVEN-from-canon): synod temperament biases aggr (role stays 'pirate' — hook only re-roles squad ships)
   s.mesh.children[0].material.color.set(HT.col); s.mesh.children[0].material.emissive.set(HT.col).multiplyScalar(0.28); s.mesh.scale.setScalar(HT.scale);
   s.quat.setFromEuler(new T.Euler(0,rand(0,TAU),0)); scene.add(s.mesh); ships.push(s); shipById[s.id]=s;
+  novelSeedDispos();   // N3: e.g. PYXIS.rel.MOROS (betrayed) seeds the moment MOROS actually flies
   const o=spriteText('',26,'#fff',{bg:'rgba(30,9,9,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS}); o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o;
   shipBlips[s.id]=topBlip('#'+new T.Color(HT.col).getHexString(),9+ti*3,1); return s; }
 function removeShip(s){ const i=ships.indexOf(s); if(i<0) return; scene.remove(s.mesh);
@@ -1168,6 +1174,83 @@ let TAMIDATA=null; fetch('./tami_data.json').then(r=>r.ok?r.json():null).then(j=
 // like TAMIDATA: if the fetch fails, `ask` falls back to the legacy grounded-graph answerer unchanged.
 let LOREDATA=null; fetch('./lore_bios.json').then(r=>r.ok?r.json():null).then(j=>{ LOREDATA=j;
   if(j) console.log(`LOREDATA loaded: ${Object.keys(j.pilots||{}).length} pilots · ${Object.keys(j.factions||{}).length} factions · ${Object.keys(j.worlds||{}).length} worlds`); }).catch(()=>{});
+// ===================== NOVELDATA (pillar N3) — the game meets the roster of THE LANES THAT BURNED =====================
+// Two soft-fail fetches (same law as TAMIDATA/LOREDATA — absent files leave the game EXACTLY as before):
+//   novel_graph.json      (lane B bake) — per-character SEGMENTS of verbatim novel sentences, each carrying
+//                         {chapter,scene,present,broadcast}. KNOWLEDGE LAW (isolation by construction): a pilot's
+//                         retrieval index gets ONLY segments[its name] — sentences from chapters it wasn't present at
+//                         are structurally absent from its index, so cross-segment knowledge cannot leak.
+//   novel/characters.json (authored canon) — the 50-name roster {name,faction,temperament,rel} + relationship matrix.
+// Everything here is GIVEN-from-canon (the authored novel), labeled as such — NOT a learning claim.
+const NOVEL_CFG={
+  ORD_BASE:400,             // novel docs sort after the pilot's bio (ord 0..) but before faction(1000+)/world(2000+) lines
+  // GIVEN-from-canon: characters.json relationship matrix -> pairwise DISPOS seeds on the EXISTING s.rel machinery
+  // (shipDisp folds s.rel into faction stance; noteHarm/kills keep moving it afterwards). Mission-fixed map:
+  REL_W:{ hates:-0.8, rival:-0.3, friend:0.5, ally:0.5, kin:0.7, debt:0.4, betrayed:-0.6, mentor:0.6, ward:0.6 },
+  // roster temperament -> aggr bias (GIVEN flavor; result clamped to CFG.AGGR_MIN..AGGR_MAX). Named constants, no magic numbers.
+  TEMPER_AGGR_UP:0.25, TEMPER_AGGR_DOWN:-0.2,
+  TEMPER_UP_RE:/execution|raider|fearless|boarding|blockade|mine layer|hunts|warlord|breacher|slow anger/i,
+  TEMPER_DOWN_RE:/medic|poet|chaplain|ledger|insurance|archivist|assessor|doubting|weary|grieving|sings|quartermaster/i };
+let NOVELDATA=null, NOVELCHARS=null, NOVEL_ROSTER=null, NOVELINDEX=null;
+// normalize lane B's bake defensively: segments -> {NAME:[{text,chapter,scene,present,broadcast}..]}. The shipped bake
+// stores segments as {chapters,sentenceIdx} POINTING into the top-level sentences[] array (dedup); inline record arrays
+// are accepted too. Counts are DERIVED from the loaded file (or its segments), never hand-typed. Empty segments drop —
+// a roster character with no scenes yet simply has no novel index (honest).
+function novelNormalize(j){ if(!j||typeof j!=='object') return null;
+  const sentsArr=Array.isArray(j.sentences)?j.sentences:null, raw=j.segments||j.segs||{}, segments={}; let sentences=0; const chaps=new Set();
+  const mkRec=r=>{ const text=(typeof r==='string')?r:String((r&&(r.text||r.sentence||r.s))||''); if(!text.trim()) return null;
+    return { text:text.trim(), chapter:(r&&r.chapter)||null, scene:(r&&r.scene)||null, present:(r&&r.present)||null, broadcast:!!(r&&r.broadcast) }; };
+  for(const nm in raw){ const v=raw[nm]; let arr=[];
+    if(Array.isArray(v)) arr=v;                                                                        // inline records
+    else if(v&&Array.isArray(v.sentenceIdx)&&sentsArr) arr=v.sentenceIdx.map(i=>sentsArr[i]).filter(Boolean);   // lane B bake: indices into sentences[]
+    else if(v&&Array.isArray(v.sentences)) arr=v.sentences;
+    const out=[]; for(const r of arr){ const rec=mkRec(r); if(rec){ out.push(rec); sentences++; if(rec.chapter) chaps.add(rec.chapter); } }
+    if(out.length) segments[nm]=out; }
+  const counts=j.counts||{};
+  return { title:j.title||null,
+    chapters:counts.chapters||(Array.isArray(j.chapters)?j.chapters.length:(typeof j.chapters==='number'?j.chapters:0))||chaps.size||0,
+    words:j.words||0, pages:j.pages||0, characters:counts.roster||j.characters||Object.keys(segments).length,
+    segments, sentences, triples:Array.isArray(j.triples)?j.triples.length:0 }; }
+function novelSegOf(name){ const S=NOVELDATA&&NOVELDATA.segments; if(!S||!name) return null; return S[name]||S[String(name).toUpperCase()]||null; }
+// caches built before the novel arrived lack its docs/names — drop them; they lazily rebuild (LORE_IDX/LORE_VOCAB).
+function novelCachesReset(){ LORE_VOCAB=null; for(const k in LORE_IDX) delete LORE_IDX[k]; }
+// GIVEN-from-canon (N3): seed pairwise DISPOS from the roster relationship matrix WHERE BOTH NAMES ARE ALIVE ships.
+// Fills only UNSET s.rel slots (combat grudges are never clobbered); idempotent — re-run on every roster-named spawn,
+// so pairs whose second endpoint arrives later (e.g. a synod pirate) seed on arrival.
+function novelSeedDispos(){ if(!NOVEL_ROSTER) return 0; let n=0; const alive={};
+  for(const o of ships) if(o.alive&&NOVEL_ROSTER.byName[o.name]) alive[o.name]=o;
+  for(const nm in alive){ const s=alive[nm], rel=(NOVEL_ROSTER.byName[nm].rel)||{};
+    for(const other in rel){ if(!alive[other]||other===nm) continue; const w=NOVEL_CFG.REL_W[rel[other]]; if(w==null) continue;
+      s.rel=s.rel||{}; if(s.rel[other]==null){ s.rel[other]=w; n++; } } }
+  return n; }
+// roster hook for a (re)spawned ship: traders faction -> trader role bias (squad only — never the player/defender roles),
+// temperament -> aggr bias, temperament -> backstory (GIVEN canon; richer than the generic pool line).
+function novelShipHook(s){ const ch=NOVEL_ROSTER&&NOVEL_ROSTER.byName[s.name]; if(!ch) return;
+  if(s.team==='squad'&&s.role!=='player'&&s.role!=='defender'&&ch.faction==='traders') s.role='trader';
+  let d=0; if(NOVEL_CFG.TEMPER_UP_RE.test(ch.temperament||'')) d+=NOVEL_CFG.TEMPER_AGGR_UP;
+  if(NOVEL_CFG.TEMPER_DOWN_RE.test(ch.temperament||'')) d+=NOVEL_CFG.TEMPER_AGGR_DOWN;
+  if(d) s.aggr=clamp((s.aggr||0)+d, CFG.AGGR_MIN, CFG.AGGR_MAX);
+  if(ch.temperament&&s.role!=='player') s.backstory=ch.temperament; }
+// synod roster names take over pirate spawns (first canon name not currently borne by a living ship); pool exhausted or
+// roster absent -> the legacy HEG tier name, exactly as before.
+function novelPirateName(){ if(!NOVEL_ROSTER||!NOVEL_ROSTER.pirate.length) return null;
+  const taken=new Set(ships.filter(o=>o.alive).map(o=>o.name));
+  for(const nm of NOVEL_ROSTER.pirate) if(!taken.has(nm)) return nm; return null; }
+// index first (the honest N1 page/word counters), then the graph — one chain so the console line can carry pages.
+fetch('./novel/novel_index.json').then(r=>r.ok?r.json():null).catch(()=>null)
+  .then(ix=>{ NOVELINDEX=ix||null; return fetch('./novel_graph.json').then(r=>r.ok?r.json():null); })
+  .then(j=>{ const d=novelNormalize(j); if(!d) return;
+    if(NOVELINDEX){ d.pages=d.pages||NOVELINDEX.pages||0; d.words=d.words||NOVELINDEX.words||0; }
+    NOVELDATA=d; novelCachesReset();
+    console.log(`NOVELDATA loaded: "${d.title||'untitled'}" · ${d.chapters} chapters · ${d.pages} pages · ${d.words} words · ${d.characters} characters · segments for ${Object.keys(d.segments).length} names · ${d.sentences} segment-sentences · ${d.triples} triples`); }).catch(()=>{});
+fetch('./novel/characters.json').then(r=>r.ok?r.json():null).then(j=>{ if(!(j&&Array.isArray(j.characters))) return; NOVELCHARS=j;
+  const byName={}; j.characters.forEach(c=>{ if(c&&c.name) byName[c.name]=c; });
+  NOVEL_ROSTER={ byName, squad:j.characters.filter(c=>c.faction!=='synod').map(c=>c.name), pirate:j.characters.filter(c=>c.faction==='synod').map(c=>c.name) };
+  // the PILOTS name POOL extends to the roster (coalition+traders -> 'squad' pool; synod names spawn as 'pirate' team via
+  // novelPirateName). Spawn COUNT stays CFG.NSHIPS — N7 is the later perf pass; only the pool grows here.
+  let added=0; for(const c of j.characters) if(c.faction!=='synod'&&PILOTS.indexOf(c.name)<0){ PILOTS.push(c.name); added++; }
+  novelCachesReset(); const seeded=novelSeedDispos();
+  console.log(`NOVEL ROSTER loaded: ${j.characters.length} characters · squad name pool ${NOVEL_ROSTER.squad.length} (+${added} new) · synod pool ${NOVEL_ROSTER.pirate.length} · DISPOS pairs seeded from canon: ${seeded}`); }).catch(()=>{});
 // AC4 (user directive: run the ACTUAL C#, no port): when the TamiRules sidecar is up (`dotnet run` in tami-cs/ — it
 // compiles the LITERAL shipping DamageModel.cs+TypeEffectiveness.cs via <Compile Link>), battle math calls the real C#
 // over localhost. When absent (e.g. the public GitHub Pages site), battles fall back to TAMIDATA — whose matrix and
@@ -1467,6 +1550,13 @@ async function tamiStatus(){
   if(TAMIDATA){ const d=TAMIDATA;   // counts come from the LOADED json (baked by bake_tami_data.js) — never hand-typed
     term(`&nbsp;&nbsp;data: <b>${d.species.length}</b> species · <b>${d.techniques.length}</b> techniques · <b>${d.basic_strikes.length}</b> basic strikes · <b>${d.afflictions.length}</b> afflictions <span style="opacity:.5">(tami_data.json${d.generated?' · baked '+String(d.generated).slice(0,10):''})</span>`,'sys'); }
   else term('&nbsp;&nbsp;data: tami_data.json NOT loaded — away-mission battles fall back to legacy stand-in units.','err');
+  // N3: THE NOVEL — every number below comes from the LOADED novel_graph.json / characters.json (never hand-typed)
+  if(NOVELDATA){ const n=NOVELDATA, segs=n.segments||{}, f=ships[focus];
+    const mineN=(f&&novelSegOf(f.name)||[]).length;
+    const inGame=ships.filter(x=>x.alive&&novelSegOf(x.name)).slice(0,6).map(x=>`${x.name} ${novelSegOf(x.name).length}`).join(' · ');
+    term(`&nbsp;&nbsp;novel: <b>${String(n.title||'untitled').replace(/</g,'&lt;')}</b> · <b>${n.chapters}</b> chapters · <b>${n.pages}</b> pages · <b>${n.characters}</b> characters · segments for <b>${Object.keys(segs).length}</b> names (${n.sentences} sentences) <span style="opacity:.5">(novel_graph.json — a pilot's index holds ONLY its own segment)</span>`,'sys');
+    term(`&nbsp;&nbsp;novel segments in-game: ${inGame||'none of the living pilots carry a segment yet'} · focus <b>${f?f.name:'—'}</b>: ${mineN} sentence${mineN===1?'':'s'}${NOVEL_ROSTER?` · roster pools squad ${NOVEL_ROSTER.squad.length} / synod ${NOVEL_ROSTER.pirate.length}`:''}`,'sys'); }
+  else term('&nbsp;&nbsp;novel: novel_graph.json NOT loaded — pilots speak lore_bios only (N3 roster/segments inactive).','sys');
   const h=await TAMI_CS.health();   // live probe (also refreshes TAMI_CS.alive if the sidecar was started after page load)
   if(h&&h.ok) term(`&nbsp;&nbsp;sidecar: <b style="color:#7fdc8a">ONLINE</b> — ${String(h.engine||'').replace(/</g,'&lt;')} · <b>${h.techniques}</b> techniques loaded <span style="opacity:.5">(localhost:7877 — battle math runs the ACTUAL shipping C#)</span>`,'sys');
   else if(CSOFF) term('&nbsp;&nbsp;sidecar: <b style="color:#ffb454">SKIPPED</b> — <b>?csoff=1</b> disables the sidecar probe for this page load (deterministic tier testing).','sys');
@@ -2150,14 +2240,20 @@ function loreEntities(idx){ const set=new Set(), add=w=>{ const lw=String(w).toL
   return set; }
 // per-pilot index, built lazily ONCE: bio + own-faction + world sentences (worlds are shared knowledge — the query
 // decides relevance). Live shipKnowledge lines are appended per query (they change every frame).
-function loreIndex(s){ if(!LOREDATA||!s||!s.name||!LOREDATA.pilots||!LOREDATA.pilots[s.name]) return null;
+function loreIndex(s){ if(!s||!s.name) return null;
+  const P=(LOREDATA&&LOREDATA.pilots&&LOREDATA.pilots[s.name])||null, seg=novelSegOf(s.name);
+  if(!P&&!seg) return null;   // a pilot indexes when it has a lore bio OR a novel segment (N3) — else the old graph path
   const key=s.name; if(LORE_IDX[key]) return LORE_IDX[key];
-  const P=LOREDATA.pilots[key], docs=[]; let ord=0;
-  const topicOf=i=>{ const out=[]; for(const t in (P.topics||{})) if((P.topics[t]||[]).includes(i)) out.push(t); return out; };
-  (P.bio||[]).forEach((sent,i)=>docs.push(loreDoc('bio:'+i,sent,'bio',ord++,topicOf(i))));
+  const docs=[]; let ord=0;
+  const topicOf=i=>{ const out=[]; for(const t in ((P||{}).topics||{})) if((P.topics[t]||[]).includes(i)) out.push(t); return out; };
+  (((P||{}).bio)||[]).forEach((sent,i)=>docs.push(loreDoc('bio:'+i,sent,'bio',ord++,topicOf(i))));
+  // NOVEL SEGMENT (N3, knowledge law — isolation by construction): ONLY NOVELDATA.segments[s.name] enters this index.
+  // Each doc keeps src:'novel' + its chapter/scene tags; the doc id carries the chapter so provenance lines show it.
+  if(seg) seg.forEach((r,i)=>{ const d=loreDoc('novel:'+(r.chapter||'ch-?')+':'+i, r.text, 'novel', NOVEL_CFG.ORD_BASE+i, []);
+    d.chapter=r.chapter||null; d.scene=r.scene||null; docs.push(d); });
   const facKeys=s.team==='pirate'?['synod','hegemon']:['coalition'];
-  facKeys.forEach(fk=>(((LOREDATA.factions||{})[fk])||[]).forEach((sent,i)=>docs.push(loreDoc('fac:'+fk+':'+i,sent,'faction:'+fk,1000+ord++,[]))));
-  for(const w in (LOREDATA.worlds||{})) (LOREDATA.worlds[w]||[]).forEach((sent,i)=>docs.push(loreDoc('world:'+w+':'+i,sent,'world:'+w,2000+ord++,[])));
+  facKeys.forEach(fk=>((((LOREDATA||{}).factions||{})[fk])||[]).forEach((sent,i)=>docs.push(loreDoc('fac:'+fk+':'+i,sent,'faction:'+fk,1000+ord++,[]))));
+  for(const w in ((LOREDATA||{}).worlds||{})) (LOREDATA.worlds[w]||[]).forEach((sent,i)=>docs.push(loreDoc('world:'+w+':'+i,sent,'world:'+w,2000+ord++,[])));
   const df=new Map(); docs.forEach(d=>{ for(const t of d.tf.keys()) df.set(t,(df.get(t)||0)+1); });
   const N=docs.length, idf=t=>Math.log(1+N/((df.get(t)||0)+0.5));
   docs.forEach(d=>{ let n=0; for(const [t,c] of d.tf){ const w=c*idf(t); n+=w*w; } d.norm=Math.sqrt(n)||1; });
@@ -2209,8 +2305,10 @@ function loreVerbatimGuard(sents,byText,selfTest){ for(const x of sents){ if(!by
   console.error('[LORE CHEAT-GUARD] BOOT SELF-TEST FAILED — the guard passed a non-corpus sentence'); })();
 // ---- LLM SPEECH TIER (TAMI_SPEAK) — voices the retrieval-selected facts; NEVER a source of facts itself ----
 // persona: one line derived from the pilot's FIRST bio sentence (contract field), plus name + faction address.
-function lorePersona(s){ const P=(((LOREDATA||{}).pilots)||{})[s.name]||{}, first=(P.bio&&P.bio[0])||(s.backstory?s.backstory+'.':'A starfighter pilot.');
-  return `${s.name}, ${s.team==='pirate'?'Iron Synod':'Coalition Warden'} pilot. ${first}`; }
+function lorePersona(s){ const P=(((LOREDATA||{}).pilots)||{})[s.name]||{}, ch=NOVEL_ROSTER&&NOVEL_ROSTER.byName[s.name];
+  const first=(P.bio&&P.bio[0])||(s.backstory?s.backstory+'.':'A starfighter pilot.');   // roster ships carry temperament as backstory (novelShipHook)
+  const fac=(ch&&ch.faction==='traders')?'Free Trader':(s.team==='pirate'?'Iron Synod':'Coalition Warden');
+  return `${s.name}, ${fac} pilot. ${first}`; }
 // GROUNDING POST-CHECK: every Capitalized token in the LLM reply must already exist in the supplied facts ∪ the
 // pilot's indexed corpus (bio + own factions + worlds, which carries all PILOTS/faction/world names via idx.ents).
 // A new named entity = fabrication -> the reply is DISCARDED and the verbatim composer takes the turn.
@@ -2305,10 +2403,10 @@ function loreAnswer(s,question){
     else declComposer(); });
 }
 function askPilot(s,question){ const q=String(question||'');
-  if(loreIsFollowUp(q)&&LORE_LAST&&LORE_LAST.alive&&LOREDATA) s=LORE_LAST;    // "tell me more" continues the last conversation
+  if(loreIsFollowUp(q)&&LORE_LAST&&LORE_LAST.alive&&(LOREDATA||NOVELDATA)) s=LORE_LAST;    // "tell me more" continues the last conversation
   if(!s||!s.alive){ term('no such pilot — try: scan, or click one in the roster','err'); return; }
   LORE_LAST=s;
-  if(!LOREDATA||!loreIndex(s)||loreRoute(loreNorm(q))==='tactical') return talkToShip(s,q);   // tactical → OLD grounded graph
+  if(!loreIndex(s)||loreRoute(loreNorm(q))==='tactical') return talkToShip(s,q);   // tactical → OLD grounded graph; no bio AND no novel segment → same
   return loreAnswer(s,q); }
 // plain-English hail: a pilot named + a question mark or wh-word → the ask path (checked BEFORE order parsing so
 // "ORION why did you fight Kaine?" is a question, not a hunt order). Bare follow-ups continue the last conversation.

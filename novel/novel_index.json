@@ -1,0 +1,30 @@
+{
+ "version": 1,
+ "title": "THE LANES THAT BURNED",
+ "chapters": 6,
+ "words": 8464,
+ "pages": 24.2,
+ "target_pages": 1000,
+ "characters": 50,
+ "pov_map": {
+  "VEGA": [
+   "ch-001"
+  ],
+  "ORION": [
+   "ch-002"
+  ],
+  "KESTREL": [
+   "ch-003"
+  ],
+  "DRACO": [
+   "ch-004"
+  ],
+  "MIRA": [
+   "ch-005"
+  ],
+  "HALE": [
+   "ch-006"
+  ]
+ },
+ "updated": "2026-07-07T03:47:31.959Z"
+}
