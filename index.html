@@ -121,6 +121,9 @@
 <script src="gamemod.js"></script>
 <script src="chatter.js"></script>
 <script src="vision.js"></script>
+<script src="deliberate.js"></script>
+<script src="knowledge.js"></script>
+<script src="acquire.js"></script>
 <script src="thoughts.js"></script>
 <script>
 "use strict";
@@ -1538,6 +1541,51 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='intro'||c==='awaken'){ if(window.PASSENGER) maybeAwaken(true); return; }
   if(c==='ponder'){ if(!window.PASSENGER) return; const on=PASSENGER.setPonder((a[1]||'on')!=='off');
     term(on?'the worm will ponder aloud after each exchange (why you asked · what it changes · its stake).':'the worm keeps its pondering to itself now.','sys'); return; }
+  // ---- DELIBERATE: watch the generalized reasoning engine run How/What/Why/When on a decision, converge, and — when
+  // it hits a gap — run the acquisition cascade to pull the missing knowledge into the PERSISTENT store (shared/private).
+  if(c==='deliberate'||c==='reason'||c==='think2'){ if(!window.DELIBERATE){ term('deliberate.js not loaded','err'); return; }
+    // a real decision the player faces: from HERE, is it worth pushing to a chosen planet, and how? Build the graph
+    // from the live world: planets are goals, hyperlanes are actions, docking WHY = fuel/trade, ordering = distance.
+    const P=ships[0]; const near=nearestPlanet(P.pos);
+    const goalName=(a.slice(1).join(' ')||'').trim(); const goalP = goalName? (findPlanet(goalName)||near) : (planets.find(p=>p!==near)||near);
+    if(!goalP){ term('no goal planet — try: deliberate '+(planets[0]?planets[0].name:'<planet>'),'err'); return; }
+    // KNOWN graph = what the player has actually seen (a partial map): the nearest planet + a couple hops. WORLD =
+    // the true galaxy graph. The engine deliberates on KNOWN; on a gap it ACQUIRES from the WORLD (reveal=private) or
+    // the latent library (generic=shared).
+    const nm=p=>'PL_'+p.name.replace(/[^A-Za-z0-9]/g,'');
+    const worldE=[]; const start=nm(near||P.docked||planets[0]);
+    // action edges = a spanning route over planets by proximity (the true galaxy); WHY = each planet serves 'a_safe_run'
+    const ps=planets.slice().sort((x,y)=>P.pos.distanceTo(x.pos)-P.pos.distanceTo(y.pos));
+    for(let i=0;i<ps.length-1;i++){ worldE.push({s:nm(ps[i]),r:'action',o:nm(ps[i+1])}); worldE.push({s:nm(ps[i]),r:'before',o:nm(ps[i+1])}); }
+    worldE.push({s:nm(goalP),r:'serves',o:'a_safe_run'}); worldE.push({s:'a_safe_run',r:'serves',o:'survive_the_campaign'});
+    const world={edges:worldE};
+    const known={edges: worldE.filter(e=>e.s===start && e.r==='action')};   // the player only knows the hop out of here
+    const latent={edges: worldE.filter(e=>e.r==='serves')};                  // generic 'why' the library can supply
+    const decision={state:start, goal:nm(goalP), question:'is the run to '+goalP.name+' worth it, and how?'};
+    const c0=DELIBERATE.deliberate(known, decision, {order:'geometry'});
+    term(`<b style="color:#8fd0ff">🜁 DELIBERATE</b> — ${decision.question}`,'sys');
+    const idx=DELIBERATE.buildIndex(known);
+    term(`&nbsp;&nbsp;WHAT can I do from here? → ${(idx.actionOut[start]||[]).map(e=>e.o.replace('PL_','')).join(', ')||'(nothing mapped)'}`,'sys');
+    term(`&nbsp;&nbsp;convergence: WHAT ${c0.convergence.axes.WHAT?'✓':'✗'} · HOW ${c0.convergence.axes.HOW?'✓':'✗'} · WHY ${c0.convergence.axes.WHY?'✓':'✗'} · WHEN ${c0.convergence.axes.WHEN?'✓':'✗'} → <b>${c0.convergence.agreement}/4</b>`,'sys');
+    if(c0.convergence.converged){ term(`&nbsp;&nbsp;→ CONCLUDE: ${JSON.stringify(c0.conclusion.take||c0.conclusion)}`,'sys'); return; }
+    term(`&nbsp;&nbsp;<span style="color:#ffb454">GAP (${c0.convergence.gap}): ${c0.conclusion.need}</span>`,'err');
+    if(!window.ACQUIRE||!window.GAME_KNOW){ term('&nbsp;&nbsp;(acquire.js/knowledge store not loaded — cannot seek)','err'); return; }
+    term('&nbsp;&nbsp;<span style="opacity:.7">…abstained → SEEKING knowledge (latent → modal → geometric → reveal), pulling verified facts into the persistent store…</span>','sys');
+    const r=ACQUIRE.acquire('YOU', decision, world, GAME_KNOW, {latent, seed:known});
+    for(const t of r.trace) term(`&nbsp;&nbsp;&nbsp;round ${t.round}: ${t.agreement}/4${t.gap?(' gap='+t.gap):' — converged'}`,'sys');
+    const conc=r.chain.conclusion;
+    term(`&nbsp;&nbsp;→ ${r.converged? ('CONCLUDE: take the run toward '+goalP.name+' (all four axes now meet)') : 'STILL ABSTAIN — the galaxy does not answer this yet'}`, r.converged?'sys':'err');
+    const st=GAME_KNOW.stats();
+    term(`&nbsp;&nbsp;<span style="opacity:.6">knowledge store now: ${st.shared} SHARED facts (every pilot + persists across runs) · ${st.private_total} PRIVATE across ${st.agents} minds · ${r.derivations} derivations this run</span>`,'sys'); return; }
+  if(c==='knowledge'||c==='know'){ if(!window.GAME_KNOW){ term('knowledge store not loaded','err'); return; }
+    const st=GAME_KNOW.stats(); const S=GAME_KNOW._state();
+    term('<b style="color:#8fd0ff">🜁 KNOWLEDGE STORE</b> <span style="opacity:.55">(persists across runs in your browser; generic=shared by all pilots, witnessed=private)</span>','sys');
+    term(`&nbsp;&nbsp;SHARED (generic, every AGI knows): <b>${st.shared}</b> facts`,'sys');
+    term(`&nbsp;&nbsp;PRIVATE (secrets, per pilot): <b>${st.private_total}</b> across ${st.agents} minds`,'sys');
+    const sh=Object.keys(S.shared).slice(0,5).map(k=>k.replace(/\|/g,' ').replace(/PL_/g,''));
+    if(sh.length) term('&nbsp;&nbsp;e.g. shared: '+sh.join(' · '),'sys');
+    term('&nbsp;&nbsp;<span style="opacity:.55">try <b>deliberate '+(planets[0]?planets[0].name:'<planet>')+'</b> to watch a pilot reason + fill a gap · <b>forgetknowledge</b> wipes it</span>','sys'); return; }
+  if(c==='forgetknowledge'){ if(window.GAME_KNOW){ GAME_KNOW.forget(); term('knowledge store wiped (shared + private).','sys'); } return; }
   if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
     const L=GAMEMOD.list();
     term(`<b style="color:#c9a0ff">🜏 ACTIVE MUTATIONS</b> — ${L.length}/${GAMEMOD.MODCFG.MAX_ACTIVE} <span style="opacity:.55">(the AGIs hold the pen; session-local — reload = vanilla; watchdog auto-reverts anything that hurts the frame)</span>`,'sys');
@@ -2504,6 +2552,9 @@ for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=320; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull
 INH.awaken();   // I1/I2/I8: the Inhabitant wakes — deterministic (first alive non-player squad ship); restores INH_STATE_v1 if present
 passengerInit();   // 🜏 the Passenger wakes in YOU — registry+telemetry+speech wired; first boot shows the awakening
+// 🜁 the shared, PERSISTENT knowledge store — one for all pilots; survives page reloads + sim resets (localStorage);
+// generic facts are shared by every AGI, witnessed facts stay private. The deliberate/acquire cascade reads+grows it.
+window.GAME_KNOW = window.KNOWLEDGE ? KNOWLEDGE.createStore({ key:'KNOWLEDGE_v1' }) : null;
 // ---- VISION: the arc3 eye + fog of war (vision.js) — two retinas, one per mind -------------------------------
 const VIS_CODE={asteroid:1,gem:2,planet:3,base:4,squad:5,pirate:6};   // game-side OPAQUE code table (agents never see these names)
 const VIS_EVERY=12;                                                   // retina tick every N frames (named const)
