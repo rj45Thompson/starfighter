@@ -242,7 +242,9 @@
     if (!c) return { ok: false, msg: 'no such option.' };
     if (!requireOk(c.require, state.active.ctx)) return { ok: false, msg: 'you can\'t take that option right now.' };
     applyEffects(c.effects, state.active.ctx);
-    if (c.next == null) { var title = tpl.title; state.active = null; return { ok: true, msg: title + ' - resolved.', done: true }; }
+    if (c.next == null) { var title = tpl.title; state.active = null;
+      var p2 = player(); if (p2) p2.questsCompleted = num(p2.questsCompleted, 0) + 1;   // SR-M20: campaign-end score formula names "quests" as a component (missions.js tracks contract completions separately)
+      return { ok: true, msg: title + ' - resolved.', done: true }; }
     state.active.node = c.next;
     return { ok: true, msg: 'onward.', done: false, view: activeView() };
   }

@@ -318,6 +318,7 @@
     if (p) {
       p.credits = num(p.credits, 0) + m.reward;
       p.score = num(p.score, 0) + m.score;
+      p.missionsCompleted = num(p.missionsCompleted, 0) + 1;   // SR-M20: campaign-end score formula names "quests" as a component
       if (h && typeof h.checkRankUp === 'function') { try { h.checkRankUp(p); } catch (e) { } }
     }
     if (m.tgt.planetName) repAt = planetByName(m.tgt.planetName);

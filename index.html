@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708z"></script>
-<script src="fflate.min.js?v=20260708z"></script>
-<script src="fbxloader.js?v=20260708z"></script>
+<script src="three.min.js?v=20260708aa"></script>
+<script src="fflate.min.js?v=20260708aa"></script>
+<script src="fbxloader.js?v=20260708aa"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708z"></script>
-<script src="inhabitant.js?v=20260708z"></script>
-<script src="passenger.js?v=20260708z"></script>
-<script src="gamemod.js?v=20260708z"></script>
-<script src="chatter.js?v=20260708z"></script>
-<script src="speech_input.js?v=20260708z"></script>
-<script src="vision.js?v=20260708z"></script>
-<script src="deliberate.js?v=20260708z"></script>
-<script src="knowledge.js?v=20260708z"></script>
-<script src="acquire.js?v=20260708z"></script>
-<script src="sound.js?v=20260708z"></script>
-<script src="hullmodels.js?v=20260708z"></script>
-<script src="knowledge_hud.js?v=20260708z"></script>
-<script src="thoughts.js?v=20260708z"></script>
-<script src="tami_battle_ui.js?v=20260708z"></script>
-<script src="power_panel.js?v=20260708z"></script>
-<script src="panels.js?v=20260708z"></script>
+<script src="speech_tier.js?v=20260708aa"></script>
+<script src="inhabitant.js?v=20260708aa"></script>
+<script src="passenger.js?v=20260708aa"></script>
+<script src="gamemod.js?v=20260708aa"></script>
+<script src="chatter.js?v=20260708aa"></script>
+<script src="speech_input.js?v=20260708aa"></script>
+<script src="vision.js?v=20260708aa"></script>
+<script src="deliberate.js?v=20260708aa"></script>
+<script src="knowledge.js?v=20260708aa"></script>
+<script src="acquire.js?v=20260708aa"></script>
+<script src="sound.js?v=20260708aa"></script>
+<script src="hullmodels.js?v=20260708aa"></script>
+<script src="knowledge_hud.js?v=20260708aa"></script>
+<script src="thoughts.js?v=20260708aa"></script>
+<script src="tami_battle_ui.js?v=20260708aa"></script>
+<script src="power_panel.js?v=20260708aa"></script>
+<script src="panels.js?v=20260708aa"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708z"></script>
-<script src="conquest.js?v=20260708z"></script>
-<script src="missions.js?v=20260708z"></script>
-<script src="planetmenu.js?v=20260708z"></script>
-<script src="textquests.js?v=20260708z"></script>
+<script src="starmap.js?v=20260708aa"></script>
+<script src="conquest.js?v=20260708aa"></script>
+<script src="missions.js?v=20260708aa"></script>
+<script src="planetmenu.js?v=20260708aa"></script>
+<script src="textquests.js?v=20260708aa"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -265,9 +265,21 @@ const CFG = {
   UP_HULLCLASS_MINLVL:3, UP_HULLCLASS_CHANCE:0.08,   // AI hull-CLASS swap (user 2026-07-07 "AI don't upgrade their hulls"): only rolled once hull level is already maxed-feeling; rare per-tick chance so capital-ship progression stays a rare late-game outcome
   // ---- M1: the HEGEMON rises (escalating machine invader + galactic war) ----
   ESC_RATE:0.5, ESC_PER_TIER:40, INVADE_THRESHOLD:3, LIBERATE_GRACE:6, CONTESTED_PROD:0.4,
+  // SR-M13 war-coupled economy shocks 2.0: CONTESTED_PROD above was already a real "blockade" (contested lanes
+  // produce at 40%) - these three extend the SAME econTick stock/flow multipliers, never a direct price write.
+  EMBARGO_PROD:0.55,          // hostile-rep worlds isolated from galactic trade (milder than active invasion - reputation, not occupation)
+  REFUGEE_DEMAND_MULT:1.8,    // contested-system worlds see FOOD consumption spike - displaced people straining local supply
+  LIBERATION_BOOM_MULT:1.6,   // temporary production surge right after a system flips back to coalition hands
+  LIBERATION_BOOM_DURATION:25,
   WIN_THRESHOLD:6, WAR_DRIFT:0.2, ESC_LIBERATE_CUT:14, WIN_REWARD:400, WIN_ESC_CUT:60,   // M7: war-front tug-of-war + win/lose
   WARSCORE_PER_CAPTURE:0.35,   // SR-M2 (REQUIREMENTS_SR.md): a single ground-captured world nudges the front - smaller than a whole SYSTEM clearing (warTick's flat +1), since one system usually holds several planets
   STRONGHOLD_ESC:70, STRONGHOLD_HULL:2600, STRONGHOLD_REGEN:10, STRONGHOLD_SPAWN_CD:9, STRONGHOLD_REWARD:600, STRONGHOLD_ESC_CUT:45, STRONGHOLD_WARSCORE:3,   // M12: the boss node - assault it to break the front
+  // SR-M20 campaign score formula (documented per the milestone's own accept bar): CAMPAIGN_SCORE = war*W_WAR +
+  // wealth*W_WEALTH + rank*W_RANK + missions*W_MISSION + quests*W_QUEST + discoveries*W_DISCOVERY. Reflects the
+  // player's whole career THIS GENERATION (no per-campaign snapshotting exists yet), evaluated fresh at each
+  // campaign's close - named weights below, no magic numbers in campaignScore() itself.
+  CAMPAIGN_SCORE_W_WAR:40, CAMPAIGN_SCORE_W_WEALTH:0.05, CAMPAIGN_SCORE_W_RANK:60,
+  CAMPAIGN_SCORE_W_MISSION:25, CAMPAIGN_SCORE_W_QUEST:20, CAMPAIGN_SCORE_W_DISCOVERY:10,
   CONTRACT_MAX:4, CONTRACT_REP:2, CONTRACT_BOUNTY_EA:22, CONTRACT_DEF_REWARD:160, CONTRACT_REFILL_CD:20,   // M4: coalition job board
   ART_DROP_BASE:0.10, ART_DROP_PER_TIER:0.22,          // M6: artifact drop chance = base + tier*per (Drone 10% .. Warlord 54%)
   BASE_R:46, SCAN_CHANCE:0.5, SCAN_FINE:0.6, CONTRA_MARKUP:2.3,   // M8/M10: base dock radius; scan probability + fine; contraband fence markup at hostile worlds
@@ -437,18 +449,31 @@ function normGeo(geo,target){ geo.computeBoundingBox(); const s=geo.boundingBox.
   geo.translate(-c.x,-c.y,-c.z); geo.scale(k,k,k); return geo; }
 function loadGameAssets(){ if(typeof T.FBXLoader==='undefined') return;        // loader not vendored → stay procedural
   const mgr=new T.LoadingManager(); mgr.setURLModifier(assetURL);
-  const L=new T.FBXLoader(mgr); const dir=ASSET_CFG.DIR; let shipsLeft=3;
+  const L=new T.FBXLoader(mgr); const dir=ASSET_CFG.DIR; let shipsLeft=3, astLeft=6, gemLeft=3;
   const shipDone=()=>{ if(--shipsLeft>0) return; ASSETS.ready=true;
     let n=0; for(const s of ships){ if(applyShipModel(s)) n++; }               // retrofit everything already flying
     notify(`Original Starfighter2 hulls online - ${n} ships re-skinned (player/Synod/freighter FBX + real textures).`,'log'); };
+  // SR-M5 (found half-wired: ships hot-swapped on load via shipDone above, asteroids/gems never did - anything
+  // already in the scene before their FBX geos finished loading stayed on its procedural fallback forever, since
+  // rockMesh()/spawnGem() only ever consult ASSETS.astGeos/gemGeos at CONSTRUCTION time). Same retrofit pattern:
+  // once every file in the group has settled (success or fail), swap the GEOMETRY only (not the whole mesh - the
+  // material was already correct either way) on everything already flying/floating. Artifact pods and micro-module
+  // drops both route through `gems[]` too but build their own distinct geometry directly, never through spawnGem's
+  // ASSETS.gemGeos check - skip those so a real artifact/micromodule doesn't get overwritten into a plain gem shape.
+  const astDone=()=>{ if(--astLeft>0||!ASSETS.astGeos.length) return;
+    let n=0; for(const a of asteroids){ a.mesh.geometry.dispose(); a.mesh.geometry=ASSETS.astGeos[randi(0,ASSETS.astGeos.length-1)]; n++; }
+    notify(`Original Starfighter2 asteroid shapes online - ${n} rocks re-skinned.`,'log'); };
+  const gemDone=()=>{ if(--gemLeft>0||!ASSETS.gemGeos.length) return;
+    let n=0; for(const g of gems){ if(g.artifact||g.micromodule) continue; g.mesh.geometry.dispose(); g.mesh.geometry=ASSETS.gemGeos[randi(0,ASSETS.gemGeos.length-1)]; n++; }
+    notify(`Original Starfighter2 gem shapes online - ${n} gems re-skinned.`,'log'); };
   const grab=(file,cb,fin)=>L.load(dir+file, g=>{ try{ cb(g); }catch(e){ console.warn('asset',file,e); } if(fin)fin(); }, undefined, ()=>{ if(fin)fin(); });
   grab('vehicle_playerShip.FBX', g=>{ ASSETS.ships.player=normalizeModel(g,ASSET_CFG.SHIP_LEN); }, shipDone);
   grab('vehicle_enemyShip.FBX',  g=>{ ASSETS.ships.enemy =normalizeModel(g,ASSET_CFG.PIRATE_LEN); }, shipDone);
   grab('Spaceship.fbx',          g=>{ ASSETS.ships.trader=normalizeModel(g,ASSET_CFG.TRADER_LEN); }, shipDone);
   for(const f of ['prop_asteroid_01.FBX','prop_asteroid_02.FBX','prop_asteroid_03.FBX','astre_0.FBX','astre_5.FBX','astre_10.FBX'])
-    grab(f, g=>{ const geo=firstGeo(g); if(geo) ASSETS.astGeos.push(normGeo(geo,ASSET_CFG.AST_UNIT*2)); });
+    grab(f, g=>{ const geo=firstGeo(g); if(geo) ASSETS.astGeos.push(normGeo(geo,ASSET_CFG.AST_UNIT*2)); }, astDone);
   for(const f of ['Diamondo.fbx','HardStar.fbx','SphereGemSmall.fbx'])
-    grab(f, g=>{ const geo=firstGeo(g); if(geo) ASSETS.gemGeos.push(normGeo(geo,ASSET_CFG.GEM_SIZE)); });
+    grab(f, g=>{ const geo=firstGeo(g); if(geo) ASSETS.gemGeos.push(normGeo(geo,ASSET_CFG.GEM_SIZE)); }, gemDone);
 }
 function shipModelKey(s){ if(s.team==='pirate') return 'enemy'; if(s.role==='trader') return 'trader'; return 'player'; }
 function applyShipModel(s){
@@ -566,13 +591,16 @@ function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=nu
   else if(spec.shape==='flame'){                                               // Incinerator: a real fire-sprite gout, flickering size + a fast fade
     m=new T.Sprite(new T.SpriteMaterial({map:FLAME_TEX,color:0xffffff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.92,rotation:rand(0,TAU)}));
     m.scale.set(r*rand(0.8,1.3),r*rand(0.8,1.3),1); }
+  else if(spec.shape==='tracer'){                                              // SR-M6: Autocannon - a thin fast streak, distinct from the laser's fat halo'd blade (was falling through to the same sprite as the missile orb)
+    m=new T.Mesh(BOLT_GEO,new T.MeshBasicMaterial({color:col,transparent:true,opacity:0.92,blending:T.AdditiveBlending,depthWrite:false}));
+    m.scale.set(0.32,spec.tracerLen||2.2,0.32); m.quaternion.setFromUnitVectors(UPL,dir); }
   else{ m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
     m.scale.set(r,r,1); if(spec.shape==='orb') m.scale.multiplyScalar(1.25); } // Seeker: a fat slow orb (its smoke trail is drawn in-flight)
   m.position.copy(pos); scene.add(m);
   if(spec.flash) burst(pos, col, 2, 7, spec.flash);                            // per-weapon muzzle flash
   let dmg=(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG; const ow=shipById[owner];
   if(ow && ow.role==='trader') dmg*=CFG.TRADER_GUN_MULT;                                     // merchants mount light guns
-  bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner,
+  bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner, col,   // SR-M6: keep the weapon's OWN color on the bullet record so impact FX can match it instead of borrowing the target's tint
     dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null, dmgType:spec.dmgType||'energy',
     trail:spec.trail||0, trailCd:spec.trailCd||0, trailT:0, bolt:spec.shape==='bolt' }); }
 // swept bullet collision: distance² from point p to the segment a→b (this frame's travel). A point-only test tunnels
@@ -618,7 +646,7 @@ function makePlanets(){ makeSystems();
   const pos=sys.center.clone().add(new T.Vector3(Math.cos(u)*r*cs, Math.sin(el)*r*0.5, Math.sin(u)*r*cs)), radius=rand(17,25);
   const stock={}; GOODS.forEach(g=>stock[g.k]=CFG.EQ_STOCK);
   const p={ name:PNAMES[i%PNAMES.length], type, pos, radius, baseRadius:radius, stock, system:sys, rep:0,
-    wealth:CFG.PLANET_WEALTH0, dev:1, eq:CFG.EQ_STOCK, underThreat:false, defCd:0,
+    wealth:CFG.PLANET_WEALTH0, dev:1, eq:CFG.EQ_STOCK, underThreat:false, defCd:0, boomT:0,   // SR-M13: post-liberation trade boom timer, set by warTick on liberation, consumed by econTick
     hull:CFG.PLANET_HULL, maxHull:CFG.PLANET_HULL, hullT:0, terra:0, terraformable:(type.t==='Mining'||type.t==='Refinery') };
   const m=new T.Mesh(new T.SphereGeometry(radius,24,18), new T.MeshStandardMaterial({color:type.col,map:PLANET_TEX,emissive:new T.Color(type.col).multiplyScalar(0.22),emissiveMap:PLANET_TEX,roughness:0.85,metalness:0.1})); m.rotation.y=rand(0,TAU); m.position.copy(pos); scene.add(m); p.mesh=m; p.spin=rand(0.01,0.035);   // real Starfighter2 planet skin (user 2026-07-07), tinted per economy TYPE; slow spin sells the sphere as a real world
   const rg=new T.Mesh(new T.TorusGeometry(CFG.DOCK_R,0.55,8,52), new T.MeshBasicMaterial({color:type.col,transparent:true,opacity:0.3})); rg.position.copy(pos); rg.rotation.x=Math.PI/2; scene.add(rg); p.ring=rg;
@@ -643,7 +671,7 @@ function makePirateStation(){ if(!systems.length) return; const sys=systems[syst
   const c=sys.center.clone().add(new T.Vector3(-CFG.SUN_R*3.4,-CFG.SUN_R*0.6,CFG.SUN_R*2.2));
   const stock={}; GOODS.forEach(g=>stock[g.k]=CFG.EQ_STOCK);
   const p={ name:'Kestrel\'s Reach', type:{t:'Pirate Station',col:0x8a1818,makes:{},needs:{}}, pos:c, radius:22, baseRadius:22,
-    stock, system:sys, rep:CFG.REP_HOSTILE-1, wealth:CFG.PLANET_WEALTH0*1.4, dev:2, eq:CFG.EQ_STOCK, underThreat:false, defCd:0,
+    stock, system:sys, rep:CFG.REP_HOSTILE-1, wealth:CFG.PLANET_WEALTH0*1.4, dev:2, eq:CFG.EQ_STOCK, underThreat:false, defCd:0, boomT:0,   // SR-M13: post-liberation trade boom timer, set by warTick on liberation, consumed by econTick
     hull:CFG.PLANET_HULL*1.6, maxHull:CFG.PLANET_HULL*1.6, hullT:0, terra:0, terraformable:false, isPirateStation:true };
   const m=new T.Mesh(new T.IcosahedronGeometry(p.radius,1), new T.MeshStandardMaterial({color:0x2a1414,emissive:0x6a1414,emissiveIntensity:0.55,roughness:0.55,metalness:0.4})); m.position.copy(c); scene.add(m); p.mesh=m; p.spin=0.018;
   const rg=new T.Mesh(new T.TorusGeometry(CFG.DOCK_R,0.55,8,52), new T.MeshBasicMaterial({color:0xff4a4a,transparent:true,opacity:0.35})); rg.position.copy(c); rg.rotation.x=Math.PI/2; scene.add(rg); p.ring=rg;
@@ -799,6 +827,7 @@ function spawnEncounter(){ if(encounters.length>=CFG.MAX_ENCOUNTERS||!systems.le
   ev(`A <b>${kind}</b> signal appears in ${sy.name}.`); }
 function removeEncounter(i){ const e=encounters[i]; scene.remove(e.mesh); if(e.label) scene.remove(e.label.sp); if(e.blip) scene.remove(e.blip); encounters.splice(i,1); }
 function resolveEncounter(e){ const P=ships[0];
+  if(P) P.discoveries=(P.discoveries||0)+1;   // SR-M20: campaign-end score formula names "discoveries" as a component - a derelict/cache/distress signal resolved IS a discovery
   if(e.kind==='derelict'){ const c=randi(30,90); P.credits+=c; if(rand(0,1)<0.4) spawnArtifactDrop(e.pos,ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]); notify(`Salvaged a derelict: +${c}c.`,'log'); }
   else if(e.kind==='cache'){ const c=randi(60,170); P.credits+=c; notify(`Cracked a treasure cache: +${c}c!`,'log'); }
   else { const c=randi(40,110); P.credits+=c; const np=nearestPlanet(e.pos); if(np) repAdd(np,CFG.REP_TERRA); P.score+=2; checkRankUp(P); notify(`Answered a distress call - rescued the crew: +${c}c, +standing.`,'log'); } }
@@ -846,9 +875,16 @@ function advanceTerra(p,amt){ p.terra=Math.min(1,(p.terra||0)+amt);             
   if(p.terra>=1 && p.type!==GARDEN){ p.type=GARDEN; p.terraformable=false; p.mesh.material.color.set(GARDEN.col); p.mesh.material.emissive.set(GARDEN.col).multiplyScalar(0.25);
     if(p.label) p.label.set(p.name+' · Garden · Lv'+p.dev,'#bfeaff'); ev(`${p.name} terraformed to EARTH-LIKE - a Garden world.`); } }
 function terraformStep(p,payer){ if(!p.terraformable||p.terra>=1||payer.credits<CFG.TERRA_PAY) return 0; payer.credits-=CFG.TERRA_PAY; advanceTerra(p,CFG.TERRA_STEP); if(payer.role==='player') repAdd(p,CFG.REP_TERRA); return CFG.TERRA_PAY; }
-function econTick(dt){ for(const p of planets){ const mk=p.type.makes,nd=p.type.needs, devP=1+CFG.DEV_PROD*(p.dev-1), war=(p.system&&p.system.contested)?CFG.CONTESTED_PROD:1;
+function econTick(dt){ for(const p of planets){ const mk=p.type.makes,nd=p.type.needs, devP=1+CFG.DEV_PROD*(p.dev-1);
+  const contested=!!(p.system&&p.system.contested);
+  const war=contested?CFG.CONTESTED_PROD:1;                                        // blockade: active invasion cuts production hard
+  const embargo=(p.rep!=null&&p.rep<=CFG.REP_HOSTILE)?CFG.EMBARGO_PROD:1;           // SR-M13: hostile-REP worlds isolated from trade even without active war
+  const boom=(p.boomT>0)?CFG.LIBERATION_BOOM_MULT:1;                               // SR-M13: temporary post-liberation production surge
+  if(p.boomT>0) p.boomT=Math.max(0,p.boomT-dt);
   const infra=(window.CONQUEST&&CONQUEST.infraMult)?CONQUEST.infraMult(p):1;   // 4X infrastructure (user): a damaged world produces less until it rebuilds - trade routes dry up
-  for(const g of GOODS){ let s=p.stock[g.k]; if(mk[g.k]) s+=mk[g.k]*CFG.PROD_RATE*dt*devP*war*infra; if(nd[g.k]) s-=nd[g.k]*CFG.CONS_RATE*dt*devP; p.stock[g.k]=Math.max(0,s); }
+  for(const g of GOODS){ let s=p.stock[g.k]; if(mk[g.k]) s+=mk[g.k]*CFG.PROD_RATE*dt*devP*war*embargo*boom*infra;
+    const demand=(contested&&g.k==='food')?CFG.REFUGEE_DEMAND_MULT:1;              // SR-M13: refugee demand spike - contested worlds strain food specifically
+    if(nd[g.k]) s-=nd[g.k]*CFG.CONS_RATE*dt*devP*demand; p.stock[g.k]=Math.max(0,s); }
   p.wealth+=CFG.CITIZEN_INCOME*p.dev*dt;                              // citizens (statistical) generate wealth
   const cost=CFG.DEV_COST_BASE*Math.pow(CFG.DEV_COST_GROW,p.dev-1);   // planet reinvests -> endless slow growth
   if(p.wealth>=cost){ p.wealth-=cost; growPlanet(p); }
@@ -968,11 +1004,25 @@ function planetDefense(){ for(const p of planets){ let hostile=null,defcount=0;
 function flashBanner(html,color){ let el=document.getElementById('warbanner'); if(!el){ el=document.createElement('div'); el.id='warbanner';
     el.style.cssText='position:fixed;left:0;right:0;top:34%;text-align:center;font:800 34px/1.25 ui-monospace,monospace;letter-spacing:.04em;pointer-events:none;z-index:60;transition:opacity 1s;text-shadow:0 2px 20px #000,0 0 40px currentColor'; document.body.appendChild(el); }
   el.style.color=color||'#ffd27a'; el.innerHTML=html; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(function(){ el.style.opacity='0'; }, 3400); }
-function warWin(){ const P=ships[0]; P.credits+=CFG.WIN_REWARD; P.score+=20; checkRankUp(P); campaign++; warScore=0; escalation=Math.max(0,escalation-CFG.WIN_ESC_CUT);
+// SR-M20: CAMPAIGN_SCORE = |war|*W_WAR + wealth*W_WEALTH + rank*W_RANK + missions*W_MISSION + quests*W_QUEST +
+// discoveries*W_DISCOVERY (weights named in CFG above, no magic numbers here). Reflects the player's whole career
+// this generation (no per-campaign snapshot exists yet - counters accumulate across every campaign until a
+// generation reset) - evaluated fresh at each campaign's close, same honesty convention as the rest of this file.
+function campaignScore(P,warFinal){ const rank=rankIdx(P.score||0);   // BUGFIX (caught live-testing): rankOf(...).n is the rank NAME string ('Legend') - the numeric tier is rankIdx(...) (0-5)
+  const war=Math.abs(warFinal||0), wealth=P.credits||0, missions=P.missionsCompleted||0, quests=P.questsCompleted||0, discoveries=P.discoveries||0;
+  const total=Math.round(war*CFG.CAMPAIGN_SCORE_W_WAR + wealth*CFG.CAMPAIGN_SCORE_W_WEALTH + rank*CFG.CAMPAIGN_SCORE_W_RANK +
+    missions*CFG.CAMPAIGN_SCORE_W_MISSION + quests*CFG.CAMPAIGN_SCORE_W_QUEST + discoveries*CFG.CAMPAIGN_SCORE_W_DISCOVERY);
+  return {total,war,wealth,rank,missions,quests,discoveries}; }
+function renderCampaignScore(endedCampaign,P,warFinal,won){ const b=campaignScore(P,warFinal);
+  term(`<b style="color:#8fd0ff">◈ CAMPAIGN ${endedCampaign} SCORE: ${b.total}</b> <span style="opacity:.7">(${won?'victory':'defeat'})</span>`,'sys');
+  term(`&nbsp;&nbsp;war front ${b.war.toFixed(1)}×${CFG.CAMPAIGN_SCORE_W_WAR} + wealth ${b.wealth}c×${CFG.CAMPAIGN_SCORE_W_WEALTH} + rank ${b.rank}(${RANKS[b.rank].n})×${CFG.CAMPAIGN_SCORE_W_RANK} + missions ${b.missions}×${CFG.CAMPAIGN_SCORE_W_MISSION} + quests ${b.quests}×${CFG.CAMPAIGN_SCORE_W_QUEST} + discoveries ${b.discoveries}×${CFG.CAMPAIGN_SCORE_W_DISCOVERY}`,'sys');
+  ev(`Campaign ${endedCampaign} ended in ${won?'victory':'defeat'} - score <b>${b.total}</b>.`); return b; }
+function warWin(){ const P=ships[0]; const warFinal=warScore, endedCampaign=campaign; P.credits+=CFG.WIN_REWARD; P.score+=20; checkRankUp(P); campaign++; warScore=0; escalation=Math.max(0,escalation-CFG.WIN_ESC_CUT);
   for(const sy of systems){ sy.contested=false; sy.clearT=0; }
   flashBanner('★ COALITION VICTORY ★<br><span style="font-size:17px;font-weight:600">the Hegemon front is broken - campaign '+campaign+'</span>','#8fffa8');
-  term(`★ COALITION VICTORY - the Hegemon is routed. +${CFG.WIN_REWARD}c, +20 score. Campaign ${campaign} begins.`,'sys'); ev(`COALITION VICTORY - campaign ${campaign} begins.`); }
-function warLose(){ const P=ships[0]; campaign++; warScore=0;
+  term(`★ COALITION VICTORY - the Hegemon is routed. +${CFG.WIN_REWARD}c, +20 score. Campaign ${campaign} begins.`,'sys'); ev(`COALITION VICTORY - campaign ${campaign} begins.`);
+  renderCampaignScore(endedCampaign,P,warFinal,true); }
+function warLose(){ const P=ships[0]; const warFinal=warScore, endedCampaign=campaign; campaign++; warScore=0;
   // HEGEMON CONQUEST (user 2026-07-07): when the Hegemon wins, the worlds of the front fall UNDER ITS CONTROL - their standing is forced HOSTILE, so you can no longer dock, refuel or repair there until they are liberated.
   let taken=0; const front=planets.slice().sort((a,b)=>(a.rep||0)-(b.rep||0));   // the weakest-held worlds fall first
   const nTake=Math.max(1,Math.ceil(front.length*0.5));
@@ -981,7 +1031,8 @@ function warLose(){ const P=ships[0]; campaign++; warScore=0;
     else p.rep=clamp((p.rep||0)-2,-CFG.REP_MAX,CFG.REP_MAX); }
   flashBanner('THE HEGEMON PREVAILS<br><span style="font-size:17px;font-weight:600">'+taken+' worlds fall under Iron Synod control - campaign '+campaign+'</span>','#ff6a6a');
   term(`<b style="color:#ff7a8a">THE HEGEMON PREVAILS</b> - ${taken} worlds are now UNDER IRON SYNOD CONTROL: no docking, no fuel, no repair there until you liberate them (clear their system of pirates). Campaign ${campaign} - hold the line.`,'err'); ev(`THE HEGEMON PREVAILS - ${taken} worlds conquered.`);
-  if(window.SOUND) SOUND.play('alarm'); }
+  if(window.SOUND) SOUND.play('alarm');
+  renderCampaignScore(endedCampaign,P,warFinal,false); }
 // M12: HEGEMON STRONGHOLD - a fortified boss node that anchors the front. Assault it to break the Hegemon.
 let stronghold=null, strongholdCd=0;
 function makeStronghold(sys){ const c=sys.center.clone().add(new T.Vector3(rand(-1,1),rand(-0.3,0.3),rand(-1,1)).setLength(CFG.SYSTEM_R*0.5));
@@ -1015,8 +1066,8 @@ function warTick(dt){ for(const sy of systems){ let enemies=0;
   sy.enemies=enemies;
   if(!sy.contested){ if(enemies>=CFG.INVADE_THRESHOLD){ sy.contested=true; sy.clearT=0; warScore-=1; ev(`<b>${sy.name} CONTESTED</b> - the Hegemon is invading.`); } }   // M7: front slips
   else if(enemies===0){ sy.clearT+=dt; if(sy.clearT>=CFG.LIBERATE_GRACE){ sy.contested=false; warScore+=1; escalation=Math.max(0,escalation-CFG.ESC_LIBERATE_CUT);   // M7: push the front back
-      let freed=0; for(const q of sy.planets){ if(q.hegemon){ q.hegemon=false; q.rep=Math.max(q.rep, 1); freed++; } q.rep=clamp((q.rep||0)+CFG.REP_LIBERATE,-CFG.REP_MAX,CFG.REP_MAX); }   // liberation BREAKS Iron Synod control - the world reopens to you
-      ev(`${sy.name} LIBERATED${freed?` - ${freed} world${freed>1?'s':''} back in coalition hands, docking reopened`:''}. Coalition standing +${CFG.REP_LIBERATE}.`); if(freed&&window.SOUND) SOUND.play('levelup'); contractLiberate(sy); } }   // M4: defense contract
+      let freed=0; for(const q of sy.planets){ if(q.hegemon){ q.hegemon=false; q.rep=Math.max(q.rep, 1); freed++; } q.rep=clamp((q.rep||0)+CFG.REP_LIBERATE,-CFG.REP_MAX,CFG.REP_MAX); q.boomT=CFG.LIBERATION_BOOM_DURATION; }   // liberation BREAKS Iron Synod control - the world reopens to you; SR-M13: trade routes reopen - a temporary production boom across the whole freed system, consumed by econTick
+      ev(`${sy.name} LIBERATED${freed?` - ${freed} world${freed>1?'s':''} back in coalition hands, docking reopened`:''}. Coalition standing +${CFG.REP_LIBERATE}. A trade boom follows.`); if(freed&&window.SOUND) SOUND.play('levelup'); contractLiberate(sy); } }   // M4: defense contract
   else sy.clearT=0; }
   // M7: territorial drift + win/lose (endless - a win/loss ends a CAMPAIGN, not the game)
   const cc=systems.filter(s=>s.contested).length, frac=systems.length?cc/systems.length:0;
@@ -1440,7 +1491,7 @@ function step(dt){
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
             if(o2.pos.distanceTo(b.pos)<b.splash){ const dmg2=rawDmg*0.5*hullResFor(o2,b.dmgType); o2.hp-=drainShield(o2,dmg2,b.pos)*(1-shieldGenPctFor(o2)); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg2); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: susceptibility+shieldgen per splash victim
-        burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
+        burst(b.pos,b.col!=null?b.col:s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);   // SR-M6: the weapon's OWN color, not the victim's tint - a laser vs. autocannon vs. missile hit now visibly differ
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE - very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
   // VISUAL FIX (user report "bullets clip into the planet"): a POINT-only test let a fast bullet's raw position land
@@ -1454,12 +1505,12 @@ function step(dt){
       burst(impact,0xff9a52,7,13,2.4); burst(impact,0xffd890,3,7,1.4);                 // a small scorch flash ON the hull, fading - not a mid-air clip
       scene.remove(b.mesh); bullets.splice(i,1); if(p.hull<=0) destroyPlanet(p); break; } } }
   if(stronghold){ for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner]; if(owner&&owner.team==='pirate') continue;   // M12: coalition fire damages the stronghold (Hegemon fire doesn't)
-    const shr=13+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,stronghold.pos)<shr*shr){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }
+    const shr=13+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,stronghold.pos)<shr*shr){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,b.col!=null?b.col:0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }   // SR-M6: weapon's own color
   for(let i=asteroids.length-1;i>=0;i--){ const a=asteroids[i]; a.pos.addScaledVector(a.vel,dt);
     if(a.pos.length()>CFG.ARENA_R-a.scale){ a.pos.setLength(CFG.ARENA_R-a.scale); const n=a.pos.clone().normalize(); a.vel.addScaledVector(n,-2*a.vel.dot(n)); }
     a.mesh.position.copy(a.pos); a.mesh.rotation.x+=a.spin.x*dt; a.mesh.rotation.y+=a.spin.y*dt; a.mesh.rotation.z+=a.spin.z*dt;
     for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const ar=a.scale+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,a.pos)<ar*ar){ const owner=shipById[b.owner];
-      a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1)); burst(b.pos,0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);
+      a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color
       if(a.hp<=0){ destroyAsteroid(i,owner); break; } } } }
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
   for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; for(const a of asteroids){ if(s.pos.distanceTo(a.pos)<CFG.SHIP_R+a.scale){
@@ -2080,7 +2131,7 @@ function manuOf(s){ return MANUFACTURERS[s.manufacturer||'human']||MANUFACTURERS
 // "Fragmentation Weapons"), missile=Seeker Missile (also gated by player-only ammo + hull point-defense, see CFG.MISSILE_AMMO_*/HULLS.pd).
 const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT vs cannon TRACER+sparks vs missile ORB+smoke trail
   energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:true,  homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6, dmgType:'energy'},
-  ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', trail:0xffd27a, trailCd:0.045, flash:2.6, dmgType:'frag'},
+  ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', tracerLen:2.4, trail:0xffd27a, trailCd:0.045, flash:2.6, dmgType:'frag'},
   missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2, dmgType:'missile'},
   // FLAMETHROWER (user 2026-07-07: "the enemies of starfighter originally had flame thrower, can you copy that").
   // Honest note: the actual Unity project has no coded flamethrower weapon anywhere in its scripts (checked every
@@ -2509,7 +2560,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!rows.length){ term('<b style="color:#8fd0ff">🏆 RANGER LEADERBOARD</b> - empty so far. It fills the first time a generation ends (lose every system, or <b>generation</b> to read how that works).','sys'); return; }
     const n=Math.min(parseInt(a[1])||10,rows.length);
     term(`<b style="color:#8fd0ff">🏆 RANGER LEADERBOARD</b> <span style="opacity:.55">(top ${n} of ${rows.length} all-time, across every generation - try: leaderboard 25)</span>`,'sys');
-    rows.slice(0,n).forEach((r,i)=>term(`&nbsp;&nbsp;${String(i+1).padStart(2,' ')}. ${r.isPlayer?'<b style=\"color:#ffcf52\">':''}${r.name}${r.isPlayer?' (you)</b>':''} - ${r.rank} · score <b>${r.score}</b> · ${r.credits}c · gen ${r.generation}`,'sys'));
+    rows.slice(0,n).forEach((r,i)=>term(`&nbsp;&nbsp;${String(i+1).padStart(2,' ')}. ${r.isPlayer?'<b style=\"color:#ffcf52\">':''}${r.name}${r.isPlayer?' (you)</b>':''} - ${r.rank} · score <b>${r.score}</b> · ${r.credits}c${r.thoughtFitness!=null?` · fitness ${r.thoughtFitness}`:''} · gen ${r.generation}`,'sys'));
     const P=ships[0], mine=rows.filter(r=>r.isPlayer);
     if(P && mine.length){ const best=mine[0], bestRank=rows.indexOf(best)+1; term(`&nbsp;&nbsp;<span style="opacity:.6">your best: #${bestRank} · score ${best.score} · generation ${best.generation}</span>`,'sys'); }
     return; }
@@ -3729,9 +3780,14 @@ function loadLeaderboard(){ try{ const raw=localStorage.getItem(LEADERBOARD_KEY)
 function saveLeaderboard(arr){ try{ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(arr)); }catch(e){} }
 function recordGenerationResults(gen){
   const rows=loadLeaderboard();
+  // SR-M14 gap (audit 2026-07-08): rows tracked score/wealth/rank only - the milestone also names thought-fitness
+  // (the N5 ledger in thoughts.js) as a ranking axis. THOUGHTS.fitness() is a one-shot snapshot of the WHOLE
+  // ledger; call it once here rather than per-ship (this only runs at a generation reset, but no reason to rebuild it in a loop).
+  const tf=(window.THOUGHTS&&THOUGHTS.fitness)?THOUGHTS.fitness().pilots:null;
   for(const s of ships){ if(!s.alive && s.role!=='player') continue;   // dead squad AI already had their run scored when they died is out of scope - only living pilots at reset time are "this generation's finishers"
     if(s.team!=='squad') continue;
-    rows.push({ name:s.name, isPlayer:s.role==='player', generation:gen, score:Math.round(s.score||0), credits:Math.round(s.credits||0), rank:rankOf(s.score||0).n }); }
+    rows.push({ name:s.name, isPlayer:s.role==='player', generation:gen, score:Math.round(s.score||0), credits:Math.round(s.credits||0), rank:rankOf(s.score||0).n,
+      thoughtFitness:(tf&&tf[s.name])?Math.round(tf[s.name].fitness*100)/100:null }); }
   rows.sort((a,b)=>b.score-a.score);
   saveLeaderboard(rows.slice(0,LEADERBOARD_CAP));   // keep only the all-time top N - unbounded growth across many generations would just bloat localStorage forever
 }
@@ -3746,7 +3802,8 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       fuelTankType:P.fuelTankType||'standard', radarType:P.radarType||'basic', scannerType:P.scannerType||'none',
       shieldGenType:P.shieldGenType||'none', droidType:P.droidType||'none', cargoHookType:P.cargoHookType||'none',
       missileAmmo:P.missileAmmo, dmgMult:P.dmgMult||0, micromodules:[...(P.micromodules||[])],   // STANDARD GEAR SLOTS
-      manufacturer:P.manufacturer||'human', hullSeries:P.hullSeries||'standard', weaponSlots:[...(P.weaponSlots||[])] },   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+      manufacturer:P.manufacturer||'human', hullSeries:P.hullSeries||'standard', weaponSlots:[...(P.weaponSlots||[])],   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+      missionsCompleted:P.missionsCompleted||0, questsCompleted:P.questsCompleted||0, discoveries:P.discoveries||0 },   // SR-M20: campaign-score components
     planets: planets.map(p=>({ name:p.name, rep:p.rep, wealth:p.wealth, dev:p.dev, hegemon:!!p.hegemon, terra:p.terra||0 })),
     systems: systems.map(sy=>({ name:sy.name, contested:!!sy.contested })),
     newsLog: (window.PLANETMENU&&PLANETMENU.getLog)?PLANETMENU.getLog():[] }; }   // SR-M10: the galaxy NEWS timeline survives a reload too
@@ -3763,7 +3820,8 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     fuelTankType:sp.fuelTankType||'standard', radarType:sp.radarType||'basic', scannerType:sp.scannerType||'none',
     shieldGenType:sp.shieldGenType||'none', droidType:sp.droidType||'none', cargoHookType:sp.cargoHookType||'none',
     missileAmmo:num2(sp.missileAmmo,CFG.MISSILE_AMMO_START), dmgMult:num2(sp.dmgMult,0), micromodules:sp.micromodules||[],   // STANDARD GEAR SLOTS
-    manufacturer:sp.manufacturer||'human', hullSeries:sp.hullSeries||'standard', weaponSlots:sp.weaponSlots||null, slotFire:null });   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+    manufacturer:sp.manufacturer||'human', hullSeries:sp.hullSeries||'standard', weaponSlots:sp.weaponSlots||null, slotFire:null,   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+    missionsCompleted:num2(sp.missionsCompleted,0), questsCompleted:num2(sp.questsCompleted,0), discoveries:num2(sp.discoveries,0) });   // SR-M20
   // MIGRATION (ENGINEERING BAY, user 2026-07-08): targeting used to be a permanent EQUIP flag/save field - an
   // older save has sp.targetingComputer:true but no gizmoSlots at all. Grandfather it in for free as a mounted
   // gizmo rather than silently deleting a purchase the player already paid for.
