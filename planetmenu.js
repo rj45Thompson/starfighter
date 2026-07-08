@@ -369,7 +369,19 @@ function marketHtml(){
   var foot = '<div class="pm-note" style="margin-top:8px">hold '+htot+'/'+Math.round(hcap)
     + ' - credits <span style="color:'+COL.AMBER+'">'+Math.round(num(P&&P.credits,0))+'c</span>'
     + ' - reputation moves prices: allied worlds sell cheap and buy dear.</div>';
-  return head+table+foot; }
+  return head+table+foot+terraformHtml(p); }
+
+/* SR-M4 gap fix (REQUIREMENTS_SR.md, "every dock-only action... achievable by clicks alone"): terraform was
+   terminal-only, its own hint text on this tab said so explicitly. Same data-cmd->HOST.runCmd path as everything
+   else here, so results are identical to typing it. */
+function terraformHtml(p){
+  if(!p || !p.terraformable) return '';
+  var pct = Math.round(num(p.terra,0)*100);
+  var done = pct>=100;
+  return '<div class="pm-panel" style="margin-top:8px"><h4>TERRAFORMING</h4>'
+    + '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.GOOD+'">Earth-like conversion</b>'
+    + '<div class="pm-sub">'+pct+'% complete'+(done?' - garden world':'')+'</div></div>'
+    + '<button class="pm-b pm-go" data-act="cmd" data-cmd="terraform"'+(done?' disabled':'')+'>'+(done?'DONE':'ADVANCE')+'</button></div></div>'; }
 
 /* ------------------------------------------------ TAB: HANGAR */
 function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
@@ -527,9 +539,10 @@ function hangarHtml(){
       + '<div style="color:'+COL.AMBER+'">'+fmtC(cost)+'</div>'
       + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford)?' disabled':'')+'>UPGRADE</button></div>'; }
   h += '<div class="pm-note">'+(S.isBase
-      ? 'Hull, weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">blackmarket</b> and <b style="color:'+COL.AMBER+'">fence</b> are still terminal-only. Upgrades are planetside.'
-      : 'Weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">terraform</b> is still terminal-only.')
+      ? 'Hull, weapons and equipment fit through the LOADOUT slots below. Upgrades are planetside; terraforming is on the MARKET tab.'
+      : 'Weapons and equipment fit through the LOADOUT slots below.')
     + '</div>';
+  h += blackmarketFenceHtml(p);
   // user 2026-07-08: "its not clear you can only upgrade hull at ranger command" - the old hint was a small note
   // buried below the hull rows themselves (only visible once you'd already clicked in expecting to buy). A
   // banner ABOVE the loadout header instead, visible the instant this tab opens, before you've gone looking.
@@ -545,6 +558,35 @@ function hangarHtml(){
   if(S.slotOpen.weapon) h += '<div class="pm-panel"><h4>WEAPON - CHOOSE REPLACEMENT</h4>'+weaponSectionHtml(P)+'</div>';
   if(S.slotOpen.equip)  h += '<div class="pm-panel"><h4>EQUIPMENT - INSTALL MORE</h4>'+equipSectionHtml(P)+'</div>';
   return h; }
+
+/* SR-M4 gap fix (REQUIREMENTS_SR.md): blackmarket/fence were terminal-only, the hangar tab's own hint text used
+   to say so explicitly. Same data-cmd->HOST.runCmd path as everything else here. Buy is available at Ranger
+   Command or a pirate station (matching the terminal command's own gate, extended to stations 2026-07-08); fence
+   needs a HOSTILE dock, which in practice is only reachable at a pirate station now that regular hostile worlds
+   refuse docking outright. */
+function blackmarketFenceHtml(p){
+  var h=H(); var CB=h&&h.CONTRABAND, CK=h&&h.CONTRA_KEYS, P=player();
+  if(!CB || !Array.isArray(CK) || !CK.length) return '';
+  var repHostile = num(h&&h.CFG&&h.CFG.REP_HOSTILE,-6);
+  var showBuy = S.isBase || (p && p.isPirateStation);
+  var showSell = !!(p && num(p.rep,0)<=repHostile);
+  if(!showBuy && !showSell) return '';
+  var out='<div class="pm-panel" style="margin-top:8px"><h4>BLACK MARKET'+(p&&p.isPirateStation?' - '+esc(p.name):'')+'</h4>', i;
+  if(showBuy){
+    out+='<div class="pm-sub" style="margin-bottom:4px">Buy illegal goods here - fence them at a hostile world for a markup.</div>';
+    for(i=0;i<CK.length;i++){ var k=CK[i], g=CB[k]; if(!g) continue; var have=num(P&&P.contraband&&P.contraband[k],0);
+      out+='<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.VIOLET+'">'+esc(g.n)+'</b>'+(have?' <span class="pm-sub">holding '+have+'</span>':'')+'</div>'
+        + '<div style="color:'+COL.AMBER+'">'+fmtC(g.base)+'</div>'
+        + '<button class="pm-b" data-act="cmd" data-cmd="blackmarket '+k+' 1">BUY 1</button></div>'; } }
+  if(showSell){
+    var any=false, j;
+    out+='<div class="pm-sub" style="margin:6px 0 4px">Fence what you\'re holding - this world looks the other way.</div>';
+    for(j=0;j<CK.length;j++){ var k2=CK[j], g2=CB[k2]; if(!g2) continue; var q=num(P&&P.contraband&&P.contraband[k2],0); if(q<=0) continue; any=true;
+      out+='<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.GOOD+'">'+esc(g2.n)+'</b> <span class="pm-sub">holding '+q+'</span></div>'
+        + '<button class="pm-b pm-go" data-act="cmd" data-cmd="fence '+k2+' '+q+'">SELL ALL</button></div>'; }
+    if(!any) out+='<div class="pm-note">nothing to fence right now.</div>'; }
+  out+='</div>';
+  return out; }
 
 /* ------------------------------------------------ TAB: MISSIONS */
 function missionsHtml(){
