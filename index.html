@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708t"></script>
-<script src="fflate.min.js?v=20260708t"></script>
-<script src="fbxloader.js?v=20260708t"></script>
+<script src="three.min.js?v=20260708z"></script>
+<script src="fflate.min.js?v=20260708z"></script>
+<script src="fbxloader.js?v=20260708z"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708t"></script>
-<script src="inhabitant.js?v=20260708t"></script>
-<script src="passenger.js?v=20260708t"></script>
-<script src="gamemod.js?v=20260708t"></script>
-<script src="chatter.js?v=20260708t"></script>
-<script src="speech_input.js?v=20260708t"></script>
-<script src="vision.js?v=20260708t"></script>
-<script src="deliberate.js?v=20260708t"></script>
-<script src="knowledge.js?v=20260708t"></script>
-<script src="acquire.js?v=20260708t"></script>
-<script src="sound.js?v=20260708t"></script>
-<script src="hullmodels.js?v=20260708t"></script>
-<script src="knowledge_hud.js?v=20260708t"></script>
-<script src="thoughts.js?v=20260708t"></script>
-<script src="tami_battle_ui.js?v=20260708t"></script>
-<script src="power_panel.js?v=20260708t"></script>
-<script src="panels.js?v=20260708t"></script>
+<script src="speech_tier.js?v=20260708z"></script>
+<script src="inhabitant.js?v=20260708z"></script>
+<script src="passenger.js?v=20260708z"></script>
+<script src="gamemod.js?v=20260708z"></script>
+<script src="chatter.js?v=20260708z"></script>
+<script src="speech_input.js?v=20260708z"></script>
+<script src="vision.js?v=20260708z"></script>
+<script src="deliberate.js?v=20260708z"></script>
+<script src="knowledge.js?v=20260708z"></script>
+<script src="acquire.js?v=20260708z"></script>
+<script src="sound.js?v=20260708z"></script>
+<script src="hullmodels.js?v=20260708z"></script>
+<script src="knowledge_hud.js?v=20260708z"></script>
+<script src="thoughts.js?v=20260708z"></script>
+<script src="tami_battle_ui.js?v=20260708z"></script>
+<script src="power_panel.js?v=20260708z"></script>
+<script src="panels.js?v=20260708z"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708t"></script>
-<script src="conquest.js?v=20260708t"></script>
-<script src="missions.js?v=20260708t"></script>
-<script src="planetmenu.js?v=20260708t"></script>
-<script src="textquests.js?v=20260708t"></script>
+<script src="starmap.js?v=20260708z"></script>
+<script src="conquest.js?v=20260708z"></script>
+<script src="missions.js?v=20260708z"></script>
+<script src="planetmenu.js?v=20260708z"></script>
+<script src="textquests.js?v=20260708z"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -188,6 +188,7 @@ const CFG = {
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:5, AST_SPLIT_KICK:12, AST_DMG:20,
   GEM_CREDIT_PER_SCALE:2, GEM_FOOD:9, GEM_PICK_R:8.5, GEM_LIFE:26, GEM_MAGNET:26, GEM_GRAB_R:55,
   HP_BASE:100, HP_PER_HULL:0.20, REGEN:2.2, WEAPON_FIRE:0.16, WEAPON_DMG:0.24, ENGINE_GAIN:0.15,
+  TECH_RES_PER_LVL:0.04, TECH_RES_FLOOR:0.55,   // TECH LEVEL (user, SR "8 hull materials... higher tech = better resistance profiles"): folded into the EXISTING `upgrade hull` progression (s.lvl.hull) rather than a new parallel currency/slot - each level -4% E/S/M susceptibility, floored so it's never free armor. Lv1 (everyone's default) = ×1.00, zero change to existing balance for anyone who never upgrades.
   UP_COST_BASE:24, UP_COST_GROW:1.5, RESPAWN_DELAY:2.0, DEATH_CREDIT_LOSS:0.4,
   EVADE_HP:0.32, THREAT_R:18, SENSE_R:95, UTTER_CD:2.6,
   // ---- ship-to-ship combat ----
@@ -222,6 +223,13 @@ const CFG = {
   SHIELD_ARC_BASE:20, SHIELD_DIVERT_MULT:2.2,   // user 2026-07-08 "same as tie fighter xwing": real fore/aft POOLS (half of SHIELD_BASE each), not one pool with an efficiency weight; diverting concentrates regen on one arc at ~2.2x, pausing the other
   LASER_CAP_MAX:100, LASER_CAP_PER_SHOT:8, LASER_CAP_REGEN:10,   // weapons energy capacitor: each shot costs this much charge, capacitor regens %/s scaled by weapons power - hits 0 -> can't fire until it climbs back up
   ENGINE_CAP_MAX:100, ENGINE_CAP_DRAIN:24, ENGINE_CAP_REGEN:14,   // user: "when I hold shift I don't want my recharge rates to change, it would just go through my engine capacitor" - nitro drains ITS OWN pool now, decoupled from the shared weapons/engines/shields power route entirely
+  GIZMO_SLOTS:2, ECM_DODGE_CHANCE:0.22, SHIELD_BOOST_MULT:1.4,   // ENGINEERING BAY (user 2026-07-08): a real 2-slot electronics bay, not an uncapped bag; ECM's dodge is a flat per-hit chance, not evasion stacking with anything else
+  // STANDARD GEAR SLOTS (user 2026-07-08, SR "A War Apart" gear list): E/S/M damage-type susceptibility per hull,
+  // missile ammo (player-only - AI keeps infinite ammo, this is a player strategic resource), point-defense vs
+  // missiles on heavier hulls, and micro-module (Optimator/Integrator) drops from the toughest kills.
+  MISSILE_AMMO_START:10, MISSILE_AMMO_MAX:30, MISSILE_AMMO_COST:18,
+  MICROMOD_DROP_CHANCE:0.16,   // rolled only on tier>=2 (Warlord) kills - the stronghold boss guarantees one on top of its guaranteed artifact
+  SCAN_BLOCK_PER_SHIELD:20, SCAN_BLOCK_MAX:85,   // `probe <ship>`: target's cargo/equipment reveal is blocked unless your Scanner's power beats this shield-derived %
   SKILL_KEYS:['gunnery','handling','tech','trade','charisma','leadership'],   // SR-M17: SR-style player skill career
   SKILL_MAX:5, SKILL_PTS_PER_RANK:1,          // 1 point per rank gained, capped at 5 levels/skill
   SKILL_GUNNERY_DMG:0.04, SKILL_HANDLING_THRUST:0.03, SKILL_TECH_REGEN:0.06,
@@ -493,6 +501,9 @@ function makeShip(i){
     role:(i/CFG.NSHIPS<CFG.TRADER_FRAC)?'trader':'raider', backstory:BACKSTORY.coalition[i%BACKSTORY.coalition.length],   // traders drive economy; raiders fight/mine; ORIGINAL per-pilot Warden backstory (GIVEN flavor)
     cargo:{}, fuel:CFG.FUEL_START, tradePlan:null, tradeCd:0, warping:false,        // trading + hyperspace state
     holdCap:CFG.HOLD_CAP, fuelCap:CFG.FUEL_CAP, senseR:CFG.SENSE_R, warpEff:1, equip:{},   // installable equipment stats
+    engineType:'standard', gizmoSlots:new Array(CFG.GIZMO_SLOTS).fill(null),   // ENGINEERING BAY: single-slot engine type + a real n-slot electronics bay
+    fuelTankType:'standard', radarType:'basic', scannerType:'none', shieldGenType:'none', droidType:'none', cargoHookType:'none',   // STANDARD GEAR SLOTS
+    missileAmmo:CFG.MISSILE_AMMO_START, dmgMult:0, micromodules:[],
     mode:'MINE', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(hue) };
   novelShipHook(s);   // N3 (GIVEN-from-canon): roster temperament -> aggr bias; traders faction -> trader role bias
   applyHull(s, s.role==='trader'?'freighter':RAIDER_HULL_VARIETY[i%RAIDER_HULL_VARIETY.length]);   // user 2026-07-08 "each race is supposed to have a different ship type by default": makeShip never set a hullClass at all, so every coalition ship defaulted to plain Fighter regardless of role; traders now spawn as the big-holdCap Freighter this file's own comment already called for, raiders spawn a mix so the fleet reads as varied on day one, not just after upgrades
@@ -534,8 +545,16 @@ function dropCredits(pos, amount){ amount=Math.round(amount||0); if(amount<=0) r
 function spawnArtifactDrop(pos,key){ const col=new T.Color(0xff5ad0);                                    // M6: a shimmering artifact pod (player-only pickup)
   const m=new T.Mesh(new T.OctahedronGeometry(2.2,0),new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.0,roughness:0.2,metalness:0.5}));
   m.position.copy(pos); const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.95})); halo.scale.set(12,12,1); m.add(halo); scene.add(m);
-  gems.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(0,1.5)), credits:0, artifact:key, mesh:m, age:0, phase:rand(0,TAU) });
+  gems.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(0,1.5)), credits:0, artifact:key, mass:1, mesh:m, age:0, phase:rand(0,TAU) });
   ev(`A Hegemon wreck ejected an artifact: <b>${ARTIFACTS[key].n}</b> - recover it.`); }
+// STANDARD GEAR SLOTS: a micro-module pod, mechanically the same shimmering pickup as an artifact drop, but
+// mass:2 - CARGO_HOOKS.none has maxMass:1, so a bare ship literally can't grab one until it fits at least a
+// Short-Range Hook (maxMass:2). See the gem-pickup loop's mass gate.
+function spawnMicromoduleDrop(pos,key){ const col=new T.Color(0x5adfff);
+  const m=new T.Mesh(new T.TetrahedronGeometry(2.4,0),new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:1.0,roughness:0.2,metalness:0.6}));
+  m.position.copy(pos); const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.95})); halo.scale.set(12,12,1); m.add(halo); scene.add(m);
+  gems.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(0,1.5)), credits:0, micromodule:key, mass:2, mesh:m, age:0, phase:rand(0,TAU) });
+  ev(`A wreck ejected a micro-module: <b>${MICROMODULES[key].n}</b> - needs a Cargo Hook to recover.`); }
 const BOLT_GEO=new T.CylinderGeometry(0.16,0.16,1,5,1);   // shared; scaled per shot (unique weapon silhouettes)
 function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=null)?spec.col:0x9fd8ff, r=spec.r||2.2;
   let m;
@@ -554,7 +573,7 @@ function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=nu
   let dmg=(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG; const ow=shipById[owner];
   if(ow && ow.role==='trader') dmg*=CFG.TRADER_GUN_MULT;                                     // merchants mount light guns
   bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner,
-    dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null,
+    dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null, dmgType:spec.dmgType||'energy',
     trail:spec.trail||0, trailCd:spec.trailCd||0, trailT:0, bolt:spec.shape==='bolt' }); }
 // swept bullet collision: distance² from point p to the segment a→b (this frame's travel). A point-only test tunnels
 // through targets whenever bulletSpeed×dt exceeds the hit radius (e.g. autocannon 150u/s at <43fps) - the reported
@@ -651,14 +670,14 @@ function setPower(s, sys, target){   // reroute: set ONE system, the other two a
   P[sys]=target;
   const sum=P.weapons+P.engines+P.shields; if(Math.abs(sum-CFG.POWER_TOTAL)>0.01) P[sys]=clamp(P[sys]+(CFG.POWER_TOTAL-sum),CFG.POWER_MIN,CFG.POWER_MAX);   // clamp slack -> the pool always stays honest
   return P; }
-function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields); }         // TOTAL across both arcs - unchanged meaning, every existing "shield%" summary display (roster/scan/status) still reads this
+function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields)*seriesOf(s).shieldMult; }         // TOTAL across both arcs - unchanged meaning, every existing "shield%" summary display (roster/scan/status) still reads this; HULL SERIES: Dandy/Pygamore run weaker shields, live multiplier
 function shieldArcMaxFor(s){ return shieldMaxFor(s)/2; }   // SR X-WING SHIELDS: each arc's own cap (fwd+aft sums to the total above)
 function shieldTick(s,dt){ if(!s.alive) return; const amax=shieldArcMaxFor(s);
   if(s.shieldFwd==null) s.shieldFwd=amax; if(s.shieldAft==null) s.shieldAft=amax;
   if(s.shieldFwd>amax) s.shieldFwd=amax; if(s.shieldAft>amax) s.shieldAft=amax;              // power just rerouted AWAY from shields -> ceiling drops immediately, same rule as before
   const canRegen = s.docked || T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY;
   if(canRegen){
-    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1);   // SR-M17 tech skill; docked = safe harbor, 2x
+    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1)*(hasGizmo(s,'shieldboost')?CFG.SHIELD_BOOST_MULT:1);   // SR-M17 tech skill; docked = safe harbor, 2x; ENGINEERING BAY: shield booster gizmo
     // SR X-WING SHIELDS (user 2026-07-08, "same as tie fighter xwing"): real fore/aft POOLS, not one pool with an efficiency
     // weight. Undiverted, BOTH arcs regen at the full base rate independently (given enough time, both reach their own
     // 100%). "shield fwd"/"shield aft" concentrates regen on one arc at SHIELD_DIVERT_MULT and pauses the other entirely -
@@ -793,7 +812,15 @@ function encounterTick(dt){ encounterCd-=dt; if(encounterCd<=0){ encounterCd=CFG
 function applyHull(s,key){ const H=HULLS[key]; if(!H) return; s.hullClass=key;
   s.maxHp=H.hp*(1+CFG.HP_PER_HULL*((s.lvl?s.lvl.hull:1)-1)); s.hp=s.maxHp;
   s.holdCap=H.hold + ((s.equip&&s.equip.cargo)||0)*15; s.hullSpeed=H.speed;
+  resizeGizmoBay(s); resizeWeaponBay(s);                                 // STANDARD GEAR SLOTS / WEAPON HARDPOINTS: role changed -> slot counts may have changed too
   if(ASSETS.ready) applyShipModel(s); }                                  // silhouette rescales with the class (scout … dreadnought)
+// resize the gizmo bay to match the new hull's role (gizmoSlotsFor) - GROWING pads with empty slots; SHRINKING
+// unmounts+refunds (50%, same rate as a manual `gizmo unmount`) whatever no longer fits, refusing to just delete a
+// mounted gizmo the player paid for.
+function resizeGizmoBay(s){ const want=gizmoSlotsFor(s);
+  if(!s.gizmoSlots) s.gizmoSlots=new Array(want).fill(null);
+  while(s.gizmoSlots.length<want) s.gizmoSlots.push(null);
+  while(s.gizmoSlots.length>want){ const k=s.gizmoSlots.pop(); if(k){ s.credits=(s.credits||0)+Math.round(GIZMOS[k].cost*GIZMO_SELL_FRAC); if(s.role==='player') notify(`${s.hullClass?HULLS[s.hullClass].n:'New hull'}'s electronics bay is smaller - unmounted ${GIZMOS[k].n} (+${Math.round(GIZMOS[k].cost*GIZMO_SELL_FRAC)}c).`,'log'); } } }
 function priceOf(p,gk){ const g=GKEY[gk], ratio=(p.eq||CFG.EQ_STOCK)/Math.max(1,p.stock[gk]); return g.base*clamp(Math.pow(ratio,CFG.PRICE_ELAST),CFG.PRICE_MIN,CFG.PRICE_MAX); }
 // reputation: helping a planet (trade/terraform) raises rep across its system faction; bombing it lowers it
 function repAdd(p,amt){ p.rep=clamp((p.rep||0)+amt,-CFG.REP_MAX,CFG.REP_MAX); if(p.system) for(const q of p.system.planets){ if(q!==p&&planets.indexOf(q)>=0) q.rep=clamp((q.rep||0)+amt*0.5,-CFG.REP_MAX,CFG.REP_MAX); } }
@@ -970,6 +997,7 @@ function destroyStronghold(killer){ if(!stronghold) return; const sys=stronghold
   burst(stronghold.pos,0xff5a30,60,40,7); burst(stronghold.pos,0xffcf52,40,30,5);
   for(let i=0;i<6;i++) spawnGem(stronghold.pos.clone().add(new T.Vector3(rand(-8,8),rand(-8,8),rand(-8,8))),rand(6,12));
   spawnArtifactDrop(stronghold.pos, ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]);
+  spawnMicromoduleDrop(stronghold.pos, MICROMOD_KEYS[randi(0,MICROMOD_KEYS.length-1)]);   // STANDARD GEAR SLOTS: the boss node guarantees a micro-module too, same as its guaranteed artifact
   const P=ships[0]; P.credits+=CFG.STRONGHOLD_REWARD; P.score+=15; checkRankUp(P);
   escalation=Math.max(0,escalation-CFG.STRONGHOLD_ESC_CUT); warScore+=CFG.STRONGHOLD_WARSCORE; if(sys) sys.contested=false;
   flashBanner('★ STRONGHOLD DESTROYED ★<br><span style="font-size:17px;font-weight:600">the Hegemon front buckles (+'+CFG.STRONGHOLD_REWARD+'c)</span>','#8fffa8');
@@ -1230,17 +1258,40 @@ function think(s,dt){
   s.ctrl={ thr:clamp(thr,0,1), pitch:clamp(aim.pitch*ng,-1,1), yaw:clamp(aim.yaw*ng,-1,1) }; s.mode=mode; s.target=target; s._prevMode=mode;   // A9: remember mode for reward attribution
   if(target&&mode==='HUNT'){ s.navAccum+=Math.max(0,aim.dot); s.navCount++; }   // A3: measure alignment vs MOVING targets (gain matters here; mining slow rocks is flat/noisy)
   s.fire-=dt;
-  if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0 && (s.capLaser==null||s.capLaser>0)){   // SR X-WING CAPACITORS: empty laser capacitor blocks firing entirely, same as everyone else
+  if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0 && (s.capLaser==null||s.capLaser>0)
+      && !(s.role==='player' && (s.weaponType||'energy')==='missile' && (s.missileAmmo||0)<=0)){   // STANDARD GEAR SLOTS: player-only missile ammo - AI keeps infinite ammo, out of ammo just silently skips firing this weapon
     const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
     if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range){
       s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
       s.capLaser=Math.max(0,(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser)-CFG.LASER_CAP_PER_SHOT);
-      const base=(s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'));   // SR-M17
+      if(s.role==='player' && W.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);   // STANDARD GEAR SLOTS: consume the player's magazine
+      const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0)))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
-        shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };   // per-weapon visual signature
+        shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy' };   // per-weapon visual signature
       const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
       if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),fwd,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),fwd,s.id,spec); }
       else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec);
+    }
+  }
+  // WEAPON HARDPOINTS (player-only, see the HARDPOINT_SELL_FRAC comment block above): slot 1 (s.weaponType)
+  // just fired through the untouched path above; extra hardpoints (s.weaponSlots) fire independently here, reusing
+  // the SAME mode/target/aim this tick already computed for the player - one full pass over ships doesn't grow.
+  if(s.role==='player' && Array.isArray(s.weaponSlots) && s.weaponSlots.length && (mode==='MINE'||mode==='HUNT') && target){
+    if(!s.slotFire) s.slotFire=new Array(s.weaponSlots.length).fill(0);
+    if(s.slotFire.length!==s.weaponSlots.length) s.slotFire=new Array(s.weaponSlots.length).fill(0);   // bay resized since last tick
+    for(let wi=0; wi<s.weaponSlots.length; wi++){ const wt=s.weaponSlots[wi]; if(!wt) continue;
+      s.slotFire[wi]-=dt; if(s.slotFire[wi]>0) continue;
+      const W2=WEAPONS[wt]||WEAPONS.energy;
+      if(!(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W2.range)) continue;
+      if(W2.dmgType==='missile' && (s.missileAmmo||0)<=0) continue;   // shares the single missileAmmo magazine with the primary slot
+      s.slotFire[wi]=W2.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));
+      if(W2.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);
+      const base2=W2.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*seriesOf(s).dmgMult*(W2.dmgType==='missile'?seriesOf(s).missileDmgMult:1);
+      const spec2={ dmg:base2, col:W2.col, speed:W2.speed, life:W2.life, r:W2.r, homing:W2.homing, splash:W2.splash, target:(W2.homing>0?target:null),
+        shape:W2.shape, boltLen:W2.boltLen, trail:W2.trail, trailCd:W2.trailCd, flash:W2.flash, dmgType:W2.dmgType||'energy' };
+      const fwd2=FWD.clone().applyQuaternion(s.quat), side2=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF*(1.8+wi*0.9));   // stagger muzzle offset so extra hardpoints visually fan out from the primary
+      if(W2.twin){ spawnBullet(_v2.copy(s.pos).add(side2).addScaledVector(fwd2,2),fwd2,s.id,spec2); spawnBullet(_v2.copy(s.pos).sub(side2).addScaledVector(fwd2,2),fwd2,s.id,spec2); }
+      else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd2,2.2),fwd2,s.id,spec2);
     }
   }
   let bought=null;
@@ -1277,14 +1328,14 @@ function flyStep(s,dt){
   const nitroMult=nitroActive?CFG.NITRO_BOOST_MULT:1;                                                // NITRO BURST: instant thrust/vmax layer - doesn't wait on the power-stat ramp above to feel like a boost
   if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
   s._nitroWasActive=nitroActive;
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier; SR-M17: handling skill
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier; SR-M17: handling skill; ENGINEERING BAY: engine type speed multiplier; HULL SERIES/MANUFACTURER: further live multipliers
   // user 2026-07-08 ("when I hold shift I want to have burst mode"): the line above only fires while W is ALSO
   // held (multiplies s.ctrl.thr, which is 0 otherwise) - so Shift alone gave one kick then coasted to a stop under
   // drag, never reading as a sustained "burst". A real afterburner propels you on its own, no second key needed -
   // this term is independent of s.ctrl.thr, active for exactly as long as Shift is held.
   if(nitroActive) s.vel.addScaledVector(fwd,CFG.NITRO_AUTOTHRUST*engMult*dt);
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -1297,7 +1348,7 @@ function flyStep(s,dt){
     if(dd<effR){ const n=_v2.copy(s.pos).sub(base.pos); if(n.lengthSq()<1e-4) n.set(1,0,0); n.setLength(1);
       s.pos.copy(base.pos).addScaledVector(n,effR); const vn=s.vel.dot(n);
       if(vn<0){ s.vel.addScaledVector(n,-vn); const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }
-  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen
+  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0)*seriesOf(s).droidMult)*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen; HULL SERIES: Repair boosts droid effectiveness
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
   capacitorTick(s,dt);                                                                              // SR X-WING CAPACITORS: laser energy regens off weapons power, engine capacitor regens off engines power (when not boosting)
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
@@ -1378,13 +1429,17 @@ function step(dt){
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner];
     for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||s.docked) continue;   // DOCKED = safe harbor - no combat damage while docked
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire - except the player (and teammates returning fire at the player)
+      if(hasGizmo(s,'ecm') && rand(0,1)<CFG.ECM_DODGE_CHANCE) continue;   // ENGINEERING BAY: jammed fire control - a flat per-hit chance the shot just misses, bullet keeps flying for anyone else
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
-        const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=drainShield(s,dmg,b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors - bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first
+        if(b.dmgType==='missile' && (HULLS[s.hullClass]&&HULLS[s.hullClass].pd) && rand(0,1)<HULLS[s.hullClass].pd){   // STANDARD GEAR SLOTS: point defense - some hulls shoot down an incoming missile before it connects, no damage at all
+          burst(b.pos,0x8fd0ff,6,11,2.0); scene.remove(b.mesh); bullets.splice(i,1); break; }
+        const rawDmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
+        const dmg=rawDmg*hullResFor(s,b.dmgType);   // STANDARD GEAR SLOTS + MANUFACTURER: E/S/M hull+manufacturer susceptibility, applied before shields
+        s.hp-=drainShield(s,dmg,b.pos)*(1-shieldGenPctFor(s)); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors - bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer on the hull-bound leftover
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
-            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=drainShield(o2,dmg*0.5,b.pos); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first
+            if(o2.pos.distanceTo(b.pos)<b.splash){ const dmg2=rawDmg*0.5*hullResFor(o2,b.dmgType); o2.hp-=drainShield(o2,dmg2,b.pos)*(1-shieldGenPctFor(o2)); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg2); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: susceptibility+shieldgen per splash victim
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE - very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
@@ -1412,9 +1467,11 @@ function step(dt){
   shipCollisions();   // pairwise ship-body contact: separate + bounce + hull scrape on hard rams
   for(let i=gems.length-1;i>=0;i--){ const g=gems[i]; g.age+=dt; let taken=false;
     for(const s of ships){ if(!s.alive||s.warping) continue; const d=s.pos.distanceTo(g.pos);
-      if(d<CFG.GEM_MAGNET && (!g.artifact || s.role==='player')) g.vel.addScaledVector(_v.copy(s.pos).sub(g.pos).setLength(1),(CFG.GEM_MAGNET-d)*0.9*dt*8);
-      if(d<CFG.GEM_PICK_R){
-        if(g.artifact){ if(s.role!=='player') continue; (s.artifacts=s.artifacts||[]).push(g.artifact); notify(`Recovered artifact: <b>${ARTIFACTS[g.artifact].n}</b> - ${ARTIFACTS[g.artifact].desc}. (equip: artifacts)`,'flag'); }
+      if(d<magnetFor(s) && (!g.artifact || s.role==='player') && (!g.micromodule || s.role==='player')) g.vel.addScaledVector(_v.copy(s.pos).sub(g.pos).setLength(1),(magnetFor(s)-d)*0.9*dt*8);   // STANDARD GEAR SLOTS: Cargo Hook extends the pull radius
+      if(d<pickRFor(s)){                                                                          // STANDARD GEAR SLOTS: Cargo Hook extends the grab radius
+        if(g.micromodule){ if(s.role!=='player') continue; if((hookOf(s).maxMass||1)<(g.mass||1)) continue;   // too heavy for the fitted hook - leave it, a better hook can come back for it
+          (s.micromodules=s.micromodules||[]).push(g.micromodule); MICROMODULES[g.micromodule].apply(s); notify(`Recovered micro-module: <b>${MICROMODULES[g.micromodule].n}</b> - ${MICROMODULES[g.micromodule].desc}.`,'flag'); }
+        else if(g.artifact){ if(s.role!=='player') continue; (s.artifacts=s.artifacts||[]).push(g.artifact); notify(`Recovered artifact: <b>${ARTIFACTS[g.artifact].n}</b> - ${ARTIFACTS[g.artifact].desc}. (equip: artifacts)`,'flag'); }
         else { s.credits+=g.credits; s.hp=Math.min(s.maxHp,s.hp+CFG.GEM_FOOD); if(s.role==='player'&&window.SOUND) SOUND.play('pickup'); }
         burst(g.pos,g.mesh.material.color.getHex(),9,11,2.6); scene.remove(g.mesh); gems.splice(i,1); taken=true; break; } }
     if(taken) continue;
@@ -1445,7 +1502,7 @@ function step(dt){
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
-function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d,fromPos); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor - no combat damage while docked; X-WING POWER: shields absorb first
+function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d,fromPos)*(1-shieldGenPctFor(s)); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor - no combat damage while docked; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   dropCargo(s);                                                     // spill the hold as salvage pods
@@ -1457,11 +1514,16 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
   // human player only - the AI squad's gear churn is a separate economy simulation, not touched.
   if(s.role==='player'){
     s.lvl={weapon:1,engine:1,hull:1}; s.weaponType='energy'; s.equip={}; s.artifacts=[]; s.contraband={};
-    s.fuelCap=CFG.FUEL_CAP; s.senseR=CFG.SENSE_R; s.warpEff=1; s.regenBonus=0; s.targetingComputer=false;
+    s.fuelCap=CFG.FUEL_CAP; s.senseR=CFG.SENSE_R; s.warpEff=1; s.regenBonus=0;
+    s.engineType='standard'; s.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);   // ENGINEERING BAY: real stakes death wipes the engine/gizmo loadout too, same as weapon/equip/artifacts
+    s.fuelTankType='standard'; s.radarType='basic'; s.scannerType='none'; s.shieldGenType='none'; s.droidType='none'; s.cargoHookType='none';
+    s.missileAmmo=CFG.MISSILE_AMMO_START; s.dmgMult=0; s.micromodules=[];   // STANDARD GEAR SLOTS: real stakes wipes this loadout too
+    s.manufacturer='human'; s.hullSeries='standard'; s.weaponSlots=null; s.slotFire=null;   // WEAPON HARDPOINTS/HULL SERIES/MANUFACTURER: same real-stakes wipe
     applyHull(s,'fighter'); }   // recomputes holdCap/maxHp/hp/hullSpeed/visual model from the reset lvl+equip
   if(window.SOUND) SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'});
   burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); say(s,'Hull breach! Punching out.');
   if(s.team==='pirate' && rand(0,1) < CFG.ART_DROP_BASE+(s.tier||0)*CFG.ART_DROP_PER_TIER) spawnArtifactDrop(s.pos, ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]);   // M6: Hegemon wrecks drop artifacts
+  if(s.team==='pirate' && (s.tier||0)>=2 && rand(0,1)<CFG.MICROMOD_DROP_CHANCE) spawnMicromoduleDrop(s.pos, MICROMOD_KEYS[randi(0,MICROMOD_KEYS.length-1)]);   // STANDARD GEAR SLOTS: only the toughest (Warlord-tier) kills drop micro-modules
   if(s.role==='defender'||s.role==='pirate') s.despawn=true;        // defenders/pirates don't respawn; they're removed
 }
 // killed by another pilot -> victim's credits scatter as bounty gems; killer earns score
@@ -1512,7 +1574,7 @@ function spriteText(text,fs,col,opts){ opts=opts||{}; const ws=opts.ws||1,weight
 // rather than being a free always-on aimbot.
 const RETICLE_CFG={ POWER_THRESH:60, PULSE_HZ:3.2 };
 const reticleMesh=(function(){ const g=new T.EdgesGeometry(new T.PlaneGeometry(1,1)); const m=new T.LineSegments(g,new T.LineBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.9})); m.visible=false; m.renderOrder=25; scene.add(m); return m; })();
-function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!P.targetingComputer){ reticleMesh.visible=false; return; }
+function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!hasGizmo(P,'targeting')){ reticleMesh.visible=false; return; }   // ENGINEERING BAY: now a mountable gizmo, not a permanent flag
   const wPct=shipPower(P).weapons; if(wPct<RETICLE_CFG.POWER_THRESH){ reticleMesh.visible=false; return; }
   let best=null,bd=P.senseR; for(const o of ships){ if(o===P||!o.alive||o.team!=='pirate') continue; const d=P.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} }
   if(!best){ reticleMesh.visible=false; return; }
@@ -1658,6 +1720,18 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'land',   desc:'land on a docked planet and walk the surface on foot - away missions, turn-based battles on the real Tami rules', usage:'dock then land · launch to leave'},
   {name:'buy',    desc:'buy goods at the docked market (sell to sell, refuel for gas)', usage:'buy <good> <n> · sell <good> <n> · refuel'},
   {name:'upgrade',desc:'spend credits improving weapon, engine or hull; outfit for equipment; blackmarket at the base', usage:'upgrade <weapon|engine|hull>'},
+  {name:'engine', desc:'the engineering bay engine drive: standard, afterburner, ion - swap engine TYPE for a speed/hyperjump-fuel tradeoff, different from the engine level upgrade', usage:'engine · engine after · engine ion · engine standard'},
+  {name:'gizmo', desc:'the engineering bay electronics slots: gizmos, gadgets, targeting computer, ECM jammer, shield booster - a real n-slot bay you mount/unmount/sell, not an unlimited buy', usage:'gizmo · gizmo mount targeting · gizmo unmount 1'},
+  {name:'tank',   desc:'standard gear slot: fuel tank type - standard/extended/reserve, swap for more fuel capacity between refuels', usage:'tank · tank extended · tank reserve'},
+  {name:'radar',  desc:'standard gear slot: radar type - basic/long-range/deep scan, swap for more sensor detection range', usage:'radar · radar longrange · radar deepscan'},
+  {name:'scanner',desc:'standard gear slot: cargo/equipment scanner - fit one, then probe an enemy ship to read their hull class/weapon/cargo if your scan power beats their shields', usage:'scanner · scanner advanced · probe <ship>'},
+  {name:'shieldgen',desc:'standard gear slot: shield generator - a flat % damage-reduction layer that stacks after your fore/aft capacitor shields', usage:'shieldgen · shieldgen reinforced'},
+  {name:'droid',  desc:'standard gear slot: repair droid tier - mk1/mk2/mk3, automatic hull regen in flight and combat', usage:'droid · droid mk2 · droid mk3'},
+  {name:'hook',   desc:'standard gear slot: cargo hook/tractor beam - extends pickup range+pull and is required to recover the heavier micro-module pods', usage:'hook · hook long · hook heavy'},
+  {name:'ammo',   desc:'missile ammo: your Seeker Missile magazine (player-only, AI has infinite ammo) - restock it here', usage:'ammo · ammo buy 10'},
+  {name:'micromods',desc:'micro-modules recovered from wrecks: Optimator (+hold), Integrator (+weapon damage) - permanent once picked up, need a Cargo Hook to recover them at all', usage:'micromods (or: mm)'},
+  {name:'series',   desc:'hull series specialization - Fast/Dandy/Repair/Ironclad/Pygamore, a real tradeoff on top of your hull (speed, sensors, droid effect, weapon damage, missile damage), resets on a hull swap', usage:'series · series fast · series ironclad'},
+  {name:'hardpoint',desc:'extra weapon hardpoints beyond your primary weapon - mount a second (or third) weapon type, real n-slot bay driven by hull role, mount/unmount/sell', usage:'hardpoint · hardpoint mount missile · hardpoint unmount 1'},
   {name:'contracts',desc:'jobs and missions from planets: accept work, deliveries, bounties for pay', usage:'contracts · accept <id>'},
   {name:'skills', desc:'pilot skill career: gunnery/handling/tech/trade/charisma/leadership, 1 point per rank-up', usage:'skills · skill <name>'},
   {name:'war',    desc:'the war: escalation, front lines, victories, the Hegemon stronghold', usage:'war · warmap'},
@@ -1810,21 +1884,204 @@ function findPlanet(n){ if(!n) return null; n=n.toLowerCase();
     || planets.find(p=>p.type&&p.type.t&&p.type.t.toLowerCase().startsWith(n))   // "go pirate station" / "go pirate" - user 2026-07-08 "i can't seem to dock at the pirate station" traced to not knowing its actual name (Kestrel's Reach); match by TYPE too, same as a real name
     || (parseInt(n)>=0?planets[parseInt(n)]:null); }   // BUG FIX 2026-07-08: only the planet's OWN name was lowercased, not the search term - "go Cydon" (typed exactly as shown everywhere in the UI) silently failed; only all-lowercase "go cydon" ever matched
 function findGood(n){ if(!n) return null; return GOODS.find(g=>g.k===n||g.n.toLowerCase().startsWith(n)); }
-const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15}, fuel:{n:'Fuel Cell',cost:100,desc:'+25 fuel',apply:s=>s.fuelCap+=25},
-  scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive - buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}},
-  droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5},
-  // TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help
-  // you target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of
-  // power"): expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties
-  // it honestly into the X-Wing power system instead of a bolted-on always-on freebie.
-  targeting:{n:'Targeting Computer',cost:900,desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve',apply:s=>s.targetingComputer=true} };
+// STANDARD GEAR SLOTS (user 2026-07-08): fuel/scanner/droid used to live here as an uncapped stacking bag - moved
+// out to real single-slot fits (FUEL_TANKS/RADARS/REPAIR_DROIDS below) so they're an actual layout choice instead
+// of "buy N of them". Old saves keep whatever numeric bonus they already stacked up (fuelCap/senseR/regenBonus are
+// plain numbers in the save, not re-derived from equip counts) - nothing is lost, just no longer re-buyable here.
+// cargo/plating stay: physical ship capacity (bigger tank, thicker plate), not a swappable module - same
+// reasoning ENGINES/GIZMOS already documented for equip vs. the true single/n-slot systems.
+const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15},
+  plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive - buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}} };
+// ENGINEERING BAY (user 2026-07-08: "copy space rangers rise of the dominators menus when you land - the item
+// shop and build the list of ship components into the engineering bay that lets you layout your ship... buy
+// different types of engines weapons electronic gizmos"). EQUIP above (cargo/fuel/scanner/plating/droid) stays a
+// permanent stacking purchase - those are PHYSICAL ship capacity (a bigger tank, thicker plate), not a module you'd
+// swap back out. ENGINES and GIZMOS below are the genuinely SWAPPABLE loadout SR-M12 asks for: a single engine
+// TYPE (like weaponType/hullClass - one slot, real tradeoffs) and a small GIZMO_SLOTS-wide electronics bay you
+// mount/unmount/sell, not an uncapped bag you just keep adding to.
+const ENGINES={
+  standard:{n:'Standard Drive', cost:0,   speedMult:1.00, fuelMult:1.00, desc:'balanced - the factory drive'},
+  after:   {n:'Afterburner Drive', cost:480, speedMult:1.22, fuelMult:1.4, desc:'faster top speed + accel - burns hyperjump fuel harder'},
+  ion:     {n:'Ion Drive', cost:520, speedMult:0.85, fuelMult:0.6, desc:'slower - sips hyperjump fuel, real range between refuels'} };
+const ENGINE_KEYS=Object.keys(ENGINES);
+function engineOf(s){ return ENGINES[s.engineType||'standard']||ENGINES.standard; }
+// GIZMOS: the electronics bay - GIZMO_SLOTS mount points (see CFG.GIZMO_SLOTS), each holding at most one gizmo key.
+// TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help you
+// target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of power"):
+// expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties it honestly
+// into the X-Wing power system instead of a bolted-on always-on freebie. Used to be a permanent EQUIP purchase;
+// now lives here so it can be unmounted to free the slot for something else, like a real Ranger loadout choice.
+const GIZMOS={
+  targeting:  {n:'Targeting Computer', cost:900, desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve'},
+  ecm:        {n:'ECM Jammer', cost:850, desc:'scrambles enemy fire control - hostiles shooting at you have a flat chance to simply miss'},
+  shieldboost:{n:'Shield Capacitor Booster', cost:800, desc:'+40% shield regen rate, both arcs'} };
+const GIZMO_KEYS=Object.keys(GIZMOS);
+const GIZMO_SELL_FRAC=0.5;   // selling a mounted gizmo back returns half its listed cost - depreciated, matches the existing hull-trade-in convention
+function hasGizmo(s,key){ return !!(s.gizmoSlots&&s.gizmoSlots.includes(key)); }
+function mountGizmo(s,key){ if(!GIZMOS[key]) return {ok:false,why:'no such gizmo'};
+  if(!s.gizmoSlots) s.gizmoSlots=new Array(gizmoSlotsFor(s)).fill(null);
+  if(hasGizmo(s,key)) return {ok:false,why:'already mounted'};
+  const free=s.gizmoSlots.indexOf(null); if(free<0) return {ok:false,why:'no free gizmo slot - unmount one first'};
+  s.gizmoSlots[free]=key; return {ok:true,slot:free}; }
+function unmountGizmo(s,idx){ if(!s.gizmoSlots||idx<0||idx>=s.gizmoSlots.length||!s.gizmoSlots[idx]) return {ok:false,why:'that slot is empty'};
+  const key=s.gizmoSlots[idx]; s.gizmoSlots[idx]=null; return {ok:true,key}; }
+
+// =================================================================================================
+// STANDARD GEAR SLOTS (user 2026-07-08: "Engine/Fuel Tank/Radar/Scanner/Shield Generator/Repair Droid/Cargo Hook").
+// Same two shapes as ENGINES/GIZMOS above: FUEL_TANKS/RADARS/REPAIR_DROIDS are single-slot SWAP-DELTA fits - they
+// each hold their own tier's contribution to an existing accumulator field (fuelCap/senseR/regenBonus) that other
+// systems (Fuel Cell EQUIP, Seeker Optics/Inertial Lattice/Regen Matrix artifacts) ALSO permanently add to, so
+// fitting a new tier subtracts the OLD tier's delta and adds the new one rather than re-deriving the whole field.
+// SCANNERS/SHIELD_GENS/CARGO_HOOKS are brand new fields with no such legacy baggage, so they just store the fitted
+// key and a getter reads the tier's stat straight off the table - no accumulator, nothing to desync.
+// =================================================================================================
+const FUEL_TANKS={
+  standard:{n:'Standard Tank',  cost:0,   bonus:0,   desc:'factory tank - baseline range between refuels'},
+  extended:{n:'Extended Tank',  cost:220, bonus:60,  desc:'+60 fuel capacity - fewer trips back to a gas giant'},
+  reserve: {n:'Reserve Tank',   cost:420, bonus:120, desc:'+120 fuel capacity - real range in deep space'} };
+const FUEL_TANK_KEYS=Object.keys(FUEL_TANKS);
+function fitFuelTank(s,key){ const old=FUEL_TANKS[s.fuelTankType||'standard'], neu=FUEL_TANKS[key]; if(!neu) return false;
+  s.fuelCap=(s.fuelCap||CFG.FUEL_CAP)-(old.bonus||0)+(neu.bonus||0); s.fuelTankType=key; return true; }
+
+const RADARS={
+  basic:    {n:'Basic Radar',     cost:0,   bonus:0,  desc:'factory array - stock detection range'},
+  longrange:{n:'Long-Range Radar',cost:260, bonus:45, desc:'+45 sensor range - see hostiles coming from further out'},
+  deepscan: {n:'Deep Scan Array', cost:520, bonus:90, desc:'+90 sensor range - the widest picture on the field'} };
+const RADAR_KEYS=Object.keys(RADARS);
+function fitRadar(s,key){ const old=RADARS[s.radarType||'basic'], neu=RADARS[key]; if(!neu) return false;
+  s.senseR=(s.senseR||CFG.SENSE_R)-(old.bonus||0)+(neu.bonus||0); s.radarType=key; return true; }
+
+const REPAIR_DROIDS={
+  none:{n:'No Repair Droid', cost:0,   bonus:0,   desc:'no automatic hull regen'},
+  mk1: {n:'Repair Droid Mk1',cost:170, bonus:2.5, desc:'+2.5 hull/s regen in flight and combat'},
+  mk2: {n:'Repair Droid Mk2',cost:360, bonus:5,   desc:'+5 hull/s regen'},
+  mk3: {n:'Repair Droid Mk3',cost:640, bonus:8.5, desc:'+8.5 hull/s regen - sustains real combat without docking'} };
+const REPAIR_DROID_KEYS=Object.keys(REPAIR_DROIDS);
+function fitDroid(s,key){ const old=REPAIR_DROIDS[s.droidType||'none'], neu=REPAIR_DROIDS[key]; if(!neu) return false;
+  s.regenBonus=(s.regenBonus||0)-(old.bonus||0)+(neu.bonus||0); s.droidType=key; return true; }
+
+// SCANNER (user: "scan other ships' cargo holds and equipment... only works if your scanner power exceeds their
+// shield's blocking percentage") - see the `probe` command and scanBlockPct() below for the actual check.
+const SCANNERS={
+  none:      {n:'No Scanner',      cost:0,   power:0,  desc:'no cargo/equipment inspection capability'},
+  basic:     {n:'Basic Scanner',   cost:200, power:30, desc:'inspects weaker-shielded ships - try: probe <name>'},
+  advanced:  {n:'Advanced Scanner',cost:480, power:55, desc:'punches through most shield screens'},
+  penetrator:{n:'Penetrator Array',cost:900, power:85, desc:'reads almost anything short of a capital-grade screen'} };
+const SCANNER_KEYS=Object.keys(SCANNERS);
+function scannerOf(s){ return SCANNERS[s.scannerType||'none']||SCANNERS.none; }
+function scanBlockPct(o){ return clamp(Math.round((shieldMaxFor(o)/CFG.SHIELD_BASE)*CFG.SCAN_BLOCK_PER_SHIELD),0,CFG.SCAN_BLOCK_MAX); }
+
+// SHIELD GENERATOR: a flat %-damage-reduction layer, distinct from (and stacking AFTER) the fore/aft capacitor
+// shield pools above - "shields absorb first, then a hull damage-reduction layer" (see the bullet-hit pipeline).
+const SHIELD_GENS={
+  none:      {n:'No Shield Generator',   cost:0,   pct:0,    desc:'no flat damage-reduction layer'},
+  basic:     {n:'Basic Shield Generator',cost:340, pct:0.08, desc:'-8% on any damage that gets past your capacitor shields'},
+  reinforced:{n:'Reinforced Generator',  cost:650, pct:0.15, desc:'-15% on any damage that gets past your capacitor shields'},
+  aegis:     {n:'Aegis Generator',       cost:1100,pct:0.24, desc:'-24% on any damage that gets past your capacitor shields'} };
+const SHIELD_GEN_KEYS=Object.keys(SHIELD_GENS);
+function shieldGenOf(s){ return SHIELD_GENS[s.shieldGenType||'none']||SHIELD_GENS.none; }
+function hullResFor(s,dmgType){ const base=(HULLS[s.hullClass]&&HULLS[s.hullClass].res&&HULLS[s.hullClass].res[dmgType])||1;
+  const tech=Math.max(CFG.TECH_RES_FLOOR, 1-CFG.TECH_RES_PER_LVL*(((s.lvl&&s.lvl.hull)||1)-1));   // TECH LEVEL: your existing hull-upgrade level, live multiplier - Lv1 is a no-op (×1.00)
+  return base*((manuOf(s).res&&manuOf(s).res[dmgType])||1)*tech; }   // STANDARD GEAR SLOTS + MANUFACTURER + TECH LEVEL: compose hull-class, manufacturer, and tech-level susceptibility
+function shieldGenPctFor(s){ return Math.min(0.9,(shieldGenOf(s).pct||0)*seriesOf(s).shieldGenMult); }   // HULL SERIES: Ironclad boosts the Shield Generator's effect
+
+// CARGO HOOK (user: "tractors in loot, minerals, and salvage - better hooks have longer ranges and can pull
+// heavier items without dropping them") - extends the existing gem/pod magnet+pick radii (see pickRFor/magnetFor),
+// and maxMass gates the new micro-module pods specifically (see MICROMODULES below) - a deliberate NEW content
+// gate, not a retroactive restriction on artifacts/credits/cargo, which stay grabbable with no hook at all.
+const CARGO_HOOKS={
+  none: {n:'No Cargo Hook',    cost:0,   range:0,  pull:0,  maxMass:1, desc:'no tractor beam - fly directly over loot to grab it'},
+  short:{n:'Short-Range Hook', cost:150, range:6,  pull:8,  maxMass:2, desc:'a modest tractor beam for nearby salvage'},
+  long: {n:'Long-Range Hook',  cost:380, range:14, pull:16, maxMass:3, desc:'reaches further, pulls loot in faster'},
+  heavy:{n:'Heavy Gripper',    cost:700, range:14, pull:22, maxMass:5, desc:'the strongest pull - won\'t drop even the heaviest salvage'} };
+const CARGO_HOOK_KEYS=Object.keys(CARGO_HOOKS);
+function hookOf(s){ return CARGO_HOOKS[s.cargoHookType||'none']||CARGO_HOOKS.none; }
+function pickRFor(s){ return CFG.GEM_PICK_R+hookOf(s).range; }
+function magnetFor(s){ return CFG.GEM_MAGNET+hookOf(s).pull; }
+
+// MICRO-MODULES (user: "Optimator reduce the size of a component by 25%... Integrator boost weapon damage across
+// the board... dropped by destroyed Dominators or earned via missions") - mechanically identical to ARTIFACTS
+// above (permanent stacking effect, recovered from a wreck pod, `apply()` runs once on pickup): Optimator frees
+// hold capacity (the "free cargo space" from shrinking a component), Integrator stacks +8%/copy weapon damage.
+const MICROMODULES={
+  optimator: {n:'Optimator',  desc:'miniaturized housings free up +15 hold capacity',        apply:s=>s.holdCap+=15},
+  integrator:{n:'Integrator', desc:'+8% weapon damage, stacks with itself',                  apply:s=>s.dmgMult=(s.dmgMult||0)+0.08} };
+const MICROMOD_KEYS=Object.keys(MICROMODULES);
+
+// =================================================================================================
+// WEAPON HARDPOINTS (user 2026-07-08, SR slot-topology notes: "up to 5 weapon slots... Fighter hulls maximize
+// weapon slots, Merchant hulls sacrifice them"). PLAYER-ONLY, deliberately: the shared AI fire/decision tick
+// below runs for every squad/pirate ship every frame, and giving every simulated ship independent multi-weapon
+// fire loops would multiply bullet counts and AI complexity across dozens of ships for no real benefit - AI
+// keeps its existing single-weaponType behavior completely unchanged (same convention already set for
+// player-only missile ammo). The existing WEAPONS/weaponType/`weapon` command stay exactly as-is (slot 1,
+// "primary") - HARDPOINTS is purely the EXTRA slots 2..N, mounted/unmounted/sold exactly like GIZMOS (real
+// slot cap, not a swap-one-for-another fit), because unlike engines/hull you plausibly want several DIFFERENT
+// weapon types (or two of the same) firing independently, not one replaceable "type".
+// =================================================================================================
+const HARDPOINT_SELL_FRAC=0.5;
+function weaponSlotsFor(s){ const role=(HULLS[s.hullClass]&&HULLS[s.hullClass].role)||'mercenary';
+  return Math.max(1, (GIZMO_SLOTS_BY_ROLE[role]||CFG.GIZMO_SLOTS) + seriesOf(s).hardpointDelta); }   // same role->count baseline as the electronics bay (SR: "Fighter hulls maximize weapon AND shield slots"), own HULL_SERIES delta (Fast/Repair trade a hardpoint)
+function hardpointCountFor(s){ return Math.max(0, weaponSlotsFor(s)-1); }   // total slots minus the always-present primary
+function hasHardpoint(s,key){ return !!(s.weaponSlots&&s.weaponSlots.includes(key)); }
+function mountHardpoint(s,key){ if(!WEAPONS[key]||key==='flame') return {ok:false,why:'no such weapon'};   // flame is Hegemon-only, never player-purchasable, same gate as the `weapon` command
+  if(!s.weaponSlots) s.weaponSlots=new Array(hardpointCountFor(s)).fill(null);
+  const free=s.weaponSlots.indexOf(null); if(free<0) return {ok:false,why:'no free hardpoint - unmount one first'};
+  s.weaponSlots[free]=key; return {ok:true,slot:free}; }
+function unmountHardpoint(s,idx){ if(!s.weaponSlots||idx<0||idx>=s.weaponSlots.length||!s.weaponSlots[idx]) return {ok:false,why:'that hardpoint is empty'};
+  const key=s.weaponSlots[idx]; s.weaponSlots[idx]=null; return {ok:true,key}; }
+function resizeWeaponBay(s){ const want=hardpointCountFor(s);
+  if(!s.weaponSlots) s.weaponSlots=new Array(want).fill(null);
+  while(s.weaponSlots.length<want) s.weaponSlots.push(null);
+  while(s.weaponSlots.length>want){ const k=s.weaponSlots.pop(); if(k){ s.credits=(s.credits||0)+Math.round(WEAPONS[k].cost*HARDPOINT_SELL_FRAC); if(s.role==='player') notify(`${HULLS[s.hullClass]?HULLS[s.hullClass].n:'New hull'}'s weapon bay is smaller - unmounted ${WEAPONS[k].n} (+${Math.round(WEAPONS[k].cost*HARDPOINT_SELL_FRAC)}c).`,'log'); } } }
+
+// HULL SERIES (user: SR "Acrynic" specialization mutations - "Fast: sacrifices weapon/artifact slots for speed;
+// Dandy: better radar and jump distance, weaker combat; Repair: boosts droid effectiveness; Ironclad: weapon
+// damage and shielding at a cost to speed; Pygamore: missile-heavy, weaker shields/sensors"). A single-slot fit
+// exactly like ENGINES - every effect below is a LIVE multiplier read at its consumption site (flight speed,
+// weapon damage, shield capacity, hardpoint/gizmo count, regen, jump fuel), never baked into a stored/mutated
+// field, so swapping series can never desync from what's actually mounted.
+const HULL_SERIES={
+  standard:{n:'Standard Series',cost:0,   desc:'no specialization - baseline hull',
+    speedMult:1.00, gizmoDelta:0,  hardpointDelta:0,  senseMult:1.00, shieldMult:1.00, droidMult:1.00, dmgMult:1.00, missileDmgMult:1.00, fuelMult:1.00, shieldGenMult:1.00},
+  fast:    {n:'Fast Series',    cost:600, desc:'+25% speed - sacrifices one weapon hardpoint and one gizmo slot',
+    speedMult:1.25, gizmoDelta:-1, hardpointDelta:-1, senseMult:1.00, shieldMult:1.00, droidMult:1.00, dmgMult:1.00, missileDmgMult:1.00, fuelMult:1.00, shieldGenMult:1.00},
+  dandy:   {n:'Dandy Series',   cost:650, desc:'+50% sensor range, -30% hyperjump fuel cost - weaker shields',
+    speedMult:1.00, gizmoDelta:0,  hardpointDelta:0,  senseMult:1.50, shieldMult:0.75, droidMult:1.00, dmgMult:1.00, missileDmgMult:1.00, fuelMult:0.70, shieldGenMult:1.00},
+  repair:  {n:'Repair Series',  cost:600, desc:'+75% repair droid effectiveness - one fewer weapon hardpoint',
+    speedMult:1.00, gizmoDelta:0,  hardpointDelta:-1, senseMult:1.00, shieldMult:1.00, droidMult:1.75, dmgMult:1.00, missileDmgMult:1.00, fuelMult:1.00, shieldGenMult:1.00},
+  ironclad:{n:'Ironclad Series',cost:900, desc:'+20% weapon damage, +30% shield generator effect - 20% slower',
+    speedMult:0.80, gizmoDelta:0,  hardpointDelta:0,  senseMult:1.00, shieldMult:1.00, droidMult:1.00, dmgMult:1.20, missileDmgMult:1.00, fuelMult:1.00, shieldGenMult:1.30},
+  pygamore:{n:'Pygamore Series',cost:850, desc:'+40% missile damage - weaker shields and sensors',
+    speedMult:1.00, gizmoDelta:0,  hardpointDelta:0,  senseMult:0.80, shieldMult:0.70, droidMult:1.00, dmgMult:1.00, missileDmgMult:1.40, fuelMult:1.00, shieldGenMult:1.00} };
+const HULL_SERIES_KEYS=Object.keys(HULL_SERIES);
+function seriesOf(s){ return HULL_SERIES[s.hullSeries||'standard']||HULL_SERIES.standard; }
+
+// MANUFACTURERS (user: SR design-language notes - "Human: balanced; Peleng: utility/adaptable; Maloq: heavy
+// armored brute-force; Faeyan: elegant lightweight efficient; Gaalian: high-tech advanced". Keller/Terron/Blazer
+// are explicitly DOMINATOR/Hegemon manufacturers in that lore - this game's Hegemon/HEG_TIERS already has its
+// own distinct stats, so those three are flavor-only, not built as a third player-purchasable set). Tied to the
+// physical hull the same way SR ties it - chosen at HULL PURCHASE time (`hull <class> <manufacturer>`), reset on
+// a hull swap like the hull class itself, not a separate swappable module. Every effect is a live multiplier at
+// its consumption site, same convention as HULL_SERIES above.
+const MANUFACTURERS={
+  human:  {n:'Human',  desc:'balanced, general-purpose - no bias',                           costMult:1.00, res:{energy:1.00,frag:1.00,missile:1.00}, speedMult:1.00},
+  peleng: {n:'Peleng',  desc:'utility and adaptability - noticeably cheaper, no extremes',    costMult:0.82, res:{energy:1.00,frag:1.00,missile:1.00}, speedMult:1.00},
+  maloq:  {n:'Maloq',   desc:'heavy, armored, brute-force - tougher against every damage type, slower, pricier', costMult:1.35, res:{energy:0.88,frag:0.88,missile:0.88}, speedMult:0.90},
+  faeyan: {n:'Faeyan',  desc:'elegant, lightweight, efficient - faster, thinner-skinned against every damage type', costMult:1.10, res:{energy:1.12,frag:1.12,missile:1.05}, speedMult:1.15},
+  gaalian:{n:'Gaalian', desc:'high-tech advanced systems - best all-round susceptibility, most expensive',        costMult:1.55, res:{energy:0.95,frag:0.95,missile:0.95}, speedMult:1.00} };
+const MANUFACTURER_KEYS=Object.keys(MANUFACTURERS);
+function manuOf(s){ return MANUFACTURERS[s.manufacturer||'human']||MANUFACTURERS.human; }
+
 // M3: WEAPON TYPES - the arms race. energy=fast/cheap, ballistic=hard-hitting/long, missile=homing+splash.
 // dmg=base anti-ship damage · cd=fire cooldown · speed/life=projectile · range=×SENSE_R fire distance
 // twin=two muzzles · homing=seek turn-rate (0=dumb) · splash=AoE radius on hit (0=none) · cost=install price
+// dmgType: E/S/M susceptibility key (see HULLS.res) - energy=Pulse Laser/Incinerator, frag=Autocannon (SR
+// "Fragmentation Weapons"), missile=Seeker Missile (also gated by player-only ammo + hull point-defense, see CFG.MISSILE_AMMO_*/HULLS.pd).
 const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT vs cannon TRACER+sparks vs missile ORB+smoke trail
-  energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:true,  homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6},
-  ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', trail:0xffd27a, trailCd:0.045, flash:2.6},
-  missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2},
+  energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:true,  homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6, dmgType:'energy'},
+  ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', trail:0xffd27a, trailCd:0.045, flash:2.6, dmgType:'frag'},
+  missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2, dmgType:'missile'},
   // FLAMETHROWER (user 2026-07-07: "the enemies of starfighter originally had flame thrower, can you copy that").
   // Honest note: the actual Unity project has no coded flamethrower weapon anywhere in its scripts (checked every
   // .cs file) - only a generic third-party "Cartoon FX" fire VFX pack used for explosions. There is nothing to
@@ -1834,7 +2091,7 @@ const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT
   // 46*0.42 = 19.3 units, a fraction of every other weapon's reach (energy 130, ballistic 203, missile 184) - pirates
   // had to be nearly touching you before it could connect at all. speed/life now give ~64 units reach (still the
   // shortest of the four, keeping it a close/mid-range weapon, just no longer point-blank-only) and dmg is up ~70%.
-  flame:    {n:'Incinerator',    dmg:12, cd:0.09, speed:75,  life:0.85, range:0.48, col:0xff7a2a, r:3.8, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.9} };
+  flame:    {n:'Incinerator',    dmg:12, cd:0.09, speed:75,  life:0.85, range:0.48, col:0xff7a2a, r:3.8, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.9, dmgType:'energy'} };
 const WEAPON_ORDER=['energy','ballistic','missile'];   // player-purchasable, in `weapon` shop order - flame is Hegemon-only, see addPirate()
 // M6: ARTIFACTS - rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
@@ -1845,20 +2102,40 @@ const ARTIFACTS={
   matrix: {n:'Regen Matrix',  desc:'+3 hull/s regen', apply:s=>s.regenBonus=(s.regenBonus||0)+3} };
 const ARTIFACT_KEYS=Object.keys(ARTIFACTS);
 // M9: SHIP HULL CLASSES - swap chassis at the Ranger Base, trading hull ↔ cargo ↔ speed.
+// HULL ROLE + E/S/M SUSCEPTIBILITY (user 2026-07-08, SR hull-role/Acrynic design notes): distilled down to what a
+// 7-hull game actually needs - `role` biases gizmo-slot COUNT (see GIZMO_SLOTS_BY_ROLE/gizmoSlotsFor below, "Fighter
+// hulls maximize weapon/shield slots, Merchant hulls sacrifice them for cargo"); `res` is a per-damage-type
+// (energy/frag/missile) multiplier on incoming damage, applied in the bullet-hit pipeline BEFORE shield absorption
+// (see the `res[b.dmgType]` lookup where dmg is read off the bullet); `pd` is a flat per-hit chance to shoot down an
+// incoming missile before it connects at all (bigger hulls carry real point-defense, small ones don't). Deliberately
+// NOT building the full Manufacturer x Tech-Level x Series procedural matrix the user also described - that's a
+// different scale of project than 7 hand-authored classes; this is the load-bearing subset of it.
 const HULLS={   // balance law: hull space is EXPENSIVE (big hold = thin armor + higher price) and BIGGER = SLOWER
   // 2026-07-07: rounded out to all 6 classes hullmodels.js already sculpts (was missing interceptor/dreadnought) - the Space-Rangers-style loadout screen needs a real progression, not just 4 stops.
-  scout:      {n:'Scout',       hp:70,  hold:12, speed:1.35, cost:0,    desc:'fast · fragile · tiny hold'},
-  fighter:    {n:'Fighter',     hp:100, hold:40, speed:1.0,  cost:0,    desc:'balanced all-rounder (default)'},
-  interceptor:{n:'Interceptor', hp:130, hold:28, speed:1.12, cost:520,  desc:'strike cruiser · more bite than a Fighter, still nimble'},
-  freighter:  {n:'Freighter',   hp:85,  hold:95, speed:0.55, cost:640,  desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)'},
-  cruiser:    {n:'Cruiser',     hp:210, hold:18, speed:0.62, cost:820,  desc:'heavy armor · slowest hull · cramped hold'},
-  dreadnought:{n:'Dreadnought', hp:340, hold:30, speed:0.42, cost:1450, desc:'flagship-grade armor · glacial · the strongest hull in the fleet'},
+  scout:      {n:'Scout',       hp:70,  hold:12, speed:1.35, cost:0,    desc:'fast · fragile · tiny hold',
+    role:'corsair',  res:{energy:1.15,frag:1.30,missile:0.90}, pd:0},
+  fighter:    {n:'Fighter',     hp:100, hold:40, speed:1.0,  cost:0,    desc:'balanced all-rounder (default)',
+    role:'mercenary',res:{energy:1.00,frag:1.00,missile:1.00}, pd:0},
+  interceptor:{n:'Interceptor', hp:130, hold:28, speed:1.12, cost:520,  desc:'strike cruiser · more bite than a Fighter, still nimble',
+    role:'fighter',  res:{energy:0.90,frag:1.10,missile:0.95}, pd:0.08},
+  freighter:  {n:'Freighter',   hp:85,  hold:95, speed:0.55, cost:640,  desc:'huge hold · lumbering · thin-skinned (cargo space, not armor)',
+    role:'merchant', res:{energy:1.10,frag:1.15,missile:1.05}, pd:0},
+  cruiser:    {n:'Cruiser',     hp:210, hold:18, speed:0.62, cost:820,  desc:'heavy armor · slowest hull · cramped hold',
+    role:'fighter',  res:{energy:0.85,frag:0.90,missile:1.10}, pd:0.15},
+  dreadnought:{n:'Dreadnought', hp:340, hold:30, speed:0.42, cost:1450, desc:'flagship-grade armor · glacial · the strongest hull in the fleet',
+    role:'fighter',  res:{energy:0.75,frag:0.80,missile:1.00}, pd:0.22},
   // 2026-07-07 (user "capital ships can't move but have high defense and high attack"): a 7th, end-of-progression class.
   // ~2.7x dreadnought hp, low-moderate hold (combat platform not a hauler), near-zero speed (0.06, never exactly 0 to
   // avoid any divide-by-zero on code elsewhere that assumes a nonzero speed multiplier), most expensive hull by a wide margin.
   // No separate hull-damage-bonus field: this game's damage comes from weapon fitting (WEAPONS/s.lvl.weapon), not the hull.
-  capital:    {n:'Capital Ship',hp:920, hold:22, speed:0.06, cost:3200, desc:'planetary-defense platform · nearly immobile · the toughest hull in the fleet'} };
+  capital:    {n:'Capital Ship',hp:920, hold:22, speed:0.06, cost:3200, desc:'planetary-defense platform · nearly immobile · the toughest hull in the fleet',
+    role:'fighter',  res:{energy:0.70,frag:0.75,missile:0.90}, pd:0.30} };
 const HULL_ORDER=['scout','fighter','interceptor','freighter','cruiser','dreadnought','capital'];
+// GIZMO_SLOTS_BY_ROLE: "Fighter hulls maximize weapon and shield slots, Merchant hulls sacrifice them for cargo" -
+// distilled to gizmo-slot count (real weapon hardpoint MULTIPLICITY per hull is out of scope, see HULLS comment above).
+const GIZMO_SLOTS_BY_ROLE={ fighter:3, mercenary:2, corsair:2, merchant:1 };
+function gizmoSlotsFor(s){ const role=(HULLS[s.hullClass]&&HULLS[s.hullClass].role)||'mercenary';
+  return Math.max(0, (GIZMO_SLOTS_BY_ROLE[role]||CFG.GIZMO_SLOTS) + seriesOf(s).gizmoDelta); }   // HULL SERIES: Fast trades a gizmo slot for speed
 const RAIDER_HULL_VARIETY=['scout','fighter','interceptor','cruiser'];   // default spawn variety for coalition raiders - dreadnought/capital stay upgrade-earned (tryHullClassUpgrade), not handed out for free
 // M10: CONTRABAND - illegal goods; buy cheap at the base black market, sell dear at HOSTILE worlds; scan risk at coalition docks.
 const CONTRABAND={ relics:{n:'Alien Relics',base:120}, narcotics:{n:'Spice',base:90}, arms:{n:'Black-market Arms',base:150} };
@@ -2505,8 +2782,16 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     P.credits-=cost; P.hp=P.maxHp; term(`Repair bots seal the hull - full (-${cost}c).`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
   if(c==='signals'||c==='encounters'){ if(!encounters.length){ term('No active signals - derelicts/caches/distress calls appear over time. Fly to them to claim.','sys'); return; } term('ACTIVE SIGNALS (fly to them):','sys'); encounters.forEach(e=>term(`  ✦ ${e.kind} · ${Math.round(P.pos.distanceTo(e.pos))}u`,'sys')); return; }
   if(c==='hull'){ if(!need(atBase(P),'hull swaps are at Ranger Command (go base)')) return; const k=HULL_ORDER.find(x=>x.startsWith((a[1]||'').toLowerCase()));
-    if(!k){ term('HULL CLASSES (hull &lt;class&gt; at base):','sys'); HULL_ORDER.forEach(x=>{ const H=HULLS[x]; term(`  ${x} - <b>${H.n}</b> · hull ${H.hp} · hold ${H.hold} · speed ×${H.speed} · ${H.desc} · ${H.cost?H.cost+'c':'free'}${P.hullClass===x?' [current]':''}`,'sys'); }); return; }
-    if(P.hullClass===k){ term(`Already flying a ${HULLS[k].n}.`,'sys'); return; } if(!need(P.credits>=HULLS[k].cost,`need ${HULLS[k].cost}c`)) return; P.credits-=HULLS[k].cost; applyHull(P,k); term(`Refitted into a <b>${HULLS[k].n}</b> - hull ${Math.round(P.maxHp)} · hold ${P.holdCap} · speed ×${HULLS[k].speed}.`,'sys'); return; }
+    if(!k){ term('HULL CLASSES (hull &lt;class&gt; [manufacturer] at base):','sys'); HULL_ORDER.forEach(x=>{ const H=HULLS[x]; term(`  ${x} - <b>${H.n}</b> · hull ${H.hp} · hold ${H.hold} · speed ×${H.speed} · role ${H.role} · gizmo slots ${GIZMO_SLOTS_BY_ROLE[H.role]||CFG.GIZMO_SLOTS} · E${H.res.energy} S${H.res.frag} M${H.res.missile}${H.pd?' · PD '+Math.round(H.pd*100)+'%':''} · ${H.desc} · ${H.cost?H.cost+'c':'free'}${P.hullClass===x?' [current]':''}`,'sys'); });
+      term('MANUFACTURERS (bias applied at purchase - hull &lt;class&gt; &lt;manufacturer&gt;):','sys'); MANUFACTURER_KEYS.forEach(mk=>{ const M=MANUFACTURERS[mk]; term(`  ${mk} - ${M.n} · ${M.desc} · cost ×${M.costMult}${P.manufacturer===mk?'  [current]':''}`,'sys'); });
+      return; }
+    const mk = a[2] ? MANUFACTURER_KEYS.find(x=>x.startsWith(a[2].toLowerCase())) : (P.manufacturer||'human');
+    if(!need(mk,'unknown manufacturer - options: '+MANUFACTURER_KEYS.join(', '))) return;
+    const M=MANUFACTURERS[mk], cost=Math.round(HULLS[k].cost*M.costMult);
+    if(P.hullClass===k && (P.manufacturer||'human')===mk){ term(`Already flying a ${M.n} ${HULLS[k].n}.`,'sys'); return; }
+    if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; applyHull(P,k); P.manufacturer=mk; P.hullSeries='standard';   // MANUFACTURER/HULL SERIES: a new hull unit resets series to baseline, same real-stakes convention as the rest of the loadout
+    const eff=(k2)=>((HULLS[k].res[k2]||1)*(M.res[k2]||1)).toFixed(2);
+    term(`Refitted into a <b>${M.n} ${HULLS[k].n}</b> (-${cost}c) - hull ${Math.round(P.maxHp)} · hold ${P.holdCap} · speed ×${(HULLS[k].speed*M.speedMult).toFixed(2)} · E${eff('energy')} S${eff('frag')} M${eff('missile')}.`,'sys'); return; }
   if(c==='blackmarket'||c==='bm'){ if(!need(atBase(P)||(P.docked&&P.docked.isPirateStation),'the black market is at Ranger Command or a pirate station (go base)')) return;   // user 2026-07-08 "add pirate space stations" - buying contraband at your OWN faction HQ never made much narrative sense; a pirate station is the natural home for it too
     if(a[1]&&a[2]){ const k=CONTRA_KEYS.find(x=>x.startsWith(a[1].toLowerCase())||CONTRABAND[x].n.toLowerCase().indexOf(a[1].toLowerCase())>=0); if(!need(k,'unknown contraband')) return; const qty=parseInt(a[2])||1, price=CONTRABAND[k].base, cost=price*qty;
       if((a[0]||'')&&cargoTotal(P)+qty>P.holdCap){ term('not enough hold.','err'); return; } if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.contraband[k]=(P.contraband[k]||0)+qty; term(`Bought ${qty} ${CONTRABAND[k].n} (-${cost}c). Sell at HOSTILE worlds - but coalition docks may SCAN you.`,'sys'); return; }
@@ -2519,7 +2804,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const sy=systems.find(x=>x.name.toLowerCase()===(a[1]||'').toLowerCase()); if(!need(sy,'unknown system - try: starmap (or press G) to see them')) return;
     const d=P.pos.distanceTo(sy.center);
     if(d<CFG.SYSTEM_R*CFG.JUMP_SAME_SYS_R_MULT){ term(`Already in ${sy.name} system - fly there directly (<b>go &lt;planet&gt;</b>), no jump needed.`,'sys'); return; }
-    const cost=Math.ceil(CFG.JUMP_FUEL_BASE+d/CFG.JUMP_DIST_PER_FUEL);
+    const cost=Math.ceil((CFG.JUMP_FUEL_BASE+d/CFG.JUMP_DIST_PER_FUEL)*engineOf(P).fuelMult*seriesOf(P).fuelMult);   // ENGINEERING BAY: Ion Drive sips hyperjump fuel, Afterburner drinks it; HULL SERIES: Dandy sips it further
     if(!need(P.fuel>=cost,`hyperjump to ${sy.name} needs ${cost} fuel (have ${Math.round(P.fuel)}/${P.fuelCap}) - refuel first`)) return;
     P.fuel-=cost; P.obj=null; P.docked=null;
     P.pos.copy(sy.center).add(new T.Vector3(rand(-1,1),rand(-0.2,0.2),rand(-1,1)).setLength(rand(40,CFG.SYSTEM_R*0.4))); P.vel.set(0,0,0);
@@ -2541,8 +2826,102 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
     if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
     term(`Fitted ${W.n} (-${W.cost}c) - dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
-  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} - ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys')); term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys'); return; }
-  if(c==='install'||c==='fit'){ if(!need(dockedP,'must be docked')) return; const k=Object.keys(EQUIP).find(x=>x.startsWith(a[1]||'~')); if(!need(k,'install cargo|fuel|scanner|hyperdrive')) return; const cost=equipCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.equip[k]=(P.equip[k]||0)+1; EQUIP[k].apply(P); term(`Installed ${EQUIP[k].n} (-${cost}c) · ${EQUIP[k].desc}.`,'sys'); return; }
+  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} - ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys'));
+    term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · engine ${ENGINES[P.engineType||'standard'].n} · gizmos ${(P.gizmoSlots||[]).filter(Boolean).length}/${gizmoSlotsFor(P)} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys');
+    term(`  gear: tank ${FUEL_TANKS[P.fuelTankType||'standard'].n} · radar ${RADARS[P.radarType||'basic'].n} · scanner ${scannerOf(P).n} · shieldgen ${shieldGenOf(P).n} · droid ${REPAIR_DROIDS[P.droidType||'none'].n} · hook ${hookOf(P).n} · missiles ${P.missileAmmo||0}/${CFG.MISSILE_AMMO_MAX}`,'sys');   // STANDARD GEAR SLOTS
+    term(`  hull: ${manuOf(P).n} ${HULLS[P.hullClass].n} · series ${seriesOf(P).n} · hardpoints ${(P.weaponSlots||[]).filter(Boolean).length}/${hardpointCountFor(P)}${(P.micromodules||[]).length?' · micro-modules '+P.micromodules.map(k=>MICROMODULES[k].n).join(', '):''}`,'sys');   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+    term('&nbsp;&nbsp;<span style="opacity:.6">also see: engine · gizmo · weapon · hull · tank · radar · scanner · shieldgen · droid · hook · ammo · probe · series · hardpoint - the ENGINEERING BAY</span>','sys'); return; }
+  if(c==='install'||c==='fit'){ if(!need(dockedP,'must be docked')) return; const k=Object.keys(EQUIP).find(x=>x.startsWith(a[1]||'~')); if(!need(k,'install cargo|plating')) return; const cost=equipCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.equip[k]=(P.equip[k]||0)+1; EQUIP[k].apply(P); term(`Installed ${EQUIP[k].n} (-${cost}c) · ${EQUIP[k].desc}.`,'sys'); return; }
+  // ENGINEERING BAY (user 2026-07-08: "the item shop and build the list of ship components into the engineering
+  // bay that lets you layout your ship... buy different types of engines weapons electronic gizmos") - the engine
+  // TYPE is a single-slot fit exactly like `weapon` above; gizmos are a real n-slot bay (CFG.GIZMO_SLOTS), mount/
+  // unmount/sell instead of an uncapped stacking buy, which is what makes it an actual LAYOUT decision.
+  if(c==='engine'){ if(!need(dockedP,'must be docked')) return; const et=(a[1]||'').toLowerCase();
+    if(!et){ term('ENGINES (fit at dock):','sys'); ENGINE_KEYS.forEach(kk=>{ const E=ENGINES[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.engineType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    const key=ENGINE_KEYS.find(kk=>kk.startsWith(et)); if(!need(key,'engine standard|after|ion')) return; const E=ENGINES[key];
+    if((P.engineType||'standard')===key){ term(`Already fitted: ${E.n}.`,'sys'); return; }
+    if(!need(P.credits>=E.cost,`need ${E.cost}c`)) return; P.credits-=E.cost; P.engineType=key;
+    term(`Fitted ${E.n} (-${E.cost}c) - ${E.desc}.`,'sys'); return; }
+  if(c==='gizmo'||c==='gizmos'){ if(!need(dockedP,'must be docked')) return; const sub=(a[1]||'').toLowerCase();
+    if(!sub||sub==='list'){ term(`GIZMO BAY (${(P.gizmoSlots||[]).filter(Boolean).length}/${gizmoSlotsFor(P)} slots used):`,'sys');
+      (P.gizmoSlots||[]).forEach((k,i)=>term(`&nbsp;&nbsp;slot ${i+1}: ${k?GIZMOS[k].n:'<span style="opacity:.5">-empty-</span>'}`,'sys'));
+      term('SHOP:','sys'); GIZMO_KEYS.forEach(k=>term(`&nbsp;&nbsp;${k} - ${GIZMOS[k].n} · ${GIZMOS[k].desc} · ${GIZMOS[k].cost}c${hasGizmo(P,k)?'  [mounted]':''}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">try: gizmo mount targeting · gizmo unmount 1</span>','sys'); return; }
+    if(sub==='mount'){ const k=GIZMO_KEYS.find(kk=>kk.startsWith((a[2]||'').toLowerCase())); if(!need(k,'gizmo mount targeting|ecm|shieldboost')) return;
+      if(!need(P.credits>=GIZMOS[k].cost,`need ${GIZMOS[k].cost}c`)) return;
+      const r=mountGizmo(P,k); if(!need(r.ok,r.why)) return; P.credits-=GIZMOS[k].cost;
+      term(`Mounted ${GIZMOS[k].n} in slot ${r.slot+1} (-${GIZMOS[k].cost}c) · ${GIZMOS[k].desc}.`,'sys'); return; }
+    if(sub==='unmount'){ const idx=(parseInt(a[2])||0)-1; const r=unmountGizmo(P,idx); if(!need(r.ok,r.why||'gizmo unmount <slot 1-N>')) return;
+      const refund=Math.round(GIZMOS[r.key].cost*GIZMO_SELL_FRAC); P.credits+=refund;
+      term(`Unmounted ${GIZMOS[r.key].n} from slot ${idx+1} (+${refund}c).`,'sys'); return; }
+    term('usage: gizmo · gizmo mount &lt;key&gt; · gizmo unmount &lt;slot&gt;','err'); return; }
+  // STANDARD GEAR SLOTS (user 2026-07-08: "Engine/Fuel Tank/Radar/Scanner/Shield Generator/Repair Droid/Cargo
+  // Hook... buy different types... that help your ship with special things like a targeting computer") - six more
+  // single-slot fits, same pattern as `engine` above (list when bare, fit-by-prefix-match when given a key).
+  if(c==='tank'){ if(!need(dockedP,'must be docked')) return; const key=FUEL_TANK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('FUEL TANKS (fit at dock):','sys'); FUEL_TANK_KEYS.forEach(kk=>{ const E=FUEL_TANKS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.fuelTankType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.fuelTankType||'standard')===key){ term(`Already fitted: ${FUEL_TANKS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=FUEL_TANKS[key].cost,`need ${FUEL_TANKS[key].cost}c`)) return; P.credits-=FUEL_TANKS[key].cost; fitFuelTank(P,key);
+    term(`Fitted ${FUEL_TANKS[key].n} (-${FUEL_TANKS[key].cost}c) - fuel cap now ${P.fuelCap}.`,'sys'); return; }
+  if(c==='radar'){ if(!need(dockedP,'must be docked')) return; const key=RADAR_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('RADARS (fit at dock):','sys'); RADAR_KEYS.forEach(kk=>{ const E=RADARS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.radarType||'basic')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.radarType||'basic')===key){ term(`Already fitted: ${RADARS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=RADARS[key].cost,`need ${RADARS[key].cost}c`)) return; P.credits-=RADARS[key].cost; fitRadar(P,key);
+    term(`Fitted ${RADARS[key].n} (-${RADARS[key].cost}c) - sensor range now ${Math.round(P.senseR)}.`,'sys'); return; }
+  if(c==='droid'){ if(!need(dockedP,'must be docked')) return; const key=REPAIR_DROID_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('REPAIR DROIDS (fit at dock):','sys'); REPAIR_DROID_KEYS.forEach(kk=>{ const E=REPAIR_DROIDS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.droidType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.droidType||'none')===key){ term(`Already fitted: ${REPAIR_DROIDS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=REPAIR_DROIDS[key].cost,`need ${REPAIR_DROIDS[key].cost}c`)) return; P.credits-=REPAIR_DROIDS[key].cost; fitDroid(P,key);
+    term(`Fitted ${REPAIR_DROIDS[key].n} (-${REPAIR_DROIDS[key].cost}c) - regen now +${(P.regenBonus||0).toFixed(1)}/s.`,'sys'); return; }
+  if(c==='scanner'){ if(!need(dockedP,'must be docked')) return; const key=SCANNER_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('SCANNERS (fit at dock):','sys'); SCANNER_KEYS.forEach(kk=>{ const E=SCANNERS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.scannerType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.scannerType||'none')===key){ term(`Already fitted: ${SCANNERS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=SCANNERS[key].cost,`need ${SCANNERS[key].cost}c`)) return; P.credits-=SCANNERS[key].cost; P.scannerType=key;
+    term(`Fitted ${SCANNERS[key].n} (-${SCANNERS[key].cost}c) - ${SCANNERS[key].desc}.`,'sys'); return; }
+  if(c==='shieldgen'){ if(!need(dockedP,'must be docked')) return; const key=SHIELD_GEN_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('SHIELD GENERATORS (fit at dock):','sys'); SHIELD_GEN_KEYS.forEach(kk=>{ const E=SHIELD_GENS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.shieldGenType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.shieldGenType||'none')===key){ term(`Already fitted: ${SHIELD_GENS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=SHIELD_GENS[key].cost,`need ${SHIELD_GENS[key].cost}c`)) return; P.credits-=SHIELD_GENS[key].cost; P.shieldGenType=key;
+    term(`Fitted ${SHIELD_GENS[key].n} (-${SHIELD_GENS[key].cost}c) - ${SHIELD_GENS[key].desc}.`,'sys'); return; }
+  if(c==='hook'){ if(!need(dockedP,'must be docked')) return; const key=CARGO_HOOK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('CARGO HOOKS (fit at dock):','sys'); CARGO_HOOK_KEYS.forEach(kk=>{ const E=CARGO_HOOKS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.cargoHookType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.cargoHookType||'none')===key){ term(`Already fitted: ${CARGO_HOOKS[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=CARGO_HOOKS[key].cost,`need ${CARGO_HOOKS[key].cost}c`)) return; P.credits-=CARGO_HOOKS[key].cost; P.cargoHookType=key;
+    term(`Fitted ${CARGO_HOOKS[key].n} (-${CARGO_HOOKS[key].cost}c) - ${CARGO_HOOKS[key].desc}.`,'sys'); return; }
+  if(c==='ammo'){ const cost=CFG.MISSILE_AMMO_COST; if(!a[1]||a[1]==='buy'){
+      if(!need(dockedP,'must be docked to restock - ammo buy <n>')) return;
+      const qty=Math.min(CFG.MISSILE_AMMO_MAX-(P.missileAmmo||0), parseInt(a[2])||5); if(!need(qty>0,'magazine already full')) return;
+      const total=qty*cost; if(!need(P.credits>=total,`need ${total}c`)) return; P.credits-=total; P.missileAmmo=(P.missileAmmo||0)+qty;
+      term(`Restocked ${qty} missiles (-${total}c) - ${P.missileAmmo}/${CFG.MISSILE_AMMO_MAX}.`,'sys'); return; }
+    term(`Missile ammo: ${P.missileAmmo||0}/${CFG.MISSILE_AMMO_MAX} · ${cost}c/unit · try: ammo buy &lt;n&gt;`,'sys'); return; }
+  if(c==='probe'){ const o=ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith((a[1]||'').toLowerCase())); if(!need(o,'no such ship - try: scan')) return;
+    if(!need(P.pos.distanceTo(o.pos)<=P.senseR*1.6,`${o.name} is out of scanner range`)) return;
+    const needPct=scanBlockPct(o), have=scannerOf(P).power;
+    if(have<needPct){ term(`◈ PROBE ${o.name} - scan resisted, their shields block it (need ${needPct} scan power, you have ${have}) - try: scanner`,'err'); return; }
+    term(`◈ PROBE ${o.name} - hull ${Math.round((o.hp/o.maxHp)*100)}% · weapon ${WEAPONS[o.weaponType||'energy'].n} · hull class ${o.hullClass?HULLS[o.hullClass].n:'?'} · cargo ${cargoTotal(o)}/${o.holdCap||0}`,'sys'); return; }
+  if(c==='micromods'||c==='mm'){ const inv=P.micromodules||[]; if(!inv.length){ term('No micro-modules recovered. Destroy Warlord-tier Hegemon ships (or the Stronghold) with a Cargo Hook fitted to recover them.','sys'); return; }
+    term('MICRO-MODULES (permanently applied on pickup):','sys'); inv.forEach(k=>term(`  ${MICROMODULES[k].n} - ${MICROMODULES[k].desc}`,'sys')); return; }
+  // HULL SERIES (user, SR "Acrynic" notes): single-slot fit, same pattern as `engine`/`tank` above.
+  if(c==='series'){ if(!need(dockedP,'must be docked')) return; const key=HULL_SERIES_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+    if(!key){ term('HULL SERIES (fit at dock):','sys'); HULL_SERIES_KEYS.forEach(kk=>{ const E=HULL_SERIES[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.hullSeries||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if((P.hullSeries||'standard')===key){ term(`Already fitted: ${HULL_SERIES[key].n}.`,'sys'); return; }
+    if(!need(P.credits>=HULL_SERIES[key].cost,`need ${HULL_SERIES[key].cost}c`)) return; P.credits-=HULL_SERIES[key].cost; P.hullSeries=key; resizeGizmoBay(P); resizeWeaponBay(P);
+    term(`Fitted ${HULL_SERIES[key].n} (-${HULL_SERIES[key].cost}c) - ${HULL_SERIES[key].desc}.`,'sys'); return; }
+  // WEAPON HARDPOINTS: n-slot bay (extra slots BEYOND the primary `weapon`-fitted one), mount/unmount/sell -
+  // same pattern as `gizmo` above, same WEAPONS table the primary weapon uses (flame excluded, Hegemon-only).
+  if(c==='hardpoint'||c==='hardpoints'){ if(!need(dockedP,'must be docked')) return; const sub=(a[1]||'').toLowerCase();
+    if(!sub||sub==='list'){ term(`WEAPON HARDPOINTS (${(P.weaponSlots||[]).filter(Boolean).length}/${hardpointCountFor(P)} slots used, plus your primary ${WEAPONS[P.weaponType||'energy'].n}):`,'sys');
+      (P.weaponSlots||[]).forEach((k,i)=>term(`&nbsp;&nbsp;slot ${i+1}: ${k?WEAPONS[k].n:'<span style="opacity:.5">-empty-</span>'}`,'sys'));
+      term('SHOP:','sys'); WEAPON_ORDER.forEach(k=>term(`&nbsp;&nbsp;${k} - ${WEAPONS[k].n} · ${WEAPONS[k].cost}c${hasHardpoint(P,k)?'  [mounted]':''}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">try: hardpoint mount missile · hardpoint unmount 1</span>','sys'); return; }
+    if(sub==='mount'){ const k=WEAPON_ORDER.find(kk=>kk.startsWith((a[2]||'').toLowerCase())); if(!need(k,'hardpoint mount energy|ballistic|missile')) return;
+      if(!need(P.credits>=WEAPONS[k].cost,`need ${WEAPONS[k].cost}c`)) return;
+      const r=mountHardpoint(P,k); if(!need(r.ok,r.why)) return; P.credits-=WEAPONS[k].cost;
+      term(`Mounted ${WEAPONS[k].n} in hardpoint ${r.slot+1} (-${WEAPONS[k].cost}c).`,'sys'); return; }
+    if(sub==='unmount'){ const idx=(parseInt(a[2])||0)-1; const r=unmountHardpoint(P,idx); if(!need(r.ok,r.why||'hardpoint unmount <slot 1-N>')) return;
+      const refund=Math.round(WEAPONS[r.key].cost*HARDPOINT_SELL_FRAC); P.credits+=refund;
+      term(`Unmounted ${WEAPONS[r.key].n} from hardpoint ${idx+1} (+${refund}c).`,'sys'); return; }
+    term('usage: hardpoint · hardpoint mount &lt;key&gt; · hardpoint unmount &lt;slot&gt;','err'); return; }
   if(c==='rep'||c==='reputation'||c==='standing'){ term('COALITION STANDING (by faction):','sys');
     systems.forEach(sy=>{ const ps=sy.planets.filter(p=>planets.indexOf(p)>=0); if(!ps.length) return; const avg=ps.reduce((a,p)=>a+(p.rep||0),0)/ps.length;
       term(`  <b>${sy.name}</b>: standing ${avg>0?'+':''}${avg.toFixed(1)}${avg<=CFG.REP_HOSTILE?' HOSTILE':avg>=CFG.REP_ALLIED?' ALLIED':''}${sy.contested?' ⚔ CONTESTED':''}`,avg<=CFG.REP_HOSTILE?'err':'sys'); });
@@ -3362,8 +3741,12 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       lvl:{...P.lvl}, equip:{...(P.equip||{})}, artifacts:[...(P.artifacts||[])], contraband:{...(P.contraband||{})},
       fuel:P.fuel, fuelCap:P.fuelCap, holdCap:P.holdCap, senseR:P.senseR, cargo:{...(P.cargo||{})},
       shieldDivert:P.shieldDivert||null, shieldFwd:P.shieldFwd, shieldAft:P.shieldAft, capLaser:P.capLaser, capEngine:P.capEngine,
-      rankShown:P.rankShown, targetingComputer:!!P.targetingComputer,
-      skills:{...(P.skills||{})}, skillPts:P.skillPts||0 },
+      rankShown:P.rankShown, engineType:P.engineType||'standard', gizmoSlots:[...(P.gizmoSlots||[])],
+      skills:{...(P.skills||{})}, skillPts:P.skillPts||0,
+      fuelTankType:P.fuelTankType||'standard', radarType:P.radarType||'basic', scannerType:P.scannerType||'none',
+      shieldGenType:P.shieldGenType||'none', droidType:P.droidType||'none', cargoHookType:P.cargoHookType||'none',
+      missileAmmo:P.missileAmmo, dmgMult:P.dmgMult||0, micromodules:[...(P.micromodules||[])],   // STANDARD GEAR SLOTS
+      manufacturer:P.manufacturer||'human', hullSeries:P.hullSeries||'standard', weaponSlots:[...(P.weaponSlots||[])] },   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
     planets: planets.map(p=>({ name:p.name, rep:p.rep, wealth:p.wealth, dev:p.dev, hegemon:!!p.hegemon, terra:p.terra||0 })),
     systems: systems.map(sy=>({ name:sy.name, contested:!!sy.contested })),
     newsLog: (window.PLANETMENU&&PLANETMENU.getLog)?PLANETMENU.getLog():[] }; }   // SR-M10: the galaxy NEWS timeline survives a reload too
@@ -3374,8 +3757,17 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     lvl:sp.lvl||P.lvl, equip:sp.equip||P.equip, artifacts:sp.artifacts||P.artifacts, contraband:sp.contraband||P.contraband,
     fuel:num2(sp.fuel,P.fuel), fuelCap:num2(sp.fuelCap,P.fuelCap), holdCap:num2(sp.holdCap,P.holdCap), senseR:num2(sp.senseR,P.senseR),
     cargo:sp.cargo||P.cargo, shieldDivert:sp.shieldDivert||null, shieldFwd:num2(sp.shieldFwd,P.shieldFwd), shieldAft:num2(sp.shieldAft,P.shieldAft),
-    capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown, targetingComputer:!!sp.targetingComputer,
-    skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0) });
+    capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown,
+    engineType:sp.engineType||'standard', gizmoSlots:sp.gizmoSlots||new Array(CFG.GIZMO_SLOTS).fill(null),
+    skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0),
+    fuelTankType:sp.fuelTankType||'standard', radarType:sp.radarType||'basic', scannerType:sp.scannerType||'none',
+    shieldGenType:sp.shieldGenType||'none', droidType:sp.droidType||'none', cargoHookType:sp.cargoHookType||'none',
+    missileAmmo:num2(sp.missileAmmo,CFG.MISSILE_AMMO_START), dmgMult:num2(sp.dmgMult,0), micromodules:sp.micromodules||[],   // STANDARD GEAR SLOTS
+    manufacturer:sp.manufacturer||'human', hullSeries:sp.hullSeries||'standard', weaponSlots:sp.weaponSlots||null, slotFire:null });   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
+  // MIGRATION (ENGINEERING BAY, user 2026-07-08): targeting used to be a permanent EQUIP flag/save field - an
+  // older save has sp.targetingComputer:true but no gizmoSlots at all. Grandfather it in for free as a mounted
+  // gizmo rather than silently deleting a purchase the player already paid for.
+  if(sp.targetingComputer && !sp.gizmoSlots && !hasGizmo(P,'targeting')) mountGizmo(P,'targeting');
   P.shield=(P.shieldFwd||0)+(P.shieldAft||0);   // keep the synced total consistent right after a restore
   applyHull(P, sp.hullClass||'fighter');   // recomputes maxHp/hp/hullSpeed/visual model from the restored class+equip
   for(const rp of save.planets||[]){ const p=planets.find(x=>x.name===rp.name); if(p){ p.rep=rp.rep; p.wealth=rp.wealth; p.dev=rp.dev; p.hegemon=rp.hegemon; p.terra=rp.terra; } }
@@ -3429,6 +3821,11 @@ window.HOST={
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
   CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS, POWER_SYS, CONTRABAND, CONTRA_KEYS,
+  EQUIP, ENGINES, ENGINE_KEYS, GIZMOS, GIZMO_KEYS, GIZMO_SELL_FRAC, hasGizmo, gizmoSlotsFor,   // ENGINEERING BAY - exposed live like HULLS/WEAPONS/ARTIFACTS so the UI never hardcodes a second copy that can drift
+  FUEL_TANKS, FUEL_TANK_KEYS, RADARS, RADAR_KEYS, SCANNERS, SCANNER_KEYS, SHIELD_GENS, SHIELD_GEN_KEYS,
+  REPAIR_DROIDS, REPAIR_DROID_KEYS, CARGO_HOOKS, CARGO_HOOK_KEYS, MICROMODULES, MICROMOD_KEYS,   // STANDARD GEAR SLOTS - same live-exposed pattern
+  HULL_SERIES, HULL_SERIES_KEYS, MANUFACTURERS, MANUFACTURER_KEYS, HARDPOINT_SELL_FRAC,
+  hasHardpoint, hardpointCountFor, weaponSlotsFor,   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER - same live-exposed pattern
   notify, term, ev, say, log, runCmd, atBase,
   nearestPlanet, planetByName:(n)=>findPlanet(n), repAdd, checkRankUp,
   // X-WING POWER MANAGEMENT (user 2026-07-07): read the live pool + shield state, or reroute it directly (bypassing
