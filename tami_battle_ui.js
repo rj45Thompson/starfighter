@@ -317,13 +317,13 @@
         var selInfo = TECHS[selTech];
         var wantAlly = selInfo.kind==='heal';
         ctrl += '<div style="margin-top:4px;color:'+COLOR.techArmedBorder+';font-size:12px">'+
-          esc(selInfo.name)+' armed &mdash; click a '+(wantAlly?'ally':'foe')+' in range ('+esc(selInfo.range)+').</div>';
+          esc(selInfo.name)+' armed - click a '+(wantAlly?'ally':'foe')+' in range ('+esc(selInfo.range)+').</div>';
       }
     } else if(bstate==='win'){
-      ctrl = '<div style="margin-top:8px;color:'+COLOR.good+';font-size:16px">VICTORY &mdash; the away team prevails.</div>'+
+      ctrl = '<div style="margin-top:8px;color:'+COLOR.good+';font-size:16px">VICTORY - the away team prevails.</div>'+
         returnButton('Back to the surface', true);
     } else if(bstate==='lose'){
-      ctrl = '<div style="margin-top:8px;color:'+COLOR.badStrong+';font-size:16px">DEFEAT &mdash; you retreat to your ship.</div>'+
+      ctrl = '<div style="margin-top:8px;color:'+COLOR.badStrong+';font-size:16px">DEFEAT - you retreat to your ship.</div>'+
         returnButton('Retreat', false);
     } else {
       var waitName = cur ? esc(cur.name) : '';
@@ -342,7 +342,7 @@
       '<div style="position:absolute;top:12px;left:12px;right:12px;max-width:440px;'+
       'background:'+COLOR.panelBg+';border:1px solid '+COLOR.panelBorder+';border-radius:10px;padding:10px 12px">'+
         '<div style="color:'+COLOR.header+';font-weight:bold;margin-bottom:6px">TURN-BASED BATTLE '+
-          '<span style="opacity:.5;font-weight:normal">&mdash; a Tami-style away-team fight</span></div>'+
+          '<span style="opacity:.5;font-weight:normal"> - a Tami-style away-team fight</span></div>'+
         cardsHtml+
         ctrl+
       '</div>'+

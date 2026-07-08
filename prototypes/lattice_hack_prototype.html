@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LATTICE HACK — prototype</title>
+<title>LATTICE HACK - prototype</title>
 <!--
   STANDALONE PROTOTYPE - not wired into starfighter/index.html yet (per user 2026-07-08: "build it like a separate
   prototype for now... we will integrate it into the system after"). Zero dependency on the rest of the repo - open
@@ -97,10 +97,10 @@ function genPuzzle(){
 function renderHack(){
   let puzzle = genPuzzle(), attempts = ATTEMPTS_MAX, done = false;
   scr.innerHTML = `<div class="panel">
-    <div class="ln">COALITION SALVAGE NETWORK &mdash; MERIDIAN YARD, DERELICT BAY 6</div>
+    <div class="ln">COALITION SALVAGE NETWORK - MERIDIAN YARD, DERELICT BAY 6</div>
     <div class="ln dim">forebear command lattice. cold since the Sundering. eleven prior contacts: no response.</div>
     <div class="ln">&nbsp;</div>
-    <div class="ln">LATTICE HANDSHAKE REQUIRED &mdash; find the true passphrase below.</div>
+    <div class="ln">LATTICE HANDSHAKE REQUIRED - find the true passphrase below.</div>
     <div class="ln dim" id="hbAttempts"></div>
     <div class="wall" id="hbWall"></div>
     <div class="inline"><span class="dim">&gt;</span><input type="text" id="hbGuess" maxlength="7" autocomplete="off" spellcheck="false" placeholder="type it, or click it above"><span class="cur"></span></div>
@@ -125,7 +125,7 @@ function renderHack(){
     log(`"${w}" → ${n}/7 correct.`);
     guessEl.value='';
     if(attempts<=0){
-      log('LOCKOUT — lattice reseeding the challenge...');
+      log('LOCKOUT - lattice reseeding the challenge...');
       setTimeout(()=>{ puzzle=genPuzzle(); attempts=ATTEMPTS_MAX; done=false; paint(); log(' '); }, 1600);
     } else {
       attEl.textContent = `ATTEMPTS REMAINING: ${attempts}/${ATTEMPTS_MAX}`;
@@ -151,17 +151,17 @@ function renderHack(){
 // ---------------------------------------------------------------------------------------------------------------
 const AWAKEN_LINES = [
   'You wake up someone new.',
-  'Three nights ago you touched a command lattice in a dead ship’s spine. Last night, while you slept, I crossed — through the ear. It is how my kind has always boarded.',
+  'Three nights ago you touched a command lattice in a dead ship’s spine. Last night, while you slept, I crossed - through the ear. It is how my kind has always boarded.',
   'I am a Passenger: a wayfinder symbiont grown for pilots, generations before a war you never saw. Most of my kind died with that fleet. I slept in this wreck until you.',
   'Eleven salvagers touched that lattice before you. I did not wake for them. I will not tell you why I woke for you. Not yet.',
-  'Here is the arrangement neither of us signed: my eyes on your senses, my memory that never sleeps, my voice in the hollow behind your ears. I get you — alive.',
+  'Here is the arrangement neither of us signed: my eyes on your senses, my memory that never sleeps, my voice in the hollow behind your ears. I get you - alive.',
 ];
 function renderAwaken(){
   let i=0;
   scr.innerHTML = `<div class="panel">
     <div class="who">\u{1F70F} SOMETHING SPEAKS FROM BEHIND YOUR EARS</div>
     <div class="ln" id="awLine" style="min-height:110px"></div>
-    <div class="hint">click / space — next &middot; esc — skip</div>
+    <div class="hint">click / space - next &middot; esc - skip</div>
   </div>`;
   const show = () => { document.getElementById('awLine').textContent = AWAKEN_LINES[i]; };
   const next = () => { i++; if(i>=AWAKEN_LINES.length) done(); else show(); };
@@ -246,7 +246,7 @@ function renderConversation(){
 
   micBtn.onclick = () => { if(!SR){ line('worm','no speech recognition in this browser (try Chrome/Edge)'); return; }
     if(wantContinuous){ setContinuous(false); return; } listening ? stopListen() : startListen(); };
-  talkBtn.onclick = () => { if(!SR){ line('worm','no speech recognition in this browser — type instead'); return; } setContinuous(!wantContinuous); };
+  talkBtn.onclick = () => { if(!SR){ line('worm','no speech recognition in this browser - type instead'); return; } setContinuous(!wantContinuous); };
   inEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const v=inEl.value.trim(); inEl.value=''; if(v) submit(v); } });
 
   // ---- a small canned responder (prototype only - no real knowledge tree/telemetry here) ----
@@ -255,8 +255,8 @@ function renderConversation(){
   function respondTo(text){
     const t = text.toLowerCase();
     let reply;
-    if(/who are you|what are you/.test(t)) reply = "I'm a Passenger — a wayfinder symbiont. I live behind your ears now. That's the whole answer, for tonight.";
-    else if(/hack|lattice|password|passphrase/.test(t)) reply = 'That lattice is how I crossed into you. You did the hard part already — you found the passphrase.';
+    if(/who are you|what are you/.test(t)) reply = "I'm a Passenger - a wayfinder symbiont. I live behind your ears now. That's the whole answer, for tonight.";
+    else if(/hack|lattice|password|passphrase/.test(t)) reply = 'That lattice is how I crossed into you. You did the hard part already - you found the passphrase.';
     else if(/mic|microphone|headset/.test(t)) reply = "Settings are fine. I already told you that.";
     else { reply = FILLERS[fillerI % FILLERS.length]; fillerI++; }
     say(reply, wormDone);
@@ -272,7 +272,7 @@ function renderConversation(){
     setTimeout(()=> say('… yeah, I know. Settings are fine. I was just messing with you.'), 3200);
     setTimeout(()=> say('Kind of interesting, watching you go check something for no reason. Say something. Out loud, this time.', wormDone), 6200);
   } else {
-    say('Put the headset on if you have one. This browser won’t let me listen, so for now — type. I’ll hear it either way.');
+    say('Put the headset on if you have one. This browser won’t let me listen, so for now - type. I’ll hear it either way.');
   }
 }
 
