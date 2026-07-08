@@ -26,6 +26,8 @@ const CFG = {
   CHROME_RESERVE:24,   // user report "the terminal pinned box seems to overlap the parasite tab": the ctl cluster/tab float AT the panel's own top corner, which collided with the panel's OWN header content (market's title, the ticker's PARASITE/TERMINAL/... row) - reserving this much top padding on every registered panel gives the chrome a real strip instead of sitting on top of the content
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
+  RESIZE_GRIP:16,              // resize-handle footprint (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it")
+  RESIZE_MIN_W:220, RESIZE_MIN_H:120,
 };
 const COL={ cyan:'#46d6ff', ink:'#080a10', txt:'#cfe2f5', dim:'#6f88a4', border:'#22344a' };
 
@@ -48,7 +50,11 @@ if(!document.getElementById('pnl-style')){
     '.pnl-tab{ position:fixed; z-index:'+(CFG.Z+1)+'; font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.06em; color:'+COL.dim+';'+
       ' background:#0c1623ee; border:1px solid '+COL.border+'; border-radius:6px; padding:4px 9px; cursor:pointer; pointer-events:auto; white-space:nowrap; user-select:none; transition:color .15s,border-color .15s; }'+
     '.pnl-tab:hover{ color:'+COL.txt+'; border-color:#3a567a; }'+
-    '.pnl-tab .pnl-pinned{ color:'+COL.cyan+'; }';
+    '.pnl-tab .pnl-pinned{ color:'+COL.cyan+'; }'+
+    '.pnl-grip{ position:fixed; z-index:'+(CFG.Z+1)+'; width:'+CFG.RESIZE_GRIP+'px; height:'+CFG.RESIZE_GRIP+'px; cursor:nwse-resize; pointer-events:auto;'+
+      ' background:linear-gradient(135deg,transparent 0%,transparent 45%,'+COL.border+' 45%,'+COL.border+' 55%,transparent 55%,transparent 100%),'+
+      'linear-gradient(135deg,transparent 0%,transparent 65%,'+COL.border+' 65%,'+COL.border+' 75%,transparent 75%,transparent 100%); border-radius:0 0 6px 0; }'+
+    '.pnl-grip:hover{ background-color:'+COL.cyan+'22; }';
   document.head.appendChild(st);
 }
 
@@ -57,6 +63,10 @@ const EDGE_MEMBERS={ top:[], bottom:[], left:[], right:[] };
 
 function clamp01(v){ return Math.max(CFG.OP_MIN, Math.min(CFG.OP_MAX, v)); }
 function rgba(rgb,a){ return 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+a+')'; }
+// RESIZE (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it") - once a
+// panel is manually resized it becomes a FIXED w/h box (maxWidth/maxHeight cleared so nothing else - a content
+// reflow, the ticker's own .big toggle, a CSS breakpoint - can silently override the size you picked).
+function applyStoredSize(el, w, h){ el.style.width=w+'px'; el.style.maxWidth='none'; el.style.height=h+'px'; el.style.maxHeight='none'; }
 
 function closedTransform(edge, centerX){
   const base=centerX?'translateX(-50%) ':'';
@@ -99,6 +109,11 @@ function applyVisual(rec){
   const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   rec.ctl.style.display = rec.open ? 'flex' : 'none';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; }
+  if(rec.grip){ rec.grip.style.display=rec.open?'block':'none'; if(rec.open) positionGrip(rec); }
+}
+function positionGrip(rec){   // bottom-right corner of the panel's own current rect (only meaningful while open)
+  const r=rec.el.getBoundingClientRect();
+  rec.grip.style.top=(r.bottom-CFG.RESIZE_GRIP)+'px'; rec.grip.style.left=(r.right-CFG.RESIZE_GRIP)+'px';
 }
 
 function persist(rec){ store[rec.id]={pinned:rec.pinned, open:rec.open, opacity:rec.opacity}; save(); }
@@ -159,6 +174,8 @@ function register(id, el, opts){
   const existingPadTop=parseFloat(getComputedStyle(el).paddingTop)||0;
   el.style.paddingTop=(existingPadTop+CFG.CHROME_RESERVE)+'px';
   const body=document.body||document.documentElement;
+  rec.resizable=!!opts.resizable;
+  if(rec.resizable && saved.w!=null && saved.h!=null) applyStoredSize(el, saved.w, saved.h);   // a size you set yourself sticks across reloads - the whole point of the feature
   const ctl=document.createElement('div'); ctl.className='pnl-ctl'; body.appendChild(ctl);           // fixed + body-level: immune to el's own scroll/slide
   const pinBtn=document.createElement('button'); pinBtn.className='pnl-btn'; pinBtn.title='pin (stay open) / unpin (auto-hide when idle)';
   const op=document.createElement('input'); op.type='range'; op.className='pnl-op'; op.min=CFG.OP_MIN; op.max=CFG.OP_MAX; op.step=CFG.OP_STEP; op.title='transparency';
@@ -169,6 +186,28 @@ function register(id, el, opts){
   const tab=document.createElement('div'); tab.className='pnl-tab'; body.appendChild(tab);
   rec.tab=tab;
 
+  let grip=null;
+  if(rec.resizable){
+    grip=document.createElement('div'); grip.className='pnl-grip'; grip.title='drag to resize'; body.appendChild(grip);
+    rec.grip=grip;
+    let dragging=false, startX=0, startY=0, startW=0, startH=0;
+    const onMove=(ev)=>{ if(!dragging) return;
+      const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+      const w=Math.max(CFG.RESIZE_MIN_W, startW+(x-startX)), h=Math.max(CFG.RESIZE_MIN_H, startH+(y-startY));
+      applyStoredSize(el, w, h); positionGrip(rec);
+      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+    const endDrag=()=>{ if(!dragging) return; dragging=false;
+      const r=el.getBoundingClientRect(); store[id]=store[id]||{}; store[id].w=Math.round(r.width); store[id].h=Math.round(r.height); save();
+      document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
+      document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag); };
+    const startDrag=(ev)=>{ dragging=true; const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
+      startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+      document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
+      document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag);
+      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+    grip.addEventListener('mousedown',startDrag); grip.addEventListener('touchstart',startDrag,{passive:false});
+  }
+
   pinBtn.onclick=(e)=>{ e.stopPropagation(); setPinned(rec, !rec.pinned); };
   xBtn.onclick=(e)=>{ e.stopPropagation(); setOpen(rec, false); };
   op.addEventListener('input', ()=>setOpacity(rec, parseFloat(op.value)));
@@ -178,6 +217,7 @@ function register(id, el, opts){
   el.addEventListener('mouseenter',stayAwake); el.addEventListener('mouseleave',mayDoze);
   tab.addEventListener('mouseenter',stayAwake); tab.addEventListener('mouseleave',mayDoze);
   ctl.addEventListener('mouseenter',stayAwake); ctl.addEventListener('mouseleave',mayDoze);   // the controls float outside `el` now - count hovering them too
+  if(grip){ grip.addEventListener('mouseenter',stayAwake); grip.addEventListener('mouseleave',mayDoze); }
 
   PANELS_[id]=rec; (EDGE_MEMBERS[rec.edge]=EDGE_MEMBERS[rec.edge]||[]).push(rec);
   applyVisual(rec); reflowEdge(rec.edge);
@@ -189,7 +229,7 @@ function register(id, el, opts){
 let retickT=null;
 function retickTabs(){ for(const id in PANELS_){ const rec=PANELS_[id]; const t=tabPosition(rec);
   rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
-  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; } } }
+  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; if(rec.grip) positionGrip(rec); } } }
 
 function open(id){ const r=PANELS_[id]; if(r) setOpen(r,true); }
 function close(id){ const r=PANELS_[id]; if(r) setOpen(r,false); }

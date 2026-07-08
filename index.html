@@ -11,6 +11,8 @@
     font-family:"Segoe UI",system-ui,sans-serif; user-select:none; }
   #stage{ position:fixed; inset:0; } canvas{ display:block; }
   .hud{ position:fixed; pointer-events:none; text-shadow:0 1px 3px #000b; z-index:5; }
+  #creditsHud{ right:14px; top:12px; font:800 15px/1 ui-monospace,monospace; letter-spacing:.04em; color:#ffcf52;
+    background:#0c1623cc; border:1px solid #3a3020; border-radius:7px; padding:6px 12px; }   /* user 2026-07-08: "I can't see my credits on the main screen" - always-visible, not buried inside the market panel */
   #pillars{ left:14px; top:12px; display:flex; gap:7px; flex-wrap:wrap; max-width:52%; }
   .pill{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.1em; color:#8fb0cc;
     border:1px solid #29405a; background:#0c1623aa; border-radius:5px; padding:4px 7px; }
@@ -107,6 +109,7 @@
 <body>
 <div id="stage"></div>
 <div id="hitfx" style="position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .05s linear"></div>
+<div class="hud" id="creditsHud">0c</div>
 <div class="hud" id="pillars"></div>
 <div class="hud" id="rosterWrap"><div id="roster"></div></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
@@ -131,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708c"></script>
-<script src="fflate.min.js?v=20260708c"></script>
-<script src="fbxloader.js?v=20260708c"></script>
+<script src="three.min.js?v=20260708d"></script>
+<script src="fflate.min.js?v=20260708d"></script>
+<script src="fbxloader.js?v=20260708d"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708c"></script>
-<script src="inhabitant.js?v=20260708c"></script>
-<script src="passenger.js?v=20260708c"></script>
-<script src="gamemod.js?v=20260708c"></script>
-<script src="chatter.js?v=20260708c"></script>
-<script src="speech_input.js?v=20260708c"></script>
-<script src="vision.js?v=20260708c"></script>
-<script src="deliberate.js?v=20260708c"></script>
-<script src="knowledge.js?v=20260708c"></script>
-<script src="acquire.js?v=20260708c"></script>
-<script src="sound.js?v=20260708c"></script>
-<script src="hullmodels.js?v=20260708c"></script>
-<script src="knowledge_hud.js?v=20260708c"></script>
-<script src="thoughts.js?v=20260708c"></script>
-<script src="tami_battle_ui.js?v=20260708c"></script>
-<script src="power_panel.js?v=20260708c"></script>
-<script src="panels.js?v=20260708c"></script>
+<script src="speech_tier.js?v=20260708d"></script>
+<script src="inhabitant.js?v=20260708d"></script>
+<script src="passenger.js?v=20260708d"></script>
+<script src="gamemod.js?v=20260708d"></script>
+<script src="chatter.js?v=20260708d"></script>
+<script src="speech_input.js?v=20260708d"></script>
+<script src="vision.js?v=20260708d"></script>
+<script src="deliberate.js?v=20260708d"></script>
+<script src="knowledge.js?v=20260708d"></script>
+<script src="acquire.js?v=20260708d"></script>
+<script src="sound.js?v=20260708d"></script>
+<script src="hullmodels.js?v=20260708d"></script>
+<script src="knowledge_hud.js?v=20260708d"></script>
+<script src="thoughts.js?v=20260708d"></script>
+<script src="tami_battle_ui.js?v=20260708d"></script>
+<script src="power_panel.js?v=20260708d"></script>
+<script src="panels.js?v=20260708d"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708c"></script>
-<script src="conquest.js?v=20260708c"></script>
-<script src="missions.js?v=20260708c"></script>
-<script src="planetmenu.js?v=20260708c"></script>
-<script src="textquests.js?v=20260708c"></script>
+<script src="starmap.js?v=20260708d"></script>
+<script src="conquest.js?v=20260708d"></script>
+<script src="missions.js?v=20260708d"></script>
+<script src="planetmenu.js?v=20260708d"></script>
+<script src="textquests.js?v=20260708d"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -429,16 +432,32 @@ function loadGameAssets(){ if(typeof T.FBXLoader==='undefined') return;        /
     grab(f, g=>{ const geo=firstGeo(g); if(geo) ASSETS.gemGeos.push(normGeo(geo,ASSET_CFG.GEM_SIZE)); });
 }
 function shipModelKey(s){ if(s.team==='pirate') return 'enemy'; if(s.role==='trader') return 'trader'; return 'player'; }
-function applyShipModel(s){ const key=shipModelKey(s), base=ASSETS.ships[key]; if(!base||!s.mesh) return false;
-  const grp=base.clone(true);                                                  // clone shares geometry; clone materials only where tinted
-  if(s.team==='pirate'){ const HT=HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)];
-    const rMap=(s.id%2===0)?SHIP_TEX.enemyRed:SHIP_TEX.enemyPurple;             // alternate skins for visual variety across the Synod fleet
-    grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, rMap, SHIP_TEX.enemyNrm, HT.col); });
-    grp.scale.setScalar(HT.scale); }
-  else{ grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, SHIP_TEX.player, SHIP_TEX.playerNrm, s.role==='trader'?0x9fb0c0:null); });   // traders: a cool grey wash on the same good texture (their own bundled skin was a broken 32x32)
-    if(s.hullClass && ASSET_CFG.VIS_SCALE[s.hullClass]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[s.hullClass]); }
-  const eng=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:new T.Color().setHSL(s.hue,0.9,0.62),blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
-  eng.scale.set(1.7,1.7,1); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;   // step() dereferences userData.eng UNGUARDED - always present
+function applyShipModel(s){
+  if(!s.mesh) return false;
+  const isPirate=s.team==='pirate';
+  let grp=null;
+  // HULL-CLASS-DISTINCT SILHOUETTE (user 2026-07-08: "other ships don't seem to be getting the model... are you
+  // missing the models"): the FBX pack only ever offered ONE generic shape per team (shipModelKey returns just
+  // 'enemy'/'trader'/'player'), scaled by VIS_SCALE - so a Scout and a Capital looked IDENTICAL except for size,
+  // and buying a new hull class produced no visible change beyond a size bump. hullmodels.js's 7 procedural
+  // per-class silhouettes were built with exactly this integration in mind (its own docblock: "INTEGRATION
+  // CONTRACT (matches starfighter.html fighterMesh)") but were only ever wired into the scan badge, never the
+  // live flight mesh. Now the primary path for non-pirate ships (player + squad, the only ones with a hullClass).
+  if(!isPirate && window.HULLMODELS && typeof HULLMODELS.build==='function'){
+    try{ grp=HULLMODELS.build(s.hullClass||'fighter', T, {color:s.color}); }catch(e){ grp=null; }
+  }
+  if(!grp){
+    const key=shipModelKey(s), base=ASSETS.ships[key]; if(!base) return false;
+    grp=base.clone(true);                                                  // clone shares geometry; clone materials only where tinted
+    if(isPirate){ const HT=HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)];
+      const rMap=(s.id%2===0)?SHIP_TEX.enemyRed:SHIP_TEX.enemyPurple;             // alternate skins for visual variety across the Synod fleet
+      grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, rMap, SHIP_TEX.enemyNrm, HT.col); });
+      grp.scale.setScalar(HT.scale); }
+    else{ grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, SHIP_TEX.player, SHIP_TEX.playerNrm, s.role==='trader'?0x9fb0c0:null); });   // traders: a cool grey wash on the same good texture (their own bundled skin was a broken 32x32) - only reachable if HULLMODELS failed to load
+      if(s.hullClass && ASSET_CFG.VIS_SCALE[s.hullClass]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[s.hullClass]); }
+    const eng=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:new T.Color().setHSL(s.hue,0.9,0.62),blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
+    eng.scale.set(1.7,1.7,1); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;   // step() dereferences userData.eng UNGUARDED - always present; HULLMODELS.build() already guarantees its own, this is only the FBX-fallback path
+  }
   grp.position.copy(s.pos); grp.quaternion.copy(s.quat); grp.visible=s.mesh.visible;
   scene.remove(s.mesh); s.mesh=grp; scene.add(grp); return true; }
 
@@ -640,6 +659,10 @@ function dockPromptTick(){ const P=ships[0]; if(!P||!base) return;
   btn.style.display = show?'block':'none'; }
 function burstHudTick(){ const P=ships[0]; const el=document.getElementById('burstHud'); if(!P||!el) return;   // user 2026-07-08: unmistakable feedback that burst mode is actually doing something
   el.style.display = P._nitroActive?'block':'none'; }
+let _creditsHudShown=null;   // user 2026-07-08: "I can't see my credits on the main screen" - always-visible readout, top-right; only touches the DOM when the number actually changes
+function creditsHudTick(){ const P=ships[0]; const el=document.getElementById('creditsHud'); if(!P||!el) return;
+  const c=Math.round(P.credits||0); if(c===_creditsHudShown) return; _creditsHudShown=c;
+  el.textContent=c.toLocaleString()+'c'; }
 // Shared arrival logic (base hub OR a planet's rep-gated market) - used by BOTH auto-dock and a `go`-commanded
 // arrival, so the two paths can never drift apart. Returns {mode,aimDir,ease} for the caller to apply.
 function completeDock(s,p,isBase){
@@ -3101,7 +3124,7 @@ if(window.PANELS){
     defaultOpacity:0.86, hotkeyLabel:'M',
     onOpenChange:(open)=>{ marketOn=open; if(open) updateMarket(); } });
   PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
-    defaultOpacity:0.91, hotkeyLabel:'`',
+    defaultOpacity:0.91, hotkeyLabel:'`', resizable:true,   // user 2026-07-08: "make the terminal sizable and it should not change size unless I size it" - drag the corner grip
     keepOpenWhile:()=>document.activeElement && document.activeElement.id==='chat' });   // don't yank it away mid-type
   // user 2026-07-07: "the player list or agi list does not have slider or transparency" - #roster was never
   // registered at all. It gets the SAME wrapper treatment as #market/#marketBody: registering the OUTER
@@ -3830,7 +3853,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); updateTargetingReticle(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
