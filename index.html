@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708p"></script>
-<script src="fflate.min.js?v=20260708p"></script>
-<script src="fbxloader.js?v=20260708p"></script>
+<script src="three.min.js?v=20260708q"></script>
+<script src="fflate.min.js?v=20260708q"></script>
+<script src="fbxloader.js?v=20260708q"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708p"></script>
-<script src="inhabitant.js?v=20260708p"></script>
-<script src="passenger.js?v=20260708p"></script>
-<script src="gamemod.js?v=20260708p"></script>
-<script src="chatter.js?v=20260708p"></script>
-<script src="speech_input.js?v=20260708p"></script>
-<script src="vision.js?v=20260708p"></script>
-<script src="deliberate.js?v=20260708p"></script>
-<script src="knowledge.js?v=20260708p"></script>
-<script src="acquire.js?v=20260708p"></script>
-<script src="sound.js?v=20260708p"></script>
-<script src="hullmodels.js?v=20260708p"></script>
-<script src="knowledge_hud.js?v=20260708p"></script>
-<script src="thoughts.js?v=20260708p"></script>
-<script src="tami_battle_ui.js?v=20260708p"></script>
-<script src="power_panel.js?v=20260708p"></script>
-<script src="panels.js?v=20260708p"></script>
+<script src="speech_tier.js?v=20260708q"></script>
+<script src="inhabitant.js?v=20260708q"></script>
+<script src="passenger.js?v=20260708q"></script>
+<script src="gamemod.js?v=20260708q"></script>
+<script src="chatter.js?v=20260708q"></script>
+<script src="speech_input.js?v=20260708q"></script>
+<script src="vision.js?v=20260708q"></script>
+<script src="deliberate.js?v=20260708q"></script>
+<script src="knowledge.js?v=20260708q"></script>
+<script src="acquire.js?v=20260708q"></script>
+<script src="sound.js?v=20260708q"></script>
+<script src="hullmodels.js?v=20260708q"></script>
+<script src="knowledge_hud.js?v=20260708q"></script>
+<script src="thoughts.js?v=20260708q"></script>
+<script src="tami_battle_ui.js?v=20260708q"></script>
+<script src="power_panel.js?v=20260708q"></script>
+<script src="panels.js?v=20260708q"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708p"></script>
-<script src="conquest.js?v=20260708p"></script>
-<script src="missions.js?v=20260708p"></script>
-<script src="planetmenu.js?v=20260708p"></script>
-<script src="textquests.js?v=20260708p"></script>
+<script src="starmap.js?v=20260708q"></script>
+<script src="conquest.js?v=20260708q"></script>
+<script src="missions.js?v=20260708q"></script>
+<script src="planetmenu.js?v=20260708q"></script>
+<script src="textquests.js?v=20260708q"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -1646,6 +1646,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'modlog', desc:'the mutation history log: who wrote which change and when, the pen\'s paper trail, audit of every self-modification', usage:'modlog'},
   {name:'voices', desc:'hear the pilots and me speak ALOUD: voices, voice, audio, sound, speech, talk out loud, text-to-speech, tts, mute, unmute, silence, hear the radio - per-pilot voices, mine low and slow', usage:'voices on|off · voice test <pilot>'},
   {name:'talk',   desc:'hands-free voice conversation with me: talk, mic, microphone, listen, speech-to-text, stt, speech recognition, voice input, speak to me out loud instead of typing - click the 🎤 for one line, or talk on for a full back-and-forth', usage:'talk on|off · click 🎤 for one line'},
+  {name:'leaderboard', desc:'the ranger leaderboard: hall of fame, rankings, top pilots, high scores, best rangers ever, standings across every generation/epoch - you\'re on it too', usage:'leaderboard · leaderboard 25 (top 25)'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2196,6 +2197,17 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(CONQUEST.describe(p),''); term('&nbsp;&nbsp;<span style="opacity:.6">defend add - buy the next defense battery (only on worlds YOU hold; dock first)</span>','sys'); return; }
   if(c==='generation'||c==='gen'){ const g=window.STARMAP&&STARMAP.generation?STARMAP.generation():1; const st=window.GAME_KNOW?GAME_KNOW.stats():null; const t=window.STARMAP&&STARMAP.territory?STARMAP.territory():null;
     term(`◈ GENERATION <b>${g}</b>${t?` - coalition holds <b>${t.coalition}/${t.total}</b> systems`:''}${st?` · the minds carry <b>${st.shared}</b> shared + <b>${st.private_total}</b> private facts across generations (never wiped)`:''}. Lose every system and the generation ends - the galaxy resets, the KNOWLEDGE persists.`,'sys'); return; }
+  // SR-M14: RANGER LEADERBOARD - persistent cross-epoch ranking (score/wealth), player included; survives
+  // reload AND a generation reset (recorded once per generation in onNewGeneration, see LEADERBOARD_KEY above).
+  if(c==='leaderboard'||c==='hof'||c==='rankings'){
+    const rows=loadLeaderboard();
+    if(!rows.length){ term('<b style="color:#8fd0ff">🏆 RANGER LEADERBOARD</b> - empty so far. It fills the first time a generation ends (lose every system, or <b>generation</b> to read how that works).','sys'); return; }
+    const n=Math.min(parseInt(a[1])||10,rows.length);
+    term(`<b style="color:#8fd0ff">🏆 RANGER LEADERBOARD</b> <span style="opacity:.55">(top ${n} of ${rows.length} all-time, across every generation - try: leaderboard 25)</span>`,'sys');
+    rows.slice(0,n).forEach((r,i)=>term(`&nbsp;&nbsp;${String(i+1).padStart(2,' ')}. ${r.isPlayer?'<b style=\"color:#ffcf52\">':''}${r.name}${r.isPlayer?' (you)</b>':''} - ${r.rank} · score <b>${r.score}</b> · ${r.credits}c · gen ${r.generation}`,'sys'));
+    const P=ships[0], mine=rows.filter(r=>r.isPlayer);
+    if(P && mine.length){ const best=mine[0], bestRank=rows.indexOf(best)+1; term(`&nbsp;&nbsp;<span style="opacity:.6">your best: #${bestRank} · score ${best.score} · generation ${best.generation}</span>`,'sys'); }
+    return; }
   if(c==='mute'){ if(window.SOUND){ const m=SOUND.toggleMute?SOUND.toggleMute():(SOUND.setMute(!SOUND.muted()),SOUND.muted()); term(`sound ${m?'muted':'on'}.`,'sys'); } return; }
   if(c==='volume'||c==='vol'){ if(window.SOUND){ const v=Math.max(0,Math.min(1,parseFloat(a[1])||0.6)); SOUND.setVolume(v); SOUND.play('ui'); term(`volume ${Math.round(v*100)}%.`,'sys'); } return; }
   if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
@@ -3294,6 +3306,24 @@ function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,
 //  each load and this snapshot re-applies on top of it.
 // =================================================================================================
 const SAVE_KEY='SF_SAVE_v1';
+// =================================================================================================
+// SR-M14: RANGER LEADERBOARD ACROSS GENERATIONS - persistent cross-epoch leaderboard of ALL pilots
+// (player included) by score/wealth, surviving a reload AND a full generation reset (a SEPARATE
+// localStorage key from SAVE_KEY - onNewGeneration() wipes the campaign/galaxy state, never this).
+// Recorded once per generation, at the moment it ends (the roster is about to be wiped/reset, so this
+// is the one honest snapshot of "how this generation's rangers actually finished").
+// =================================================================================================
+const LEADERBOARD_KEY='SF_LEADERBOARD_v1', LEADERBOARD_CAP=100;
+function loadLeaderboard(){ try{ const raw=localStorage.getItem(LEADERBOARD_KEY); return raw?JSON.parse(raw):[]; }catch(e){ return []; } }
+function saveLeaderboard(arr){ try{ localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(arr)); }catch(e){} }
+function recordGenerationResults(gen){
+  const rows=loadLeaderboard();
+  for(const s of ships){ if(!s.alive && s.role!=='player') continue;   // dead squad AI already had their run scored when they died is out of scope - only living pilots at reset time are "this generation's finishers"
+    if(s.team!=='squad') continue;
+    rows.push({ name:s.name, isPlayer:s.role==='player', generation:gen, score:Math.round(s.score||0), credits:Math.round(s.credits||0), rank:rankOf(s.score||0).n }); }
+  rows.sort((a,b)=>b.score-a.score);
+  saveLeaderboard(rows.slice(0,LEADERBOARD_CAP));   // keep only the all-time top N - unbounded growth across many generations would just bloat localStorage forever
+}
 function gatherSaveState(){ const P=ships[0]; if(!P) return null;
   return { v:1, campaign, escalation, warScore,
     player:{ credits:P.credits, score:P.score, hullClass:P.hullClass, weaponType:P.weaponType,
@@ -3377,7 +3407,8 @@ window.HOST={
   // GENERATION RESET (user: "if all territory is lost the game ends but the knowledge graphs persist and get better"):
   // the galaxy is reborn - worlds freed, fronts reset, the player back at Ranger Command - but GAME_KNOW is NOT touched:
   // every shared/private fact the minds earned carries into the next generation. Death of the world, not of the minds.
-  onNewGeneration(){ campaign++; escalation=0; warScore=0;
+  onNewGeneration(){ recordGenerationResults(window.STARMAP&&STARMAP.generation?STARMAP.generation():campaign);   // SR-M14: the one honest snapshot of this generation's final standing, BEFORE anything below wipes it
+    campaign++; escalation=0; warScore=0;
     for(const sy of systems){ sy.contested=false; sy.clearT=0; }
     for(const p of planets){ if(p.isPirateStation) continue;   // stays permanently hostile - not swept into the coalition/Hegemon reset
       p.hegemon=false; p.owner=null; p._cq=null; p.rep=Math.max(-1, Math.round((p.rep||0)*0.3)); p.underThreat=false; if(p.hull!=null&&p.maxHull!=null) p.hull=p.maxHull; }
