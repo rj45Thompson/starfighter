@@ -127,39 +127,41 @@
 <button id="btnThr">THR</button>
 <button id="btnFire">FIRE</button>
 <button id="dockPromptBtn" style="display:none;position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:12;font:800 15px/1 ui-monospace,monospace;letter-spacing:.08em;color:#04121c;background:linear-gradient(#9fe6ff,#46d6ff);border:1px solid #eafcff;border-radius:10px;padding:12px 26px;cursor:pointer;box-shadow:0 0 22px #46d6ff88,0 4px 0 #1a6a8a;pointer-events:auto">⌂ DOCK AT RANGER COMMAND</button>
+<div id="burstHud" style="display:none;position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:12;font:800 14px/1 ui-monospace,monospace;letter-spacing:.14em;color:#04121c;background:linear-gradient(#ffd27a,#ff8a2a);border:1px solid #ffe6b0;border-radius:8px;padding:6px 16px;pointer-events:none;box-shadow:0 0 18px #ff8a2a99;animation:burstPulse .5s ease-in-out infinite alternate">⚡ BURST</div>
+<style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708b"></script>
-<script src="fflate.min.js?v=20260708b"></script>
-<script src="fbxloader.js?v=20260708b"></script>
+<script src="three.min.js?v=20260708c"></script>
+<script src="fflate.min.js?v=20260708c"></script>
+<script src="fbxloader.js?v=20260708c"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708b"></script>
-<script src="inhabitant.js?v=20260708b"></script>
-<script src="passenger.js?v=20260708b"></script>
-<script src="gamemod.js?v=20260708b"></script>
-<script src="chatter.js?v=20260708b"></script>
-<script src="speech_input.js?v=20260708b"></script>
-<script src="vision.js?v=20260708b"></script>
-<script src="deliberate.js?v=20260708b"></script>
-<script src="knowledge.js?v=20260708b"></script>
-<script src="acquire.js?v=20260708b"></script>
-<script src="sound.js?v=20260708b"></script>
-<script src="hullmodels.js?v=20260708b"></script>
-<script src="knowledge_hud.js?v=20260708b"></script>
-<script src="thoughts.js?v=20260708b"></script>
-<script src="tami_battle_ui.js?v=20260708b"></script>
-<script src="power_panel.js?v=20260708b"></script>
-<script src="panels.js?v=20260708b"></script>
+<script src="speech_tier.js?v=20260708c"></script>
+<script src="inhabitant.js?v=20260708c"></script>
+<script src="passenger.js?v=20260708c"></script>
+<script src="gamemod.js?v=20260708c"></script>
+<script src="chatter.js?v=20260708c"></script>
+<script src="speech_input.js?v=20260708c"></script>
+<script src="vision.js?v=20260708c"></script>
+<script src="deliberate.js?v=20260708c"></script>
+<script src="knowledge.js?v=20260708c"></script>
+<script src="acquire.js?v=20260708c"></script>
+<script src="sound.js?v=20260708c"></script>
+<script src="hullmodels.js?v=20260708c"></script>
+<script src="knowledge_hud.js?v=20260708c"></script>
+<script src="thoughts.js?v=20260708c"></script>
+<script src="tami_battle_ui.js?v=20260708c"></script>
+<script src="power_panel.js?v=20260708c"></script>
+<script src="panels.js?v=20260708c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708b"></script>
-<script src="conquest.js?v=20260708b"></script>
-<script src="missions.js?v=20260708b"></script>
-<script src="planetmenu.js?v=20260708b"></script>
-<script src="textquests.js?v=20260708b"></script>
+<script src="starmap.js?v=20260708c"></script>
+<script src="conquest.js?v=20260708c"></script>
+<script src="missions.js?v=20260708c"></script>
+<script src="planetmenu.js?v=20260708c"></script>
+<script src="textquests.js?v=20260708c"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -214,6 +216,7 @@ const CFG = {
   SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
   NITRO_RATE:70,   // %/s the power pool dumps into engines while holding Shift (drains weapons+shields to feed it)
   NITRO_BOOST_MULT:1.55, NITRO_KICK:15,   // instant afterburner layer (user 2026-07-07 "holding shift does not boost speed"): thrust/vmax mult + one-time forward kick, doesn't wait on the power-stat ramp above
+  NITRO_AUTOTHRUST:30,   // user 2026-07-08 "hold shift = burst mode": self-sufficient forward thrust while nitro is held, independent of W - roughly 68% of base THRUST so a bare Shift-hold is a real sustained burst, not just a jolt
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
@@ -608,7 +611,20 @@ function shieldTick(s,dt){ if(!s.alive) return; const max=shieldMaxFor(s);
   else if(s.docked) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*2*dt); }      // docked = a safe harbor, shields recharge fast too
 function drainShield(s,dmg,fromPos){ if(s.shield==null) s.shield=shieldMaxFor(s); s.shieldHitT=T0;
   triggerHitFx(s,fromPos||s.pos,dmg);   // user 2026-07-07: "flash red in the direction you are hit and rock the camera" - no-op for anyone but the player
-  if(s.shield>0){ const absorb=Math.min(s.shield,dmg); s.shield-=absorb; dmg-=absorb; } return dmg; }   // returns the LEFTOVER damage that spills to hull
+  if(s.shield>0){
+    // FORE/AFT SHIELD BALANCE (user 2026-07-08, TIE Fighter/X-Wing reference): s.shieldBalance (0-100, default 50)
+    // splits the SAME total pool's effectiveness between front and rear arcs - reuses powerMult()'s existing
+    // 0.4x-1.6x curve (the exact shape already used for weapons/engines/shields power routing) so a hit from a
+    // well-covered facing is absorbed more efficiently, a hit from a thin facing spills through even with plenty
+    // of shield left in reserve. The pool itself stays one number - only how EFFICIENTLY it blocks a given hit
+    // depends on facing - so regen/docked-bonus/etc. above are untouched.
+    let facingMult=1;
+    if(fromPos){ _vhit.copy(fromPos).sub(s.pos); if(_vhit.lengthSq()>1e-6){ _vhit.normalize();
+      const bal=s.shieldBalance==null?50:s.shieldBalance;
+      const isFront=_vhit.dot(FWD.clone().applyQuaternion(s.quat))>0;
+      facingMult=powerMult(isFront?bal:100-bal); } }
+    const absorb=Math.min(s.shield,dmg,dmg*facingMult); s.shield-=absorb; dmg-=absorb;
+  } return dmg; }   // returns the LEFTOVER damage that spills to hull
 // AUTO-DOCK (user 2026-07-07: "if you fly into the planet auto dock to it"): physical proximity alone docks - no go/dock command required. Returns the base or a planet if the ship is currently inside its dock radius.
 function autoDockTarget(s){   // Ranger Command is a DELIBERATE dock now (a button prompt, Space-Rangers style - see dockPromptTick) - only planets auto-dock on approach
   for(const p of planets) if(s.pos.distanceTo(p.pos)<=CFG.DOCK_R) return p; return null; }
@@ -622,6 +638,8 @@ function dockPromptTick(){ const P=ships[0]; if(!P||!base) return;
   // tell why. Tightened to comfortably INSIDE the real gate so the button never promises access the menu can't give.
   const show = !P.docked && P.alive && P.pos.distanceTo(base.pos)<=CFG.BASE_R*0.85;
   btn.style.display = show?'block':'none'; }
+function burstHudTick(){ const P=ships[0]; const el=document.getElementById('burstHud'); if(!P||!el) return;   // user 2026-07-08: unmistakable feedback that burst mode is actually doing something
+  el.style.display = P._nitroActive?'block':'none'; }
 // Shared arrival logic (base hub OR a planet's rep-gated market) - used by BOTH auto-dock and a `go`-commanded
 // arrival, so the two paths can never drift apart. Returns {mode,aimDir,ease} for the caller to apply.
 function completeDock(s,p,isBase){
@@ -1172,6 +1190,11 @@ function flyStep(s,dt){
   if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
   s._nitroWasActive=nitroActive;
   s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(s.hullSpeed||1)*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier
+  // user 2026-07-08 ("when I hold shift I want to have burst mode"): the line above only fires while W is ALSO
+  // held (multiplies s.ctrl.thr, which is 0 otherwise) - so Shift alone gave one kick then coasted to a stop under
+  // drag, never reading as a sustained "burst". A real afterburner propels you on its own, no second key needed -
+  // this term is independent of s.ctrl.thr, active for exactly as long as Shift is held.
+  if(nitroActive) s.vel.addScaledVector(fwd,CFG.NITRO_AUTOTHRUST*engMult*dt);
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
   const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
@@ -1189,7 +1212,8 @@ function flyStep(s,dt){
   s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
-  s.mesh.userData.eng.material.opacity=0.3+0.5*s.ctrl.thr; s.mesh.userData.eng.scale.setScalar(1.3+1.5*s.ctrl.thr);
+  const engVisT=nitroActive?1:s.ctrl.thr;                                                            // burst mode flares the engine glow to full even with W not held - the visible half of "it's really doing something"
+  s.mesh.userData.eng.material.opacity=0.3+0.5*engVisT; s.mesh.userData.eng.scale.setScalar(1.3+1.5*engVisT);
 }
 // ---- friendly-fire exception + consequence (see bullets-vs-ships loop below) ----
 function ffCanHit(owner,victim){
@@ -2136,11 +2160,22 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!a[1]){ if(window.PANELS&&window.POWERPANEL) PANELS.open('powerpanel');   // the visual 3-bar draggable panel - its own edge tab also opens/closes it
       term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool - routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
       for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
-      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max <span style="opacity:.55">· try: power weapons 80</span>`,'sys'); return; }
+      const bal0=P.shieldBalance==null?50:P.shieldBalance;
+      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max · fore/aft <b>${Math.round(bal0)}/${Math.round(100-bal0)}</b> <span style="opacity:.55">· try: power weapons 80 · shield fwd</span>`,'sys'); return; }
     const sys=POWER_SYS.find(k=>k.startsWith(a[1].toLowerCase())); if(!need(sys,'power weapons|engines|shields &lt;0-100&gt;')) return;
     const lvl=parseFloat(a[2]); if(!need(isFinite(lvl),'give a level 0-100, e.g. power shields 70')) return;
     setPower(P,sys,lvl); const p1=shipPower(P);
     term(`Rerouted - <b>${sys}</b> ${Math.round(p1[sys])}% · ${POWER_SYS.filter(k=>k!==sys).map(k=>k+' '+Math.round(p1[k])+'%').join(' · ')}.`,'sys');
+    if(window.SOUND) SOUND.play('ui'); return; }
+  // FORE/AFT SHIELD BALANCE (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio") - a
+  // second dial alongside the weapons/engines/shields pool, same TIE-Fighter/X-Wing reference as `power` above.
+  if(c==='shield'||c==='shields'){
+    if(!a[1]){ const bal=P.shieldBalance==null?50:P.shieldBalance;
+      term(`<b style="color:#8fd0ff">🛡 SHIELD BALANCE</b> fore <b>${Math.round(bal)}%</b> / aft <b>${Math.round(100-bal)}%</b> <span style="opacity:.55">(shifts how efficiently the SAME pool blocks a hit from that arc - try: shield fwd · shield aft · shield even · shield 70)</span>`,'sys'); return; }
+    const w=a[1].toLowerCase(); let bal=w.startsWith('fwd')||w.startsWith('fore')||w.startsWith('front')?100:w.startsWith('aft')||w.startsWith('rear')||w.startsWith('back')?0:w.startsWith('even')?50:parseFloat(a[1]);
+    if(!need(isFinite(bal),'give fwd, aft, even, or a number 0-100 (0=full aft, 100=full fwd)')) return;
+    P.shieldBalance=clamp(bal,0,100);
+    term(`Shield balance set - fore <b>${Math.round(P.shieldBalance)}%</b> / aft <b>${Math.round(100-P.shieldBalance)}%</b>.`,'sys');
     if(window.SOUND) SOUND.play('ui'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot - try: scan')) return; t=o; }
     term(`<b>${t.name}</b> reasoning chain (TDRE-style, grounded):`,'sys'); reasonChain(t).forEach(l=>term('&nbsp;&nbsp;'+l,'sys')); return; }
@@ -3183,6 +3218,8 @@ window.HOST={
   // the `power` text command - same effect, for a UI panel / the parasite's own proactive reroutes).
   powerOf:(s)=>shipPower(s||ships[0]), setPower:(s,sys,lvl)=>setPower(s||ships[0],sys,lvl), powerMult,
   shieldOf:(s)=>{ s=s||ships[0]; const max=shieldMaxFor(s); return { cur:(s.shield==null?max:s.shield), max }; },
+  shieldBalanceOf:(s)=>{ s=s||ships[0]; return s.shieldBalance==null?50:s.shieldBalance; },
+  setShieldBalance:(s,v)=>{ s=s||ships[0]; s.shieldBalance=clamp(Number(v)||0,0,100); return s.shieldBalance; },
   priceOf:(p,k,buying)=>buying?priceOf(p,k)*repBuyFactor(p):priceOf(p,k),
   sound:(n)=>{ if(window.SOUND) try{ SOUND.play(n); }catch(e){} },
   get KNOW(){ return window.GAME_KNOW; },
@@ -3793,7 +3830,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); updateTargetingReticle(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); updateTargetingReticle(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }

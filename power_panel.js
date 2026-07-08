@@ -119,6 +119,21 @@ function setPower(sys, level) {
   try { H.setPower(H.P, sys, level); } catch (e) {}
 }
 
+// FORE/AFT SHIELD BALANCE (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio") -
+// a second dial alongside the weapons/engines/shields pool above. 0 = full aft, 100 = full fore, 50 = even.
+function readBalance() {
+  var H = getHost();
+  if (!H || typeof H.shieldBalanceOf !== 'function') return 50;
+  var v = null;
+  try { v = H.shieldBalanceOf(H.P); } catch (e) { v = null; }
+  return (typeof v === 'number' && !isNaN(v)) ? clamp(v, 0, 100) : 50;
+}
+function setBalance(v) {
+  var H = getHost();
+  if (!H || typeof H.setShieldBalance !== 'function') return;
+  try { H.setShieldBalance(H.P, v); } catch (e) {}
+}
+
 function playSound(name) {
   var H = getHost();
   if (!H || typeof H.sound !== 'function') return;
@@ -130,8 +145,10 @@ var PP = {
   built: false, shown: false,
   root: null, hullEl: null, shieldEl: null,
   bars: {},       // sys.key -> {fillEl, trackEl, pctEl, multEl}
+  balance: null,  // {trackEl, fillFore, fillAft, labelEl}
   timer: null,
-  dragSys: null,  // which system is currently being dragged (or null)
+  dragSys: null,     // which of the 3 vertical power systems is being dragged (or null)
+  dragBalance: false, // is the fore/aft shield-balance bar being dragged
 };
 
 // value (0-100) -> fill fraction, top-anchored fill (bar fills from bottom up)
@@ -178,9 +195,15 @@ function renderBars() {
   }
 }
 
+function renderBalance() {
+  if (!PP.built || PP.dragBalance) return;   // skip re-reading while the user is actively dragging it (same rule as renderBars)
+  applyBalanceVisual(readBalance());
+}
+
 function renderAll() {
   try { renderStatus(); } catch (e) {}
   try { renderBars(); } catch (e) {}
+  try { renderBalance(); } catch (e) {}
 }
 
 // translate a pointer Y within a track's bounding box into a 0-100 level (bottom of track = 0, top = 100)
@@ -282,6 +305,79 @@ function buildBar(sys) {
   return col;
 }
 
+// horizontal fore/aft shield-balance bar - same click/drag-to-set language as the vertical bars above,
+// just on the X axis: left = full aft, right = full fore.
+function balanceFromPointer(trackEl, clientX) {
+  if (!trackEl || typeof trackEl.getBoundingClientRect !== 'function') return null;
+  var rect = null;
+  try { rect = trackEl.getBoundingClientRect(); } catch (e) { return null; }
+  if (!rect || !rect.width) return null;
+  var frac = (clientX - rect.left) / rect.width;
+  return clamp(frac * 100, 0, 100);
+}
+function applyBalanceVisual(bal) {
+  var b = PP.balance; if (!b) return;
+  if (b.fillAft) b.fillAft.style.width = (100 - bal).toFixed(1) + '%';
+  if (b.fillFore) b.fillFore.style.width = bal.toFixed(1) + '%';
+  if (b.labelEl) b.labelEl.textContent = 'FORE ' + round(bal) + '% / AFT ' + round(100 - bal) + '%';
+}
+function wireBalanceDrag(trackEl) {
+  if (!trackEl) return;
+  var d = doc();
+  function applyAt(clientX) {
+    var bal = balanceFromPointer(trackEl, clientX);
+    if (bal == null) return;
+    setBalance(bal); applyBalanceVisual(bal);
+  }
+  function onMove(ev) {
+    if (!PP.dragBalance) return;
+    var x = (ev.touches && ev.touches[0]) ? ev.touches[0].clientX : ev.clientX;
+    applyAt(x);
+    if (ev.preventDefault) try { ev.preventDefault(); } catch (e) {}
+  }
+  function endDrag() {
+    if (!PP.dragBalance) return;
+    PP.dragBalance = false;
+    if (d && typeof d.removeEventListener === 'function') {
+      try {
+        d.removeEventListener('mousemove', onMove); d.removeEventListener('mouseup', endDrag);
+        d.removeEventListener('touchmove', onMove); d.removeEventListener('touchend', endDrag);
+      } catch (e) {}
+    }
+  }
+  function startDrag(ev) {
+    PP.dragBalance = true; playSound('ui');
+    var x = (ev.touches && ev.touches[0]) ? ev.touches[0].clientX : ev.clientX;
+    applyAt(x);
+    if (d && typeof d.addEventListener === 'function') {
+      try {
+        d.addEventListener('mousemove', onMove); d.addEventListener('mouseup', endDrag);
+        d.addEventListener('touchmove', onMove, { passive: false }); d.addEventListener('touchend', endDrag);
+      } catch (e) {}
+    }
+    if (ev.preventDefault) try { ev.preventDefault(); } catch (e) {}
+  }
+  if (trackEl && typeof trackEl.addEventListener === 'function') {
+    trackEl.addEventListener('mousedown', startDrag);
+    trackEl.addEventListener('touchstart', startDrag, { passive: false });
+  }
+  trackEl._ppStartDrag = startDrag; trackEl._ppMove = onMove; trackEl._ppEnd = endDrag;
+}
+function buildBalanceBar() {
+  var wrap = el('div', 'margin-top:9px;padding-top:8px;border-top:1px solid ' + CFG.COL_TRACK_BORDER);
+  var label = el('div', 'font:700 9px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-bottom:4px;text-align:center', 'FORE 50% / AFT 50%');
+  var track = el('div',
+    'position:relative;height:12px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';' +
+    'border-radius:5px;overflow:hidden;cursor:ew-resize;touch-action:none;-webkit-user-select:none;user-select:none');
+  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:50%;background:' + CFG.COL_ENGINES + '55');
+  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:50%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset');
+  track.appendChild(fillAft); track.appendChild(fillFore);
+  wrap.appendChild(label); wrap.appendChild(track);
+  wireBalanceDrag(track);
+  PP.balance = { trackEl: track, fillFore: fillFore, fillAft: fillAft, labelEl: label };
+  return wrap;
+}
+
 function build(parentEl) {
   if (PP.built) return PP.root;
   var d = doc(); if (!d) { PP.built = true; return null; }   // node/no-DOM: mark built, nothing to show
@@ -320,6 +416,8 @@ function build(parentEl) {
   var row = el('div', 'display:flex;justify-content:space-between;gap:' + CFG.BAR_GAP + 'px');
   for (var i = 0; i < SYSTEMS.length; i++) row.appendChild(buildBar(SYSTEMS[i]));
   root.appendChild(row);
+
+  root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio"
 
   if (parent && parent.appendChild) parent.appendChild(root);
   PP.root = root; PP.built = true;
@@ -377,7 +475,7 @@ if (typeof require !== 'undefined' && require.main === module) {
         if (!listeners[type]) return;
         var idx = listeners[type].indexOf(fn); if (idx >= 0) listeners[type].splice(idx, 1);
       },
-      getBoundingClientRect: function () { return { top: 100, bottom: 208, height: 108, left: 0, right: 30 }; },
+      getBoundingClientRect: function () { return { top: 100, bottom: 208, height: 108, left: 0, right: 30, width: 30 }; },   // a real DOMRect always carries width alongside height; the horizontal balance-bar test needs it
       set onclick(f) { this._onclick = f; }, get onclick() { return this._onclick || null; },
       _fire: function (type, evt) { var ls = listeners[type] || []; for (var i = 0; i < ls.length; i++) ls[i](evt || {}); },
     };
@@ -416,6 +514,8 @@ if (typeof require !== 'undefined' && require.main === module) {
       },
       powerMult: function (level) { return 0.4 + (Math.max(0, Math.min(100, level)) / 100) * (1.6 - 0.4); },
       shieldOf: function (s) { s = s || fakeShip; return { cur: 42, max: 60 }; },
+      shieldBalanceOf: function (s) { s = s || fakeShip; return s.shieldBalance == null ? 50 : s.shieldBalance; },
+      setShieldBalance: function (s, v) { s = s || fakeShip; s.shieldBalance = Math.max(0, Math.min(100, Number(v) || 0)); return s.shieldBalance; },
       sound: function (name) { /* no-op stub */ },
     },
   };
@@ -484,6 +584,26 @@ if (typeof require !== 'undefined' && require.main === module) {
   var total = fakeShip.power.weapons + fakeShip.power.engines + fakeShip.power.shields;
   check('HOST.setPower reroute keeps pool total constant (~150)', Math.abs(total - 150) < 0.5);
   check('HOST.setPower actually moved shields to 80', Math.abs(fakeShip.power.shields - 80) < 0.5);
+
+  // 7b. fore/aft shield-balance bar (user 2026-07-08 "tie fighter... shields forward/behind ratio")
+  check('balance bar built', !!(pp._PP.balance && pp._PP.balance.trackEl));
+  var balTrack = pp._PP.balance ? pp._PP.balance.trackEl : null;
+  if (balTrack && balTrack._ppStartDrag) {
+    safeCall('simulated balance drag: mousedown at clientX=30 (rect left=0,right=30 -> full fore)', function () {
+      balTrack._ppStartDrag({ clientX: 30 });
+    });
+    check('balance drag start called HOST.setShieldBalance (near 100, full fore)', fakeShip.shieldBalance != null && fakeShip.shieldBalance > 90);
+    safeCall('simulated balance drag: mousemove to clientX=0 (full aft), fired on document', function () {
+      global.document._fire('mousemove', { clientX: 0 });
+    });
+    check('balance drag move re-called HOST.setShieldBalance (near 0, full aft)', fakeShip.shieldBalance < 10);
+    safeCall('simulated balance drag: mouseup ends it', function () { global.document._fire('mouseup', {}); });
+  } else {
+    check('drag handle wired onto balance track', false);
+  }
+  safeCall('direct HOST.setShieldBalance(fakeShip, 70)', function () { global.window.HOST.setShieldBalance(fakeShip, 70); });
+  check('HOST.setShieldBalance actually moved it to 70', Math.abs(fakeShip.shieldBalance - 70) < 0.5);
+  check('HOST.shieldBalanceOf reads it back', Math.abs(global.window.HOST.shieldBalanceOf(fakeShip) - 70) < 0.5);
 
   // 8. mounting into an explicit parent element works
   var altParent = stubEl();
