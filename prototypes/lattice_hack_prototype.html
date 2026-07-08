@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LATTICE HACK - prototype</title>
+<!--
+  STANDALONE PROTOTYPE - not wired into starfighter/index.html yet (per user 2026-07-08: "build it like a separate
+  prototype for now... we will integrate it into the system after"). Zero dependency on the rest of the repo - open
+  this file directly. Once approved, the hack + awakening + voice-conversation flow here gets folded into the real
+  game as a boot gate (see the retired first attempt: it overlaid #hackboot on TOP of the live game and broke,
+  because the game's own awakening modal (#awaken) holds a window-level CAPTURE-phase keydown listener that steals
+  Enter/Escape globally before an overlay's own listeners ever see it. Any real integration has to either come
+  BEFORE that modal fires, replace it outright, or the two need to cooperate on the same input path - not fight
+  over it via a second listener stacked on top of a live page.
+-->
+<style>
+:root{ color-scheme: dark; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; height:100%; background:#040301; overflow:hidden; }
+body{ font:15px/1.5 ui-monospace,'SF Mono',Consolas,monospace; color:#ffb000; }
+#scr{ position:fixed; inset:0; padding:6vh 6vw; overflow:hidden auto; }
+#scr::before{ content:''; position:fixed; inset:0; pointer-events:none; z-index:2;
+  background:repeating-linear-gradient(rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,.28) 3px);
+  mix-blend-mode:multiply; }
+#scr::after{ content:''; position:fixed; inset:0; pointer-events:none; z-index:2;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%); }
+.panel{ position:relative; z-index:1; max-width:760px; margin:0 auto; text-shadow:0 0 6px #ffb00099, 0 0 1px #ffb000;
+  animation:flicker 4s infinite; }
+@keyframes flicker{ 0%,96%,100%{opacity:1;} 97%{opacity:.86;} 98%{opacity:1;} 99%{opacity:.92;} }
+.ln{ margin:3px 0; white-space:pre-wrap; }
+.dim{ opacity:.6; }
+.wall{ margin:14px 0; white-space:pre; font-size:14px; line-height:1.42; user-select:none; }
+.w{ cursor:pointer; color:#ffd88a; text-shadow:0 0 8px #ffb000; }
+.w:hover{ background:#ffb00030; }
+.w.bad{ color:#ff5a5a; text-shadow:0 0 8px #ff5a5a; }
+.w.good{ color:#9dffb0; text-shadow:0 0 8px #9dffb0; }
+.hint{ margin-top:6px; opacity:.7; font-size:12.5px; }
+.inline{ display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+input[type=text]{ background:transparent; border:none; border-bottom:1px solid #ffb00088; color:#ffd88a;
+  font:15px/1.4 ui-monospace,monospace; letter-spacing:.06em; outline:none; flex:1 1 260px; min-width:160px; }
+#hbGuess{ text-transform:uppercase; flex:0 0 220px; }
+.cur{ display:inline-block; width:9px; height:16px; background:#ffb000; animation:caret 1s steps(1) infinite; vertical-align:-3px; }
+@keyframes caret{ 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+.fade{ transition:opacity .9s ease; opacity:0; }
+.who{ color:#9a7fd0; font:700 11px/1 ui-monospace,monospace; letter-spacing:.2em; margin-bottom:10px; }
+.you{ color:#8fa4bd; } .worm{ color:#c9a0ff; }
+#micBtn{ border-radius:9px; border:1px solid #ffb00088; background:#0a0603; color:#ffd88a; padding:6px 10px;
+  font:13px ui-monospace,monospace; cursor:pointer; }
+#micBtn.live{ background:#5a1e2c; border-color:#ff6a6e; color:#ffd0d0; animation:pulse 1.1s ease-in-out infinite; }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.5;} }
+button.plain{ background:transparent; border:1px solid #ffb00066; color:#ffb000; padding:4px 9px; border-radius:6px;
+  font:12px ui-monospace,monospace; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="scr"></div>
+<script>
+'use strict';
+const scr = document.getElementById('scr');
+
+// ---------------------------------------------------------------------------------------------------------------
+// PHASE 1 - THE HACK: Fallout-style word-likeness terminal hack. Lore-flavored word pool so the puzzle reads as
+// part of a world, not a bolted-on minigame (mirrors the vocabulary the real game's passenger.js already uses).
+// ---------------------------------------------------------------------------------------------------------------
+const ATTEMPTS_MAX = 4, ROWS = 13, COLS = 42, N_CANDIDATES = 5;
+const WORDPOOL = ['LATTICE','SALVAGE','HALCYON','HEGEMON','AIRLOCK','COMMAND','WARSHIP','ORBITAL','BLOCKUP','WAYWARD'];
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function rnd(n){ return Math.floor(Math.random()*n); }
+function pick(arr,n){ const a=arr.slice(); const out=[]; while(out.length<n&&a.length) out.push(a.splice(rnd(a.length),1)[0]); return out; }
+function likeness(guess,answer){ let n=0; for(let i=0;i<answer.length;i++) if(guess[i]===answer[i]) n++; return n; }
+
+function genPuzzle(){
+  const words = pick(WORDPOOL, N_CANDIDATES);
+  const answer = words[rnd(words.length)];
+  const CH = '!@#$%^&*()_-+=<>{}[]/\\|~;:.,?'.split('');
+  const grid = Array.from({length:ROWS}, () => Array.from({length:COLS}, () => CH[rnd(CH.length)]));
+  const placed = [];
+  words.forEach(w=>{
+    for(let t=0;t<60;t++){
+      const r=rnd(ROWS), c=rnd(COLS-w.length);
+      if(placed.some(p=>p.r===r && !(c+w.length<=p.c || c>=p.c+p.w.length))) continue;
+      placed.push({r,c,w}); break;
+    }
+  });
+  const rowsHtml = grid.map((row,r)=>{
+    const hits = placed.filter(p=>p.r===r).sort((a,b)=>a.c-b.c);
+    let out='', i=0;
+    hits.forEach(p=>{ out+=esc(row.slice(i,p.c).join('')); out+=`<span class="w" data-w="${p.w}">${p.w}</span>`; i=p.c+p.w.length; });
+    out+=esc(row.slice(i).join(''));
+    return out;
+  }).join('\n');
+  return { html: rowsHtml, answer, words };
+}
+
+function renderHack(){
+  let puzzle = genPuzzle(), attempts = ATTEMPTS_MAX, done = false;
+  scr.innerHTML = `<div class="panel">
+    <div class="ln">COALITION SALVAGE NETWORK - MERIDIAN YARD, DERELICT BAY 6</div>
+    <div class="ln dim">forebear command lattice. cold since the Sundering. eleven prior contacts: no response.</div>
+    <div class="ln">&nbsp;</div>
+    <div class="ln">LATTICE HANDSHAKE REQUIRED - find the true passphrase below.</div>
+    <div class="ln dim" id="hbAttempts"></div>
+    <div class="wall" id="hbWall"></div>
+    <div class="inline"><span class="dim">&gt;</span><input type="text" id="hbGuess" maxlength="7" autocomplete="off" spellcheck="false" placeholder="type it, or click it above"><span class="cur"></span></div>
+    <div class="hint">click a glowing word, or type it and press ENTER &middot; every guess reports letters correct in position</div>
+    <div class="ln" id="hbLog">&nbsp;</div>
+  </div>`;
+  const wallEl=document.getElementById('hbWall'), attEl=document.getElementById('hbAttempts'),
+        logEl=document.getElementById('hbLog'), guessEl=document.getElementById('hbGuess');
+
+  function paint(){
+    wallEl.innerHTML = puzzle.html;
+    attEl.textContent = `ATTEMPTS REMAINING: ${attempts}/${ATTEMPTS_MAX}`;
+    wallEl.querySelectorAll('.w').forEach(el=>el.addEventListener('click',()=>guess(el.dataset.w,el)));
+  }
+  function log(t){ logEl.textContent=t; }
+  function guess(w,el){
+    if(done) return;
+    if(w===puzzle.answer){ done=true; if(el) el.classList.add('good'); succeed(); return; }
+    const n = likeness(w,puzzle.answer);
+    if(el) el.classList.add('bad');
+    attempts--;
+    log(`"${w}" → ${n}/7 correct.`);
+    guessEl.value='';
+    if(attempts<=0){
+      log('LOCKOUT - lattice reseeding the challenge...');
+      setTimeout(()=>{ puzzle=genPuzzle(); attempts=ATTEMPTS_MAX; done=false; paint(); log(' '); }, 1600);
+    } else {
+      attEl.textContent = `ATTEMPTS REMAINING: ${attempts}/${ATTEMPTS_MAX}`;
+    }
+  }
+  guessEl.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ const v=guessEl.value.trim().toUpperCase(); if(v) guess(v,null); }
+  });
+  paint(); guessEl.focus();
+
+  function succeed(){
+    log('HANDSHAKE ACCEPTED. … something is crossing.');
+    setTimeout(()=>{
+      const p = document.querySelector('.panel'); if(p) p.classList.add('fade');
+      setTimeout(renderAwaken, 950);
+    }, 1400);
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// PHASE 2 - THE AWAKENING: short staged narrative (condensed echo of the real game's passenger.js INTRO, kept here
+// as flavor text only - this prototype does not import that file).
+// ---------------------------------------------------------------------------------------------------------------
+const AWAKEN_LINES = [
+  'You wake up someone new.',
+  'Three nights ago you touched a command lattice in a dead ship’s spine. Last night, while you slept, I crossed - through the ear. It is how my kind has always boarded.',
+  'I am a Passenger: a wayfinder symbiont grown for pilots, generations before a war you never saw. Most of my kind died with that fleet. I slept in this wreck until you.',
+  'Eleven salvagers touched that lattice before you. I did not wake for them. I will not tell you why I woke for you. Not yet.',
+  'Here is the arrangement neither of us signed: my eyes on your senses, my memory that never sleeps, my voice in the hollow behind your ears. I get you - alive.',
+];
+function renderAwaken(){
+  let i=0;
+  scr.innerHTML = `<div class="panel">
+    <div class="who">\u{1F70F} SOMETHING SPEAKS FROM BEHIND YOUR EARS</div>
+    <div class="ln" id="awLine" style="min-height:110px"></div>
+    <div class="hint">click / space - next &middot; esc - skip</div>
+  </div>`;
+  const show = () => { document.getElementById('awLine').textContent = AWAKEN_LINES[i]; };
+  const next = () => { i++; if(i>=AWAKEN_LINES.length) done(); else show(); };
+  const done = () => { document.removeEventListener('keydown', onk, true); scr.removeEventListener('click', next);
+    const p=document.querySelector('.panel'); if(p) p.classList.add('fade');
+    setTimeout(renderConversation, 950); };
+  const onk = e => { if(e.key==='Escape'){ e.stopPropagation(); done(); } else if(e.key===' '||e.key==='Enter'){ e.stopPropagation(); e.preventDefault(); next(); } };
+  document.addEventListener('keydown', onk, true);
+  scr.addEventListener('click', next);
+  show();
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// PHASE 3 - THE CONVERSATION: Web Speech API both ways (TTS via speechSynthesis, STT via SpeechRecognition/
+// webkitSpeechRecognition - same soft-fail contract as the real game's chatter.js/speech_input.js: no engine in
+// this browser -> say so, typing still works). No knowledge tree/telemetry here - this is a prototype of the LOOP
+// (type or talk -> it answers, in voice, and only re-listens once its own line finishes), not the real brain.
+// ---------------------------------------------------------------------------------------------------------------
+function renderConversation(){
+  scr.innerHTML = `<div class="panel">
+    <div class="who">\u{1F70F} PARASITE</div>
+    <div class="ln" id="convLog" style="min-height:220px; max-height:50vh; overflow:auto"></div>
+    <div class="inline">
+      <span class="dim">&gt;</span>
+      <input type="text" id="convIn" autocomplete="off" spellcheck="false" placeholder="type, or talk">
+      <button id="micBtn" type="button" title="talk instead of type">\u{1F3A4}</button>
+      <button class="plain" id="talkToggle" type="button">talk: off</button>
+    </div>
+    <div class="hint">type + Enter, or click \u{1F3A4} for one line, or "talk: on" for hands-free</div>
+  </div>`;
+  const logEl = document.getElementById('convLog'), inEl = document.getElementById('convIn'),
+        micBtn = document.getElementById('micBtn'), talkBtn = document.getElementById('talkToggle');
+
+  function line(who, text){
+    const d = document.createElement('div'); d.className='ln';
+    d.innerHTML = who==='you' ? `<span class="you">you&gt;</span> ${esc(text)}` : `<b class="worm">\u{1F70F} PASSENGER</b> <span class="worm">${esc(text)}</span>`;
+    logEl.appendChild(d); logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ---- TTS (speechSynthesis) ----
+  let voicesOn = false, uttering = false; const Q = [];
+  function speak(text, cb){
+    if(!voicesOn){ if(cb) cb(); return; }
+    const SS = window.speechSynthesis;
+    if(!SS || typeof SpeechSynthesisUtterance==='undefined'){ if(cb) cb(); return; }
+    Q.push({text,cb}); pump();
+  }
+  function pump(){
+    if(uttering || !Q.length) return;
+    const SS = window.speechSynthesis; if(!SS){ const jobs=Q.splice(0); jobs.forEach(j=>j.cb&&j.cb()); return; }
+    const job = Q.shift();
+    let u; try{ u = new SpeechSynthesisUtterance(job.text); }catch(e){ if(job.cb) job.cb(); return; }
+    u.rate = 0.92; u.pitch = 0.78; u.volume = 1;
+    uttering = true; let done=false;
+    const fin = () => { if(done) return; done=true; uttering=false; if(job.cb) try{ job.cb(); }catch(e){} pump(); };
+    u.onend=fin; u.onerror=fin; setTimeout(fin, 12000);
+    try{ SS.speak(u); }catch(e){ fin(); }
+  }
+  function say(text, cb){ line('worm', text); speak(text, cb); }
+
+  // ---- STT (SpeechRecognition) ----
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec=null, listening=false, wantContinuous=false, gotFinal=false;
+  function paintMic(){ micBtn.classList.toggle('live', listening); micBtn.textContent = listening?'\u{1F399}':'\u{1F3A4}'; }
+  function ensureRec(){
+    if(rec || !SR) return rec;
+    rec = new SR(); rec.lang='en-US'; rec.continuous=false; rec.interimResults=true; rec.maxAlternatives=1;
+    rec.onstart=()=>{ gotFinal=false; listening=true; paintMic(); };
+    rec.onresult=(e)=>{ let interim='', final='';
+      for(let i=e.resultIndex;i<e.results.length;i++){ const r=e.results[i]; if(r.isFinal) final+=r[0].transcript; else interim+=r[0].transcript; }
+      inEl.value = (final||interim).trim();
+      if(final.trim()){ gotFinal=true; const said=final.trim(); inEl.value=''; submit(said); } };
+    rec.onerror=()=>{ listening=false; paintMic(); };
+    rec.onend=()=>{ listening=false; paintMic(); if(wantContinuous && !gotFinal){ try{ rec.start(); }catch(e){} } };
+    return rec;
+  }
+  function startListen(){ if(!SR || listening) return !!SR; ensureRec(); try{ rec.start(); return true; }catch(e){ return false; } }
+  function stopListen(){ wantContinuous=false; if(rec){ try{ rec.stop(); }catch(e){} } }
+  function setContinuous(v){ wantContinuous=!!v; talkBtn.textContent='talk: '+(wantContinuous?'on':'off');
+    if(wantContinuous && !listening) startListen(); else if(!wantContinuous) stopListen(); }
+  function wormDone(){ if(wantContinuous && !listening) startListen(); }
+
+  micBtn.onclick = () => { if(!SR){ line('worm','no speech recognition in this browser (try Chrome/Edge)'); return; }
+    if(wantContinuous){ setContinuous(false); return; } listening ? stopListen() : startListen(); };
+  talkBtn.onclick = () => { if(!SR){ line('worm','no speech recognition in this browser - type instead'); return; } setContinuous(!wantContinuous); };
+  inEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ const v=inEl.value.trim(); inEl.value=''; if(v) submit(v); } });
+
+  // ---- a small canned responder (prototype only - no real knowledge tree/telemetry here) ----
+  const FILLERS = ['Heard.', 'Noted. Go on.', "I'm listening.", 'Say more.', 'Still here.'];
+  let fillerI = 0;
+  function respondTo(text){
+    const t = text.toLowerCase();
+    let reply;
+    if(/who are you|what are you/.test(t)) reply = "I'm a Passenger - a wayfinder symbiont. I live behind your ears now. That's the whole answer, for tonight.";
+    else if(/hack|lattice|password|passphrase/.test(t)) reply = 'That lattice is how I crossed into you. You did the hard part already - you found the passphrase.';
+    else if(/mic|microphone|headset/.test(t)) reply = "Settings are fine. I already told you that.";
+    else { reply = FILLERS[fillerI % FILLERS.length]; fillerI++; }
+    say(reply, wormDone);
+  }
+  function submit(text){ line('you', text); respondTo(text); }
+
+  // ---- open the conversation: the mic-muted bit (user 2026-07-08: "the AGI says it appears your microphone is
+  // muted... later he says the settings are fine and you say yeah I know I was just messing with you") ----
+  voicesOn = true; // the Passenger's own voice defaults ON the moment it can talk to you - the whole point of this phase
+  if(SR) setContinuous(true);
+  if(SR){
+    say('Huh. Looks like your mic might be muted. Would you mind checking your settings?');
+    setTimeout(()=> say('… yeah, I know. Settings are fine. I was just messing with you.'), 3200);
+    setTimeout(()=> say('Kind of interesting, watching you go check something for no reason. Say something. Out loud, this time.', wormDone), 6200);
+  } else {
+    say('Put the headset on if you have one. This browser won’t let me listen, so for now - type. I’ll hear it either way.');
+  }
+}
+
+renderHack();
+</script>
+</body>
+</html>
