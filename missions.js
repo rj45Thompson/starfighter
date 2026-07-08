@@ -112,9 +112,12 @@
 
   function mkMission(type, rank, mult, title, desc, tgt) {
     var base = hcfg('MISSION_BASE_REWARD', CFG.MISSION_BASE_REWARD);
+    var h = H(), p = player();
+    var ldrLvl = (h && p && typeof h.skillLvl === 'function') ? num(h.skillLvl(p, 'leadership'), 0) : 0;
+    var ldrMult = 1 + hcfg('SKILL_LEADERSHIP_REWARD', 0.05) * ldrLvl;   // SR-M17: leadership negotiates better contract terms
     return {
       id: seq++, type: type, rank: rank, title: title, desc: desc, tgt: tgt || {},
-      reward: Math.round(base * (1 + rank) * mult),
+      reward: Math.round(base * (1 + rank) * mult * ldrMult),
       score: Math.round(CFG.SCORE_BASE * (1 + rank)),
       rep: CFG.REP_BASE * (1 + rank),
       prog: '', st: { done: false }
