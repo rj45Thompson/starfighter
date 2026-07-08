@@ -17,6 +17,12 @@
 // Persists {pinned, open, opacity} per id to localStorage (lazy load once, save on change - never wipes).
 'use strict';
 (function(){
+// ANDROID/TOUCH FIX (user 2026-07-08 "fix the panels for android"): the auto-hide-when-idle behavior below is
+// entirely mouseenter/mouseleave-driven - a desktop-only "IDE hover" affordance. Touch has no hover state at all,
+// so on a phone an unpinned panel's hide timer starts the instant it opens and is NEVER refreshed (tapping inside
+// it doesn't fire mouseenter), meaning it slides away ~1.6s after opening even while you're still tapping around
+// in it. Same IS_TOUCH formula index.html already uses (kept independent - this file stays self-contained).
+const IS_TOUCH = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window);
 const CFG = {
   STORE_KEY:'SF_PANELS_v2',   // bumped v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
@@ -65,7 +71,17 @@ if(!document.getElementById('pnl-style')){
     '.pnl-grip{ position:fixed; z-index:'+(CFG.Z+1)+'; width:'+CFG.RESIZE_GRIP+'px; height:'+CFG.RESIZE_GRIP+'px; cursor:nwse-resize; pointer-events:auto;'+
       ' background:linear-gradient(135deg,transparent 0%,transparent 45%,'+COL.border+' 45%,'+COL.border+' 55%,transparent 55%,transparent 100%),'+
       'linear-gradient(135deg,transparent 0%,transparent 65%,'+COL.border+' 65%,'+COL.border+' 75%,transparent 75%,transparent 100%); border-radius:0 0 6px 0; }'+
-    '.pnl-grip:hover{ background-color:'+COL.cyan+'22; }';
+    '.pnl-grip:hover{ background-color:'+COL.cyan+'22; }'+
+    // ANDROID/TOUCH: the desktop sizes above (20x18 buttons, 16x16 grip) are well under a comfortable touch
+    // target (~40px+) - fine for a mouse pointer, fiddly for a fingertip. `pointer:coarse` is the standard signal
+    // for "primary input is imprecise" and degrades gracefully on hybrid devices (a touchscreen laptop with a
+    // mouse plugged in still gets the small desktop sizing once the mouse is the active pointer).
+    '@media (pointer:coarse){'+
+      '.pnl-btn{ width:34px; height:30px; font-size:13px; }'+
+      '.pnl-op{ width:70px; height:20px; }'+
+      '.pnl-tab{ padding:8px 14px; font-size:12px; }'+
+      '.pnl-grip{ width:28px; height:28px; }'+
+    '}';
   document.head.appendChild(st);
 }
 
@@ -137,7 +153,10 @@ function applyVisual(rec){
 }
 function positionGrip(rec){   // bottom-right corner of the panel's own current rect (only meaningful while open)
   const r=rec.el.getBoundingClientRect();
-  rec.grip.style.top=(r.bottom-CFG.RESIZE_GRIP)+'px'; rec.grip.style.left=(r.right-CFG.RESIZE_GRIP)+'px';
+  // read the grip's OWN rendered size rather than assume CFG.RESIZE_GRIP - the touch media query above enlarges
+  // it, and anchoring off the wrong (smaller) constant would leave it hanging partway off the panel's corner.
+  const gw=rec.grip.offsetWidth||CFG.RESIZE_GRIP, gh=rec.grip.offsetHeight||CFG.RESIZE_GRIP;
+  rec.grip.style.top=(r.bottom-gh)+'px'; rec.grip.style.left=(r.right-gw)+'px';
 }
 
 // BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
@@ -150,6 +169,10 @@ function persist(rec){ store[rec.id]={...(store[rec.id]||{}), pinned:rec.pinned,
 function armAutoHide(rec){
   clearTimeout(rec.hideT);
   if(rec.pinned || !rec.open) return;
+  // ANDROID/TOUCH: auto-hide-on-idle is a hover affordance with no touch equivalent - arming it here would just
+  // close the panel out from under a touch user with no warning. Touch users open/close explicitly (tab or ✕);
+  // the pin button still works exactly the same (still shows "pinned" state, still user-toggleable).
+  if(IS_TOUCH) return;
   rec.hideT=setTimeout(()=>{
     if(rec.pinned) return;
     if(rec.keepOpenWhile && rec.keepOpenWhile()) { armAutoHide(rec); return; }   // e.g. the chat input still has focus
@@ -191,8 +214,16 @@ function reflowEdge(edge){
 function register(id, el, opts){
   opts=opts||{}; if(!el) return null;
   const saved=store[id]||{};
+  // ANDROID/TOUCH: every panel here defaults to open+pinned (the caller has to opt OUT per-panel, and most don't -
+  // see khud/powerpanel above for the only two that do). That's fine on a wide desktop screen where edge panels
+  // have room; on a narrow phone every "on by default" panel piles up on top of the others (roster+market+
+  // terminal all open+pinned = three overlapping boxes before the player has touched anything). Only touches the
+  // FIRST-EVER load (saved.open/pinned stay authoritative the moment a player actually opens/closes/pins anything -
+  // this never overrides a real preference, only the un-set initial default) - a phone starts clean, every panel
+  // still one tap away on its edge tab exactly as before.
+  const touchDefaultOpen = !IS_TOUCH && opts.defaultOpen!==false, touchDefaultPinned = !IS_TOUCH && opts.defaultPinned!==false;
   const rec={ id, el, edge:opts.edge||'top', centerX:!!opts.centerX, rgb:opts.rgb||[9,17,27], title:opts.title||id,
-    open: saved.open!=null?saved.open:(opts.defaultOpen!==false), pinned: saved.pinned!=null?saved.pinned:(opts.defaultPinned!==false),
+    open: saved.open!=null?saved.open:touchDefaultOpen, pinned: saved.pinned!=null?saved.pinned:touchDefaultPinned,
     opacity: clamp01(saved.opacity!=null?saved.opacity:(opts.defaultOpacity!=null?opts.defaultOpacity:0.88)),
     onOpenChange:opts.onOpenChange||null, keepOpenWhile:opts.keepOpenWhile||null, hovering:false, hideT:null };
 
