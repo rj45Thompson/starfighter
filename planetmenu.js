@@ -530,6 +530,12 @@ function hangarHtml(){
       ? 'Hull, weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">blackmarket</b> and <b style="color:'+COL.AMBER+'">fence</b> are still terminal-only. Upgrades are planetside.'
       : 'Weapons and equipment fit through the LOADOUT slots below - <b style="color:'+COL.AMBER+'">terraform</b> is still terminal-only.')
     + '</div>';
+  // user 2026-07-08: "its not clear you can only upgrade hull at ranger command" - the old hint was a small note
+  // buried below the hull rows themselves (only visible once you'd already clicked in expecting to buy). A
+  // banner ABOVE the loadout header instead, visible the instant this tab opens, before you've gone looking.
+  if(!S.isBase) h += '<div class="pm-note" style="border:1px solid '+COL.AMBER+'55;background:'+COL.AMBER+'14;padding:8px 10px;margin-bottom:8px">'
+    + '<b style="color:'+COL.AMBER+'">⌂ HULL SWAPS ARE RANGER-COMMAND-ONLY</b> - this world can fit your WEAPON and EQUIPMENT, '
+    + 'but changing HULL CLASS needs a dock at Ranger Command specifically (<b style="color:'+COL.AMBER+'">go base</b>).</div>';
   /* -- Star-Control-2/Space-Rangers-style loadout screen: slot header, then the (unchanged) buy
      lists for whichever slot is expanded. hullSectionHtml/weaponSectionHtml/equipSectionHtml and
      the HOST.runCmd('hull '+key) / ('weapon '+key) / ('install '+key) calls inside them are

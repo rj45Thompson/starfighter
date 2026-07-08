@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708d"></script>
-<script src="fflate.min.js?v=20260708d"></script>
-<script src="fbxloader.js?v=20260708d"></script>
+<script src="three.min.js?v=20260708e"></script>
+<script src="fflate.min.js?v=20260708e"></script>
+<script src="fbxloader.js?v=20260708e"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708d"></script>
-<script src="inhabitant.js?v=20260708d"></script>
-<script src="passenger.js?v=20260708d"></script>
-<script src="gamemod.js?v=20260708d"></script>
-<script src="chatter.js?v=20260708d"></script>
-<script src="speech_input.js?v=20260708d"></script>
-<script src="vision.js?v=20260708d"></script>
-<script src="deliberate.js?v=20260708d"></script>
-<script src="knowledge.js?v=20260708d"></script>
-<script src="acquire.js?v=20260708d"></script>
-<script src="sound.js?v=20260708d"></script>
-<script src="hullmodels.js?v=20260708d"></script>
-<script src="knowledge_hud.js?v=20260708d"></script>
-<script src="thoughts.js?v=20260708d"></script>
-<script src="tami_battle_ui.js?v=20260708d"></script>
-<script src="power_panel.js?v=20260708d"></script>
-<script src="panels.js?v=20260708d"></script>
+<script src="speech_tier.js?v=20260708e"></script>
+<script src="inhabitant.js?v=20260708e"></script>
+<script src="passenger.js?v=20260708e"></script>
+<script src="gamemod.js?v=20260708e"></script>
+<script src="chatter.js?v=20260708e"></script>
+<script src="speech_input.js?v=20260708e"></script>
+<script src="vision.js?v=20260708e"></script>
+<script src="deliberate.js?v=20260708e"></script>
+<script src="knowledge.js?v=20260708e"></script>
+<script src="acquire.js?v=20260708e"></script>
+<script src="sound.js?v=20260708e"></script>
+<script src="hullmodels.js?v=20260708e"></script>
+<script src="knowledge_hud.js?v=20260708e"></script>
+<script src="thoughts.js?v=20260708e"></script>
+<script src="tami_battle_ui.js?v=20260708e"></script>
+<script src="power_panel.js?v=20260708e"></script>
+<script src="panels.js?v=20260708e"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708d"></script>
-<script src="conquest.js?v=20260708d"></script>
-<script src="missions.js?v=20260708d"></script>
-<script src="planetmenu.js?v=20260708d"></script>
-<script src="textquests.js?v=20260708d"></script>
+<script src="starmap.js?v=20260708e"></script>
+<script src="conquest.js?v=20260708e"></script>
+<script src="missions.js?v=20260708e"></script>
+<script src="planetmenu.js?v=20260708e"></script>
+<script src="textquests.js?v=20260708e"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -232,6 +232,7 @@ const CFG = {
   REP_KILL_HEG:0.4, REP_LIBERATE:3,          // M2: coalition standing - fight the Hegemon, planets warm to you
   // ---- weak enemy pirates (farm targets) + inter-agent communication ----
   PIRATE_MAX:11, PIRATE_HP:62, PIRATE_DMG:9, PIRATE_HUNT_R:170, PIRATE_SPAWN_CD:6, PIRATE_LOOT:14, FLAME_CRUISER_CHANCE:0.3,
+  LAWLESS_SPAWN_BIAS:0.4,   // user 2026-07-08 "pirate space not owned" - odds a new pirate spawns in the lawless system specifically, vs uniform-random across the galaxy
   COMM_R:190, COMM_CD:3.5,          // radio range for agent-to-agent messages + per-agent cooldown
   COMM_EPS:0.12, COMM_LR:0.5, COMM_LEARN_CD:0.22,   // A1: Lewis-game exploration ε, learning rate, episode cadence
   CHAIN_SPEAK_CD:7.5,                                // A0: how often the focused pilot narrates its full reasoning chain to radio
@@ -603,6 +604,23 @@ function makeBase(){ if(!systems.length) return; const c=systems[0].center.clone
   const ring=new T.Mesh(new T.TorusGeometry(CFG.BASE_R,0.5,8,60), new T.MeshBasicMaterial({color:0x9fd8ff,transparent:true,opacity:0.25})); ring.position.copy(c); ring.rotation.x=Math.PI/2; scene.add(ring);
   const lab=spriteText('⌂ RANGER COMMAND',26,'#bfeaff',{bg:'rgba(10,26,44,0.72)',pad:8,r:8,align:'center',ws:0.06}); lab.sp.position.copy(c); lab.sp.position.y+=13; lab.sp.renderOrder=9; scene.add(lab.sp);
   base.blip=topBlip('#9fd8ff',15,1); base.blip.position.copy(c); }
+// PIRATE STATION (user 2026-07-08: "add pirate space stations and pirate space not owned"): a criminal hub in
+// the galaxy's one LAWLESS system - no coalition presence, elevated pirate activity. Modeled as a special PLANET
+// (not a second bespoke singleton like base) so the ENTIRE existing dock/market/hangar machinery works unchanged;
+// isPirateStation exempts it from the normal hostile-docking refusal (completeDock) and gates blackmarket here too.
+let pirateStation=null;
+function makePirateStation(){ if(!systems.length) return; const sys=systems[systems.length-1]; sys.lawless=true;   // furthest system from Ranger Command (systems[0]) - the frontier, nobody's beat
+  const c=sys.center.clone().add(new T.Vector3(-CFG.SUN_R*3.4,-CFG.SUN_R*0.6,CFG.SUN_R*2.2));
+  const stock={}; GOODS.forEach(g=>stock[g.k]=CFG.EQ_STOCK);
+  const p={ name:'Kestrel\'s Reach', type:{t:'Pirate Station',col:0x8a1818,makes:{},needs:{}}, pos:c, radius:22, baseRadius:22,
+    stock, system:sys, rep:CFG.REP_HOSTILE-1, wealth:CFG.PLANET_WEALTH0*1.4, dev:2, eq:CFG.EQ_STOCK, underThreat:false, defCd:0,
+    hull:CFG.PLANET_HULL*1.6, maxHull:CFG.PLANET_HULL*1.6, hullT:0, terra:0, terraformable:false, isPirateStation:true };
+  const m=new T.Mesh(new T.IcosahedronGeometry(p.radius,1), new T.MeshStandardMaterial({color:0x2a1414,emissive:0x6a1414,emissiveIntensity:0.55,roughness:0.55,metalness:0.4})); m.position.copy(c); scene.add(m); p.mesh=m; p.spin=0.018;
+  const rg=new T.Mesh(new T.TorusGeometry(CFG.DOCK_R,0.55,8,52), new T.MeshBasicMaterial({color:0xff4a4a,transparent:true,opacity:0.35})); rg.position.copy(c); rg.rotation.x=Math.PI/2; scene.add(rg); p.ring=rg;
+  const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xff3a3a,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.55})); halo.scale.setScalar(p.radius*4.5); m.add(halo);
+  const lab=spriteText('☠ '+p.name,26,'#ffd0d0',{bg:'rgba(30,8,8,0.75)',pad:8,r:8,align:'center',ws:0.075}); lab.sp.position.copy(c); lab.sp.position.y+=p.radius+9; lab.sp.renderOrder=9; scene.add(lab.sp); p.label=lab;
+  p.blip=topBlip('#ff3a3a',15,1); p.blip.position.copy(c);
+  sys.planets.push(p); planets.push(p); pirateStation=p; }
 function atBase(s){ return base && s.pos.distanceTo(base.pos)<CFG.BASE_R; }
 // =================================================================================================
 //  X-WING POWER MANAGEMENT (user 2026-07-07): "power reroute to shields engines or lasers all use the
@@ -644,19 +662,24 @@ function drainShield(s,dmg,fromPos){ if(s.shield==null) s.shield=shieldMaxFor(s)
       facingMult=powerMult(isFront?bal:100-bal); } }
     const absorb=Math.min(s.shield,dmg,dmg*facingMult); s.shield-=absorb; dmg-=absorb;
   } return dmg; }   // returns the LEFTOVER damage that spills to hull
-// AUTO-DOCK (user 2026-07-07: "if you fly into the planet auto dock to it"): physical proximity alone docks - no go/dock command required. Returns the base or a planet if the ship is currently inside its dock radius.
-function autoDockTarget(s){   // Ranger Command is a DELIBERATE dock now (a button prompt, Space-Rangers style - see dockPromptTick) - only planets auto-dock on approach
-  for(const p of planets) if(s.pos.distanceTo(p.pos)<=CFG.DOCK_R) return p; return null; }
 // SPACE-RANGERS DOCK PROMPT (user 2026-07-07): "Ranger Command should be like Space Rangers - I fly to it and a
-// button appears to dock". Unlike a planet (auto-dock), the home base surfaces a real button; you choose to press it.
-function dockPromptTick(){ const P=ships[0]; if(!P||!base) return;
-  const btn=document.getElementById('dockPromptBtn'); if(!btn) return;
-  // user 2026-07-07 ("hull appears grayed out even though I have the money"): this used to show the button out to
-  // BASE_R*1.15 (~53u) while hull/blackmarket/repair all gate on the plain atBase() check (<BASE_R, 46u) - clicking
-  // DOCK from the 46-53u band opened the loadout screen with every base-only action already disabled, no way to
-  // tell why. Tightened to comfortably INSIDE the real gate so the button never promises access the menu can't give.
-  const show = !P.docked && P.alive && P.pos.distanceTo(base.pos)<=CFG.BASE_R*0.85;
-  btn.style.display = show?'block':'none'; }
+// button appears to dock". Generalized 2026-07-08 ("add button to land on planets or ranger space station or a
+// other space station") to EVERY dockable target, not just the base - fly close to anything dockable and the
+// SAME deliberate button appears, labeled for whatever's nearest. Replaces the old silent planet auto-dock.
+let dockTarget=null;   // whatever completeDock() should target if the button is clicked right now (a planet, or `base`)
+function dockPromptTick(){ const P=ships[0]; const btn=document.getElementById('dockPromptBtn'); if(!P||!btn) return;
+  dockTarget=null;
+  if(P.docked || !P.alive){ btn.style.display='none'; return; }
+  let bestD=Infinity;
+  // user 2026-07-07 ("hull appears grayed out even though I have the money"): the button used to show out to
+  // BASE_R*1.15 while hull/blackmarket/repair all gate on the plain atBase() check (<BASE_R) - clicking DOCK from
+  // that gap opened the loadout screen with everything already disabled, no way to tell why. Every candidate below
+  // uses a radius comfortably INSIDE its own real gate, so the button never promises access the menu can't give.
+  if(base){ const d=P.pos.distanceTo(base.pos); if(d<=CFG.BASE_R*0.85 && d<bestD){ bestD=d; dockTarget=base; } }
+  for(const p of planets){ const d=P.pos.distanceTo(p.pos); if(d<=CFG.DOCK_R*0.85 && d<bestD){ bestD=d; dockTarget=p; } }
+  if(!dockTarget){ btn.style.display='none'; return; }
+  btn.textContent = dockTarget===base ? '⌂ DOCK AT RANGER COMMAND' : dockTarget.isPirateStation ? ('☠ DOCK AT '+dockTarget.name) : ('⬇ LAND ON '+dockTarget.name);
+  btn.style.display='block'; }
 function burstHudTick(){ const P=ships[0]; const el=document.getElementById('burstHud'); if(!P||!el) return;   // user 2026-07-08: unmistakable feedback that burst mode is actually doing something
   el.style.display = P._nitroActive?'block':'none'; }
 let _creditsHudShown=null;   // user 2026-07-08: "I can't see my credits on the main screen" - always-visible readout, top-right; only touches the DOM when the number actually changes
@@ -667,7 +690,7 @@ function creditsHudTick(){ const P=ships[0]; const el=document.getElementById('c
 // arrival, so the two paths can never drift apart. Returns {mode,aimDir,ease} for the caller to apply.
 function completeDock(s,p,isBase){
   if(isBase){ s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
-  if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }
+  if(p.rep<=CFG.REP_HOSTILE && !p.isPirateStation){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }   // a pirate station's whole business model is welcoming ships everyone else refuses - see makePirateStation()
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player' && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
   // SR-M9 TEXT QUESTS (REQUIREMENTS_SR.md, "SR2's signature feature"): a chance to offer a branching quest on
@@ -844,7 +867,8 @@ function addDefender(p,target){ if(ships.length>=CFG.MAX_SHIPS) return null;
 let pirateCd=0, chainSpeakCd=3;
 function addPirate(){ if(ships.filter(s=>s.team==='pirate').length>=enemyCap()) return null;
   const ti=Math.max(0, hegTier()-(rand(0,1)<0.4?1:0)), HT=HEG_TIERS[ti];   // mostly current tier, some lower
-  const sys=systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()};
+  const lawlessSys=systems.find(sy=>sy.lawless);
+  const sys=(lawlessSys && rand(0,1)<CFG.LAWLESS_SPAWN_BIAS) ? lawlessSys : (systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()});
   const off=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.SYSTEM_R*rand(0.8,1.15));
   const rosterName=novelPirateName();   // N3: synod roster canon name when the novel roster is loaded; else legacy HEG tier name
   const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
@@ -1105,17 +1129,13 @@ function think(s,dt){
   if(nearBound){ mode='BOUND'; aimDir=_v.copy(s.pos).multiplyScalar(-1); }             // safety: turn back at the edge
   else if(s.role==='player'){ const o=s.obj;                                            // human-commanded ship (terminal)
     if(s.docked && s.pos.distanceTo(s.docked.pos)>CFG.DOCK_R+8) s.docked=null;
-    const autoDock=!s.docked&&autoDockTarget(s);
-    if(autoDock){ const r=completeDock(s,autoDock,!!autoDock._base); mode=r.mode; aimDir=r.aimDir; ease=r.ease; }
-    else if(!o){ mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0; }
+    // user 2026-07-08 ("add button to land on planets"): planets used to auto-dock the instant you drifted inside
+    // DOCK_R, no choice involved - inconsistent with Ranger Command's own deliberate ⌂ DOCK button. Both now HOLD
+    // on arrival and wait for the (generalized) dockPromptTick() button; see completeDock/dockPromptTick below.
+    if(!o){ mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0; }
     else if(o.type==='goto'){ const p=o.planet; const d=s.pos.distanceTo(p.pos);   // hyperspace REMOVED (balance): the player flies real-space too
-      if(p._base){ if(d<=CFG.BASE_R*0.9){ s.obj=null; mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15; } else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }   // SPACE-RANGERS DOCK PROMPT (user 2026-07-07): arriving just HOLDS position near the base now - the ⌂ DOCK button (dockPromptTick) is the deliberate action, no more instant auto-dock
-      else if(d<=CFG.DOCK_R){ if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); mode='FLEE'; aimDir=_v.copy(s.pos).sub(p.pos); ease=1; }
-        else { s.docked=p; s.obj=null; contractDeliver(p);
-          if(s.role==='player' && p.rep>CFG.REP_HOSTILE && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
-          dockMenu(p,false); mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15;
-          if(s.role==='player'){ if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
-        } }
+      const approachR=p._base?CFG.BASE_R*0.9:CFG.DOCK_R;
+      if(d<=approachR){ s.obj=null; mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0.15; }
       else { mode='TRADE'; aimDir=_v.copy(p.pos).sub(s.pos); } }
     else if(o.type==='hunt'){ if(o.target&&o.target.alive){ mode='HUNT'; target=o.target; aimDir=_v.copy(o.target.pos).sub(s.pos); } else { s.obj=null; term('Target down / lost.','sys'); } }
     else if(o.type==='bombard'){ if(planets.indexOf(o.planet)<0){ s.obj=null; } else { mode='HUNT'; target=o.planet; aimDir=_v.copy(o.planet.pos).sub(s.pos); } }
@@ -1738,7 +1758,7 @@ function maybeAwaken(force){ const lines=PASSENGER.introLines(force);
   show(); }
 
 // ================= PLAYER TERMINAL - a human commands their own ship (ships[0]) by text =================
-function findPlanet(n){ if(!n) return null; return planets.find(p=>p.name.toLowerCase().startsWith(n)) || (parseInt(n)>=0?planets[parseInt(n)]:null); }
+function findPlanet(n){ if(!n) return null; n=n.toLowerCase(); return planets.find(p=>p.name.toLowerCase().startsWith(n)) || (parseInt(n)>=0?planets[parseInt(n)]:null); }   // BUG FIX 2026-07-08: only the planet's OWN name was lowercased, not the search term - "go Cydon" (typed exactly as shown everywhere in the UI) silently failed; only all-lowercase "go cydon" ever matched
 function findGood(n){ if(!n) return null; return GOODS.find(g=>g.k===n||g.n.toLowerCase().startsWith(n)); }
 const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15}, fuel:{n:'Fuel Cell',cost:100,desc:'+25 fuel',apply:s=>s.fuelCap+=25},
   scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive - buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}},
@@ -2341,10 +2361,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='galaxy'||c==='systems'||c==='g'){ systems.forEach(sy=>{ term(`<b>${sy.name}</b> system · ${Math.round(P.pos.distanceTo(sy.center))}u away`,'sys'); sy.planets.forEach(p=>{ if(planets.indexOf(p)>=0) term(`   ${p.name} · ${p.type.t} Lv${p.dev}${p.rep?(' · rep '+(p.rep>0?'+':'')+Math.round(p.rep)):''}`,'sys'); }); }); return; }
   if(c==='war'||c==='front'){ const nHeg=ships.filter(s=>s.alive&&s.team==='pirate').length, T=HEG_TIERS[hegTier()];
     term(`<b>THE HEGEMON</b> - escalation ${Math.floor(escalation)} · spawning up to <b>${T.n}</b>-class · ${nHeg} hostile now / cap ${enemyCap()}`,'err');
-    systems.forEach(sy=>term(`   ${sy.name}: ${sy.contested?('<span style="color:#ff6a6a">CONTESTED</span> ('+(sy.enemies||0)+' hostiles)'):'<span style="color:#7fdc8a">free</span>'}`,'sys'));
+    systems.forEach(sy=>term(`   ${sy.name}: ${sy.lawless?'<span style="color:#ff8a4a">⚠ LAWLESS</span> - no one\'s beat, pirates roam free':sy.contested?('<span style="color:#ff6a6a">CONTESTED</span> ('+(sy.enemies||0)+' hostiles)'):'<span style="color:#7fdc8a">free</span>'}`,'sys'));
     const cc=systems.filter(sy=>sy.contested).length; term(cc?`${cc}/${systems.length} systems contested - push them back.`:'All systems free. Hold the line.',cc?'err':'sys'); return; }
   if(c==='warmap'||c==='campaign'){ term(`GALAXY WAR MAP · campaign ${campaign} · escalation ${escalation|0} (${HEG_TIERS[hegTier()].n})`,'sys');
-    systems.forEach(sy=>term(`  ${sy.name}: ${sy.contested?('<span style="color:#ff6a6a">✖ CONTESTED</span> ('+(sy.enemies||0)+' hostiles)'):'<span style="color:#7fdc8a">● free</span>'}`,'sys'));
+    systems.forEach(sy=>term(`  ${sy.name}: ${sy.lawless?'<span style="color:#ff8a4a">⚠ LAWLESS</span>':sy.contested?('<span style="color:#ff6a6a">✖ CONTESTED</span> ('+(sy.enemies||0)+' hostiles)'):'<span style="color:#7fdc8a">● free</span>'}`,'sys'));
     const f=clamp((warScore+CFG.WIN_THRESHOLD)/(2*CFG.WIN_THRESHOLD),0,1), fill=Math.round(f*12);
     term(`  FRONT: <span style="color:#7fdc8a">coalition</span> ${'█'.repeat(fill)}${'░'.repeat(12-fill)} <span style="color:#ff6a6a">Hegemon</span> · ${warScore>=0?'+':''}${warScore.toFixed(1)} / ±${CFG.WIN_THRESHOLD} (win vs lose)`, warScore<0?'err':'sys');
     if(stronghold) term(`  ☠ <b style="color:#ff6a6a">STRONGHOLD</b> in ${stronghold.system?stronghold.system.name:'?'} - hull ${Math.round(100*stronghold.hull/stronghold.maxHull)}% · type <b>assault</b> to break it`,'err'); return; }
@@ -2390,7 +2410,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='hull'){ if(!need(atBase(P),'hull swaps are at Ranger Command (go base)')) return; const k=HULL_ORDER.find(x=>x.startsWith((a[1]||'').toLowerCase()));
     if(!k){ term('HULL CLASSES (hull &lt;class&gt; at base):','sys'); HULL_ORDER.forEach(x=>{ const H=HULLS[x]; term(`  ${x} - <b>${H.n}</b> · hull ${H.hp} · hold ${H.hold} · speed ×${H.speed} · ${H.desc} · ${H.cost?H.cost+'c':'free'}${P.hullClass===x?' [current]':''}`,'sys'); }); return; }
     if(P.hullClass===k){ term(`Already flying a ${HULLS[k].n}.`,'sys'); return; } if(!need(P.credits>=HULLS[k].cost,`need ${HULLS[k].cost}c`)) return; P.credits-=HULLS[k].cost; applyHull(P,k); term(`Refitted into a <b>${HULLS[k].n}</b> - hull ${Math.round(P.maxHp)} · hold ${P.holdCap} · speed ×${HULLS[k].speed}.`,'sys'); return; }
-  if(c==='blackmarket'||c==='bm'){ if(!need(atBase(P),'the black market is at Ranger Command (go base)')) return;
+  if(c==='blackmarket'||c==='bm'){ if(!need(atBase(P)||(P.docked&&P.docked.isPirateStation),'the black market is at Ranger Command or a pirate station (go base)')) return;   // user 2026-07-08 "add pirate space stations" - buying contraband at your OWN faction HQ never made much narrative sense; a pirate station is the natural home for it too
     if(a[1]&&a[2]){ const k=CONTRA_KEYS.find(x=>x.startsWith(a[1].toLowerCase())||CONTRABAND[x].n.toLowerCase().indexOf(a[1].toLowerCase())>=0); if(!need(k,'unknown contraband')) return; const qty=parseInt(a[2])||1, price=CONTRABAND[k].base, cost=price*qty;
       if((a[0]||'')&&cargoTotal(P)+qty>P.holdCap){ term('not enough hold.','err'); return; } if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.contraband[k]=(P.contraband[k]||0)+qty; term(`Bought ${qty} ${CONTRABAND[k].n} (-${cost}c). Sell at HOSTILE worlds - but coalition docks may SCAN you.`,'sys'); return; }
     term('BLACK MARKET (blackmarket &lt;good&gt; &lt;qty&gt;):','sys'); CONTRA_KEYS.forEach(x=>term(`  ${x} - <b>${CONTRABAND[x].n}</b> · ${CONTRABAND[x].base}c${P.contraband[x]?(' · holding '+P.contraband[x]):''}`,'sys')); return; }
@@ -3201,6 +3221,7 @@ function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,
 
 makePlanets();
 makeBase();   // M8: the Ranger Command hub
+makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=500; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull; 500c (was 320 - user: "free units to spare" for testing hulls/gear
 INH.awaken();   // I1/I2/I8: the Inhabitant wakes - deterministic (first alive non-player squad ship); restores INH_STATE_v1 if present
@@ -3353,7 +3374,7 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
   stick.addEventListener('touchend',send); stick.addEventListener('touchcancel',send);
   const hold=(el,on)=>{ if(!el) return; el.addEventListener('touchstart',e=>{ e.preventDefault(); on(true); manOn(); },{passive:false}); const o=e=>{ e.preventDefault(); on(false); }; el.addEventListener('touchend',o); el.addEventListener('touchcancel',o); };
   hold(thb,v=>MAN.thr=v?1:0); hold(fb,v=>MAN.fire=v); })();
-(function(){ const b=document.getElementById('dockPromptBtn'); if(b) b.onclick=()=>{ const P=ships[0]; if(P&&base&&!P.docked){ const r=completeDock(P,base,true); if(window.SOUND) SOUND.play('dock'); } }; })();
+(function(){ const b=document.getElementById('dockPromptBtn'); if(b) b.onclick=()=>{ const P=ships[0]; if(P&&dockTarget&&!P.docked){ completeDock(P,dockTarget,dockTarget===base); if(window.SOUND) SOUND.play('dock'); } }; })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
