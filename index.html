@@ -15,7 +15,8 @@
   .pill{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.1em; color:#8fb0cc;
     border:1px solid #29405a; background:#0c1623aa; border-radius:5px; padding:4px 7px; }
   .pill b{ color:var(--cyan); }
-  #roster{ left:14px; top:44px; display:flex; flex-direction:column; gap:4px; pointer-events:auto; }
+  #rosterWrap{ left:14px; top:44px; pointer-events:auto; }   /* OUTER persistent box (registered w/ PANELS) - buildRoster() wipes the INNER #roster's innerHTML on every rebuild, so the panel chrome lives one level up, same wrapper pattern as #market/#marketBody and #ticker/#logbody */
+  #roster{ display:flex; flex-direction:column; gap:4px; }
   .rs{ display:flex; align-items:center; gap:7px; font:700 11px/1 ui-monospace,monospace; cursor:pointer;
     background:#0c1623bb; border:1px solid #23344a; border-radius:6px; padding:4px 8px; width:182px; transition:.1s; }
   .rs:hover{ border-color:#3a567a; } .rs.foc{ border-color:var(--cyan); box-shadow:0 0 0 1px #46d6ff44 inset; }
@@ -84,7 +85,8 @@
   body.touch #stick, body.touch #btnThr, body.touch #btnFire{ display:block; }
   @media (max-width:760px){
     #pillars{ display:none; }
-    #roster{ top:8px; left:8px; flex-direction:row; flex-wrap:nowrap; gap:5px; overflow-x:auto; max-width:calc(100% - 66px); -webkit-overflow-scrolling:touch; }
+    #rosterWrap{ top:8px; left:8px; max-width:calc(100% - 66px); }
+    #roster{ flex-direction:row; flex-wrap:nowrap; gap:5px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
     .rs{ width:auto; flex:0 0 auto; padding:5px 8px; }
     #ticker{ left:8px; width:calc(100% - 16px); max-width:none; top:48px; bottom:auto; max-height:22vh; font-size:12px; }
     #ticker.big{ width:calc(100% - 16px); max-width:none; max-height:52vh; }
@@ -97,7 +99,7 @@
 <body>
 <div id="stage"></div>
 <div class="hud" id="pillars"></div>
-<div class="hud" id="roster"></div>
+<div class="hud" id="rosterWrap"><div id="roster"></div></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
 <div id="market"><div id="marketBody"></div></div>
 <div class="vlabel" id="lblTop">TOP-DOWN <span>· scroll zoom · drag pan · click select · dbl-click reset</span></div>
@@ -199,6 +201,7 @@ const CFG = {
   POWER_TOTAL:150, POWER_MIN:0, POWER_MAX:100, POWER_DEFAULT:50, POWER_MULT_MIN:0.4, POWER_MULT_MAX:1.6,
   SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
   NITRO_RATE:70,   // %/s the power pool dumps into engines while holding Shift (drains weapons+shields to feed it)
+  NITRO_BOOST_MULT:1.55, NITRO_KICK:15,   // instant afterburner layer (user 2026-07-07 "holding shift does not boost speed"): thrust/vmax mult + one-time forward kick, doesn't wait on the power-stat ramp above
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
@@ -1139,9 +1142,13 @@ function flyStep(s,dt){
   s.bank=lerp(s.bank,-s.ctrl.yaw*CFG.BANK_MAX,1-Math.exp(-CFG.BANK_LERP*dt));
   const fwd=FWD.clone().applyQuaternion(s.quat);
   const engMult=powerMult(shipPower(s).engines);                                                     // X-WING POWER: reroute into engines for a real speed boost
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(s.hullSpeed||1)*engMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier
+  const nitroActive=!!s._nitroActive;
+  const nitroMult=nitroActive?CFG.NITRO_BOOST_MULT:1;                                                // NITRO BURST: instant thrust/vmax layer - doesn't wait on the power-stat ramp above to feel like a boost
+  if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
+  s._nitroWasActive=nitroActive;
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(s.hullSpeed||1)*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -2991,6 +2998,12 @@ if(window.PANELS){
   PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
     defaultOpacity:0.91, hotkeyLabel:'`',
     keepOpenWhile:()=>document.activeElement && document.activeElement.id==='chat' });   // don't yank it away mid-type
+  // user 2026-07-07: "the player list or agi list does not have slider or transparency" - #roster was never
+  // registered at all. It gets the SAME wrapper treatment as #market/#marketBody: registering the OUTER
+  // #rosterWrap (never touched) instead of #roster itself (which buildRoster() wipes wholesale with
+  // innerHTML='' on every rebuild - ship deaths, Tab-cycling focus, etc.) so the pin/opacity chrome survives.
+  const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
+    defaultOpacity:0.9 });
 }
 function buildMarket(){ const el=document.getElementById('market'), body=document.getElementById('marketBody'); if(!planets.length){ el.style.display='none'; return; }
   let h='<div class="mkt-h">GALAXY MARKET · price/unit <span class="mkt-k">green=cheap (buy) · red=dear (sell) · drag the pin ▾ to keep this open</span></div><table><tr><th>good</th>';
@@ -3071,8 +3084,12 @@ if(window.POWERPANEL){ POWERPANEL.mount(); POWERPANEL.show(); }   // same patter
 if(window.PANELS){
   const khudEl=document.getElementById('khud'); if(khudEl) PANELS.register('khud', khudEl, { title:'KNOWLEDGE HUD', edge:'right', rgb:[10,14,24],
     defaultOpacity:0.9, defaultOpen:false, hotkeyLabel:'agi' });
+  // defaultOpen:true (user 2026-07-07: "i don't see the star wars tie fighter or xwing bars for laser speed and
+  // shields") - this is core moment-to-moment combat HUD, the exact X-Wing/TIE-Fighter reference the user asked
+  // for, not a secondary/debug view like the knowledge HUD above - it should be on screen from the start, not
+  // something you have to already know to go find via an edge tab.
   const ppEl=document.getElementById('powerpanel'); if(ppEl) PANELS.register('powerpanel', ppEl, { title:'POWER', edge:'right', rgb:[9,17,27],
-    defaultOpacity:0.9, defaultOpen:false, hotkeyLabel:'power' });
+    defaultOpacity:0.9, defaultOpen:true, hotkeyLabel:'power' });
 }
 loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems) - async; procedural stand-ins until it lands
 // =================================================================================================
@@ -3158,6 +3175,9 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   // and lasers"): dumps the X-Wing power pool into engines, draining weapons+shields to feed it - reuses the
   // SAME setPower reroute the power panel/terminal use, so it is one honest mechanic, not a bespoke side-system.
   // The drain does not auto-restore on release - a burst has a real cost you have to manage afterward.
+  // s._nitroActive is the INSTANT half of the effect (read by flyStep for the thrust/vmax mult + rising-edge
+  // kick below) - it does not wait on this gradual power-stat reroute to ramp up.
+  s._nitroActive=!!MAN.nitro;
   if(MAN.nitro){ const pw=shipPower(s); if(pw.engines<CFG.POWER_MAX-0.5){ setPower(s,'engines',pw.engines+CFG.NITRO_RATE*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } } }
   else s._nitroSounded=false;
   s.fire-=dt;
@@ -3183,7 +3203,10 @@ addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElemen
   if(e.code==='KeyM'){ if(window.PANELS) PANELS.toggle('market'); else { marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); } return; }
   if(e.code==='KeyG'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } return; }   // GALAXY map - the primary way to cross systems (user: "easier to access")
   if(e.code==='Backquote'){ document.getElementById('ticker').classList.toggle('big'); return; }
-  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
+  // ROOT CAUSE of user 2026-07-07 "holding shift does not boost speed": ShiftLeft/ShiftRight were missing from
+  // this whitelist, so keysDown never actually recorded Shift during real flight - MAN.nitro could never turn
+  // true no matter what the nitro physics in flyStep/manualControl did with it. Added here.
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
 addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if(keysDown.delete(e.code)) applyKeys(); });
 // on-screen touch flight controls (multi-touch: steer + thrust + fire at once)
 (function(){ const stick=document.getElementById('stick'), knob=document.getElementById('knob'), thb=document.getElementById('btnThr'), fb=document.getElementById('btnFire'); if(!stick) return; const R=46; let sid=null;

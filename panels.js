@@ -18,7 +18,7 @@
 'use strict';
 (function(){
 const CFG = {
-  STORE_KEY:'SF_PANELS_v1',
+  STORE_KEY:'SF_PANELS_v2',   // bumped v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
   SLIDE_MS:320,                // slide transition duration
   GAP:8,                       // px between stacked panels on the same edge
