@@ -340,8 +340,14 @@ function build(parentEl) {
   return root;
 }
 
-function show() { if (!H.built) build(); if (H.root) H.root.style.display = 'block'; H.shown = true; update(); }
-function hide() { if (H.root) H.root.style.display = 'none'; H.shown = false; }
+// BUGFIX (user 2026-07-08: "i pinned the knowledge hud and couldn't unpin it... got stuck pinned at the top right"):
+// this used to set display:none/'block' directly - a SEPARATE visibility channel from panels.js, which only ever
+// moves a panel via `transform` (see panels.js's applyVisual). Once display:none landed here, panels.js's own
+// pin/unpin/tab controls had nothing left to affect (a transform on a display:none element is invisible either way)
+// - clicking unpin looked like it did nothing. Now this delegates to PANELS when it's registered ours, so there is
+// ONE visibility owner; only falls back to raw display toggling standalone (Node self-test, or before registration).
+function show() { if (!H.built) build(); if (win() && window.PANELS && typeof window.PANELS.open === 'function') { window.PANELS.open('khud'); } else if (H.root) { H.root.style.display = 'block'; } H.shown = true; update(); }
+function hide() { if (win() && window.PANELS && typeof window.PANELS.close === 'function') { window.PANELS.close('khud'); } else if (H.root) { H.root.style.display = 'none'; } H.shown = false; }
 
 // ---- public API ----------------------------------------------------------------------------------------------
 function mount(parentEl) { return build(parentEl); }
@@ -352,8 +358,9 @@ function update() {
 }
 function toggle() { if (!H.built) build(); if (H.shown) hide(); else show(); return H.shown; }
 function visible() { return !!H.shown; }
+function setShown(v) { H.shown = !!v; if (H.shown) try { update(); } catch (e) {} }   // sync point for PANELS' onOpenChange - keeps H.shown correct no matter what triggered the open/close (floating tab, this module's own button, a terminal command)
 
-var API = { mount: mount, update: update, toggle: toggle, visible: visible, CFG: CFG, _H: H };
+var API = { mount: mount, update: update, toggle: toggle, visible: visible, setShown: setShown, CFG: CFG, _H: H };
 
 if (typeof window !== 'undefined') window.KHUD = API;
 if (typeof module !== 'undefined' && module.exports) module.exports = API;

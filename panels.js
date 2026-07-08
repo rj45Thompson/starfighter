@@ -36,6 +36,17 @@ function load(){ try{ store=JSON.parse(localStorage.getItem(CFG.STORE_KEY)||'{}'
 let saveT=null;
 function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(CFG.STORE_KEY, JSON.stringify(store)); }catch(e){} }, 200); }
 load();
+// ONE-TIME MIGRATION (user 2026-07-08 "the knowledge graph hud got stuck pinned"): khud/powerpanel's register()
+// call didn't pass defaultPinned before, so both defaulted pinned:true - combined with their now-fixed legacy
+// display:none close buttons, that produced the stuck-pinned bug. Fixing the DEFAULT only helps a FRESH
+// registration though; anyone who already has pinned:true saved (as this user does) has it outrank the new
+// default forever, same class of problem CFG.STORE_KEY's v1->v2 bump solved for powerpanel's defaultOpen. A full
+// key bump would also wipe unrelated saved state (e.g. the ticker's manually-dragged w/h) that has nothing to do
+// with this bug, so migrate just these two ids' `pinned` flag once, flagged so a deliberate re-pin afterward sticks.
+if(!store.__migratedDefaultPinned2026_07_08){
+  for(const id of ['khud','powerpanel']){ if(store[id]) store[id].pinned=false; }
+  store.__migratedDefaultPinned2026_07_08=true; save();
+}
 
 if(!document.getElementById('pnl-style')){
   const st=document.createElement('style'); st.id='pnl-style';
@@ -67,6 +78,19 @@ function rgba(rgb,a){ return 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+a+')'; }
 // panel is manually resized it becomes a FIXED w/h box (maxWidth/maxHeight cleared so nothing else - a content
 // reflow, the ticker's own .big toggle, a CSS breakpoint - can silently override the size you picked).
 function applyStoredSize(el, w, h){ el.style.width=w+'px'; el.style.maxWidth='none'; el.style.height=h+'px'; el.style.maxHeight='none'; }
+// user 2026-07-08 "the terminal pinning works different than the other windows": not actually the pin/open
+// mechanics (verified those match market/roster exactly) - the real inconsistency is the ticker's OWN pre-existing
+// `.big` class toggle (Backquote key / tbLog button), which only sets max-width/max-height. Once you drag the NEW
+// resize grip, applyStoredSize above sets explicit width/height + maxWidth/maxHeight:none, which silently outranks
+// `.big` forever - the legacy toggle looks broken because it is, for anyone who has ever resized the box. Letting
+// the `.big` toggle call this first restores "CSS decides the size" so it does something again; the grip remains
+// the way to pick an exact custom size afterward.
+function clearSize(id){
+  const r=PANELS_[id]; if(!r||!r.resizable) return;
+  r.el.style.width=''; r.el.style.maxWidth=''; r.el.style.height=''; r.el.style.maxHeight='';
+  if(store[id]){ delete store[id].w; delete store[id].h; save(); }
+  if(r.open && r.grip) positionGrip(r);
+}
 
 function closedTransform(edge, centerX){
   const base=centerX?'translateX(-50%) ':'';
@@ -116,7 +140,12 @@ function positionGrip(rec){   // bottom-right corner of the panel's own current 
   rec.grip.style.top=(r.bottom-CFG.RESIZE_GRIP)+'px'; rec.grip.style.left=(r.right-CFG.RESIZE_GRIP)+'px';
 }
 
-function persist(rec){ store[rec.id]={pinned:rec.pinned, open:rec.open, opacity:rec.opacity}; save(); }
+// BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
+// on every pin/open/opacity change, silently dropping the resize grip's saved w/h the instant you so much as
+// clicked pin or dragged the opacity slider afterward - reproduced live (ticker's saved 663x191 vanished after a
+// handful of pin-toggle test clicks). Spreading the previous entry first preserves any field persist() doesn't
+// itself own (currently just w/h, whatever a future feature adds too).
+function persist(rec){ store[rec.id]={...(store[rec.id]||{}), pinned:rec.pinned, open:rec.open, opacity:rec.opacity}; save(); }
 
 function armAutoHide(rec){
   clearTimeout(rec.hideT);
@@ -168,6 +197,13 @@ function register(id, el, opts){
     onOpenChange:opts.onOpenChange||null, keepOpenWhile:opts.keepOpenWhile||null, hovering:false, hideT:null };
 
   el.style.pointerEvents='auto';
+  // BUGFIX (user 2026-07-08: "i pinned the knowledge hud and couldn't unpin it... got stuck pinned"): some panels
+  // (knowledge_hud.js, power_panel.js) have their OWN legacy internal close button that sets `display:none` DIRECTLY,
+  // left over from before they were wired into this module - this system only ever moves a panel via `transform`
+  // (see applyVisual below), so once display:none lands, no amount of pin/unpin/tab-click can bring it back (a
+  // transform on a display:none element does nothing). Clearing any stale display here means every panel starts
+  // this module's management from a clean, actually-visible baseline, no matter what happened before registration.
+  el.style.display='';
   // reserve a strip for the ctl/tab chrome ON TOP OF whatever top padding the panel already had - so its OWN
   // content (market's title row, the ticker's PARASITE/TERMINAL/... tab row) starts BELOW the chrome instead of
   // underneath it. Longhand paddingTop set inline beats the stylesheet's `padding` shorthand for just this one side.
@@ -238,7 +274,7 @@ function isOpen(id){ const r=PANELS_[id]; return r?r.open:null; }
 function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
 
-const api={ register, open, close, toggle, isOpen, reflow:reflowAll };
+const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize };
 if(typeof window!=='undefined') window.PANELS=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;
 })();

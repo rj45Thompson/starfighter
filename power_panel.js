@@ -506,21 +506,30 @@ function ensureTimer() {
   }, CFG.UPDATE_MS);
 }
 
+// BUGFIX (user 2026-07-08, same class as knowledge_hud.js): used to set display:none/'block' directly, a SEPARATE
+// visibility channel from panels.js (which only ever moves a panel via `transform`) - delegate to PANELS when this
+// panel is registered there so there's one visibility owner, falling back to raw display only when standalone.
 function show() {
   if (!PP.built) build();
-  if (PP.root) PP.root.style.display = 'block';
+  if (win() && window.PANELS && typeof window.PANELS.open === 'function') { window.PANELS.open('powerpanel'); }
+  else if (PP.root) { PP.root.style.display = 'block'; }
   PP.shown = true;
   ensureTimer();
   renderAll();
 }
-function hide() { if (PP.root) PP.root.style.display = 'none'; PP.shown = false; }
+function hide() {
+  if (win() && window.PANELS && typeof window.PANELS.close === 'function') { window.PANELS.close('powerpanel'); }
+  else if (PP.root) { PP.root.style.display = 'none'; }
+  PP.shown = false;
+}
 
 // ---- public API --------------------------------------------------------------------------------------------
 function mount(parentEl) { var r = build(parentEl); ensureTimer(); return r; }
 function toggle() { if (!PP.built) build(); if (PP.shown) hide(); else show(); return PP.shown; }
 function visible() { return !!PP.shown; }
+function setShown(v) { PP.shown = !!v; if (PP.shown) try { renderAll(); } catch (e) {} }   // sync point for PANELS' onOpenChange
 
-var API = { mount: mount, show: show, hide: hide, toggle: toggle, visible: visible, CFG: CFG, _PP: PP };
+var API = { mount: mount, show: show, hide: hide, toggle: toggle, visible: visible, setShown: setShown, CFG: CFG, _PP: PP };
 
 if (typeof window !== 'undefined') window.POWERPANEL = API;
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
