@@ -98,6 +98,7 @@
 </head>
 <body>
 <div id="stage"></div>
+<div id="hitfx" style="position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .05s linear"></div>
 <div class="hud" id="pillars"></div>
 <div class="hud" id="rosterWrap"><div id="roster"></div></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
@@ -119,35 +120,35 @@
 <button id="dockPromptBtn" style="display:none;position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:12;font:800 15px/1 ui-monospace,monospace;letter-spacing:.08em;color:#04121c;background:linear-gradient(#9fe6ff,#46d6ff);border:1px solid #eafcff;border-radius:10px;padding:12px 26px;cursor:pointer;box-shadow:0 0 22px #46d6ff88,0 4px 0 #1a6a8a;pointer-events:auto">⌂ DOCK AT RANGER COMMAND</button>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js"></script>
-<script src="fflate.min.js"></script>
-<script src="fbxloader.js"></script>
+<script src="three.min.js?v=20260707d"></script>
+<script src="fflate.min.js?v=20260707d"></script>
+<script src="fbxloader.js?v=20260707d"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js"></script>
-<script src="inhabitant.js"></script>
-<script src="passenger.js"></script>
-<script src="gamemod.js"></script>
-<script src="chatter.js"></script>
-<script src="vision.js"></script>
-<script src="deliberate.js"></script>
-<script src="knowledge.js"></script>
-<script src="acquire.js"></script>
-<script src="sound.js"></script>
-<script src="hullmodels.js"></script>
-<script src="knowledge_hud.js"></script>
-<script src="thoughts.js"></script>
-<script src="tami_battle_ui.js"></script>
-<script src="power_panel.js"></script>
-<script src="panels.js"></script>
+<script src="speech_tier.js?v=20260707d"></script>
+<script src="inhabitant.js?v=20260707d"></script>
+<script src="passenger.js?v=20260707d"></script>
+<script src="gamemod.js?v=20260707d"></script>
+<script src="chatter.js?v=20260707d"></script>
+<script src="vision.js?v=20260707d"></script>
+<script src="deliberate.js?v=20260707d"></script>
+<script src="knowledge.js?v=20260707d"></script>
+<script src="acquire.js?v=20260707d"></script>
+<script src="sound.js?v=20260707d"></script>
+<script src="hullmodels.js?v=20260707d"></script>
+<script src="knowledge_hud.js?v=20260707d"></script>
+<script src="thoughts.js?v=20260707d"></script>
+<script src="tami_battle_ui.js?v=20260707d"></script>
+<script src="power_panel.js?v=20260707d"></script>
+<script src="panels.js?v=20260707d"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js"></script>
-<script src="conquest.js"></script>
-<script src="missions.js"></script>
-<script src="planetmenu.js"></script>
+<script src="starmap.js?v=20260707d"></script>
+<script src="conquest.js?v=20260707d"></script>
+<script src="missions.js?v=20260707d"></script>
+<script src="planetmenu.js?v=20260707d"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -236,6 +237,7 @@ const CFG = {
   BASE_R:46, SCAN_CHANCE:0.5, SCAN_FINE:0.6, CONTRA_MARKUP:2.3,   // M8/M10: base dock radius; scan probability + fine; contraband fence markup at hostile worlds
   MAX_ENCOUNTERS:4, ENCOUNTER_CD:13, ENCOUNTER_R:17, ENCOUNTER_LIFE:70, NEWS_CD:22,   // M11: roaming derelicts/caches/distress + galaxy news that shocks prices
   CAM_BACK:18, CAM_UP:7.5, CAM_AHEAD:20, CAM_LAG:3.0, CAM_UP_LERP:2.4,
+  HITFX_DUR:0.45, HITFX_MAX_OPACITY:0.55, HITFX_DMG_REF:14, CAM_SHAKE_MAG:0.85,   // user 2026-07-07 "flash red in the direction you are hit and rock the camera"
   SPEAK_SHOW:2.4, SPEECH_WS:0.03,                  // 3D speech bubble: only for meaningful events now, smaller
   NOTIFY_DEDUPE_S:2.5, TOAST_MAX:4, TOAST_LIFE_S:3.2,   // message-triage: collapse identical bursts; cap the corner toast stack
   RIGHT_FRAC:0.4, RIGHT_MIN:340, RIGHT_MAX:600,    // right column width
@@ -593,7 +595,8 @@ function shieldTick(s,dt){ if(!s.alive) return; const max=shieldMaxFor(s);
   if(s.shield>max) s.shield=max;                                                      // power just rerouted AWAY from shields -> ceiling drops immediately
   else if(!s.docked && T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*dt);
   else if(s.docked) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*2*dt); }      // docked = a safe harbor, shields recharge fast too
-function drainShield(s,dmg){ if(s.shield==null) s.shield=shieldMaxFor(s); s.shieldHitT=T0;
+function drainShield(s,dmg,fromPos){ if(s.shield==null) s.shield=shieldMaxFor(s); s.shieldHitT=T0;
+  triggerHitFx(s,fromPos||s.pos,dmg);   // user 2026-07-07: "flash red in the direction you are hit and rock the camera" - no-op for anyone but the player
   if(s.shield>0){ const absorb=Math.min(s.shield,dmg); s.shield-=absorb; dmg-=absorb; } return dmg; }   // returns the LEFTOVER damage that spills to hull
 // AUTO-DOCK (user 2026-07-07: "if you fly into the planet auto dock to it"): physical proximity alone docks - no go/dock command required. Returns the base or a planet if the ship is currently inside its dock radius.
 function autoDockTarget(s){   // Ranger Command is a DELIBERATE dock now (a button prompt, Space-Rangers style - see dockPromptTick) - only planets auto-dock on approach
@@ -602,12 +605,16 @@ function autoDockTarget(s){   // Ranger Command is a DELIBERATE dock now (a butt
 // button appears to dock". Unlike a planet (auto-dock), the home base surfaces a real button; you choose to press it.
 function dockPromptTick(){ const P=ships[0]; if(!P||!base) return;
   const btn=document.getElementById('dockPromptBtn'); if(!btn) return;
-  const show = !P.docked && P.alive && P.pos.distanceTo(base.pos)<=CFG.BASE_R*1.15;
+  // user 2026-07-07 ("hull appears grayed out even though I have the money"): this used to show the button out to
+  // BASE_R*1.15 (~53u) while hull/blackmarket/repair all gate on the plain atBase() check (<BASE_R, 46u) - clicking
+  // DOCK from the 46-53u band opened the loadout screen with every base-only action already disabled, no way to
+  // tell why. Tightened to comfortably INSIDE the real gate so the button never promises access the menu can't give.
+  const show = !P.docked && P.alive && P.pos.distanceTo(base.pos)<=CFG.BASE_R*0.85;
   btn.style.display = show?'block':'none'; }
 // Shared arrival logic (base hub OR a planet's rep-gated market) - used by BOTH auto-dock and a `go`-commanded
 // arrival, so the two paths can never drift apart. Returns {mode,aimDir,ease} for the caller to apply.
 function completeDock(s,p,isBase){
-  if(isBase){ s.obj=null; dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }
+  if(isBase){ s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
   if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player' && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
@@ -1176,6 +1183,20 @@ function ffRetaliate(victim,owner){ if(!owner||owner.role!=='player'||!victim||!
   victim.huntTarget=owner; victim.huntUntil=T0+CFG.FF_RETALIATE_SEC; }
 // ---- ship-vs-ship body collision (user report "ships fly through each other") ----
 const _cn=new T.Vector3(),_cv=new T.Vector3();   // dedicated scratch (killShip clobbers _v2 mid-loop)
+// ---- directional hit feedback: red screen flash toward the hit's source + a camera shake (user 2026-07-07) ----
+const _vhit=new T.Vector3();   // dedicated scratch - drainShield fires mid-statement alongside other _v/_v2 users
+let hitfxT=0, hitfxRX=0, hitfxFZ=1, hitfxMag=1;
+function triggerHitFx(s,fromPos,dmg){ if(s!==ships[0]||!fromPos) return;   // screen-space feedback only means anything for the human's own view
+  _vhit.copy(fromPos).sub(s.pos); if(_vhit.lengthSq()<1e-6) _vhit.set(0,0,1); _vhit.normalize();
+  hitfxRX=_vhit.dot(RGT.clone().applyQuaternion(s.quat)); hitfxFZ=_vhit.dot(FWD.clone().applyQuaternion(s.quat));
+  hitfxMag=clamp(dmg/CFG.HITFX_DMG_REF,0.4,1); hitfxT=CFG.HITFX_DUR; }
+const hitfxEl=document.getElementById('hitfx');
+function updateHitFx(dt){ if(!hitfxEl) return;
+  if(hitfxT>0){ hitfxT=Math.max(0,hitfxT-dt); const k=hitfxT/CFG.HITFX_DUR;
+    const px=(50+hitfxRX*44).toFixed(1), py=(50-hitfxFZ*38).toFixed(1);           // bearing in the player's own frame -> a screen-space hot-spot (front=top, behind=bottom, left/right per side hit)
+    hitfxEl.style.background=`radial-gradient(circle at ${px}% ${py}%, rgba(255,40,40,.95) 0%, rgba(220,20,30,.4) 32%, rgba(200,0,20,0) 68%)`;
+    hitfxEl.style.opacity=(k*hitfxMag*CFG.HITFX_MAX_OPACITY).toFixed(3); }
+  else if(hitfxEl.style.opacity!=='0') hitfxEl.style.opacity='0'; }
 function shipCollisions(){
   const minD=2*CFG.SHIP_R, minDSq=minD*minD, skipD=CFG.SHIP_COLLIDE_SKIP_MULT*CFG.SHIP_R;
   for(let i=0;i<ships.length;i++){ const a=ships[i]; if(!a.alive||a.warping||a.docked) continue;
@@ -1190,8 +1211,8 @@ function shipCollisions(){
         a.vel.addScaledVector(_cn,-imp); c.vel.addScaledVector(_cn,imp);
         if(closing>CFG.SHIP_RAM_MIN_SPEED){ const dmg=closing*CFG.RAM_DMG_SCALE;                  // hull scrape on a hard ram (iframe respected)
           burst(_cv.copy(a.pos).addScaledVector(_cn,CFG.SHIP_R),0xffc07a,8,14,2.4);
-          if(a.iframe<=0&&!a.docked){ if(a.inhabitant) INH.onDamaged(c.name,dmg); a.hp-=drainShield(a,dmg); a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }   // DOCKED = safe harbor (user 2026-07-07): no combat damage while docked; shields absorb first
-          if(c.iframe<=0&&!c.docked){ if(c.inhabitant) INH.onDamaged(a.name,dmg); c.hp-=drainShield(c,dmg); c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
+          if(a.iframe<=0&&!a.docked){ if(a.inhabitant) INH.onDamaged(c.name,dmg); a.hp-=drainShield(a,dmg,c.pos); a.iframe=CFG.IFRAME; if(a.hp<=0) killByShip(a,c); }   // DOCKED = safe harbor (user 2026-07-07): no combat damage while docked; shields absorb first
+          if(c.iframe<=0&&!c.docked){ if(c.inhabitant) INH.onDamaged(a.name,dmg); c.hp-=drainShield(c,dmg,a.pos); c.iframe=CFG.IFRAME; if(c.hp<=0) killByShip(c,a); } } }
       a.mesh.position.copy(a.pos); c.mesh.position.copy(c.pos); } } }
 function step(dt){
   FRAME_N++;
@@ -1228,11 +1249,11 @@ function step(dt){
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire - except the player (and teammates returning fire at the player)
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        s.hp-=drainShield(s,dmg); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors - bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first
+        s.hp-=drainShield(s,dmg,b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors - bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
-            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=drainShield(o2,dmg*0.5); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first
+            if(o2.pos.distanceTo(b.pos)<b.splash){ o2.hp-=drainShield(o2,dmg*0.5,b.pos); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg*0.5); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (I1: identity only if on sensors); X-WING POWER: shields absorb first
         burst(b.pos,s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);
         if(s.hp<=0) killByShip(s,owner); break; } } }
   // bullets vs planets (SIEGE - very slow: planet is tanky + self-heals + its defenders respond; strategic, not a farm)
@@ -1256,7 +1277,7 @@ function step(dt){
       if(a.hp<=0){ destroyAsteroid(i,owner); break; } } } }
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
   for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; for(const a of asteroids){ if(s.pos.distanceTo(a.pos)<CFG.SHIP_R+a.scale){
-    hurt(s,CFG.AST_DMG); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); break; } } }
+    hurt(s,CFG.AST_DMG,a.pos); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); break; } } }
   shipCollisions();   // pairwise ship-body contact: separate + bounce + hull scrape on hard rams
   for(let i=gems.length-1;i>=0;i--){ const g=gems[i]; g.age+=dt; let taken=false;
     for(const s of ships){ if(!s.alive||s.warping) continue; const d=s.pos.distanceTo(g.pos);
@@ -1293,12 +1314,20 @@ function step(dt){
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
-function hurt(s,d){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor - no combat damage while docked; X-WING POWER: shields absorb first
+function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d,fromPos); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor - no combat damage while docked; X-WING POWER: shields absorb first
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   dropCargo(s);                                                     // spill the hold as salvage pods
   spawnGem(_v2.copy(s.pos).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))), CFG.SCRAP_GEM);   // ALWAYS drop some loot
   dropCredits(s.pos, s.credits); s.credits=0;                        // DEATH DROPS ALL YOUR MONEY - a persistent stash for the next ship
+  // user 2026-07-07: "when you die you should lose everything all your money and ship" - credits/cargo are already
+  // wiped above; the SHIP itself (hull class, weapon fit, upgrade levels, installed equipment, artifacts,
+  // contraband) resets to a stock Fighter too, same real-stakes convention as SC2/Space Rangers. Scoped to the
+  // human player only - the AI squad's gear churn is a separate economy simulation, not touched.
+  if(s.role==='player'){
+    s.lvl={weapon:1,engine:1,hull:1}; s.weaponType='energy'; s.equip={}; s.artifacts=[]; s.contraband={};
+    s.fuelCap=CFG.FUEL_CAP; s.senseR=CFG.SENSE_R; s.warpEff=1; s.regenBonus=0; s.targetingComputer=false;
+    applyHull(s,'fighter'); }   // recomputes holdCap/maxHp/hp/hullSpeed/visual model from the reset lvl+equip
   if(window.SOUND) SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'});
   burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); say(s,'Hull breach! Punching out.');
   if(s.team==='pirate' && rand(0,1) < CFG.ART_DROP_BASE+(s.tier||0)*CFG.ART_DROP_PER_TIER) spawnArtifactDrop(s.pos, ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]);   // M6: Hegemon wrecks drop artifacts
@@ -2966,6 +2995,8 @@ function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thou
 function updateCamera(dt){ const s=ships[focus]; if(!s) return;
   const off=new T.Vector3(0,CFG.CAM_UP,CFG.CAM_BACK).applyQuaternion(s.quat);
   chaseCam.position.lerp(s.pos.clone().add(off),1-Math.exp(-CFG.CAM_LAG*dt));
+  if(hitfxT>0 && s===ships[0]){ const shk=hitfxT/CFG.HITFX_DUR*hitfxMag*CFG.CAM_SHAKE_MAG;   // user 2026-07-07: "rock the camera" - only while the camera is actually following the player who got hit
+    chaseCam.position.x+=rand(-1,1)*shk; chaseCam.position.y+=rand(-1,1)*shk; chaseCam.position.z+=rand(-1,1)*shk; }
   const up=WUP.clone().lerp(UPL.clone().applyQuaternion(s.quat),0.6); chaseCam.up.lerp(up,1-Math.exp(-CFG.CAM_UP_LERP*dt)).normalize();
   chaseCam.lookAt(s.pos.clone().addScaledVector(FWD.clone().applyQuaternion(s.quat),CFG.CAM_AHEAD)); }
 const rosterEl=document.getElementById('roster');
@@ -3016,7 +3047,11 @@ function updateMarket(){ if(!marketOn||!planets.length) return;
   const wr=document.getElementById('mkt-war'); if(wr){ const nHeg=ships.filter(s=>s.alive&&s.team==='pirate').length, T=HEG_TIERS[hegTier()], cc=systems.filter(sy=>sy.contested).length;
     wr.innerHTML=`<b style="color:#ff6a6a">⚔ HEGEMON</b> esc ${Math.floor(escalation)} · <b>${T.n}</b>-class · ${nHeg}/${enemyCap()} hostile · `+systems.map(sy=>`${sy.name} <b style="color:${sy.contested?'#ff6a6a':'#7fdc8a'}">${sy.contested?'✖':'●'}</b>`).join(' ')+` · front <b style="color:${warScore<0?'#ff6a6a':'#7fdc8a'}">${warScore>=0?'+':''}${warScore.toFixed(1)}</b>/±${CFG.WIN_THRESHOLD} · camp ${campaign}`+(stronghold?` · <b style="color:#ff6a6a">☠STRONGHOLD ${Math.round(100*stronghold.hull/stronghold.maxHull)}%</b>`:''); }
   const pl=document.getElementById('mkt-planets'); if(pl) pl.innerHTML='PLANETS · '+planets.map(p=>`<b style="color:#${new T.Color(p.type.col).getHexString()}">${p.name}</b> Lv${p.dev} ${Math.round(p.wealth)}c${p.underThreat?' <span style="color:#ff5a6e">⚠</span>':''}`).join('  ·  ');
-  const s=ships[focus], el=document.getElementById('mkt-ship'); if(s&&el){ const cg=Object.keys(s.cargo).map(k=>`${GKEY[k].n} ${s.cargo[k]}`).join(' · ')||'empty';
+  // user 2026-07-07: "I don't see my money stats" - this used to read ships[focus] (whoever you'd last clicked
+  // in the roster/Tab-cycled to), so opening the buy menu after inspecting an AI pilot showed THEIR wallet, not
+  // yours. The market is a player-facing UI (buy/sell already only ever spend the real player's credits via `P`
+  // in runCmd) - it should always show YOUR stats, regardless of who's currently focused for the reasoning graph.
+  const s=ships[0], el=document.getElementById('mkt-ship'); if(s&&el){ const cg=Object.keys(s.cargo).map(k=>`${GKEY[k].n} ${s.cargo[k]}`).join(' · ')||'empty';
     el.innerHTML=`<b style="color:hsl(${s.hue*360},80%,68%)">${s.name}</b> · ${s.role} · <span style="color:#ffcf52">${s.credits}c</span> · fuel ${Math.round(s.fuel)}/${s.fuelCap||CFG.FUEL_CAP} · hold: ${cg}`; } }
 
 // -------- NO-CHEAT economy self-check: prove prices are organic (buy raises, sell lowers, isolated drifts) --------
@@ -3712,7 +3747,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); updateTargetingReticle(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); updateTargetingReticle(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
