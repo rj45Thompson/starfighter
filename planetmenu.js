@@ -13,7 +13,7 @@ var CFG = {
   Z_INDEX: 74,                  // above the away-mission overlay (60) and the war banner (60)
   REFRESH_HEADER_S: 1.0,        // header credits/fuel/hull re-render cadence while open
   REFRESH_CONTENT_S: 3.0,       // live tabs (market/log/ground) re-render cadence while open
-  LOG_MAX: 12,                  // ring-buffer length for pushEvent
+  LOG_MAX: 80,                   // ring-buffer length for pushEvent (SR-M10: a real browsable news timeline, not a 12-line scratchpad)
   QTY_STEPS: [1, 10],           // per-click trade quantities
   DEF_PIPS_MAX: 5,              // defense pips shown in header + ground tab
   EQUIP_BAY_VISUAL_MAX: 8,      // HANGAR loadout equipment-bay grid box count - purely presentational
@@ -32,7 +32,7 @@ var CFG = {
           {k:'missions', n:'MISSIONS'},
           {k:'quests',   n:'QUESTS'},
           {k:'ground',   n:'GROUND'},
-          {k:'log',      n:'LOG'},
+          {k:'log',      n:'NEWS'},
           {k:'depart',   n:'DEPART'} ],
   UP_KINDS: [ {k:'weapon', n:'WEAPON', d:'faster, harder-hitting guns'},
               {k:'engine', n:'ENGINE', d:'more thrust - close, chase, escape'},
@@ -660,9 +660,9 @@ function groundHtml(){
     + '<div class="pm-sub">'+(S.isBase?'no surface here':'closes this screen and drops you planetside')+'</div></div>';
   return h; }
 
-/* ------------------------------------------------ TAB: LOG */
+/* ------------------------------------------------ TAB: NEWS (galaxy timeline: war front, economy, campaign) */
 function logHtml(){
-  if(!S.log.length) return '<div class="pm-note">No events logged yet - fly, trade, fight. The last '+CFG.LOG_MAX+' events land here.</div>';
+  if(!S.log.length) return '<div class="pm-note">No news yet - the front, the markets, and the campaign all report here as they happen. The last '+CFG.LOG_MAX+' items land here, and it survives a reload.</div>';
   var h='', i;
   for(i=0;i<S.log.length;i++){ var e=S.log[i];
     h+='<div class="pm-log"><span class="pm-tm">'+tstr(e.t)+'</span>'+e.h+'</div>'; }
@@ -718,6 +718,11 @@ function pushEvent(html){
   if(S.log.length>CFG.LOG_MAX) S.log.length=CFG.LOG_MAX;
   if(S.open){ renderTabs(); if(S.tab==='log') renderBody(); } }
 
+// SR-M10: news survives a reload - HOST's save/load calls these directly (plain data, no DOM/HOST refs)
+function getLog(){ return S.log.map(function(e){ return { t:e.t, h:e.h }; }); }
+function setLog(arr){ S.log = (Array.isArray(arr) ? arr : []).slice(0, CFG.LOG_MAX).map(function(e){
+  return { t:num(e&&e.t,0), h:String((e&&e.h)==null?'':e.h) }; }); }
+
 function tick(dt){
   if(!S.open) return;
   var d=(typeof dt==='number' && isFinite(dt)) ? dt : 0;
@@ -726,5 +731,5 @@ function tick(dt){
   if(S.tBody>=CFG.REFRESH_CONTENT_S){ S.tBody=0;
     if(S.tab==='market'||S.tab==='log'||S.tab==='ground') renderBody(); } }
 
-window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent };
+window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog };
 })();
