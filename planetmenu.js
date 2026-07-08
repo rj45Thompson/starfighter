@@ -49,7 +49,8 @@ var COL = { HEAD:'#8fd0ff', GOOD:'#7fd0b0', BAD:'#ff8a8a', AMBER:'#ffd27a', VIOL
 /* ------------------------------------------------ STATE */
 var S = { built:false, keysBound:false, open:false, planet:null, isBase:false,
           tab:'market', tHead:0, tBody:0, log:[], el:{},
-          slotOpen:{ hull:false, weapon:false, equip:false, engine:false, gizmo:false } };   /* HANGAR loadout-slot expand/collapse (presentation only) */
+          slotOpen:{ hull:false, weapon:false, equip:false, engine:false, gizmo:false,
+            tank:false, radar:false, scanner:false, shieldgen:false, droid:false, hook:false } };   /* HANGAR loadout-slot expand/collapse (presentation only) */
 
 /* ------------------------------------------------ SAFE HOST ACCESS */
 function H(){ return window.HOST || null; }
@@ -478,6 +479,37 @@ function engineSectionHtml(P){
       + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
   return rows; }
 
+/* -- STANDARD GEAR SLOTS (user 2026-07-08): Fuel Tank/Radar/Scanner/Shield Generator/Repair Droid/Cargo Hook -
+   six more single-slot fits, all structurally identical to ENGINE above (list-or-fitted row, BUY button) - one
+   generic renderer instead of six near-duplicate functions; each reads its table straight off HOST (H().FUEL_TANKS
+   etc, exposed the same live way as HULLS/WEAPONS/ENGINES/GIZMOS) so this file never hardcodes a second copy. -- */
+function simpleSlotSectionHtml(P, tableProp, keysProp, field, defKey, cmdVerb){
+  var h=H(); var TABLE=h&&h[tableProp], KEYS=h&&h[keysProp];
+  if(!TABLE || !Array.isArray(KEYS) || !KEYS.length) return '<div class="pm-note">(registry offline)</div>';
+  var rows='', i;
+  for(i=0;i<KEYS.length;i++){ var key=KEYS[i], it=TABLE[key]; if(!it) continue;
+    var isCurrent = P && (P[field]||defKey)===key;
+    var afford = num(P&&P.credits,0) >= num(it.cost,0);
+    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
+    rows += '<div class="pm-row"><div class="pm-grow">'
+      + '<b style="color:'+COL.HEAD+'">'+esc(it.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">FITTED</span>':'')
+      + '<div class="pm-sub">'+esc(it.desc||'')+'</div></div>'
+      + '<div style="color:'+costCol+'">'+(num(it.cost,0)>0?fmtC(it.cost):'free')+'</div>'
+      + '<button class="pm-b" data-act="cmd" data-cmd="'+cmdVerb+' '+key+'"'
+      + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
+  return rows; }
+var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cmdVerb]
+  ['tank',      'FUEL TANK',        'FUEL_TANKS',    'FUEL_TANK_KEYS',    'fuelTankType', 'standard', 'tank'],
+  ['radar',     'RADAR',            'RADARS',        'RADAR_KEYS',        'radarType',    'basic',    'radar'],
+  ['scanner',   'SCANNER',          'SCANNERS',      'SCANNER_KEYS',      'scannerType',  'none',     'scanner'],
+  ['shieldgen', 'SHIELD GENERATOR', 'SHIELD_GENS',   'SHIELD_GEN_KEYS',   'shieldGenType','none',     'shieldgen'],
+  ['droid',     'REPAIR DROID',     'REPAIR_DROIDS', 'REPAIR_DROID_KEYS', 'droidType',    'none',     'droid'],
+  ['hook',      'CARGO HOOK',       'CARGO_HOOKS',   'CARGO_HOOK_KEYS',   'cargoHookType','none',     'hook'] ];
+function gearSlotHeaderRow(P, def){
+  var h=H(); var TABLE=h&&h[def[2]]; if(!TABLE) return '';
+  var it=TABLE[(P&&P[def[4]])||def[5]]; if(!it) return '';
+  return loadoutSlotHtml(def[0], def[1]+' (1 fitted)', '<b style="color:'+COL.HEAD+'">'+esc(it.n)+'</b>', esc(it.desc||''), S.slotOpen[def[0]]); }
+
 /* -- GIZMOS: the REAL slot-based bay (mount/unmount/sell) - unlike EQUIPMENT above, a gizmo already
    mounted in every slot blocks buying another until you free one. -- */
 function gizmoSectionHtml(P){
@@ -563,8 +595,9 @@ function loadoutHeaderHtml(P){
     + loadoutSlotHtml('weapon', 'WEAPON (1 fitted)', wpnFilled,  wpnSub,  S.slotOpen.weapon)
     + loadoutSlotHtml('engine', 'ENGINE (1 fitted)', engFilled, engSub,  S.slotOpen.engine)
     + loadoutSlotHtml('gizmo',  'ELECTRONICS BAY (' + slots.length + ' slots)', gzFilled, gzSub, S.slotOpen.gizmo)
+    + GEAR_SLOTS.map(function(def){ return gearSlotHeaderRow(P, def); }).join('')
     + equipBayHtml(P)
-    + '<div class="pm-note" style="margin-top:2px">click a slot to open its buy list below - HULL, WEAPON and ENGINE hold exactly one fitting each, '
+    + '<div class="pm-note" style="margin-top:2px">click a slot to open its buy list below - HULL, WEAPON, ENGINE and the six STANDARD GEAR slots each hold exactly one fitting, '
     +   'the ELECTRONICS BAY holds exactly ' + slots.length + ' gizmos (mount/unmount/sell); '
     +   'the EQUIPMENT BAY grid below that is presentational (fills to how many you own), the game itself has no fixed equipment-slot count.</div>'
     + '</div>'; }
@@ -620,6 +653,7 @@ function hangarHtml(){
   if(S.slotOpen.hull)   h += '<div class="pm-panel"><h4>HULL - CHOOSE REPLACEMENT</h4>'+hullSectionHtml(P)+'</div>';
   if(S.slotOpen.weapon) h += '<div class="pm-panel"><h4>WEAPON - CHOOSE REPLACEMENT</h4>'+weaponSectionHtml(P)+'</div>';
   if(S.slotOpen.engine) h += '<div class="pm-panel"><h4>ENGINE - CHOOSE DRIVE</h4>'+engineSectionHtml(P)+'</div>';
+  GEAR_SLOTS.forEach(function(def){ if(S.slotOpen[def[0]]) h += '<div class="pm-panel"><h4>'+def[1]+' - CHOOSE FITTING</h4>'+simpleSlotSectionHtml(P,def[2],def[3],def[4],def[5],def[6])+'</div>'; });
   if(S.slotOpen.gizmo)  h += '<div class="pm-panel"><h4>ELECTRONICS BAY</h4>'+gizmoSectionHtml(P)+'</div>';
   if(S.slotOpen.equip)  h += '<div class="pm-panel"><h4>EQUIPMENT - INSTALL MORE</h4>'+equipSectionHtml(P)+'</div>';
   return h; }
