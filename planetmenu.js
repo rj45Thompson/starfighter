@@ -644,6 +644,13 @@ function hangarHtml(){
   if(!P) return '<div class="pm-note">(no ship telemetry)</div>';
   var h='';
   var hegemonHere = !S.isBase && p && p.hegemon;
+  /* SHIP LAYOUT: opens the visual Engineering Bay (engbay.js) - a top-down click-to-mount schematic of the real
+     per-hull weapon/gizmo mount points, same gizmo/hardpoint bays this tab already lists below just laid out
+     spatially. Same data-act="cmd" dispatch every other button on this tab already uses - no new click-handler
+     branch needed in the dispatcher. */
+  h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.HEAD+'">SHIP LAYOUT</b>'
+    + '<div class="pm-sub">lay out weapons and gizmos on your hull\'s real mount points</div></div>'
+    + '<button class="pm-b pm-go" data-act="cmd" data-cmd="engbay">OPEN ENGINEERING BAY</button></div>';
   /* repair */
   var missing=Math.max(0, num(P.maxHp,0)-num(P.hp,0));
   var rcost=Math.round(missing*(S.isBase?CFG.REPAIR_RATE_BASE:CFG.REPAIR_RATE_PLANET));
