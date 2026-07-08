@@ -224,7 +224,8 @@ function toggleSlot(k){
 
 function tryAccept(i){ var M=window.MISSIONS;
   if(!M || typeof M.accept!=='function' || !isFinite(i)) return;
-  try{ M.accept(i); }catch(e){} }
+  try{ var r=M.accept(i); if(r && r.msg) notifyHost(r.ok?('Accepted: '+esc(r.msg.replace(/^accepted:\s*/,''))):esc(r.msg), r.ok?'flag':'log'); }   // BUGFIX: the result was silently discarded - a rank-too-low/already-on-assignment rejection looked identical to a dead button
+  catch(e){ notifyHost('mission board offline','log'); } }
 function tryAddDefense(){ var C=window.CONQUEST;
   if(!C || typeof C.addDefense!=='function' || !S.planet) return;
   try{ C.addDefense(S.planet); }catch(e){} }
@@ -608,7 +609,7 @@ function missionsHtml(){
       h+='</table>'; }
     else {
       var j; h+='<div class="pm-note">Accept by board order (top = 1):</div><div>';
-      for(j=0;j<CFG.MISSION_BTN_N;j++) h+='<button class="pm-b pm-go" style="margin-right:6px" data-act="accept" data-i="'+j+'">ACCEPT '+(j+1)+'</button>';
+      for(j=0;j<CFG.MISSION_BTN_N;j++) h+='<button class="pm-b pm-go" style="margin-right:6px" data-act="accept" data-i="'+(j+1)+'">ACCEPT '+(j+1)+'</button>';   // BUGFIX: MISSIONS.accept(idx) is 1-based (does idx-1 internally) - button j=0 ("ACCEPT 1") must send data-i=1, not 0, or it always misses by one slot
       h+='</div>'; } }
   else h += '<div class="pm-note">Coalition contracts still post on the terminal: <b style="color:'+COL.AMBER+'">contracts</b> - <b style="color:'+COL.AMBER+'">accept &lt;id&gt;</b>.</div>';
   return h; }
