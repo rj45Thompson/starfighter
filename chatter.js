@@ -181,25 +181,27 @@ function voiceParams(name,temper){
     pitch:+(VOICE_CFG.PITCH_MIN+(((h>>>10)%1000)/999)*(VOICE_CFG.PITCH_MAX-VOICE_CFG.PITCH_MIN)).toFixed(2),
     src:'temperament-hash' };
 }
-function speakText(name,text,params,force){
-  if(!voicesOn&&!force) return false;                                  // DEFAULT OFF: zero speechSynthesis traffic until opted in
-  const SS=window.speechSynthesis; if(!SS||typeof SpeechSynthesisUtterance==='undefined') return false;
+// cb (optional): fires once THIS utterance finishes (or is dropped/never queued) - lets a caller (e.g. the mic's
+// hands-free loop in speech_input.js) know when it is safe to listen again without picking up our own voice.
+function speakText(name,text,params,force,cb){
+  if(!voicesOn&&!force){ if(cb) cb(); return false; }                   // DEFAULT OFF: zero speechSynthesis traffic until opted in
+  const SS=window.speechSynthesis; if(!SS||typeof SpeechSynthesisUtterance==='undefined'){ if(cb) cb(); return false; }
   const plain=String(text||'').replace(/<[^>]*>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')
     .replace(/\s+/g,' ').trim().slice(0,CHATTER_CFG.LINE_MAX_CHARS);
-  if(!plain) return false;
-  if(SQ.length>=VOICE_CFG.QUEUE_MAX) return false;                     // ear saturated - drop, never backlog
-  SQ.push({name,plain,params:params||voiceParams(name,'')}); pump(); return true;
+  if(!plain){ if(cb) cb(); return false; }
+  if(SQ.length>=VOICE_CFG.QUEUE_MAX){ if(cb) cb(); return false; }      // ear saturated - drop, never backlog
+  SQ.push({name,plain,params:params||voiceParams(name,''),cb}); pump(); return true;
 }
 function pump(){ if(uttering||!SQ.length) return;
-  const SS=window.speechSynthesis; if(!SS) { SQ.length=0; return; }
+  const SS=window.speechSynthesis; if(!SS) { const jobs=SQ.splice(0); jobs.forEach(j=>{ if(j.cb) j.cb(); }); return; }
   const job=SQ.shift();
-  let u; try{ u=new SpeechSynthesisUtterance(job.plain); }catch(e){ return; }
+  let u; try{ u=new SpeechSynthesisUtterance(job.plain); }catch(e){ if(job.cb) job.cb(); return; }
   u.rate=job.params.rate; u.pitch=job.params.pitch; u.volume=VOICE_CFG.VOLUME;
   try{ const vs=SS.getVoices?SS.getVoices():[];
     if(vs&&vs.length){ const en=vs.filter(v=>/^en/i.test(v.lang||'')); const pool=en.length?en:vs;
       u.voice=pool[hash32(job.name)%pool.length]; } }catch(e){}
   uttering=true; let done=false;
-  const fin=()=>{ if(done) return; done=true; uttering=false; pump(); };   // SERIALIZED: next only when this one ends
+  const fin=()=>{ if(done) return; done=true; uttering=false; if(job.cb) try{ job.cb(); }catch(e){} pump(); };   // SERIALIZED: next only when this one ends
   u.onend=fin; u.onerror=fin; setTimeout(fin,VOICE_CFG.UTTER_TIMEOUT_MS);  // engines that drop events must not deadlock
   try{ SS.speak(u); }catch(e){ fin(); }
 }
@@ -207,7 +209,7 @@ function setVoices(v){ voicesOn=!!v;
   if(!voicesOn){ SQ.length=0; uttering=false; try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(e){} } }
 // hooks the game calls (one line each in starfighter.html):
 function voiceSay(s,text){ if(!voicesOn||!s) return; speakText(s.name,text,voiceParams(s.name,s.backstory||'')); }
-function voiceWorm(html){ if(!voicesOn) return; speakText(VOICE_CFG.WORM_NAME,html,voiceParams(VOICE_CFG.WORM_NAME)); }
+function voiceWorm(html,cb){ if(!voicesOn){ if(cb) cb(); return; } speakText(VOICE_CFG.WORM_NAME,html,voiceParams(VOICE_CFG.WORM_NAME),false,cb); }
 // `voice test <pilot>` - an explicit user action counts as opt-in for that single utterance (force), even when off.
 function voiceTest(shipOrName){
   let name=null, temper='', text='';
