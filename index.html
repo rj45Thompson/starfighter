@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708p"></script>
-<script src="fflate.min.js?v=20260708p"></script>
-<script src="fbxloader.js?v=20260708p"></script>
+<script src="three.min.js?v=20260708q"></script>
+<script src="fflate.min.js?v=20260708q"></script>
+<script src="fbxloader.js?v=20260708q"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708p"></script>
-<script src="inhabitant.js?v=20260708p"></script>
-<script src="passenger.js?v=20260708p"></script>
-<script src="gamemod.js?v=20260708p"></script>
-<script src="chatter.js?v=20260708p"></script>
-<script src="speech_input.js?v=20260708p"></script>
-<script src="vision.js?v=20260708p"></script>
-<script src="deliberate.js?v=20260708p"></script>
-<script src="knowledge.js?v=20260708p"></script>
-<script src="acquire.js?v=20260708p"></script>
-<script src="sound.js?v=20260708p"></script>
-<script src="hullmodels.js?v=20260708p"></script>
-<script src="knowledge_hud.js?v=20260708p"></script>
-<script src="thoughts.js?v=20260708p"></script>
-<script src="tami_battle_ui.js?v=20260708p"></script>
-<script src="power_panel.js?v=20260708p"></script>
-<script src="panels.js?v=20260708p"></script>
+<script src="speech_tier.js?v=20260708q"></script>
+<script src="inhabitant.js?v=20260708q"></script>
+<script src="passenger.js?v=20260708q"></script>
+<script src="gamemod.js?v=20260708q"></script>
+<script src="chatter.js?v=20260708q"></script>
+<script src="speech_input.js?v=20260708q"></script>
+<script src="vision.js?v=20260708q"></script>
+<script src="deliberate.js?v=20260708q"></script>
+<script src="knowledge.js?v=20260708q"></script>
+<script src="acquire.js?v=20260708q"></script>
+<script src="sound.js?v=20260708q"></script>
+<script src="hullmodels.js?v=20260708q"></script>
+<script src="knowledge_hud.js?v=20260708q"></script>
+<script src="thoughts.js?v=20260708q"></script>
+<script src="tami_battle_ui.js?v=20260708q"></script>
+<script src="power_panel.js?v=20260708q"></script>
+<script src="panels.js?v=20260708q"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708p"></script>
-<script src="conquest.js?v=20260708p"></script>
-<script src="missions.js?v=20260708p"></script>
-<script src="planetmenu.js?v=20260708p"></script>
-<script src="textquests.js?v=20260708p"></script>
+<script src="starmap.js?v=20260708q"></script>
+<script src="conquest.js?v=20260708q"></script>
+<script src="missions.js?v=20260708q"></script>
+<script src="planetmenu.js?v=20260708q"></script>
+<script src="textquests.js?v=20260708q"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -219,11 +219,13 @@ const CFG = {
   // POWER_DEFAULT*3 == POWER_TOTAL so a fresh ship's baseline multiplier is exactly 1.0 (today's balance, untouched).
   POWER_TOTAL:150, POWER_MIN:0, POWER_MAX:100, POWER_DEFAULT:50, POWER_MULT_MIN:0.4, POWER_MULT_MAX:1.6,
   SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
+  SHIELD_ARC_BASE:20, SHIELD_DIVERT_MULT:2.2,   // user 2026-07-08 "same as tie fighter xwing": real fore/aft POOLS (half of SHIELD_BASE each), not one pool with an efficiency weight; diverting concentrates regen on one arc at ~2.2x, pausing the other
+  LASER_CAP_MAX:100, LASER_CAP_PER_SHOT:8, LASER_CAP_REGEN:10,   // weapons energy capacitor: each shot costs this much charge, capacitor regens %/s scaled by weapons power - hits 0 -> can't fire until it climbs back up
+  ENGINE_CAP_MAX:100, ENGINE_CAP_DRAIN:24, ENGINE_CAP_REGEN:14,   // user: "when I hold shift I don't want my recharge rates to change, it would just go through my engine capacitor" - nitro drains ITS OWN pool now, decoupled from the shared weapons/engines/shields power route entirely
   SKILL_KEYS:['gunnery','handling','tech','trade','charisma','leadership'],   // SR-M17: SR-style player skill career
   SKILL_MAX:5, SKILL_PTS_PER_RANK:1,          // 1 point per rank gained, capped at 5 levels/skill
   SKILL_GUNNERY_DMG:0.04, SKILL_HANDLING_THRUST:0.03, SKILL_TECH_REGEN:0.06,
   SKILL_TRADE_PRICE:0.02, SKILL_CHARISMA_FINE:0.12, SKILL_LEADERSHIP_REWARD:0.05,   // %/level effect sizes
-  NITRO_RATE:70,   // %/s the power pool dumps into engines while holding Shift (drains weapons+shields to feed it)
   NITRO_BOOST_MULT:1.55, NITRO_KICK:15,   // instant afterburner layer (user 2026-07-07 "holding shift does not boost speed"): thrust/vmax mult + one-time forward kick, doesn't wait on the power-stat ramp above
   NITRO_AUTOTHRUST:30,   // user 2026-07-08 "hold shift = burst mode": self-sufficient forward thrust while nitro is held, independent of W - roughly 68% of base THRUST so a bare Shift-hold is a real sustained burst, not just a jolt
   PROD_RATE:0.85, CONS_RATE:0.78, EQ_STOCK:120, PRICE_ELAST:0.9, PRICE_MIN:0.25, PRICE_MAX:3.4, PROFIT_MIN:2.5,
@@ -649,28 +651,49 @@ function setPower(s, sys, target){   // reroute: set ONE system, the other two a
   P[sys]=target;
   const sum=P.weapons+P.engines+P.shields; if(Math.abs(sum-CFG.POWER_TOTAL)>0.01) P[sys]=clamp(P[sys]+(CFG.POWER_TOTAL-sum),CFG.POWER_MIN,CFG.POWER_MAX);   // clamp slack -> the pool always stays honest
   return P; }
-function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields); }
-function shieldTick(s,dt){ if(!s.alive) return; const max=shieldMaxFor(s);
-  if(s.shield==null) s.shield=max;
-  if(s.shield>max) s.shield=max;                                                      // power just rerouted AWAY from shields -> ceiling drops immediately
-  else if(!s.docked && T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*dt);   // SR-M17: tech skill
-  else if(s.docked) s.shield=Math.min(max,s.shield+CFG.SHIELD_REGEN_BASE*2*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*dt); }      // docked = a safe harbor, shields recharge fast too
-function drainShield(s,dmg,fromPos){ if(s.shield==null) s.shield=shieldMaxFor(s); s.shieldHitT=T0;
+function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields); }         // TOTAL across both arcs - unchanged meaning, every existing "shield%" summary display (roster/scan/status) still reads this
+function shieldArcMaxFor(s){ return shieldMaxFor(s)/2; }   // SR X-WING SHIELDS: each arc's own cap (fwd+aft sums to the total above)
+function shieldTick(s,dt){ if(!s.alive) return; const amax=shieldArcMaxFor(s);
+  if(s.shieldFwd==null) s.shieldFwd=amax; if(s.shieldAft==null) s.shieldAft=amax;
+  if(s.shieldFwd>amax) s.shieldFwd=amax; if(s.shieldAft>amax) s.shieldAft=amax;              // power just rerouted AWAY from shields -> ceiling drops immediately, same rule as before
+  const canRegen = s.docked || T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY;
+  if(canRegen){
+    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1);   // SR-M17 tech skill; docked = safe harbor, 2x
+    // SR X-WING SHIELDS (user 2026-07-08, "same as tie fighter xwing"): real fore/aft POOLS, not one pool with an efficiency
+    // weight. Undiverted, BOTH arcs regen at the full base rate independently (given enough time, both reach their own
+    // 100%). "shield fwd"/"shield aft" concentrates regen on one arc at SHIELD_DIVERT_MULT and pauses the other entirely -
+    // "configure shields both forward" in the user's words.
+    const div=s.shieldDivert;   // 'fwd' | 'aft' | null (balanced)
+    const fMult = div==='fwd'?CFG.SHIELD_DIVERT_MULT : (div==='aft'?0:1);
+    const aMult = div==='aft'?CFG.SHIELD_DIVERT_MULT : (div==='fwd'?0:1);
+    if(s.shieldFwd<amax) s.shieldFwd=Math.min(amax,s.shieldFwd+rate*fMult*dt);
+    if(s.shieldAft<amax) s.shieldAft=Math.min(amax,s.shieldAft+rate*aMult*dt);
+  }
+  s.shield=s.shieldFwd+s.shieldAft; }   // kept in sync - every pre-existing "total shield" reader (roster%, scan, status line) needs no changes
+function drainShield(s,dmg,fromPos){
+  if(s.shieldFwd==null) s.shieldFwd=shieldArcMaxFor(s); if(s.shieldAft==null) s.shieldAft=shieldArcMaxFor(s);
+  s.shieldHitT=T0;
   triggerHitFx(s,fromPos||s.pos,dmg);   // user 2026-07-07: "flash red in the direction you are hit and rock the camera" - no-op for anyone but the player
-  if(s.shield>0){
-    // FORE/AFT SHIELD BALANCE (user 2026-07-08, TIE Fighter/X-Wing reference): s.shieldBalance (0-100, default 50)
-    // splits the SAME total pool's effectiveness between front and rear arcs - reuses powerMult()'s existing
-    // 0.4x-1.6x curve (the exact shape already used for weapons/engines/shields power routing) so a hit from a
-    // well-covered facing is absorbed more efficiently, a hit from a thin facing spills through even with plenty
-    // of shield left in reserve. The pool itself stays one number - only how EFFICIENTLY it blocks a given hit
-    // depends on facing - so regen/docked-bonus/etc. above are untouched.
-    let facingMult=1;
-    if(fromPos){ _vhit.copy(fromPos).sub(s.pos); if(_vhit.lengthSq()>1e-6){ _vhit.normalize();
-      const bal=s.shieldBalance==null?50:s.shieldBalance;
-      const isFront=_vhit.dot(FWD.clone().applyQuaternion(s.quat))>0;
-      facingMult=powerMult(isFront?bal:100-bal); } }
-    const absorb=Math.min(s.shield,dmg,dmg*facingMult); s.shield-=absorb; dmg-=absorb;
+  // SR X-WING SHIELDS: the hit arc absorbs from ITS OWN pool only - real fore/aft split, not an efficiency weight on one
+  // shared number. An empty arc lets damage spill straight through to hull; it NEVER bleeds into the other arc (matching
+  // the genre reference: a depleted front shield doesn't borrow from a full rear shield).
+  let isFront=true;
+  if(fromPos){ _vhit.copy(fromPos).sub(s.pos); if(_vhit.lengthSq()>1e-6){ _vhit.normalize(); isFront=_vhit.dot(FWD.clone().applyQuaternion(s.quat))>0; } }
+  const arcKey=isFront?'shieldFwd':'shieldAft';
+  if(s[arcKey]>0){
+    const absorb=Math.min(s[arcKey],dmg); s[arcKey]-=absorb; dmg-=absorb;
+    s.shield=s.shieldFwd+s.shieldAft;
   } return dmg; }   // returns the LEFTOVER damage that spills to hull
+// SR X-WING CAPACITORS (user 2026-07-08: "copy xwing... show the power capacitor levels for lasers shields and engine
+// speed"): two independent energy pools, separate from the weapons/engines/shields ALLOCATION sliders above (which now
+// govern RECHARGE RATE, not just efficiency) - LASER drains per shot fired and hard-blocks firing at 0; ENGINE drains
+// while nitro is held and gates the burst-thrust bonus at 0. Neither capacitor touches the OTHER systems' allocation at
+// all - draining one never changes another's recharge rate (the user's specific correction to the old nitro behavior).
+function capacitorTick(s,dt){ if(!s.alive) return;
+  if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
+  if(s.capEngine==null) s.capEngine=CFG.ENGINE_CAP_MAX;
+  s.capLaser=Math.min(CFG.LASER_CAP_MAX,s.capLaser+CFG.LASER_CAP_REGEN*powerMult(shipPower(s).weapons)*dt);
+  if(!s._nitroActive) s.capEngine=Math.min(CFG.ENGINE_CAP_MAX,s.capEngine+CFG.ENGINE_CAP_REGEN*powerMult(shipPower(s).engines)*dt); }
 // SPACE-RANGERS DOCK PROMPT (user 2026-07-07): "Ranger Command should be like Space Rangers - I fly to it and a
 // button appears to dock". Generalized 2026-07-08 ("add button to land on planets or ranger space station or a
 // other space station") to EVERY dockable target, not just the base - fly close to anything dockable and the
@@ -1207,10 +1230,11 @@ function think(s,dt){
   s.ctrl={ thr:clamp(thr,0,1), pitch:clamp(aim.pitch*ng,-1,1), yaw:clamp(aim.yaw*ng,-1,1) }; s.mode=mode; s.target=target; s._prevMode=mode;   // A9: remember mode for reward attribution
   if(target&&mode==='HUNT'){ s.navAccum+=Math.max(0,aim.dot); s.navCount++; }   // A3: measure alignment vs MOVING targets (gain matters here; mining slow rocks is flat/noisy)
   s.fire-=dt;
-  if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0){
+  if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0 && (s.capLaser==null||s.capLaser>0)){   // SR X-WING CAPACITORS: empty laser capacitor blocks firing entirely, same as everyone else
     const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
     if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range){
       s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
+      s.capLaser=Math.max(0,(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser)-CFG.LASER_CAP_PER_SHOT);
       const base=(s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'));   // SR-M17
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
         shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };   // per-weapon visual signature
@@ -1275,6 +1299,7 @@ function flyStep(s,dt){
       if(vn<0){ s.vel.addScaledVector(n,-vn); const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }
   s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
+  capacitorTick(s,dt);                                                                              // SR X-WING CAPACITORS: laser energy regens off weapons power, engine capacitor regens off engines power (when not boosting)
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
   const engVisT=nitroActive?1:s.ctrl.thr;                                                            // burst mode flares the engine glow to full even with W not held - the visible half of "it's really doing something"
   s.mesh.userData.eng.material.opacity=0.3+0.5*engVisT; s.mesh.userData.eng.scale.setScalar(1.3+1.5*engVisT);
@@ -1330,7 +1355,7 @@ function step(dt){
         s._thinkAcc=(s._thinkAcc||0)+dt;
         if((s.id+FRAME_N)%CFG.THINK_STRIDE===0 || s===ships[focus]){ think(s,s._thinkAcc); s._thinkAcc=0; } }
       flyStep(s,dt); }
-    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shield=shieldMaxFor(s);   // X-WING POWER: a fresh hull gets full shields too
+    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s); s.shield=s.shieldFwd+s.shieldAft; s.capLaser=CFG.LASER_CAP_MAX; s.capEngine=CFG.ENGINE_CAP_MAX;   // X-WING POWER: a fresh hull gets full shields + capacitors too
       // RETREAT TO TERRITORY (user): the destroyed come back inside COALITION space - a held planet (via the
       // starmap's territory model when loaded), else the Ranger Base - never dumped into a random (possibly lost) system.
       let anchor=null;
@@ -2244,8 +2269,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!a[1]){ if(window.PANELS&&window.POWERPANEL) PANELS.open('powerpanel');   // the visual 3-bar draggable panel - its own edge tab also opens/closes it
       term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool - routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
       for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
-      const bal0=P.shieldBalance==null?50:P.shieldBalance;
-      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max · fore/aft <b>${Math.round(bal0)}/${Math.round(100-bal0)}</b> <span style="opacity:.55">· try: power weapons 80 · shield fwd</span>`,'sys'); return; }
+      const amax=shieldArcMaxFor(P), fwd=P.shieldFwd==null?amax:P.shieldFwd, aft=P.shieldAft==null?amax:P.shieldAft;
+      const capL=P.capLaser==null?CFG.LASER_CAP_MAX:P.capLaser, capE=P.capEngine==null?CFG.ENGINE_CAP_MAX:P.capEngine;
+      term(`&nbsp;&nbsp;shield fore <b>${Math.round(fwd)}</b>/${Math.round(amax)} · aft <b>${Math.round(aft)}</b>/${Math.round(amax)} <span style="opacity:.55">(divert: ${P.shieldDivert==='fwd'?'FWD':P.shieldDivert==='aft'?'AFT':'even'} - try: shield fwd)</span>`,'sys');
+      term(`&nbsp;&nbsp;<span style="color:#ffb454">⚡ LASER CAP</span> ${Math.round(capL)}/${CFG.LASER_CAP_MAX} <span style="opacity:.55">·</span> <span style="color:#46d6ff">⚡ ENGINE CAP</span> ${Math.round(capE)}/${CFG.ENGINE_CAP_MAX} <span style="opacity:.55">(nitro drains this, not the power plant above)</span>`,'sys'); return; }
     const sys=POWER_SYS.find(k=>k.startsWith(a[1].toLowerCase())); if(!need(sys,'power weapons|engines|shields &lt;0-100&gt;')) return;
     const lvl=parseFloat(a[2]); if(!need(isFinite(lvl),'give a level 0-100, e.g. power shields 70')) return;
     setPower(P,sys,lvl); const p1=shipPower(P);
@@ -2253,13 +2280,15 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(window.SOUND) SOUND.play('ui'); return; }
   // FORE/AFT SHIELD BALANCE (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio") - a
   // second dial alongside the weapons/engines/shields pool, same TIE-Fighter/X-Wing reference as `power` above.
-  if(c==='shield'||c==='shields'){
-    if(!a[1]){ const bal=P.shieldBalance==null?50:P.shieldBalance;
-      term(`<b style="color:#8fd0ff">🛡 SHIELD BALANCE</b> fore <b>${Math.round(bal)}%</b> / aft <b>${Math.round(100-bal)}%</b> <span style="opacity:.55">(shifts how efficiently the SAME pool blocks a hit from that arc - try: shield fwd · shield aft · shield even · shield 70)</span>`,'sys'); return; }
-    const w=a[1].toLowerCase(); let bal=w.startsWith('fwd')||w.startsWith('fore')||w.startsWith('front')?100:w.startsWith('aft')||w.startsWith('rear')||w.startsWith('back')?0:w.startsWith('even')?50:parseFloat(a[1]);
-    if(!need(isFinite(bal),'give fwd, aft, even, or a number 0-100 (0=full aft, 100=full fwd)')) return;
-    P.shieldBalance=clamp(bal,0,100);
-    term(`Shield balance set - fore <b>${Math.round(P.shieldBalance)}%</b> / aft <b>${Math.round(100-P.shieldBalance)}%</b>.`,'sys');
+  if(c==='shield'||c==='shields'){   // SR X-WING SHIELDS: real fore/aft POOLS now, not an efficiency weight on one shared number
+    const amax=shieldArcMaxFor(P), fwd=P.shieldFwd==null?amax:P.shieldFwd, aft=P.shieldAft==null?amax:P.shieldAft;
+    const divLabel=P.shieldDivert==='fwd'?'FORWARD':P.shieldDivert==='aft'?'AFT':'BALANCED';
+    if(!a[1]){ term(`<b style="color:#8fd0ff">🛡 SHIELDS</b> fore <b>${Math.round(fwd)}</b>/${Math.round(amax)} · aft <b>${Math.round(aft)}</b>/${Math.round(amax)} <span style="opacity:.55">· divert: <b>${divLabel}</b> (try: shield fwd · shield aft · shield even)</span>`,'sys'); return; }
+    const w=a[1].toLowerCase();
+    const div = w.startsWith('fwd')||w.startsWith('fore')||w.startsWith('front')?'fwd' : w.startsWith('aft')||w.startsWith('rear')||w.startsWith('back')?'aft' : w.startsWith('even')||w.startsWith('bal')?null : (isFinite(parseFloat(a[1]))?(parseFloat(a[1])>55?'fwd':parseFloat(a[1])<45?'aft':null):undefined);
+    if(!need(div!==undefined,'give fwd, aft, even, or a number 0-100 (kept for backward compat: >55=fwd, <45=aft)')) return;
+    P.shieldDivert=div;
+    term(`Shields diverted - <b>${div==='fwd'?'FORWARD':div==='aft'?'AFT':'BALANCED'}</b> <span style="opacity:.6">(${div?('the other arc pauses, this one regens ~'+CFG.SHIELD_DIVERT_MULT+'x'):'both arcs regen normally toward their own 100%'})</span>.`,'sys');
     if(window.SOUND) SOUND.play('ui'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot - try: scan')) return; t=o; }
     term(`<b>${t.name}</b> reasoning chain (TDRE-style, grounded):`,'sys'); reasonChain(t).forEach(l=>term('&nbsp;&nbsp;'+l,'sys')); return; }
@@ -3299,7 +3328,8 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
     player:{ credits:P.credits, score:P.score, hullClass:P.hullClass, weaponType:P.weaponType,
       lvl:{...P.lvl}, equip:{...(P.equip||{})}, artifacts:[...(P.artifacts||[])], contraband:{...(P.contraband||{})},
       fuel:P.fuel, fuelCap:P.fuelCap, holdCap:P.holdCap, senseR:P.senseR, cargo:{...(P.cargo||{})},
-      shieldBalance:P.shieldBalance, rankShown:P.rankShown, targetingComputer:!!P.targetingComputer,
+      shieldDivert:P.shieldDivert||null, shieldFwd:P.shieldFwd, shieldAft:P.shieldAft, capLaser:P.capLaser, capEngine:P.capEngine,
+      rankShown:P.rankShown, targetingComputer:!!P.targetingComputer,
       skills:{...(P.skills||{})}, skillPts:P.skillPts||0 },
     planets: planets.map(p=>({ name:p.name, rep:p.rep, wealth:p.wealth, dev:p.dev, hegemon:!!p.hegemon, terra:p.terra||0 })),
     systems: systems.map(sy=>({ name:sy.name, contested:!!sy.contested })),
@@ -3310,8 +3340,10 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
   Object.assign(P,{ credits:num2(sp.credits,P.credits), score:num2(sp.score,P.score), weaponType:sp.weaponType||P.weaponType,
     lvl:sp.lvl||P.lvl, equip:sp.equip||P.equip, artifacts:sp.artifacts||P.artifacts, contraband:sp.contraband||P.contraband,
     fuel:num2(sp.fuel,P.fuel), fuelCap:num2(sp.fuelCap,P.fuelCap), holdCap:num2(sp.holdCap,P.holdCap), senseR:num2(sp.senseR,P.senseR),
-    cargo:sp.cargo||P.cargo, shieldBalance:sp.shieldBalance, rankShown:sp.rankShown, targetingComputer:!!sp.targetingComputer,
+    cargo:sp.cargo||P.cargo, shieldDivert:sp.shieldDivert||null, shieldFwd:num2(sp.shieldFwd,P.shieldFwd), shieldAft:num2(sp.shieldAft,P.shieldAft),
+    capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown, targetingComputer:!!sp.targetingComputer,
     skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0) });
+  P.shield=(P.shieldFwd||0)+(P.shieldAft||0);   // keep the synced total consistent right after a restore
   applyHull(P, sp.hullClass||'fighter');   // recomputes maxHp/hp/hullSpeed/visual model from the restored class+equip
   for(const rp of save.planets||[]){ const p=planets.find(x=>x.name===rp.name); if(p){ p.rep=rp.rep; p.wealth=rp.wealth; p.dev=rp.dev; p.hegemon=rp.hegemon; p.terra=rp.terra; } }
   for(const rs of save.systems||[]){ const sy=systems.find(x=>x.name===rs.name); if(sy) sy.contested=rs.contested; }
@@ -3368,8 +3400,11 @@ window.HOST={
   // the `power` text command - same effect, for a UI panel / the parasite's own proactive reroutes).
   powerOf:(s)=>shipPower(s||ships[0]), setPower:(s,sys,lvl)=>setPower(s||ships[0],sys,lvl), powerMult,
   shieldOf:(s)=>{ s=s||ships[0]; const max=shieldMaxFor(s); return { cur:(s.shield==null?max:s.shield), max }; },
-  shieldBalanceOf:(s)=>{ s=s||ships[0]; return s.shieldBalance==null?50:s.shieldBalance; },
-  setShieldBalance:(s,v)=>{ s=s||ships[0]; s.shieldBalance=clamp(Number(v)||0,0,100); return s.shieldBalance; },
+  shieldDivertOf:(s)=>{ s=s||ships[0]; return s.shieldDivert||null; },
+  setShieldDivert:(s,mode)=>{ s=s||ships[0]; s.shieldDivert=(mode==='fwd'||mode==='aft')?mode:null; return s.shieldDivert; },
+  shieldArcsOf:(s)=>{ s=s||ships[0]; const max=shieldArcMaxFor(s); return { fwd:(s.shieldFwd==null?max:s.shieldFwd), aft:(s.shieldAft==null?max:s.shieldAft), max }; },
+  capLaserOf:(s)=>{ s=s||ships[0]; return { cur:(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser), max:CFG.LASER_CAP_MAX }; },
+  capEngineOf:(s)=>{ s=s||ships[0]; return { cur:(s.capEngine==null?CFG.ENGINE_CAP_MAX:s.capEngine), max:CFG.ENGINE_CAP_MAX }; },
   skillLvl:(s,k)=>skillLvl(s||ships[0],k),   // SR-M17: pilot skill career - lets missions.js price leadership into contract rewards
   priceOf:(p,k,buying)=>buying?priceOf(p,k)*repBuyFactor(p):priceOf(p,k),
   sound:(n)=>{ if(window.SOUND) try{ SOUND.play(n); }catch(e){} },
@@ -3436,18 +3471,22 @@ const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false };
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
   s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
-  // NITRO BURST (user 2026-07-07: "holding shift should use nitro burst which uses power rapidly from shields
-  // and lasers"): dumps the X-Wing power pool into engines, draining weapons+shields to feed it - reuses the
-  // SAME setPower reroute the power panel/terminal use, so it is one honest mechanic, not a bespoke side-system.
-  // The drain does not auto-restore on release - a burst has a real cost you have to manage afterward.
-  // s._nitroActive is the INSTANT half of the effect (read by flyStep for the thrust/vmax mult + rising-edge
-  // kick below) - it does not wait on this gradual power-stat reroute to ramp up.
-  s._nitroActive=!!MAN.nitro;
-  if(MAN.nitro){ const pw=shipPower(s); if(pw.engines<CFG.POWER_MAX-0.5){ setPower(s,'engines',pw.engines+CFG.NITRO_RATE*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } } }
+  // SR X-WING CAPACITORS (user 2026-07-08: "when I hold shift I don't want my recharge rates to change it would just
+  // go through my engine capacitor"): nitro now drains its OWN dedicated engine capacitor directly - it no longer
+  // reroutes the shared weapons/engines/shields power pool at all (that used to force weapons+shields DOWN to feed
+  // engines, which is exactly the "recharge rates changing" the user didn't want). The burst-thrust bonus (read by
+  // flyStep via s._nitroActive) only applies while the capacitor actually has charge - hold Shift past empty and
+  // you're back to plain thrust until it climbs back up (capacitorTick, gated off while nitro is active).
+  if(s.capEngine==null) s.capEngine=CFG.ENGINE_CAP_MAX;
+  const nitroWanted=!!MAN.nitro;
+  s._nitroActive=nitroWanted && s.capEngine>0;
+  if(nitroWanted && s.capEngine>0){ s.capEngine=Math.max(0,s.capEngine-CFG.ENGINE_CAP_DRAIN*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } }
   else s._nitroSounded=false;
   s.fire-=dt;
-  if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
+  if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
+  if(MAN.fire && s.fire<=0 && s.capLaser>0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
     s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
+    s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);   // SR X-WING CAPACITORS: hits 0 -> next fire attempt is blocked until it regens
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);

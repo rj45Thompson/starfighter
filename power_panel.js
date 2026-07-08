@@ -49,6 +49,9 @@ var CFG = {
   COL_HULL_OK: '#7fdc8a',
   COL_HULL_LOW: '#ff8a8a',
   HULL_LOW_FRAC: 0.3,         // hull/maxHull below this fraction reads red instead of green
+  DIVERT_ZONE: 0.33,          // SR X-WING SHIELDS: click/drag the outer third of the fwd/aft bar to divert, middle third = balanced
+  COL_LASER: '#ffb454',       // capacitor gauge colors
+  COL_ENGINE_CAP: '#46d6ff',
 };
 
 var SYSTEMS = [
@@ -119,19 +122,46 @@ function setPower(sys, level) {
   try { H.setPower(H.P, sys, level); } catch (e) {}
 }
 
-// FORE/AFT SHIELD BALANCE (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio") -
-// a second dial alongside the weapons/engines/shields pool above. 0 = full aft, 100 = full fore, 50 = even.
-function readBalance() {
+// SR X-WING SHIELDS (user 2026-07-08: "same as tie fighter xwing... configure shields both forward or both behind") -
+// real fore/aft POOLS (not an efficiency weight on one shared number) plus a 3-state divert: 'fwd' | 'aft' | null(even).
+function readShieldArcs() {
   var H = getHost();
-  if (!H || typeof H.shieldBalanceOf !== 'function') return 50;
+  if (!H || typeof H.shieldArcsOf !== 'function') return { fwd: 0, aft: 0, max: 0 };
   var v = null;
-  try { v = H.shieldBalanceOf(H.P); } catch (e) { v = null; }
-  return (typeof v === 'number' && !isNaN(v)) ? clamp(v, 0, 100) : 50;
+  try { v = H.shieldArcsOf(H.P); } catch (e) { v = null; }
+  if (!v || typeof v !== 'object') return { fwd: 0, aft: 0, max: 0 };
+  return { fwd: Number(v.fwd) || 0, aft: Number(v.aft) || 0, max: Number(v.max) || 0 };
 }
-function setBalance(v) {
+function readDivert() {
   var H = getHost();
-  if (!H || typeof H.setShieldBalance !== 'function') return;
-  try { H.setShieldBalance(H.P, v); } catch (e) {}
+  if (!H || typeof H.shieldDivertOf !== 'function') return null;
+  var v = null;
+  try { v = H.shieldDivertOf(H.P); } catch (e) { v = null; }
+  return (v === 'fwd' || v === 'aft') ? v : null;
+}
+function setDivert(mode) {
+  var H = getHost();
+  if (!H || typeof H.setShieldDivert !== 'function') return;
+  try { H.setShieldDivert(H.P, mode); } catch (e) {}
+}
+
+// SR X-WING CAPACITORS (user 2026-07-08: "show the power capacitor levels for lasers shields and engine speed") -
+// independent energy pools, separate from the weapons/engines/shields ALLOCATION bars above.
+function readCapLaser() {
+  var H = getHost();
+  if (!H || typeof H.capLaserOf !== 'function') return { cur: 100, max: 100 };
+  var v = null;
+  try { v = H.capLaserOf(H.P); } catch (e) { v = null; }
+  if (!v || typeof v !== 'object') return { cur: 100, max: 100 };
+  return { cur: Number(v.cur) || 0, max: Number(v.max) || 100 };
+}
+function readCapEngine() {
+  var H = getHost();
+  if (!H || typeof H.capEngineOf !== 'function') return { cur: 100, max: 100 };
+  var v = null;
+  try { v = H.capEngineOf(H.P); } catch (e) { v = null; }
+  if (!v || typeof v !== 'object') return { cur: 100, max: 100 };
+  return { cur: Number(v.cur) || 0, max: Number(v.max) || 100 };
 }
 
 function playSound(name) {
@@ -145,10 +175,11 @@ var PP = {
   built: false, shown: false,
   root: null, hullEl: null, shieldEl: null,
   bars: {},       // sys.key -> {fillEl, trackEl, pctEl, multEl}
-  balance: null,  // {trackEl, fillFore, fillAft, labelEl}
+  balance: null,  // {trackEl, fillFore, fillAft, labelEl} - the fore/aft shield-arc bar (now shows REAL charge, sets divert)
+  capLaser: null, capEngine: null,   // {fillEl, pctEl} - SR X-WING CAPACITORS gauges
   timer: null,
   dragSys: null,     // which of the 3 vertical power systems is being dragged (or null)
-  dragBalance: false, // is the fore/aft shield-balance bar being dragged
+  dragBalance: false, // is the fore/aft shield-arc bar being dragged
 };
 
 // value (0-100) -> fill fraction, top-anchored fill (bar fills from bottom up)
@@ -197,13 +228,29 @@ function renderBars() {
 
 function renderBalance() {
   if (!PP.built || PP.dragBalance) return;   // skip re-reading while the user is actively dragging it (same rule as renderBars)
-  applyBalanceVisual(readBalance());
+  applyBalanceVisual(readShieldArcs(), readDivert());
+}
+
+function renderCapacitors() {
+  if (!PP.built) return;
+  var lz = readCapLaser(), en = readCapEngine();
+  if (PP.capLaser) {
+    var lf = lz.max > 0 ? clamp(lz.cur / lz.max, 0, 1) : 0;
+    if (PP.capLaser.fillEl) PP.capLaser.fillEl.style.width = (lf * 100).toFixed(1) + '%';
+    if (PP.capLaser.pctEl) PP.capLaser.pctEl.textContent = 'LASER ' + round(lz.cur) + '/' + round(lz.max);
+  }
+  if (PP.capEngine) {
+    var ef = en.max > 0 ? clamp(en.cur / en.max, 0, 1) : 0;
+    if (PP.capEngine.fillEl) PP.capEngine.fillEl.style.width = (ef * 100).toFixed(1) + '%';
+    if (PP.capEngine.pctEl) PP.capEngine.pctEl.textContent = 'ENGINE ' + round(en.cur) + '/' + round(en.max);
+  }
 }
 
 function renderAll() {
   try { renderStatus(); } catch (e) {}
   try { renderBars(); } catch (e) {}
   try { renderBalance(); } catch (e) {}
+  try { renderCapacitors(); } catch (e) {}
 }
 
 // translate a pointer Y within a track's bounding box into a 0-100 level (bottom of track = 0, top = 100)
@@ -305,29 +352,32 @@ function buildBar(sys) {
   return col;
 }
 
-// horizontal fore/aft shield-balance bar - same click/drag-to-set language as the vertical bars above,
-// just on the X axis: left = full aft, right = full fore.
-function balanceFromPointer(trackEl, clientX) {
-  if (!trackEl || typeof trackEl.getBoundingClientRect !== 'function') return null;
+// horizontal fore/aft SHIELD ARC bar - shows REAL charge per arc (not a preference slider). The FWD gauge lives on
+// the left (matches fillFore's left anchor below), AFT on the right - clicking/dragging the left third diverts to
+// FWD, the right third to AFT, the middle third returns to BALANCED (both arcs regen normally).
+function zoneFromPointer(trackEl, clientX) {
+  if (!trackEl || typeof trackEl.getBoundingClientRect !== 'function') return undefined;
   var rect = null;
-  try { rect = trackEl.getBoundingClientRect(); } catch (e) { return null; }
-  if (!rect || !rect.width) return null;
+  try { rect = trackEl.getBoundingClientRect(); } catch (e) { return undefined; }
+  if (!rect || !rect.width) return undefined;
   var frac = (clientX - rect.left) / rect.width;
-  return clamp(frac * 100, 0, 100);
+  return frac < CFG.DIVERT_ZONE ? 'fwd' : (frac > (1 - CFG.DIVERT_ZONE) ? 'aft' : null);
 }
-function applyBalanceVisual(bal) {
+function applyBalanceVisual(arcs, divert) {
   var b = PP.balance; if (!b) return;
-  if (b.fillAft) b.fillAft.style.width = (100 - bal).toFixed(1) + '%';
-  if (b.fillFore) b.fillFore.style.width = bal.toFixed(1) + '%';
-  if (b.labelEl) b.labelEl.textContent = 'FORE ' + round(bal) + '% / AFT ' + round(100 - bal) + '%';
+  var aFrac = arcs.max > 0 ? clamp(arcs.aft / arcs.max, 0, 1) : 0, fFrac = arcs.max > 0 ? clamp(arcs.fwd / arcs.max, 0, 1) : 0;
+  if (b.fillAft) b.fillAft.style.width = (aFrac * 50).toFixed(1) + '%';   // aft occupies the LEFT half (up to 50% of the track), scaled by its own charge fraction
+  if (b.fillFore) b.fillFore.style.width = (fFrac * 50).toFixed(1) + '%';   // fwd occupies the RIGHT half
+  var divLabel = divert === 'fwd' ? ' - DIVERT FWD' : divert === 'aft' ? ' - DIVERT AFT' : '';
+  if (b.labelEl) b.labelEl.textContent = 'FWD ' + round(arcs.fwd) + '/' + round(arcs.max) + '  AFT ' + round(arcs.aft) + '/' + round(arcs.max) + divLabel;
 }
 function wireBalanceDrag(trackEl) {
   if (!trackEl) return;
   var d = doc();
   function applyAt(clientX) {
-    var bal = balanceFromPointer(trackEl, clientX);
-    if (bal == null) return;
-    setBalance(bal); applyBalanceVisual(bal);
+    var zone = zoneFromPointer(trackEl, clientX);
+    if (zone === undefined) return;
+    setDivert(zone); applyBalanceVisual(readShieldArcs(), zone);
   }
   function onMove(ev) {
     if (!PP.dragBalance) return;
@@ -365,16 +415,39 @@ function wireBalanceDrag(trackEl) {
 }
 function buildBalanceBar() {
   var wrap = el('div', 'margin-top:9px;padding-top:8px;border-top:1px solid ' + CFG.COL_TRACK_BORDER);
-  var label = el('div', 'font:700 9px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-bottom:4px;text-align:center', 'FORE 50% / AFT 50%');
+  var label = el('div', 'font:700 9px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-bottom:4px;text-align:center', 'FWD --/-- AFT --/--');
   var track = el('div',
     'position:relative;height:12px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';' +
     'border-radius:5px;overflow:hidden;cursor:ew-resize;touch-action:none;-webkit-user-select:none;user-select:none');
-  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:50%;background:' + CFG.COL_ENGINES + '55');
-  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:50%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset');
-  track.appendChild(fillAft); track.appendChild(fillFore);
+  var divider = el('div', 'position:absolute;top:0;bottom:0;left:50%;width:1px;background:' + CFG.COL_TRACK_BORDER);
+  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:0%;background:' + CFG.COL_ENGINES + '55');
+  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:0%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset');
+  track.appendChild(fillAft); track.appendChild(fillFore); track.appendChild(divider);
   wrap.appendChild(label); wrap.appendChild(track);
   wireBalanceDrag(track);
   PP.balance = { trackEl: track, fillFore: fillFore, fillAft: fillAft, labelEl: label };
+  return wrap;
+}
+
+// SR X-WING CAPACITORS: a small horizontal readout gauge (non-interactive - these drain/regen automatically, there's
+// nothing to drag) for laser and engine energy, separate from the weapons/engines/shields ALLOCATION bars above.
+function buildCapGauge(label0, col) {
+  var wrap = el('div', 'margin-top:5px');
+  var track = el('div',
+    'position:relative;height:9px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';border-radius:4px;overflow:hidden');
+  var fill = el('div', 'position:absolute;top:0;bottom:0;left:0;width:100%;background:' + col + ';box-shadow:0 0 6px ' + col + '88 inset;transition:width 0.15s');
+  var pct = el('div', 'font:700 8.5px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-top:2px;text-align:center', label0);
+  track.appendChild(fill);
+  wrap.appendChild(track); wrap.appendChild(pct);
+  return { wrap: wrap, fillEl: fill, pctEl: pct };
+}
+function buildCapacitorRow() {
+  var wrap = el('div', 'margin-top:9px;padding-top:8px;border-top:1px solid ' + CFG.COL_TRACK_BORDER);
+  var laser = buildCapGauge('LASER --/--', CFG.COL_LASER);
+  var engine = buildCapGauge('ENGINE --/--', CFG.COL_ENGINE_CAP);
+  wrap.appendChild(laser.wrap); wrap.appendChild(engine.wrap);
+  PP.capLaser = { fillEl: laser.fillEl, pctEl: laser.pctEl };
+  PP.capEngine = { fillEl: engine.fillEl, pctEl: engine.pctEl };
   return wrap;
 }
 
@@ -418,6 +491,7 @@ function build(parentEl) {
   root.appendChild(row);
 
   root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio"
+  root.appendChild(buildCapacitorRow());   // user 2026-07-08: "show the power capacitor levels for lasers shields and engine speed"
 
   if (parent && parent.appendChild) parent.appendChild(root);
   PP.root = root; PP.built = true;
@@ -514,8 +588,11 @@ if (typeof require !== 'undefined' && require.main === module) {
       },
       powerMult: function (level) { return 0.4 + (Math.max(0, Math.min(100, level)) / 100) * (1.6 - 0.4); },
       shieldOf: function (s) { s = s || fakeShip; return { cur: 42, max: 60 }; },
-      shieldBalanceOf: function (s) { s = s || fakeShip; return s.shieldBalance == null ? 50 : s.shieldBalance; },
-      setShieldBalance: function (s, v) { s = s || fakeShip; s.shieldBalance = Math.max(0, Math.min(100, Number(v) || 0)); return s.shieldBalance; },
+      shieldArcsOf: function (s) { s = s || fakeShip; return { fwd: s.shieldFwd == null ? 20 : s.shieldFwd, aft: s.shieldAft == null ? 20 : s.shieldAft, max: 20 }; },
+      shieldDivertOf: function (s) { s = s || fakeShip; return s.shieldDivert || null; },
+      setShieldDivert: function (s, mode) { s = s || fakeShip; s.shieldDivert = (mode === 'fwd' || mode === 'aft') ? mode : null; return s.shieldDivert; },
+      capLaserOf: function (s) { s = s || fakeShip; return { cur: s.capLaser == null ? 100 : s.capLaser, max: 100 }; },
+      capEngineOf: function (s) { s = s || fakeShip; return { cur: s.capEngine == null ? 100 : s.capEngine, max: 100 }; },
       sound: function (name) { /* no-op stub */ },
     },
   };
@@ -585,25 +662,43 @@ if (typeof require !== 'undefined' && require.main === module) {
   check('HOST.setPower reroute keeps pool total constant (~150)', Math.abs(total - 150) < 0.5);
   check('HOST.setPower actually moved shields to 80', Math.abs(fakeShip.power.shields - 80) < 0.5);
 
-  // 7b. fore/aft shield-balance bar (user 2026-07-08 "tie fighter... shields forward/behind ratio")
+  // 7b. SR X-WING SHIELDS - fore/aft ARC bar, now a 3-state divert (fwd/aft/balanced) over REAL charge, not a
+  // continuous preference blend (user 2026-07-08: "same as tie fighter xwing... configure shields both forward or
+  // both behind"). Stub track rect is left=0,right=30,width=30 (see stubEl above); DIVERT_ZONE=0.33 so clientX=30
+  // (frac=1.0) lands in the right third -> 'aft', clientX=0 (frac=0) lands in the left third -> 'fwd'.
   check('balance bar built', !!(pp._PP.balance && pp._PP.balance.trackEl));
   var balTrack = pp._PP.balance ? pp._PP.balance.trackEl : null;
   if (balTrack && balTrack._ppStartDrag) {
-    safeCall('simulated balance drag: mousedown at clientX=30 (rect left=0,right=30 -> full fore)', function () {
+    safeCall('simulated balance drag: mousedown at clientX=30 (right third -> divert AFT)', function () {
       balTrack._ppStartDrag({ clientX: 30 });
     });
-    check('balance drag start called HOST.setShieldBalance (near 100, full fore)', fakeShip.shieldBalance != null && fakeShip.shieldBalance > 90);
-    safeCall('simulated balance drag: mousemove to clientX=0 (full aft), fired on document', function () {
+    check('balance drag start called HOST.setShieldDivert (aft)', fakeShip.shieldDivert === 'aft');
+    safeCall('simulated balance drag: mousemove to clientX=0 (left third -> divert FWD), fired on document', function () {
       global.document._fire('mousemove', { clientX: 0 });
     });
-    check('balance drag move re-called HOST.setShieldBalance (near 0, full aft)', fakeShip.shieldBalance < 10);
+    check('balance drag move re-called HOST.setShieldDivert (fwd)', fakeShip.shieldDivert === 'fwd');
+    safeCall('simulated balance drag: mousemove to clientX=15 (middle third -> balanced)', function () {
+      global.document._fire('mousemove', { clientX: 15 });
+    });
+    check('balance drag move set BALANCED (null) in the middle zone', fakeShip.shieldDivert === null);
     safeCall('simulated balance drag: mouseup ends it', function () { global.document._fire('mouseup', {}); });
   } else {
     check('drag handle wired onto balance track', false);
   }
-  safeCall('direct HOST.setShieldBalance(fakeShip, 70)', function () { global.window.HOST.setShieldBalance(fakeShip, 70); });
-  check('HOST.setShieldBalance actually moved it to 70', Math.abs(fakeShip.shieldBalance - 70) < 0.5);
-  check('HOST.shieldBalanceOf reads it back', Math.abs(global.window.HOST.shieldBalanceOf(fakeShip) - 70) < 0.5);
+  safeCall('direct HOST.setShieldDivert(fakeShip, "fwd")', function () { global.window.HOST.setShieldDivert(fakeShip, 'fwd'); });
+  check('HOST.setShieldDivert actually set it to fwd', fakeShip.shieldDivert === 'fwd');
+  check('HOST.shieldDivertOf reads it back', global.window.HOST.shieldDivertOf(fakeShip) === 'fwd');
+  fakeShip.shieldFwd = 15; fakeShip.shieldAft = 8;
+  var arcs = global.window.HOST.shieldArcsOf(fakeShip);
+  check('HOST.shieldArcsOf reads real per-arc charge', arcs.fwd === 15 && arcs.aft === 8 && arcs.max === 20);
+
+  // 7c. SR X-WING CAPACITORS - laser/engine energy gauges (user 2026-07-08: "show the power capacitor levels for
+  // lasers shields and engine speed")
+  check('capacitor gauges built', !!(pp._PP.capLaser && pp._PP.capLaser.fillEl) && !!(pp._PP.capEngine && pp._PP.capEngine.fillEl));
+  fakeShip.capLaser = 40; fakeShip.capEngine = 90;
+  safeCall('renderCapacitors via a fresh show()', function () { pp.hide(); pp.show(); });
+  check('laser gauge DOM text reflects the fake ship value end-to-end', pp._PP.capLaser.pctEl.textContent.indexOf('40') >= 0);
+  check('engine gauge DOM text reflects the fake ship value end-to-end', pp._PP.capEngine.pctEl.textContent.indexOf('90') >= 0);
 
   // 8. mounting into an explicit parent element works
   var altParent = stubEl();
