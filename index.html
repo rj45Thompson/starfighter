@@ -1799,10 +1799,13 @@ const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT
   // FLAMETHROWER (user 2026-07-07: "the enemies of starfighter originally had flame thrower, can you copy that").
   // Honest note: the actual Unity project has no coded flamethrower weapon anywhere in its scripts (checked every
   // .cs file) - only a generic third-party "Cartoon FX" fire VFX pack used for explosions. There is nothing to
-  // port. Built fresh here using that REAL fire texture (assets/flame1.png) for an authentic look: short range,
-  // rapid weak hits (simulates a continuous stream within the existing discrete-shot architecture), no homing.
-  // Not player-purchasable (not in WEAPON_ORDER) - it is the Hegemon's own signature close-range terror weapon.
-  flame:    {n:'Incinerator',    dmg:7,  cd:0.09, speed:46,  life:0.42, range:0.30, col:0xff7a2a, r:3.4, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.8} };
+  // port. Built fresh here using that REAL fire texture (assets/flame1.png, loaded as FLAME_TEX) for an authentic
+  // look, no homing. Not player-purchasable (not in WEAPON_ORDER) - it is the Hegemon's own signature terror weapon.
+  // BUFFED (user 2026-07-08: "the flame doesn't shoot far enough or do enough damage"): reach = speed*life was
+  // 46*0.42 = 19.3 units, a fraction of every other weapon's reach (energy 130, ballistic 203, missile 184) - pirates
+  // had to be nearly touching you before it could connect at all. speed/life now give ~64 units reach (still the
+  // shortest of the four, keeping it a close/mid-range weapon, just no longer point-blank-only) and dmg is up ~70%.
+  flame:    {n:'Incinerator',    dmg:12, cd:0.09, speed:75,  life:0.85, range:0.48, col:0xff7a2a, r:3.8, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.9} };
 const WEAPON_ORDER=['energy','ballistic','missile'];   // player-purchasable, in `weapon` shop order - flame is Hegemon-only, see addPirate()
 // M6: ARTIFACTS - rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
