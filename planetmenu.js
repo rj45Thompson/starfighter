@@ -30,6 +30,7 @@ var CFG = {
   TABS: [ {k:'market',   n:'MARKET'},
           {k:'hangar',   n:'HANGAR'},
           {k:'missions', n:'MISSIONS'},
+          {k:'quests',   n:'QUESTS'},
           {k:'ground',   n:'GROUND'},
           {k:'log',      n:'LOG'},
           {k:'depart',   n:'DEPART'} ],
@@ -315,7 +316,8 @@ function renderTabs(){
   if(!S.el.tabs) return;
   var h='', i;
   for(i=0;i<CFG.TABS.length;i++){ var t=CFG.TABS[i];
-    var label = t.n + (t.k==='log' && S.log.length ? (' ('+S.log.length+')') : '');
+    var label = t.n + (t.k==='log' && S.log.length ? (' ('+S.log.length+')') : '')
+      + (t.k==='quests' && questPending() ? ' <span class="pm-tag mk">!</span>' : '');
     h += '<button class="pm-tab'+(S.tab===t.k?' on':'')+'" data-act="tab" data-tab="'+t.k+'">'
        +   '<span class="pm-k">'+(i+1)+'</span>'+label+'</button>'; }
   S.el.tabs.innerHTML=h; }
@@ -563,6 +565,23 @@ function missionsHtml(){
   else h += '<div class="pm-note">Coalition contracts still post on the terminal: <b style="color:'+COL.AMBER+'">contracts</b> - <b style="color:'+COL.AMBER+'">accept &lt;id&gt;</b>.</div>';
   return h; }
 
+/* ------------------------------------------------ TAB: QUESTS (SR-M9, REQUIREMENTS_SR.md - Space Rangers 2's
+   signature: branching dialogue with real consequences, not a checklist objective like MISSIONS above) */
+function questPending(){ var TQ=window.TEXTQUESTS; if(!TQ) return false;
+  try{ return !!TQ.active(); }catch(e){ return false; } }
+function questsHtml(){
+  var TQ=window.TEXTQUESTS;
+  if(!TQ) return '<div class="pm-note">(quest system offline)</div>';
+  var q=null; try{ q=TQ.active(); }catch(e){ q=null; }
+  if(!q) return '<div class="pm-note">Nothing on offer right now. Dock somewhere and a quest may come up - '
+    + 'branching choices with real consequences (credits, standing, reputation), not a checklist.</div>';
+  var h='<div class="pm-panel"><h4>'+esc(q.title)+'</h4><div style="margin-bottom:10px;line-height:1.5">'+q.text+'</div>', i;
+  for(i=0;i<q.choices.length;i++){ var c=q.choices[i];
+    h += '<button class="pm-row pm-b'+(c.enabled?' pm-go':'')+'" style="width:100%;text-align:left;margin-bottom:6px;display:block" '
+       + 'data-act="cmd" data-cmd="choose '+c.n+'"'+(c.enabled?'':' disabled')+'>'+esc(c.label)+'</button>'; }
+  h += '</div>';
+  return h; }
+
 /* ------------------------------------------------ TAB: GROUND */
 function groundHtml(){
   var p=S.planet, own=S.isBase?'base':ownerOf(p), ob=CFG.OWNER[own]||CFG.OWNER.coalition;
@@ -617,6 +636,7 @@ function renderBody(){
   if(S.tab==='market') h=marketHtml();
   else if(S.tab==='hangar') h=hangarHtml();
   else if(S.tab==='missions') h=missionsHtml();
+  else if(S.tab==='quests') h=questsHtml();
   else if(S.tab==='ground') h=groundHtml();
   else if(S.tab==='log') h=logHtml();
   else if(S.tab==='depart') h=departHtml();

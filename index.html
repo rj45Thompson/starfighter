@@ -120,35 +120,36 @@
 <button id="dockPromptBtn" style="display:none;position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:12;font:800 15px/1 ui-monospace,monospace;letter-spacing:.08em;color:#04121c;background:linear-gradient(#9fe6ff,#46d6ff);border:1px solid #eafcff;border-radius:10px;padding:12px 26px;cursor:pointer;box-shadow:0 0 22px #46d6ff88,0 4px 0 #1a6a8a;pointer-events:auto">⌂ DOCK AT RANGER COMMAND</button>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260707d"></script>
-<script src="fflate.min.js?v=20260707d"></script>
-<script src="fbxloader.js?v=20260707d"></script>
+<script src="three.min.js?v=20260707e"></script>
+<script src="fflate.min.js?v=20260707e"></script>
+<script src="fbxloader.js?v=20260707e"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260707d"></script>
-<script src="inhabitant.js?v=20260707d"></script>
-<script src="passenger.js?v=20260707d"></script>
-<script src="gamemod.js?v=20260707d"></script>
-<script src="chatter.js?v=20260707d"></script>
-<script src="vision.js?v=20260707d"></script>
-<script src="deliberate.js?v=20260707d"></script>
-<script src="knowledge.js?v=20260707d"></script>
-<script src="acquire.js?v=20260707d"></script>
-<script src="sound.js?v=20260707d"></script>
-<script src="hullmodels.js?v=20260707d"></script>
-<script src="knowledge_hud.js?v=20260707d"></script>
-<script src="thoughts.js?v=20260707d"></script>
-<script src="tami_battle_ui.js?v=20260707d"></script>
-<script src="power_panel.js?v=20260707d"></script>
-<script src="panels.js?v=20260707d"></script>
+<script src="speech_tier.js?v=20260707e"></script>
+<script src="inhabitant.js?v=20260707e"></script>
+<script src="passenger.js?v=20260707e"></script>
+<script src="gamemod.js?v=20260707e"></script>
+<script src="chatter.js?v=20260707e"></script>
+<script src="vision.js?v=20260707e"></script>
+<script src="deliberate.js?v=20260707e"></script>
+<script src="knowledge.js?v=20260707e"></script>
+<script src="acquire.js?v=20260707e"></script>
+<script src="sound.js?v=20260707e"></script>
+<script src="hullmodels.js?v=20260707e"></script>
+<script src="knowledge_hud.js?v=20260707e"></script>
+<script src="thoughts.js?v=20260707e"></script>
+<script src="tami_battle_ui.js?v=20260707e"></script>
+<script src="power_panel.js?v=20260707e"></script>
+<script src="panels.js?v=20260707e"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260707d"></script>
-<script src="conquest.js?v=20260707d"></script>
-<script src="missions.js?v=20260707d"></script>
-<script src="planetmenu.js?v=20260707d"></script>
+<script src="starmap.js?v=20260707e"></script>
+<script src="conquest.js?v=20260707e"></script>
+<script src="missions.js?v=20260707e"></script>
+<script src="planetmenu.js?v=20260707e"></script>
+<script src="textquests.js?v=20260707e"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -618,8 +619,15 @@ function completeDock(s,p,isBase){
   if(p.rep<=CFG.REP_HOSTILE){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player' && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
+  // SR-M9 TEXT QUESTS (REQUIREMENTS_SR.md, "SR2's signature feature"): a chance to offer a branching quest on
+  // every player dock at a non-base world - only fires if nothing is already active (tryOffer no-ops otherwise).
+  // Rolled BEFORE dockMenu() so the planet screen's QUESTS tab shows its "!" badge from its very first render,
+  // not one render-tick stale.
+  let questOffer=null;
+  if(s.role==='player'&&window.TEXTQUESTS) questOffer=TEXTQUESTS.tryOffer(p);
   dockMenu(p,false);
   if(s.role==='player'){ if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
+  if(questOffer) term(`<b style="color:#c9a0ff">📜 ${questOffer.title}</b> - ${questOffer.text}<br>`+questOffer.choices.map(c=>`  <b>[${c.n}]</b> ${c.label}`).join('<br>')+`<br><span style="opacity:.65">type <b>choose &lt;n&gt;</b>, or open the QUESTS tab</span>`,'sys');
   return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15};
 }
 function contraCount(s){ let n=0; for(const k in (s.contraband||{})) n+=s.contraband[k]||0; return n; }
@@ -2265,6 +2273,15 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     contracts.forEach(ct=>{ const prog=ct.type==='bounty'?` [${ct.got}/${ct.need}]`:''; term(`  [${ct.id}] ${ct.desc} · <span style="color:#ffcf52">${ct.reward}c</span> +${ct.rep}rep @ ${ct.issuer.name}${ct.accepted?(' <span style="color:#7fdc8a">ACCEPTED</span>'+prog):''}`,'sys'); }); return; }
   if(c==='accept'){ const ct=contracts.find(x=>x.id===parseInt(a[1])); if(!need(ct,'unknown contract id - try: contracts')) return; if(ct.accepted){ term('Already accepted.','sys'); return; } ct.accepted=true; term(`Accepted [${ct.id}] ${ct.desc}. Reward ${ct.reward}c +${ct.rep}rep.`,'sys'); return; }
   if(c==='abandon'){ const ct=contracts.find(x=>x.id===parseInt(a[1])); if(!need(ct,'unknown contract id')) return; ct.accepted=false; if(ct.type==='bounty') ct.got=0; term(`Abandoned [${ct.id}].`,'sys'); return; }
+  // SR-M9 TEXT QUESTS - a branching dialogue offered on dock (completeDock), distinct from the linear
+  // CONTRACTS above: choices carry real consequences (credits/rep/score), not just an objective checklist.
+  if(c==='quest'){ if(!window.TEXTQUESTS) return void term('quest system offline.','err'); const q=TEXTQUESTS.active();
+    if(!q){ term('No quest on offer right now - dock somewhere and one might come up.','sys'); return; }
+    term(`<b style="color:#c9a0ff">📜 ${q.title}</b> - ${q.text}<br>`+q.choices.map(c2=>`  <b>[${c2.n}]</b> ${c2.label}${c2.enabled?'':' <span style="opacity:.5">(unavailable)</span>'}`).join('<br>'),'sys'); return; }
+  if(c==='choose'){ if(!window.TEXTQUESTS) return void term('quest system offline.','err'); const r=TEXTQUESTS.choose(parseInt(a[1]));
+    if(!r.ok){ term(r.msg,'err'); return; }
+    if(r.done){ term(`<b style="color:#c9a0ff">📜</b> ${r.msg}`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
+    const q=r.view; term(`<b style="color:#c9a0ff">📜 ${q.title}</b> - ${q.text}<br>`+q.choices.map(c2=>`  <b>[${c2.n}]</b> ${c2.label}${c2.enabled?'':' <span style="opacity:.5">(unavailable)</span>'}`).join('<br>'),'sys'); return; }
   if(c==='rank'){ const i=rankIdx(P.score||0), nx=RANKS[i+1]; term(`RANGER RANK: <b>${RANKS[i].n}</b> (${i+1}/${RANKS.length}) · score ${P.score|0}${nx?` · next <b>${nx.n}</b> at ${nx.pts} (${Math.max(0,nx.pts-(P.score|0))} to go)`:' · MAX'}`,'sys'); return; }
   if(c==='artifacts'||c==='art'){ const inv=P.artifacts||[], eq=P.artEquipped||[];
     if(a[1]){ const idx=inv.findIndex(k=>k.startsWith(a[1].toLowerCase())||ARTIFACTS[k].n.toLowerCase().indexOf(a[1].toLowerCase())>=0); if(!need(idx>=0,'unknown artifact - try: artifacts')) return; const key=inv[idx]; inv.splice(idx,1); ARTIFACTS[key].apply(P); eq.push(key); P.artEquipped=eq; term(`Installed <b>${ARTIFACTS[key].n}</b> - ${ARTIFACTS[key].desc}.`,'sys'); return; }
