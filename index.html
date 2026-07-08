@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708s"></script>
-<script src="fflate.min.js?v=20260708s"></script>
-<script src="fbxloader.js?v=20260708s"></script>
+<script src="three.min.js?v=20260708v"></script>
+<script src="fflate.min.js?v=20260708v"></script>
+<script src="fbxloader.js?v=20260708v"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708s"></script>
-<script src="inhabitant.js?v=20260708s"></script>
-<script src="passenger.js?v=20260708s"></script>
-<script src="gamemod.js?v=20260708s"></script>
-<script src="chatter.js?v=20260708s"></script>
-<script src="speech_input.js?v=20260708s"></script>
-<script src="vision.js?v=20260708s"></script>
-<script src="deliberate.js?v=20260708s"></script>
-<script src="knowledge.js?v=20260708s"></script>
-<script src="acquire.js?v=20260708s"></script>
-<script src="sound.js?v=20260708s"></script>
-<script src="hullmodels.js?v=20260708s"></script>
-<script src="knowledge_hud.js?v=20260708s"></script>
-<script src="thoughts.js?v=20260708s"></script>
-<script src="tami_battle_ui.js?v=20260708s"></script>
-<script src="power_panel.js?v=20260708s"></script>
-<script src="panels.js?v=20260708s"></script>
+<script src="speech_tier.js?v=20260708v"></script>
+<script src="inhabitant.js?v=20260708v"></script>
+<script src="passenger.js?v=20260708v"></script>
+<script src="gamemod.js?v=20260708v"></script>
+<script src="chatter.js?v=20260708v"></script>
+<script src="speech_input.js?v=20260708v"></script>
+<script src="vision.js?v=20260708v"></script>
+<script src="deliberate.js?v=20260708v"></script>
+<script src="knowledge.js?v=20260708v"></script>
+<script src="acquire.js?v=20260708v"></script>
+<script src="sound.js?v=20260708v"></script>
+<script src="hullmodels.js?v=20260708v"></script>
+<script src="knowledge_hud.js?v=20260708v"></script>
+<script src="thoughts.js?v=20260708v"></script>
+<script src="tami_battle_ui.js?v=20260708v"></script>
+<script src="power_panel.js?v=20260708v"></script>
+<script src="panels.js?v=20260708v"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708s"></script>
-<script src="conquest.js?v=20260708s"></script>
-<script src="missions.js?v=20260708s"></script>
-<script src="planetmenu.js?v=20260708s"></script>
-<script src="textquests.js?v=20260708s"></script>
+<script src="starmap.js?v=20260708v"></script>
+<script src="conquest.js?v=20260708v"></script>
+<script src="missions.js?v=20260708v"></script>
+<script src="planetmenu.js?v=20260708v"></script>
+<script src="textquests.js?v=20260708v"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -222,6 +222,7 @@ const CFG = {
   SHIELD_ARC_BASE:20, SHIELD_DIVERT_MULT:2.2,   // user 2026-07-08 "same as tie fighter xwing": real fore/aft POOLS (half of SHIELD_BASE each), not one pool with an efficiency weight; diverting concentrates regen on one arc at ~2.2x, pausing the other
   LASER_CAP_MAX:100, LASER_CAP_PER_SHOT:8, LASER_CAP_REGEN:10,   // weapons energy capacitor: each shot costs this much charge, capacitor regens %/s scaled by weapons power - hits 0 -> can't fire until it climbs back up
   ENGINE_CAP_MAX:100, ENGINE_CAP_DRAIN:24, ENGINE_CAP_REGEN:14,   // user: "when I hold shift I don't want my recharge rates to change, it would just go through my engine capacitor" - nitro drains ITS OWN pool now, decoupled from the shared weapons/engines/shields power route entirely
+  GIZMO_SLOTS:2, ECM_DODGE_CHANCE:0.22, SHIELD_BOOST_MULT:1.4,   // ENGINEERING BAY (user 2026-07-08): a real 2-slot electronics bay, not an uncapped bag; ECM's dodge is a flat per-hit chance, not evasion stacking with anything else
   SKILL_KEYS:['gunnery','handling','tech','trade','charisma','leadership'],   // SR-M17: SR-style player skill career
   SKILL_MAX:5, SKILL_PTS_PER_RANK:1,          // 1 point per rank gained, capped at 5 levels/skill
   SKILL_GUNNERY_DMG:0.04, SKILL_HANDLING_THRUST:0.03, SKILL_TECH_REGEN:0.06,
@@ -493,6 +494,7 @@ function makeShip(i){
     role:(i/CFG.NSHIPS<CFG.TRADER_FRAC)?'trader':'raider', backstory:BACKSTORY.coalition[i%BACKSTORY.coalition.length],   // traders drive economy; raiders fight/mine; ORIGINAL per-pilot Warden backstory (GIVEN flavor)
     cargo:{}, fuel:CFG.FUEL_START, tradePlan:null, tradeCd:0, warping:false,        // trading + hyperspace state
     holdCap:CFG.HOLD_CAP, fuelCap:CFG.FUEL_CAP, senseR:CFG.SENSE_R, warpEff:1, equip:{},   // installable equipment stats
+    engineType:'standard', gizmoSlots:new Array(CFG.GIZMO_SLOTS).fill(null),   // ENGINEERING BAY: single-slot engine type + a real n-slot electronics bay
     mode:'MINE', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(hue) };
   novelShipHook(s);   // N3 (GIVEN-from-canon): roster temperament -> aggr bias; traders faction -> trader role bias
   applyHull(s, s.role==='trader'?'freighter':RAIDER_HULL_VARIETY[i%RAIDER_HULL_VARIETY.length]);   // user 2026-07-08 "each race is supposed to have a different ship type by default": makeShip never set a hullClass at all, so every coalition ship defaulted to plain Fighter regardless of role; traders now spawn as the big-holdCap Freighter this file's own comment already called for, raiders spawn a mix so the fleet reads as varied on day one, not just after upgrades
@@ -658,7 +660,7 @@ function shieldTick(s,dt){ if(!s.alive) return; const amax=shieldArcMaxFor(s);
   if(s.shieldFwd>amax) s.shieldFwd=amax; if(s.shieldAft>amax) s.shieldAft=amax;              // power just rerouted AWAY from shields -> ceiling drops immediately, same rule as before
   const canRegen = s.docked || T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY;
   if(canRegen){
-    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1);   // SR-M17 tech skill; docked = safe harbor, 2x
+    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1)*(hasGizmo(s,'shieldboost')?CFG.SHIELD_BOOST_MULT:1);   // SR-M17 tech skill; docked = safe harbor, 2x; ENGINEERING BAY: shield booster gizmo
     // SR X-WING SHIELDS (user 2026-07-08, "same as tie fighter xwing"): real fore/aft POOLS, not one pool with an efficiency
     // weight. Undiverted, BOTH arcs regen at the full base rate independently (given enough time, both reach their own
     // 100%). "shield fwd"/"shield aft" concentrates regen on one arc at SHIELD_DIVERT_MULT and pauses the other entirely -
@@ -1277,14 +1279,14 @@ function flyStep(s,dt){
   const nitroMult=nitroActive?CFG.NITRO_BOOST_MULT:1;                                                // NITRO BURST: instant thrust/vmax layer - doesn't wait on the power-stat ramp above to feel like a boost
   if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
   s._nitroWasActive=nitroActive;
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier; SR-M17: handling skill
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier; SR-M17: handling skill; ENGINEERING BAY: engine type speed multiplier
   // user 2026-07-08 ("when I hold shift I want to have burst mode"): the line above only fires while W is ALSO
   // held (multiplies s.ctrl.thr, which is 0 otherwise) - so Shift alone gave one kick then coasted to a stop under
   // drag, never reading as a sustained "burst". A real afterburner propels you on its own, no second key needed -
   // this term is independent of s.ctrl.thr, active for exactly as long as Shift is held.
   if(nitroActive) s.vel.addScaledVector(fwd,CFG.NITRO_AUTOTHRUST*engMult*dt);
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engineOf(s).speedMult*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -1378,6 +1380,7 @@ function step(dt){
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner];
     for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||s.docked) continue;   // DOCKED = safe harbor - no combat damage while docked
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire - except the player (and teammates returning fire at the player)
+      if(hasGizmo(s,'ecm') && rand(0,1)<CFG.ECM_DODGE_CHANCE) continue;   // ENGINEERING BAY: jammed fire control - a flat per-hit chance the shot just misses, bullet keeps flying for anyone else
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
         const dmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
         s.hp-=drainShield(s,dmg,b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // I1 FIX (puppet audit wave 1): the attacker's IDENTITY is only learnable if they are on sensors - bullets outrange senseR, so a shot from the dark is src 'unknown'; X-WING POWER: shields absorb first
@@ -1457,7 +1460,8 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
   // human player only - the AI squad's gear churn is a separate economy simulation, not touched.
   if(s.role==='player'){
     s.lvl={weapon:1,engine:1,hull:1}; s.weaponType='energy'; s.equip={}; s.artifacts=[]; s.contraband={};
-    s.fuelCap=CFG.FUEL_CAP; s.senseR=CFG.SENSE_R; s.warpEff=1; s.regenBonus=0; s.targetingComputer=false;
+    s.fuelCap=CFG.FUEL_CAP; s.senseR=CFG.SENSE_R; s.warpEff=1; s.regenBonus=0;
+    s.engineType='standard'; s.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);   // ENGINEERING BAY: real stakes death wipes the engine/gizmo loadout too, same as weapon/equip/artifacts
     applyHull(s,'fighter'); }   // recomputes holdCap/maxHp/hp/hullSpeed/visual model from the reset lvl+equip
   if(window.SOUND) SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'});
   burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); say(s,'Hull breach! Punching out.');
@@ -1512,7 +1516,7 @@ function spriteText(text,fs,col,opts){ opts=opts||{}; const ws=opts.ws||1,weight
 // rather than being a free always-on aimbot.
 const RETICLE_CFG={ POWER_THRESH:60, PULSE_HZ:3.2 };
 const reticleMesh=(function(){ const g=new T.EdgesGeometry(new T.PlaneGeometry(1,1)); const m=new T.LineSegments(g,new T.LineBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.9})); m.visible=false; m.renderOrder=25; scene.add(m); return m; })();
-function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!P.targetingComputer){ reticleMesh.visible=false; return; }
+function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!hasGizmo(P,'targeting')){ reticleMesh.visible=false; return; }   // ENGINEERING BAY: now a mountable gizmo, not a permanent flag
   const wPct=shipPower(P).weapons; if(wPct<RETICLE_CFG.POWER_THRESH){ reticleMesh.visible=false; return; }
   let best=null,bd=P.senseR; for(const o of ships){ if(o===P||!o.alive||o.team!=='pirate') continue; const d=P.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} }
   if(!best){ reticleMesh.visible=false; return; }
@@ -1658,6 +1662,8 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'land',   desc:'land on a docked planet and walk the surface on foot - away missions, turn-based battles on the real Tami rules', usage:'dock then land · launch to leave'},
   {name:'buy',    desc:'buy goods at the docked market (sell to sell, refuel for gas)', usage:'buy <good> <n> · sell <good> <n> · refuel'},
   {name:'upgrade',desc:'spend credits improving weapon, engine or hull; outfit for equipment; blackmarket at the base', usage:'upgrade <weapon|engine|hull>'},
+  {name:'engine', desc:'the engineering bay engine drive: standard, afterburner, ion - swap engine TYPE for a speed/hyperjump-fuel tradeoff, different from the engine level upgrade', usage:'engine · engine after · engine ion · engine standard'},
+  {name:'gizmo', desc:'the engineering bay electronics slots: gizmos, gadgets, targeting computer, ECM jammer, shield booster - a real n-slot bay you mount/unmount/sell, not an unlimited buy', usage:'gizmo · gizmo mount targeting · gizmo unmount 1'},
   {name:'contracts',desc:'jobs and missions from planets: accept work, deliveries, bounties for pay', usage:'contracts · accept <id>'},
   {name:'skills', desc:'pilot skill career: gunnery/handling/tech/trade/charisma/leadership, 1 point per rank-up', usage:'skills · skill <name>'},
   {name:'war',    desc:'the war: escalation, front lines, victories, the Hegemon stronghold', usage:'war · warmap'},
@@ -1812,12 +1818,40 @@ function findPlanet(n){ if(!n) return null; n=n.toLowerCase();
 function findGood(n){ if(!n) return null; return GOODS.find(g=>g.k===n||g.n.toLowerCase().startsWith(n)); }
 const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=15}, fuel:{n:'Fuel Cell',cost:100,desc:'+25 fuel',apply:s=>s.fuelCap+=25},
   scanner:{n:'Scanner',cost:150,desc:'+35 sensor range',apply:s=>s.senseR+=35}, plating:{n:'Armor Plating',cost:190,desc:'+20 max hull (hull space is expensive - buy it)',apply:s=>{s.maxHp+=20;s.hp+=20;}},
-  droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5},
-  // TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help
-  // you target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of
-  // power"): expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties
-  // it honestly into the X-Wing power system instead of a bolted-on always-on freebie.
-  targeting:{n:'Targeting Computer',cost:900,desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve',apply:s=>s.targetingComputer=true} };
+  droid:{n:'Repair Droid',cost:170,desc:'+2.5 hull/s regen',apply:s=>s.regenBonus=(s.regenBonus||0)+2.5} };
+// ENGINEERING BAY (user 2026-07-08: "copy space rangers rise of the dominators menus when you land - the item
+// shop and build the list of ship components into the engineering bay that lets you layout your ship... buy
+// different types of engines weapons electronic gizmos"). EQUIP above (cargo/fuel/scanner/plating/droid) stays a
+// permanent stacking purchase - those are PHYSICAL ship capacity (a bigger tank, thicker plate), not a module you'd
+// swap back out. ENGINES and GIZMOS below are the genuinely SWAPPABLE loadout SR-M12 asks for: a single engine
+// TYPE (like weaponType/hullClass - one slot, real tradeoffs) and a small GIZMO_SLOTS-wide electronics bay you
+// mount/unmount/sell, not an uncapped bag you just keep adding to.
+const ENGINES={
+  standard:{n:'Standard Drive', cost:0,   speedMult:1.00, fuelMult:1.00, desc:'balanced - the factory drive'},
+  after:   {n:'Afterburner Drive', cost:480, speedMult:1.22, fuelMult:1.4, desc:'faster top speed + accel - burns hyperjump fuel harder'},
+  ion:     {n:'Ion Drive', cost:520, speedMult:0.85, fuelMult:0.6, desc:'slower - sips hyperjump fuel, real range between refuels'} };
+const ENGINE_KEYS=Object.keys(ENGINES);
+function engineOf(s){ return ENGINES[s.engineType||'standard']||ENGINES.standard; }
+// GIZMOS: the electronics bay - GIZMO_SLOTS mount points (see CFG.GIZMO_SLOTS), each holding at most one gizmo key.
+// TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help you
+// target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of power"):
+// expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties it honestly
+// into the X-Wing power system instead of a bolted-on always-on freebie. Used to be a permanent EQUIP purchase;
+// now lives here so it can be unmounted to free the slot for something else, like a real Ranger loadout choice.
+const GIZMOS={
+  targeting:  {n:'Targeting Computer', cost:900, desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve'},
+  ecm:        {n:'ECM Jammer', cost:850, desc:'scrambles enemy fire control - hostiles shooting at you have a flat chance to simply miss'},
+  shieldboost:{n:'Shield Capacitor Booster', cost:800, desc:'+40% shield regen rate, both arcs'} };
+const GIZMO_KEYS=Object.keys(GIZMOS);
+const GIZMO_SELL_FRAC=0.5;   // selling a mounted gizmo back returns half its listed cost - depreciated, matches the existing hull-trade-in convention
+function hasGizmo(s,key){ return !!(s.gizmoSlots&&s.gizmoSlots.includes(key)); }
+function mountGizmo(s,key){ if(!GIZMOS[key]) return {ok:false,why:'no such gizmo'};
+  if(!s.gizmoSlots) s.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);
+  if(hasGizmo(s,key)) return {ok:false,why:'already mounted'};
+  const free=s.gizmoSlots.indexOf(null); if(free<0) return {ok:false,why:'no free gizmo slot - unmount one first'};
+  s.gizmoSlots[free]=key; return {ok:true,slot:free}; }
+function unmountGizmo(s,idx){ if(!s.gizmoSlots||idx<0||idx>=s.gizmoSlots.length||!s.gizmoSlots[idx]) return {ok:false,why:'that slot is empty'};
+  const key=s.gizmoSlots[idx]; s.gizmoSlots[idx]=null; return {ok:true,key}; }
 // M3: WEAPON TYPES - the arms race. energy=fast/cheap, ballistic=hard-hitting/long, missile=homing+splash.
 // dmg=base anti-ship damage · cd=fire cooldown · speed/life=projectile · range=×SENSE_R fire distance
 // twin=two muzzles · homing=seek turn-rate (0=dumb) · splash=AoE radius on hit (0=none) · cost=install price
@@ -2519,7 +2553,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const sy=systems.find(x=>x.name.toLowerCase()===(a[1]||'').toLowerCase()); if(!need(sy,'unknown system - try: starmap (or press G) to see them')) return;
     const d=P.pos.distanceTo(sy.center);
     if(d<CFG.SYSTEM_R*CFG.JUMP_SAME_SYS_R_MULT){ term(`Already in ${sy.name} system - fly there directly (<b>go &lt;planet&gt;</b>), no jump needed.`,'sys'); return; }
-    const cost=Math.ceil(CFG.JUMP_FUEL_BASE+d/CFG.JUMP_DIST_PER_FUEL);
+    const cost=Math.ceil((CFG.JUMP_FUEL_BASE+d/CFG.JUMP_DIST_PER_FUEL)*engineOf(P).fuelMult);   // ENGINEERING BAY: Ion Drive sips hyperjump fuel, Afterburner drinks it
     if(!need(P.fuel>=cost,`hyperjump to ${sy.name} needs ${cost} fuel (have ${Math.round(P.fuel)}/${P.fuelCap}) - refuel first`)) return;
     P.fuel-=cost; P.obj=null; P.docked=null;
     P.pos.copy(sy.center).add(new T.Vector3(rand(-1,1),rand(-0.2,0.2),rand(-1,1)).setLength(rand(40,CFG.SYSTEM_R*0.4))); P.vel.set(0,0,0);
@@ -2541,8 +2575,33 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
     if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
     term(`Fitted ${W.n} (-${W.cost}c) - dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
-  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} - ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys')); term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys'); return; }
+  if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} - ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys'));
+    term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · engine ${ENGINES[P.engineType||'standard'].n} · gizmos ${(P.gizmoSlots||[]).filter(Boolean).length}/${CFG.GIZMO_SLOTS} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys');
+    term('&nbsp;&nbsp;<span style="opacity:.6">also see: engine · gizmo · weapon · hull - the ENGINEERING BAY</span>','sys'); return; }
   if(c==='install'||c==='fit'){ if(!need(dockedP,'must be docked')) return; const k=Object.keys(EQUIP).find(x=>x.startsWith(a[1]||'~')); if(!need(k,'install cargo|fuel|scanner|hyperdrive')) return; const cost=equipCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.equip[k]=(P.equip[k]||0)+1; EQUIP[k].apply(P); term(`Installed ${EQUIP[k].n} (-${cost}c) · ${EQUIP[k].desc}.`,'sys'); return; }
+  // ENGINEERING BAY (user 2026-07-08: "the item shop and build the list of ship components into the engineering
+  // bay that lets you layout your ship... buy different types of engines weapons electronic gizmos") - the engine
+  // TYPE is a single-slot fit exactly like `weapon` above; gizmos are a real n-slot bay (CFG.GIZMO_SLOTS), mount/
+  // unmount/sell instead of an uncapped stacking buy, which is what makes it an actual LAYOUT decision.
+  if(c==='engine'){ if(!need(dockedP,'must be docked')) return; const et=(a[1]||'').toLowerCase();
+    if(!et){ term('ENGINES (fit at dock):','sys'); ENGINE_KEYS.forEach(kk=>{ const E=ENGINES[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.engineType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    const key=ENGINE_KEYS.find(kk=>kk.startsWith(et)); if(!need(key,'engine standard|after|ion')) return; const E=ENGINES[key];
+    if((P.engineType||'standard')===key){ term(`Already fitted: ${E.n}.`,'sys'); return; }
+    if(!need(P.credits>=E.cost,`need ${E.cost}c`)) return; P.credits-=E.cost; P.engineType=key;
+    term(`Fitted ${E.n} (-${E.cost}c) - ${E.desc}.`,'sys'); return; }
+  if(c==='gizmo'||c==='gizmos'){ if(!need(dockedP,'must be docked')) return; const sub=(a[1]||'').toLowerCase();
+    if(!sub||sub==='list'){ term(`GIZMO BAY (${(P.gizmoSlots||[]).filter(Boolean).length}/${CFG.GIZMO_SLOTS} slots used):`,'sys');
+      (P.gizmoSlots||[]).forEach((k,i)=>term(`&nbsp;&nbsp;slot ${i+1}: ${k?GIZMOS[k].n:'<span style="opacity:.5">-empty-</span>'}`,'sys'));
+      term('SHOP:','sys'); GIZMO_KEYS.forEach(k=>term(`&nbsp;&nbsp;${k} - ${GIZMOS[k].n} · ${GIZMOS[k].desc} · ${GIZMOS[k].cost}c${hasGizmo(P,k)?'  [mounted]':''}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">try: gizmo mount targeting · gizmo unmount 1</span>','sys'); return; }
+    if(sub==='mount'){ const k=GIZMO_KEYS.find(kk=>kk.startsWith((a[2]||'').toLowerCase())); if(!need(k,'gizmo mount targeting|ecm|shieldboost')) return;
+      if(!need(P.credits>=GIZMOS[k].cost,`need ${GIZMOS[k].cost}c`)) return;
+      const r=mountGizmo(P,k); if(!need(r.ok,r.why)) return; P.credits-=GIZMOS[k].cost;
+      term(`Mounted ${GIZMOS[k].n} in slot ${r.slot+1} (-${GIZMOS[k].cost}c) · ${GIZMOS[k].desc}.`,'sys'); return; }
+    if(sub==='unmount'){ const idx=(parseInt(a[2])||0)-1; const r=unmountGizmo(P,idx); if(!need(r.ok,r.why||'gizmo unmount <slot 1-N>')) return;
+      const refund=Math.round(GIZMOS[r.key].cost*GIZMO_SELL_FRAC); P.credits+=refund;
+      term(`Unmounted ${GIZMOS[r.key].n} from slot ${idx+1} (+${refund}c).`,'sys'); return; }
+    term('usage: gizmo · gizmo mount &lt;key&gt; · gizmo unmount &lt;slot&gt;','err'); return; }
   if(c==='rep'||c==='reputation'||c==='standing'){ term('COALITION STANDING (by faction):','sys');
     systems.forEach(sy=>{ const ps=sy.planets.filter(p=>planets.indexOf(p)>=0); if(!ps.length) return; const avg=ps.reduce((a,p)=>a+(p.rep||0),0)/ps.length;
       term(`  <b>${sy.name}</b>: standing ${avg>0?'+':''}${avg.toFixed(1)}${avg<=CFG.REP_HOSTILE?' HOSTILE':avg>=CFG.REP_ALLIED?' ALLIED':''}${sy.contested?' ⚔ CONTESTED':''}`,avg<=CFG.REP_HOSTILE?'err':'sys'); });
@@ -3362,7 +3421,7 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       lvl:{...P.lvl}, equip:{...(P.equip||{})}, artifacts:[...(P.artifacts||[])], contraband:{...(P.contraband||{})},
       fuel:P.fuel, fuelCap:P.fuelCap, holdCap:P.holdCap, senseR:P.senseR, cargo:{...(P.cargo||{})},
       shieldDivert:P.shieldDivert||null, shieldFwd:P.shieldFwd, shieldAft:P.shieldAft, capLaser:P.capLaser, capEngine:P.capEngine,
-      rankShown:P.rankShown, targetingComputer:!!P.targetingComputer,
+      rankShown:P.rankShown, engineType:P.engineType||'standard', gizmoSlots:[...(P.gizmoSlots||[])],
       skills:{...(P.skills||{})}, skillPts:P.skillPts||0 },
     planets: planets.map(p=>({ name:p.name, rep:p.rep, wealth:p.wealth, dev:p.dev, hegemon:!!p.hegemon, terra:p.terra||0 })),
     systems: systems.map(sy=>({ name:sy.name, contested:!!sy.contested })),
@@ -3374,8 +3433,13 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     lvl:sp.lvl||P.lvl, equip:sp.equip||P.equip, artifacts:sp.artifacts||P.artifacts, contraband:sp.contraband||P.contraband,
     fuel:num2(sp.fuel,P.fuel), fuelCap:num2(sp.fuelCap,P.fuelCap), holdCap:num2(sp.holdCap,P.holdCap), senseR:num2(sp.senseR,P.senseR),
     cargo:sp.cargo||P.cargo, shieldDivert:sp.shieldDivert||null, shieldFwd:num2(sp.shieldFwd,P.shieldFwd), shieldAft:num2(sp.shieldAft,P.shieldAft),
-    capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown, targetingComputer:!!sp.targetingComputer,
+    capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown,
+    engineType:sp.engineType||'standard', gizmoSlots:sp.gizmoSlots||new Array(CFG.GIZMO_SLOTS).fill(null),
     skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0) });
+  // MIGRATION (ENGINEERING BAY, user 2026-07-08): targeting used to be a permanent EQUIP flag/save field - an
+  // older save has sp.targetingComputer:true but no gizmoSlots at all. Grandfather it in for free as a mounted
+  // gizmo rather than silently deleting a purchase the player already paid for.
+  if(sp.targetingComputer && !sp.gizmoSlots && !hasGizmo(P,'targeting')) mountGizmo(P,'targeting');
   P.shield=(P.shieldFwd||0)+(P.shieldAft||0);   // keep the synced total consistent right after a restore
   applyHull(P, sp.hullClass||'fighter');   // recomputes maxHp/hp/hullSpeed/visual model from the restored class+equip
   for(const rp of save.planets||[]){ const p=planets.find(x=>x.name===rp.name); if(p){ p.rep=rp.rep; p.wealth=rp.wealth; p.dev=rp.dev; p.hegemon=rp.hegemon; p.terra=rp.terra; } }
@@ -3429,6 +3493,7 @@ window.HOST={
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
   CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS, POWER_SYS, CONTRABAND, CONTRA_KEYS,
+  EQUIP, ENGINES, ENGINE_KEYS, GIZMOS, GIZMO_KEYS, GIZMO_SELL_FRAC, hasGizmo,   // ENGINEERING BAY - exposed live like HULLS/WEAPONS/ARTIFACTS so the UI never hardcodes a second copy that can drift
   notify, term, ev, say, log, runCmd, atBase,
   nearestPlanet, planetByName:(n)=>findPlanet(n), repAdd, checkRankUp,
   // X-WING POWER MANAGEMENT (user 2026-07-07): read the live pool + shield state, or reroute it directly (bypassing
