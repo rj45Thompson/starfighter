@@ -219,6 +219,23 @@ const CFG = {
   // POWER_DEFAULT*3 == POWER_TOTAL so a fresh ship's baseline multiplier is exactly 1.0 (today's balance, untouched).
   POWER_TOTAL:150, POWER_MIN:0, POWER_MAX:100, POWER_DEFAULT:50, POWER_MULT_MIN:0.4, POWER_MULT_MAX:1.6,
   SHIELD_BASE:40, SHIELD_REGEN_BASE:3, SHIELD_REGEN_DELAY:2.5,
+  // WEAPON CAPACITOR (user 2026-07-08: "as I fire my lasers it should drain down the total energy... the speed
+  // and shields and lasers are only a recharge rate not their maximum capacity"): the weapons/engines/shields
+  // dial above was ONLY ever a rate multiplier (fire-rate/thrust/regen-speed) - firing never touched it, so there
+  // was no actual depletable "ammo" reservoir behind a laser the way shields already have one (s.shield, a real
+  // current/max buffer). This adds that missing reservoir for weapons: draining at WEP_CHARGE_DRAIN_PER_SEC while
+  // the trigger is held (cost-per-shot = that rate × the weapon's OWN effective cooldown, so a rapid-fire gun and
+  // a slow one drain the SAME per-second regardless of rate-of-fire - only the regen side varies with power%),
+  // refilled by WEP_CHARGE_REGEN at a rate the weapons power% dial controls (so that dial now genuinely reads as
+  // "recharge rate", matching what the user expected it to mean) - out of charge = the gun stops firing until it
+  // recovers, exactly like a real capacitor weapon.
+  WEP_CHARGE_MAX:100, WEP_CHARGE_DRAIN_PER_SEC:36, WEP_CHARGE_REGEN:16,
+  // FORE/AFT SHIELD PIPS (user 2026-07-08: "the fore/aft should have two levels front and aft, maybe up to 3 or 4
+  // for higher-end shields"): the continuous 0-100 shieldBalance dial now SNAPS to discrete pip steps (2 pips =
+  // {0,50,100}: full aft / even / full fore) instead of any arbitrary percentage - a base ship has 2 pips.
+  // s.shieldPipCap (per-ship, defaults to this) is the extension point for a future higher-tier shield upgrade
+  // granting 3-4 pips; nothing purchasable wired up yet since that needs its own price/where-sold decision.
+  SHIELD_PIP_BASE:2,
   SKILL_KEYS:['gunnery','handling','tech','trade','charisma','leadership'],   // SR-M17: SR-style player skill career
   SKILL_MAX:5, SKILL_PTS_PER_RANK:1,          // 1 point per rank gained, capped at 5 levels/skill
   SKILL_GUNNERY_DMG:0.04, SKILL_HANDLING_THRUST:0.03, SKILL_TECH_REGEN:0.06,
@@ -650,6 +667,14 @@ function setPower(s, sys, target){   // reroute: set ONE system, the other two a
   const sum=P.weapons+P.engines+P.shields; if(Math.abs(sum-CFG.POWER_TOTAL)>0.01) P[sys]=clamp(P[sys]+(CFG.POWER_TOTAL-sum),CFG.POWER_MIN,CFG.POWER_MAX);   // clamp slack -> the pool always stays honest
   return P; }
 function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields); }
+// WEAPON CAPACITOR: a real depletable reservoir behind the weapons power% dial (see CFG.WEP_CHARGE_* above).
+function shipCharge(s){ if(s.wepCharge==null) s.wepCharge=CFG.WEP_CHARGE_MAX; return s.wepCharge; }
+function wepChargeTick(s,dt){ if(!s.alive) return; shipCharge(s);
+  s.wepCharge=Math.min(CFG.WEP_CHARGE_MAX,s.wepCharge+CFG.WEP_CHARGE_REGEN*powerMult(shipPower(s).weapons)*dt); }
+// FORE/AFT SHIELD PIPS: snap a 0-100 balance value to the nearest of shieldPipCapFor(s)+1 discrete positions.
+function shieldPipCapFor(s){ return s.shieldPipCap||CFG.SHIELD_PIP_BASE; }
+function quantizePips(bal,pipCap){ const step=100/pipCap; return clamp(Math.round(clamp(bal,0,100)/step)*step,0,100); }
+function pipStr(s){ const cap=shieldPipCapFor(s), bal=s.shieldBalance==null?50:s.shieldBalance, fore=Math.round(bal/100*cap); return `fore ${fore}/${cap} · aft ${cap-fore}/${cap}`; }
 function shieldTick(s,dt){ if(!s.alive) return; const max=shieldMaxFor(s);
   if(s.shield==null) s.shield=max;
   if(s.shield>max) s.shield=max;                                                      // power just rerouted AWAY from shields -> ceiling drops immediately
@@ -1209,8 +1234,10 @@ function think(s,dt){
   s.fire-=dt;
   if((mode==='MINE'||mode==='HUNT') && target && s.fire<=0){
     const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
-    if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range){
-      s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
+    const effCd=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
+    const chargeCost=CFG.WEP_CHARGE_DRAIN_PER_SEC*effCd;                                             // WEAPON CAPACITOR: same per-second drain regardless of the weapon's own rate-of-fire
+    if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range && shipCharge(s)>=chargeCost){
+      s.wepCharge-=chargeCost; s.fire=effCd;
       const base=(s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'));   // SR-M17
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
         shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };   // per-weapon visual signature
@@ -1275,6 +1302,7 @@ function flyStep(s,dt){
       if(vn<0){ s.vel.addScaledVector(n,-vn); const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }
   s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
+  wepChargeTick(s,dt);                                                                               // weapons capacitor regens the same way (see CFG.WEP_CHARGE_*)
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
   const engVisT=nitroActive?1:s.ctrl.thr;                                                            // burst mode flares the engine glow to full even with W not held - the visible half of "it's really doing something"
   s.mesh.userData.eng.material.opacity=0.3+0.5*engVisT; s.mesh.userData.eng.scale.setScalar(1.3+1.5*engVisT);
@@ -2244,22 +2272,23 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!a[1]){ if(window.PANELS&&window.POWERPANEL) PANELS.open('powerpanel');   // the visual 3-bar draggable panel - its own edge tab also opens/closes it
       term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool - routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
       for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
-      const bal0=P.shieldBalance==null?50:P.shieldBalance;
-      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max · fore/aft <b>${Math.round(bal0)}/${Math.round(100-bal0)}</b> <span style="opacity:.55">· try: power weapons 80 · shield fwd</span>`,'sys'); return; }
+      term(`&nbsp;&nbsp;<span style="color:#ff8a5a">weapons capacitor</span> ${Math.round(shipCharge(P))}/${CFG.WEP_CHARGE_MAX} <span style="opacity:.55">- drains as you fire, refills faster the more power you route to weapons</span>`,'sys');
+      term(`&nbsp;&nbsp;shield ${Math.round(((P.shield==null?shieldMaxFor(P):P.shield)/shieldMaxFor(P))*100)}% of ${Math.round(shieldMaxFor(P))} max · <b>${pipStr(P)}</b> pips <span style="opacity:.55">· try: power weapons 80 · shield fwd</span>`,'sys'); return; }
     const sys=POWER_SYS.find(k=>k.startsWith(a[1].toLowerCase())); if(!need(sys,'power weapons|engines|shields &lt;0-100&gt;')) return;
     const lvl=parseFloat(a[2]); if(!need(isFinite(lvl),'give a level 0-100, e.g. power shields 70')) return;
     setPower(P,sys,lvl); const p1=shipPower(P);
     term(`Rerouted - <b>${sys}</b> ${Math.round(p1[sys])}% · ${POWER_SYS.filter(k=>k!==sys).map(k=>k+' '+Math.round(p1[k])+'%').join(' · ')}.`,'sys');
     if(window.SOUND) SOUND.play('ui'); return; }
-  // FORE/AFT SHIELD BALANCE (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio") - a
-  // second dial alongside the weapons/engines/shields pool, same TIE-Fighter/X-Wing reference as `power` above.
+  // FORE/AFT SHIELD PIPS (user 2026-07-08: "starwars tie fighter... shields (forward/behind) ratio", then
+  // "should have two levels front and aft, maybe up to 3 or 4 for higher-end shields") - a second dial alongside
+  // the weapons/engines/shields pool, discrete pip steps rather than a free percentage (see CFG.SHIELD_PIP_BASE).
   if(c==='shield'||c==='shields'){
-    if(!a[1]){ const bal=P.shieldBalance==null?50:P.shieldBalance;
-      term(`<b style="color:#8fd0ff">🛡 SHIELD BALANCE</b> fore <b>${Math.round(bal)}%</b> / aft <b>${Math.round(100-bal)}%</b> <span style="opacity:.55">(shifts how efficiently the SAME pool blocks a hit from that arc - try: shield fwd · shield aft · shield even · shield 70)</span>`,'sys'); return; }
+    const cap=shieldPipCapFor(P);
+    if(!a[1]){ term(`<b style="color:#8fd0ff">🛡 SHIELD PIPS</b> <b>${pipStr(P)}</b> <span style="opacity:.55">(shifts how efficiently the SAME pool blocks a hit from that arc - try: shield fwd · shield aft · shield even${cap>2?' · shield 2':''})</span>`,'sys'); return; }
     const w=a[1].toLowerCase(); let bal=w.startsWith('fwd')||w.startsWith('fore')||w.startsWith('front')?100:w.startsWith('aft')||w.startsWith('rear')||w.startsWith('back')?0:w.startsWith('even')?50:parseFloat(a[1]);
-    if(!need(isFinite(bal),'give fwd, aft, even, or a number 0-100 (0=full aft, 100=full fwd)')) return;
-    P.shieldBalance=clamp(bal,0,100);
-    term(`Shield balance set - fore <b>${Math.round(P.shieldBalance)}%</b> / aft <b>${Math.round(100-P.shieldBalance)}%</b>.`,'sys');
+    if(!need(isFinite(bal),'give fwd, aft, even, or a number 0-100 (0=full aft, 100=full fwd) - snaps to your '+cap+' shield pips')) return;
+    P.shieldBalance=quantizePips(bal,cap);
+    term(`Shield pips set - <b>${pipStr(P)}</b>.`,'sys');
     if(window.SOUND) SOUND.play('ui'); return; }
   if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot - try: scan')) return; t=o; }
     term(`<b>${t.name}</b> reasoning chain (TDRE-style, grounded):`,'sys'); reasonChain(t).forEach(l=>term('&nbsp;&nbsp;'+l,'sys')); return; }
@@ -3368,8 +3397,10 @@ window.HOST={
   // the `power` text command - same effect, for a UI panel / the parasite's own proactive reroutes).
   powerOf:(s)=>shipPower(s||ships[0]), setPower:(s,sys,lvl)=>setPower(s||ships[0],sys,lvl), powerMult,
   shieldOf:(s)=>{ s=s||ships[0]; const max=shieldMaxFor(s); return { cur:(s.shield==null?max:s.shield), max }; },
+  wepChargeOf:(s)=>{ s=s||ships[0]; return { cur:shipCharge(s), max:CFG.WEP_CHARGE_MAX }; },
   shieldBalanceOf:(s)=>{ s=s||ships[0]; return s.shieldBalance==null?50:s.shieldBalance; },
-  setShieldBalance:(s,v)=>{ s=s||ships[0]; s.shieldBalance=clamp(Number(v)||0,0,100); return s.shieldBalance; },
+  setShieldBalance:(s,v)=>{ s=s||ships[0]; s.shieldBalance=quantizePips(Number(v)||0,shieldPipCapFor(s)); return s.shieldBalance; },
+  shieldPipCapOf:(s)=>shieldPipCapFor(s||ships[0]),
   skillLvl:(s,k)=>skillLvl(s||ships[0],k),   // SR-M17: pilot skill career - lets missions.js price leadership into contract rewards
   priceOf:(p,k,buying)=>buying?priceOf(p,k)*repBuyFactor(p):priceOf(p,k),
   sound:(n)=>{ if(window.SOUND) try{ SOUND.play(n); }catch(e){} },
@@ -3446,13 +3477,20 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   if(MAN.nitro){ const pw=shipPower(s); if(pw.engines<CFG.POWER_MAX-0.5){ setPower(s,'engines',pw.engines+CFG.NITRO_RATE*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } } }
   else s._nitroSounded=false;
   s.fire-=dt;
-  if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
-    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
+  if(MAN.fire && s.fire<=0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
+    const effCd=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
+    const chargeCost=CFG.WEP_CHARGE_DRAIN_PER_SEC*effCd;   // WEAPON CAPACITOR: same per-second drain regardless of the weapon's own rate-of-fire
+    if(shipCharge(s)<chargeCost){                                                                    // capacitor empty - the gun just doesn't fire (no cooldown reset, so it tries again next frame)
+      if(s.role==='player' && !s._wepEmptyWarned){ s._wepEmptyWarned=true; term('<b style="color:#ffb454">weapons capacitor drained</b> - reroute more power to weapons (<b>power weapons 80</b>) or let it recharge.','err'); }
+    } else {
+    if(s.role==='player') s._wepEmptyWarned=false;
+    if(window.SOUND) SOUND.play('shoot');
+    s.wepCharge-=chargeCost; s.fire=effCd;
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
     if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),fwd,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),fwd,s.id,spec); }
-    else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec); }
+    else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec); } }
   s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false }; }
 const keysDown=new Set();
 function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;

@@ -5,6 +5,10 @@
 //   HOST.setPower(ship,sys,level) -> reroute ONE system to `level`, the other two absorb the difference
 //   HOST.powerMult(level)         -> multiplier that level produces (0.4 @0, 1.0 @50, 1.6 @100)
 //   HOST.shieldOf(ship)           -> {cur,max} real absorbing shield buffer (separate from hull)
+//   HOST.wepChargeOf(ship)        -> {cur,max} the weapons CAPACITOR (drains as you fire, refills over time -
+//                                    user 2026-07-08: "the speed and shields and lasers are only a recharge
+//                                    rate not their maximum capacity" - this is that missing capacity)
+//   HOST.shieldPipCapOf(ship)     -> total fore/aft shield pips this ship has (2 base, higher for upgraded shields)
 //   HOST.P                        -> the player ship ({hp,maxHp} for the hull readout)
 //   HOST.sound(name)              -> safe SOUND.play wrapper
 //
@@ -103,6 +107,23 @@ function readShield() {
   return { cur: Number(s.cur) || 0, max: Number(s.max) || 0 };
 }
 
+function readCharge() {
+  var H = getHost();
+  if (!H || typeof H.wepChargeOf !== 'function') return null;
+  var c = null;
+  try { c = H.wepChargeOf(H.P); } catch (e) { c = null; }
+  if (!c || typeof c !== 'object') return null;
+  return { cur: Number(c.cur) || 0, max: Number(c.max) || 0 };
+}
+
+function readPipCap() {
+  var H = getHost();
+  if (!H || typeof H.shieldPipCapOf !== 'function') return 2;
+  var v = null;
+  try { v = H.shieldPipCapOf(H.P); } catch (e) { v = null; }
+  return (typeof v === 'number' && !isNaN(v) && v > 0) ? v : 2;
+}
+
 function readHull() {
   var H = getHost(); if (!H) return null;
   var P = null;
@@ -130,8 +151,8 @@ function readBalance() {
 }
 function setBalance(v) {
   var H = getHost();
-  if (!H || typeof H.setShieldBalance !== 'function') return;
-  try { H.setShieldBalance(H.P, v); } catch (e) {}
+  if (!H || typeof H.setShieldBalance !== 'function') return v;
+  try { return H.setShieldBalance(H.P, v); } catch (e) { return v; }
 }
 
 function playSound(name) {
@@ -178,6 +199,15 @@ function renderStatus() {
       PP.shieldEl.innerHTML = 'SHIELD <b style="color:' + CFG.COL_SHIELDS + '">' + round(shield.cur) + '</b>/' + round(shield.max);
     } else {
       PP.shieldEl.innerHTML = 'SHIELD <span style="opacity:.5">--/--</span>';
+    }
+  }
+  var charge = readCharge();
+  if (PP.chargeEl) {
+    if (charge) {
+      var low = charge.max > 0 && (charge.cur / charge.max) < 0.25;
+      PP.chargeEl.innerHTML = 'CAP <b style="color:' + (low ? CFG.COL_HULL_LOW : CFG.COL_WEAPONS) + '">' + round(charge.cur) + '</b>/' + round(charge.max);
+    } else {
+      PP.chargeEl.innerHTML = 'CAP <span style="opacity:.5">--/--</span>';
     }
   }
 }
@@ -315,11 +345,17 @@ function balanceFromPointer(trackEl, clientX) {
   var frac = (clientX - rect.left) / rect.width;
   return clamp(frac * 100, 0, 100);
 }
+// FORE/AFT SHIELD PIPS (user 2026-07-08: "should have two levels front and aft, maybe up to 3 or 4 for
+// higher-end shields") - bal is still 0-100 under the hood (the host snaps it to discrete pip steps before
+// this ever reads it back), but the label now reads in PIPS since that's the mental model, not a percentage.
 function applyBalanceVisual(bal) {
   var b = PP.balance; if (!b) return;
   if (b.fillAft) b.fillAft.style.width = (100 - bal).toFixed(1) + '%';
   if (b.fillFore) b.fillFore.style.width = bal.toFixed(1) + '%';
-  if (b.labelEl) b.labelEl.textContent = 'FORE ' + round(bal) + '% / AFT ' + round(100 - bal) + '%';
+  if (b.labelEl) {
+    var cap = readPipCap(), fore = round(bal / 100 * cap), aft = cap - fore;
+    b.labelEl.textContent = 'FORE ' + fore + '/' + cap + ' · AFT ' + aft + '/' + cap;
+  }
 }
 function wireBalanceDrag(trackEl) {
   if (!trackEl) return;
@@ -327,7 +363,7 @@ function wireBalanceDrag(trackEl) {
   function applyAt(clientX) {
     var bal = balanceFromPointer(trackEl, clientX);
     if (bal == null) return;
-    setBalance(bal); applyBalanceVisual(bal);
+    var snapped = setBalance(bal); applyBalanceVisual(snapped == null ? bal : snapped);   // snap LIVE during drag, not just on next periodic render
   }
   function onMove(ev) {
     if (!PP.dragBalance) return;
@@ -408,9 +444,10 @@ function build(parentEl) {
     'border-bottom:1px solid ' + CFG.COL_TRACK_BORDER + ';display:flex;flex-direction:column;gap:2px');
   var hullEl = el('div', '', 'HULL --/--');
   var shieldEl = el('div', '', 'SHIELD --/--');
-  status.appendChild(hullEl); status.appendChild(shieldEl);
+  var chargeEl = el('div', '', 'CAP --/--');
+  status.appendChild(hullEl); status.appendChild(shieldEl); status.appendChild(chargeEl);
   root.appendChild(status);
-  PP.hullEl = hullEl; PP.shieldEl = shieldEl;
+  PP.hullEl = hullEl; PP.shieldEl = shieldEl; PP.chargeEl = chargeEl;
 
   // three bars, side by side
   var row = el('div', 'display:flex;justify-content:space-between;gap:' + CFG.BAR_GAP + 'px');
@@ -491,7 +528,8 @@ if (typeof require !== 'undefined' && require.main === module) {
     },
     _fire: function (type, evt) { var ls = docListeners[type] || []; for (var i = 0; i < ls.length; i++) ls[i](evt || {}); },
   };
-  var fakeShip = { hp: 74, maxHp: 100, power: { weapons: 50, engines: 50, shields: 50 } };
+  var fakeShip = { hp: 74, maxHp: 100, power: { weapons: 50, engines: 50, shields: 50 }, wepCharge: 63, shieldPipCap: 2 };
+  function quantizePipsStub(bal, cap) { var step = 100 / cap; return Math.max(0, Math.min(100, Math.round(bal / step) * step)); }
   var lastSetPower = null;
   global.window = {
     setInterval: function (fn, ms) { return 0; },   // never actually fire on a timer under node
@@ -514,8 +552,10 @@ if (typeof require !== 'undefined' && require.main === module) {
       },
       powerMult: function (level) { return 0.4 + (Math.max(0, Math.min(100, level)) / 100) * (1.6 - 0.4); },
       shieldOf: function (s) { s = s || fakeShip; return { cur: 42, max: 60 }; },
+      wepChargeOf: function (s) { s = s || fakeShip; return { cur: s.wepCharge == null ? 100 : s.wepCharge, max: 100 }; },
+      shieldPipCapOf: function (s) { s = s || fakeShip; return s.shieldPipCap || 2; },
       shieldBalanceOf: function (s) { s = s || fakeShip; return s.shieldBalance == null ? 50 : s.shieldBalance; },
-      setShieldBalance: function (s, v) { s = s || fakeShip; s.shieldBalance = Math.max(0, Math.min(100, Number(v) || 0)); return s.shieldBalance; },
+      setShieldBalance: function (s, v) { s = s || fakeShip; s.shieldBalance = quantizePipsStub(Number(v) || 0, s.shieldPipCap || 2); return s.shieldBalance; },
       sound: function (name) { /* no-op stub */ },
     },
   };
@@ -601,9 +641,23 @@ if (typeof require !== 'undefined' && require.main === module) {
   } else {
     check('drag handle wired onto balance track', false);
   }
-  safeCall('direct HOST.setShieldBalance(fakeShip, 70)', function () { global.window.HOST.setShieldBalance(fakeShip, 70); });
-  check('HOST.setShieldBalance actually moved it to 70', Math.abs(fakeShip.shieldBalance - 70) < 0.5);
-  check('HOST.shieldBalanceOf reads it back', Math.abs(global.window.HOST.shieldBalanceOf(fakeShip) - 70) < 0.5);
+  // FORE/AFT SHIELD PIPS (user 2026-07-08 "should have two levels front and aft"): setShieldBalance now SNAPS
+  // to the ship's pip count (2 here) instead of accepting any free percentage - 70 is nearer 50 than 100 with
+  // only 2 pips available, so it should land on the pip step (50), not the raw input.
+  safeCall('direct HOST.setShieldBalance(fakeShip, 70) snaps to the nearest of 2 pips', function () { global.window.HOST.setShieldBalance(fakeShip, 70); });
+  check('HOST.setShieldBalance snapped 70 -> 50 (nearest pip step with a 2-pip cap)', Math.abs(fakeShip.shieldBalance - 50) < 0.5);
+  check('HOST.shieldBalanceOf reads the snapped value back', Math.abs(global.window.HOST.shieldBalanceOf(fakeShip) - 50) < 0.5);
+  fakeShip.shieldPipCap = 4;
+  safeCall('direct HOST.setShieldBalance(fakeShip, 70) with a 4-pip cap', function () { global.window.HOST.setShieldBalance(fakeShip, 70); });
+  check('HOST.setShieldBalance snapped 70 -> 75 (nearest of 4 pips: 0/25/50/75/100)', Math.abs(fakeShip.shieldBalance - 75) < 0.5);
+  check('HOST.shieldPipCapOf reads the raised pip cap back', global.window.HOST.shieldPipCapOf(fakeShip) === 4);
+  fakeShip.shieldPipCap = 2;   // restore for the remaining checks below
+
+  // WEAPONS CAPACITOR readout (user 2026-07-08: "the speed and shields and lasers are only a recharge rate not
+  // their maximum capacity" - this is the missing depletable reservoir behind the weapons power% dial).
+  check('CAP status element exists', !!pp._PP.chargeEl);
+  safeCall('renderAll draws the capacitor readout', function () { pp.hide(); pp.show(); });
+  check('CAP readout shows the fake ship\'s wepCharge (63/100)', /63/.test(pp._PP.chargeEl.innerHTML) && /100/.test(pp._PP.chargeEl.innerHTML));
 
   // 8. mounting into an explicit parent element works
   var altParent = stubEl();
