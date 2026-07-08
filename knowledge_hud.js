@@ -65,7 +65,7 @@ var STATUS = {
   growing:  'ACQUIRING: cascade closed a gap -> verified fact committed (0-fab) -> store grew.',
   steady:   'DELIBERATING: chain-reasoning how/what/why/when over the live graph; store steady.',
   seeking:  'SEEKING: goal-decode active; deliberation looking for the next gap to close.',
-  cold:     'IDLE: reasoning substrate loaded, awaiting the next decision to deliberate over.',
+  cold:     'IDLE: 0 facts yet - a random living mind runs its first deliberation shortly (or type deliberate <planet> to force one now).',
   nostore:  'BOOT: knowledge store not attached yet - pillars initializing.',
 };
 
@@ -233,9 +233,9 @@ function statusLine(store, pillars, fit) {
   for (var i = 0; i < pillars.length; i++) { if (pillars[i].label === 'seek' && pillars[i].on) seekOn = true; if (pillars[i].label === 'acquire' && pillars[i].on) acqOn = true; }
   var total = store.stats.shared + store.stats.private_total;
   if (H._lastTotal != null && total > H._lastTotal) return STATUS.growing;
+  if (total === 0) return STATUS.cold;   // BUGFIX: this was checked AFTER seekOn, so a genuinely-empty store (nothing has ever run yet) showed the misleading "SEEKING active" line instead of the honest "0 facts yet" one - seek/acquire presence just means the MODULE loaded, not that anything is happening
   if (seekOn) return STATUS.seeking;
   if (acqOn && total > 0) return STATUS.steady;
-  if (total === 0) return STATUS.cold;
   return STATUS.steady;
 }
 

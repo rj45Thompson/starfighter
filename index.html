@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708o"></script>
-<script src="fflate.min.js?v=20260708o"></script>
-<script src="fbxloader.js?v=20260708o"></script>
+<script src="three.min.js?v=20260708p"></script>
+<script src="fflate.min.js?v=20260708p"></script>
+<script src="fbxloader.js?v=20260708p"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708o"></script>
-<script src="inhabitant.js?v=20260708o"></script>
-<script src="passenger.js?v=20260708o"></script>
-<script src="gamemod.js?v=20260708o"></script>
-<script src="chatter.js?v=20260708o"></script>
-<script src="speech_input.js?v=20260708o"></script>
-<script src="vision.js?v=20260708o"></script>
-<script src="deliberate.js?v=20260708o"></script>
-<script src="knowledge.js?v=20260708o"></script>
-<script src="acquire.js?v=20260708o"></script>
-<script src="sound.js?v=20260708o"></script>
-<script src="hullmodels.js?v=20260708o"></script>
-<script src="knowledge_hud.js?v=20260708o"></script>
-<script src="thoughts.js?v=20260708o"></script>
-<script src="tami_battle_ui.js?v=20260708o"></script>
-<script src="power_panel.js?v=20260708o"></script>
-<script src="panels.js?v=20260708o"></script>
+<script src="speech_tier.js?v=20260708p"></script>
+<script src="inhabitant.js?v=20260708p"></script>
+<script src="passenger.js?v=20260708p"></script>
+<script src="gamemod.js?v=20260708p"></script>
+<script src="chatter.js?v=20260708p"></script>
+<script src="speech_input.js?v=20260708p"></script>
+<script src="vision.js?v=20260708p"></script>
+<script src="deliberate.js?v=20260708p"></script>
+<script src="knowledge.js?v=20260708p"></script>
+<script src="acquire.js?v=20260708p"></script>
+<script src="sound.js?v=20260708p"></script>
+<script src="hullmodels.js?v=20260708p"></script>
+<script src="knowledge_hud.js?v=20260708p"></script>
+<script src="thoughts.js?v=20260708p"></script>
+<script src="tami_battle_ui.js?v=20260708p"></script>
+<script src="power_panel.js?v=20260708p"></script>
+<script src="panels.js?v=20260708p"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708o"></script>
-<script src="conquest.js?v=20260708o"></script>
-<script src="missions.js?v=20260708o"></script>
-<script src="planetmenu.js?v=20260708o"></script>
-<script src="textquests.js?v=20260708o"></script>
+<script src="starmap.js?v=20260708p"></script>
+<script src="conquest.js?v=20260708p"></script>
+<script src="missions.js?v=20260708p"></script>
+<script src="planetmenu.js?v=20260708p"></script>
+<script src="textquests.js?v=20260708p"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -212,6 +212,7 @@ const CFG = {
   // ---- trading economy · planets (organic: prices EMERGE from stock; nothing scripted; hyperspace REMOVED) ----
   N_PLANETS:16, DOCK_R:44, TRADE_COOLDOWN:0.5, HOLD_CAP:40, TRADE_QTY:20, TRADER_FRAC:0.62, CREDIT_RESERVE:12,
   TRADER_EQUIP_CD:26, TRADER_EQUIP_RESERVE:320,   // user 2026-07-08 "the other agi don't ever update their ships": doTrade() never spent a trader's accumulated wealth on anything - now they periodically invest surplus into gear
+  AMBIENT_DELIBERATE_CD:22, AMBIENT_DELIBERATE_FIRST:8,   // user 2026-07-08 "the knowledge graph viewer seemed blank": deliberate/acquire only ever ran from the manually-typed `deliberate` command - nothing ambient ever fed GAME_KNOW, so the AGI-test HUD stayed 0/0/0 forever unless you knew the hidden command. A random living mind now silently runs one cycle on this cadence.
   FUEL_CAP:60, FUEL_START:60, FUEL_LOW:18,
   JUMP_FUEL_BASE:8, JUMP_DIST_PER_FUEL:85, JUMP_SAME_SYS_R_MULT:1.3,   // HYPERSPACE (user 2026-07-07, Space-Rangers style): fuel is for CROSSING systems, not flying within one
   // X-WING POWER MANAGEMENT: one shared pool (POWER_TOTAL) split across weapons/engines/shields, each 0-100;
@@ -2133,6 +2134,9 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(on?'the worm will tell you what it thinks you should do, unprompted (threat › survival › opportunity › go-see). Type <b>advice now</b> for its read this instant.':'the worm will hold its counsel until you ask (advice on · advice now).','sys'); return; }
   // ---- DELIBERATE: watch the generalized reasoning engine run How/What/Why/When on a decision, converge, and - when
   // it hits a gap - run the acquisition cascade to pull the missing knowledge into the PERSISTENT store (shared/private).
+  // NOTE: ambientDeliberationTick() (below, near the frame loop) runs the same core reasoning silently on a timer so
+  // the knowledge HUD isn't permanently empty - kept as a small deliberate duplication rather than refactoring this
+  // verified, already-working command.
   if(c==='deliberate'||c==='reason'||c==='think2'){ if(!window.DELIBERATE){ term('deliberate.js not loaded','err'); return; }
     // a real decision the player faces: from HERE, is it worth pushing to a chosen planet, and how? Build the graph
     // from the live world: planets are goals, hyperlanes are actions, docking WHY = fuel/trade, ordering = distance.
@@ -3978,12 +3982,39 @@ const AWAY=(function(){
   return { active:()=>active, enter, exit, key, frame, debugStartBattle, autoBattle, autoStep, autoOn:()=>autoOn };
 })();
 
+// SR: a random living mind silently runs one deliberate->acquire cycle on a timer, so the knowledge HUD (`agi` cmd)
+// genuinely fills in during normal play instead of staying 0/0/0 forever unless the player types `deliberate <planet>`
+// themselves. Deliberately duplicates the CORE reasoning steps from that terminal command rather than refactoring it
+// (see the note above the command) - no term() output, no player-facing side effects, just feeds the same store.
+let _ambientDelibCd=CFG.AMBIENT_DELIBERATE_FIRST;
+function ambientDeliberateTick(dt){
+  _ambientDelibCd-=dt; if(_ambientDelibCd>0) return;
+  _ambientDelibCd=CFG.AMBIENT_DELIBERATE_CD*rand(0.7,1.4);
+  if(!window.DELIBERATE||!window.ACQUIRE||!window.GAME_KNOW||planets.length<2) return;
+  const alive=ships.filter(s=>s.alive && s.role!=='defender'); if(!alive.length) return;
+  const fromShip=alive[randi(0,alive.length-1)];
+  const near=nearestPlanet(fromShip.pos); const others=planets.filter(p=>p!==near); if(!others.length) return;
+  const goalP=others[randi(0,others.length-1)];
+  try{
+    const nm=p=>'PL_'+p.name.replace(/[^A-Za-z0-9]/g,'');
+    const worldE=[]; const start=nm(near||fromShip.docked||planets[0]);
+    const ps=planets.slice().sort((x,y)=>fromShip.pos.distanceTo(x.pos)-fromShip.pos.distanceTo(y.pos));
+    for(let i=0;i<ps.length-1;i++){ worldE.push({s:nm(ps[i]),r:'action',o:nm(ps[i+1])}); worldE.push({s:nm(ps[i]),r:'before',o:nm(ps[i+1])}); }
+    worldE.push({s:nm(goalP),r:'serves',o:'a_safe_run'}); worldE.push({s:'a_safe_run',r:'serves',o:'survive_the_campaign'});
+    const world={edges:worldE};
+    const known={edges: worldE.filter(e=>e.s===start && e.r==='action')};
+    const latent={edges: worldE.filter(e=>e.r==='serves')};
+    const decision={state:start, goal:nm(goalP), question:'ambient: is the run to '+goalP.name+' worth it?'};
+    const c0=DELIBERATE.deliberate(known, decision, {order:'geometry'});
+    if(!c0.convergence.converged) ACQUIRE.acquire(fromShip.name||'agent', decision, world, GAME_KNOW, {latent, seed:known});
+  }catch(e){}
+}
 let last=performance.now(), mktAcc=0;
 function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=0.05;
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
