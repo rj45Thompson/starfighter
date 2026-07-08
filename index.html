@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708e"></script>
-<script src="fflate.min.js?v=20260708e"></script>
-<script src="fbxloader.js?v=20260708e"></script>
+<script src="three.min.js?v=20260708g"></script>
+<script src="fflate.min.js?v=20260708g"></script>
+<script src="fbxloader.js?v=20260708g"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708e"></script>
-<script src="inhabitant.js?v=20260708e"></script>
-<script src="passenger.js?v=20260708e"></script>
-<script src="gamemod.js?v=20260708e"></script>
-<script src="chatter.js?v=20260708e"></script>
-<script src="speech_input.js?v=20260708e"></script>
-<script src="vision.js?v=20260708e"></script>
-<script src="deliberate.js?v=20260708e"></script>
-<script src="knowledge.js?v=20260708e"></script>
-<script src="acquire.js?v=20260708e"></script>
-<script src="sound.js?v=20260708e"></script>
-<script src="hullmodels.js?v=20260708e"></script>
-<script src="knowledge_hud.js?v=20260708e"></script>
-<script src="thoughts.js?v=20260708e"></script>
-<script src="tami_battle_ui.js?v=20260708e"></script>
-<script src="power_panel.js?v=20260708e"></script>
-<script src="panels.js?v=20260708e"></script>
+<script src="speech_tier.js?v=20260708g"></script>
+<script src="inhabitant.js?v=20260708g"></script>
+<script src="passenger.js?v=20260708g"></script>
+<script src="gamemod.js?v=20260708g"></script>
+<script src="chatter.js?v=20260708g"></script>
+<script src="speech_input.js?v=20260708g"></script>
+<script src="vision.js?v=20260708g"></script>
+<script src="deliberate.js?v=20260708g"></script>
+<script src="knowledge.js?v=20260708g"></script>
+<script src="acquire.js?v=20260708g"></script>
+<script src="sound.js?v=20260708g"></script>
+<script src="hullmodels.js?v=20260708g"></script>
+<script src="knowledge_hud.js?v=20260708g"></script>
+<script src="thoughts.js?v=20260708g"></script>
+<script src="tami_battle_ui.js?v=20260708g"></script>
+<script src="power_panel.js?v=20260708g"></script>
+<script src="panels.js?v=20260708g"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708e"></script>
-<script src="conquest.js?v=20260708e"></script>
-<script src="missions.js?v=20260708e"></script>
-<script src="planetmenu.js?v=20260708e"></script>
-<script src="textquests.js?v=20260708e"></script>
+<script src="starmap.js?v=20260708g"></script>
+<script src="conquest.js?v=20260708g"></script>
+<script src="missions.js?v=20260708g"></script>
+<script src="planetmenu.js?v=20260708g"></script>
+<script src="textquests.js?v=20260708g"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -224,6 +224,7 @@ const CFG = {
   // ---- ecosystem (phase 2): cargo drops · living/growing planets · hired defenders ----
   POD_LIFE:34, SALVAGE:0.6, POD_CHUNK:8,
   CITIZEN_INCOME:1.7, DEV_COST_BASE:240, DEV_COST_GROW:1.34, DEV_PROD:0.16, DEV_EQ:0.12, DEV_RADIUS:0.05, PLANET_WEALTH0:150,
+  SAVE_INTERVAL_S:15,   // SR-M1 (REQUIREMENTS_SR.md): autosave cadence, same convention as the Inhabitant's own INH_CFG.SAVE_EVERY
   DEFEND_R:115, HIRE_COST:110, HIRE_CD:5.5, MAX_DEF_PER:2, DEF_DESPAWN:15, MAX_SHIPS:62, RAID_LOOT:0.15,   // MAX_SHIPS headroom (SR ramp: ~50 minds + defenders) so escalating pirates don't starve coalition defenders
   PLANET_HULL:3500, PLANET_DMG:2, PLANET_REGEN:16, SCRAP_GEM:2,          // planets are VERY tanky -> killing one is slow + strategic, not a farm
   TERRA_PAY:60, TERRA_STEP:0.12, TERRA_AI_COST:130, TERRA_AI_STEP:0.02,  // terraform: earth-like conversion (by human or AI), slow
@@ -2383,6 +2384,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(r.done){ term(`<b style="color:#c9a0ff">📜</b> ${r.msg}`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
     const q=r.view; term(`<b style="color:#c9a0ff">📜 ${q.title}</b> - ${q.text}<br>`+q.choices.map(c2=>`  <b>[${c2.n}]</b> ${c2.label}${c2.enabled?'':' <span style="opacity:.5">(unavailable)</span>'}`).join('<br>'),'sys'); return; }
   if(c==='rank'){ const i=rankIdx(P.score||0), nx=RANKS[i+1]; term(`RANGER RANK: <b>${RANKS[i].n}</b> (${i+1}/${RANKS.length}) · score ${P.score|0}${nx?` · next <b>${nx.n}</b> at ${nx.pts} (${Math.max(0,nx.pts-(P.score|0))} to go)`:' · MAX'}`,'sys'); return; }
+  if(c==='save'){ term(saveGame()?'Game saved.':'Save failed (localStorage unavailable?).','sys'); return; }   // SR-M1: autosaves every 15s anyway; manual save for "I want this exact moment kept"
+  if(c==='load'){ term(loadGame()?'Game loaded - some numbers may jump to match the restored save.':'No save found.','sys'); return; }
   if(c==='artifacts'||c==='art'){ const inv=P.artifacts||[], eq=P.artEquipped||[];
     if(a[1]){ const idx=inv.findIndex(k=>k.startsWith(a[1].toLowerCase())||ARTIFACTS[k].n.toLowerCase().indexOf(a[1].toLowerCase())>=0); if(!need(idx>=0,'unknown artifact - try: artifacts')) return; const key=inv[idx]; inv.splice(idx,1); ARTIFACTS[key].apply(P); eq.push(key); P.artEquipped=eq; term(`Installed <b>${ARTIFACTS[key].n}</b> - ${ARTIFACTS[key].desc}.`,'sys'); return; }
     if(!inv.length && !eq.length){ term('No artifacts recovered. Destroy Hegemon ships (esp. Warlords) to salvage them.','sys'); return; }
@@ -3219,11 +3222,47 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
 function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
 function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,chaseCam); renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam); renderer.setScissorTest(false); }
 
+// =================================================================================================
+//  SAVE / LOAD (SR-M1, REQUIREMENTS_SR.md - "a living galaxy you leave and return to"): credits, rank,
+//  reputation, hull/weapon/equipment, and the war/campaign state all survive a page reload. Mirrors the
+//  Inhabitant's own established pattern (autosave to localStorage on a timer, restore at boot) rather
+//  than inventing a new convention. Ships/planets/meshes are NEVER serialized - only the data fields
+//  that boot doesn't already regenerate identically get saved; everything else just gets rebuilt fresh
+//  each load and this snapshot re-applies on top of it.
+// =================================================================================================
+const SAVE_KEY='SF_SAVE_v1';
+function gatherSaveState(){ const P=ships[0]; if(!P) return null;
+  return { v:1, campaign, escalation, warScore,
+    player:{ credits:P.credits, score:P.score, hullClass:P.hullClass, weaponType:P.weaponType,
+      lvl:{...P.lvl}, equip:{...(P.equip||{})}, artifacts:[...(P.artifacts||[])], contraband:{...(P.contraband||{})},
+      fuel:P.fuel, fuelCap:P.fuelCap, holdCap:P.holdCap, senseR:P.senseR, cargo:{...(P.cargo||{})},
+      shieldBalance:P.shieldBalance, rankShown:P.rankShown, targetingComputer:!!P.targetingComputer },
+    planets: planets.map(p=>({ name:p.name, rep:p.rep, wealth:p.wealth, dev:p.dev, hegemon:!!p.hegemon, terra:p.terra||0 })),
+    systems: systems.map(sy=>({ name:sy.name, contested:!!sy.contested })) }; }
+function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; const P=ships[0];
+  campaign=save.campaign||1; escalation=save.escalation||0; warScore=save.warScore||0;
+  const sp=save.player||{};
+  Object.assign(P,{ credits:num2(sp.credits,P.credits), score:num2(sp.score,P.score), weaponType:sp.weaponType||P.weaponType,
+    lvl:sp.lvl||P.lvl, equip:sp.equip||P.equip, artifacts:sp.artifacts||P.artifacts, contraband:sp.contraband||P.contraband,
+    fuel:num2(sp.fuel,P.fuel), fuelCap:num2(sp.fuelCap,P.fuelCap), holdCap:num2(sp.holdCap,P.holdCap), senseR:num2(sp.senseR,P.senseR),
+    cargo:sp.cargo||P.cargo, shieldBalance:sp.shieldBalance, rankShown:sp.rankShown, targetingComputer:!!sp.targetingComputer });
+  applyHull(P, sp.hullClass||'fighter');   // recomputes maxHp/hp/hullSpeed/visual model from the restored class+equip
+  for(const rp of save.planets||[]){ const p=planets.find(x=>x.name===rp.name); if(p){ p.rep=rp.rep; p.wealth=rp.wealth; p.dev=rp.dev; p.hegemon=rp.hegemon; p.terra=rp.terra; } }
+  for(const rs of save.systems||[]){ const sy=systems.find(x=>x.name===rs.name); if(sy) sy.contested=rs.contested; }
+  return true; }
+function num2(v,d){ v=Number(v); return isNaN(v)?d:v; }
+function saveGame(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(gatherSaveState())); return true; }catch(e){ return false; } }
+function loadGame(){ try{ const raw=localStorage.getItem(SAVE_KEY); if(!raw) return false; return applySaveState(JSON.parse(raw)); }catch(e){ return false; } }
+let _saveCd=CFG.SAVE_INTERVAL_S;
+function saveTick(dt){ _saveCd-=dt; if(_saveCd<=0){ _saveCd=CFG.SAVE_INTERVAL_S; saveGame(); } }
+
 makePlanets();
 makeBase();   // M8: the Ranger Command hub
 makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=500; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'fighter'); })();   // M9: player starts in a Fighter hull; 500c (was 320 - user: "free units to spare" for testing hulls/gear
+const _loadedSave=loadGame();   // SR-M1: restores credits/rank/rep/hull/war/campaign over the fresh-boot defaults above, if a prior session saved one
+if(_loadedSave) console.log('[save] restored a prior session');
 INH.awaken();   // I1/I2/I8: the Inhabitant wakes - deterministic (first alive non-player squad ship); restores INH_STATE_v1 if present
 passengerInit();   // 🜏 the Passenger wakes in YOU - registry+telemetry+speech wired; first boot shows the awakening
 // 🜁 the shared, PERSISTENT knowledge store - one for all pilots; survives page reloads + sim resets (localStorage);
@@ -3272,12 +3311,13 @@ window.HOST={
   // every shared/private fact the minds earned carries into the next generation. Death of the world, not of the minds.
   onNewGeneration(){ campaign++; escalation=0; warScore=0;
     for(const sy of systems){ sy.contested=false; sy.clearT=0; }
-    for(const p of planets){ p.hegemon=false; p.owner=null; p._cq=null; p.rep=Math.max(-1, Math.round((p.rep||0)*0.3)); p.underThreat=false; if(p.hull!=null&&p.maxHull!=null) p.hull=p.maxHull; }
+    for(const p of planets){ if(p.isPirateStation) continue;   // stays permanently hostile - not swept into the coalition/Hegemon reset
+      p.hegemon=false; p.owner=null; p._cq=null; p.rep=Math.max(-1, Math.round((p.rep||0)*0.3)); p.underThreat=false; if(p.hull!=null&&p.maxHull!=null) p.hull=p.maxHull; }
     const P=ships[0]; if(P){ P.alive=true; P.hp=P.maxHp; P.fuel=P.fuelCap; P.docked=null; P.obj=null;
       if(typeof base!=='undefined'&&base&&base.pos) P.pos.copy(base.pos).add(new T.Vector3(rand(-1,1),0.2,rand(-1,1)).setLength(60)); P.vel.set(0,0,0); }
     const st=window.GAME_KNOW?GAME_KNOW.stats():null;
     notify(`GENERATION ${window.STARMAP&&STARMAP.generation?STARMAP.generation():campaign} - the galaxy is reborn. The minds remember${st?` (<b>${st.shared}</b> shared + <b>${st.private_total}</b> private facts persist)`:''}.`,'alert','#c9a0ff');
-    if(window.SOUND) try{ SOUND.play('warp'); }catch(e){} },
+    if(window.SOUND) try{ SOUND.play('warp'); }catch(e){} saveGame(); },   // SR-M1: persist the reset immediately, else a reload right after would revert to the PRE-reset save
 };
 // SR modules boot (all optional - each degrades to nothing if its file is missing)
 for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].init) try{ window[M].init(); }catch(e){ console.warn(M+' init',e); }
@@ -3874,13 +3914,14 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+addEventListener('beforeunload',()=>saveGame());   // SR-M1: catch the moment before a close/refresh, not just the 15s tick
 </script>
 </body>
 </html>

@@ -80,6 +80,7 @@ var CFG = {
   COL_COALITION: '#7fd0b0',    // owner: coalition (green)
   COL_HEGEMON: '#ff8a8a',      // owner: hegemon (red)
   COL_CONTESTED: '#ffd27a',    // owner: contested (amber)
+  COL_LAWLESS: '#ff8a4a',      // owner: lawless (orange) - user 2026-07-08 "pirate space not owned", matches the war/warmap terminal label color
   COL_VIOLET: '#c9a0ff',       // knowledge/minds accent
   COL_TEXT: '#c9d6e8',         // body text
   COL_DIM: '#6f8296',          // dim text
@@ -111,7 +112,7 @@ var CFG = {
   WORLD_EPS: 0.001,            // min world span so a 1-system galaxy still fits
 };
 var TAU = Math.PI * 2;
-var OWNER_COL = { coalition: CFG.COL_COALITION, hegemon: CFG.COL_HEGEMON, contested: CFG.COL_CONTESTED };
+var OWNER_COL = { coalition: CFG.COL_COALITION, hegemon: CFG.COL_HEGEMON, contested: CFG.COL_CONTESTED, lawless: CFG.COL_LAWLESS };
 
 // ---------------------------------------------------------------- tiny guards / helpers
 function W() { return (typeof window !== 'undefined') ? window : null; }
@@ -149,6 +150,7 @@ function lsSetGen(v) {
 // ---------------------------------------------------------------- territory model
 function ownerOf(sys) {
   if (!sys) return 'contested';
+  if (sys.lawless) return 'lawless';   // user 2026-07-08 "pirate space not owned" - a permanent designation, distinct from the shifting war/contest state below
   var ps = (sys.planets && sys.planets.length) ? sys.planets : [];
   var nHeg = 0;
   for (var i = 0; i < ps.length; i++) if (ps[i] && ps[i].hegemon) nHeg++;
