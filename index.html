@@ -134,37 +134,37 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708g"></script>
-<script src="fflate.min.js?v=20260708g"></script>
-<script src="fbxloader.js?v=20260708g"></script>
+<script src="three.min.js?v=20260708h"></script>
+<script src="fflate.min.js?v=20260708h"></script>
+<script src="fbxloader.js?v=20260708h"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708g"></script>
-<script src="inhabitant.js?v=20260708g"></script>
-<script src="passenger.js?v=20260708g"></script>
-<script src="gamemod.js?v=20260708g"></script>
-<script src="chatter.js?v=20260708g"></script>
-<script src="speech_input.js?v=20260708g"></script>
-<script src="vision.js?v=20260708g"></script>
-<script src="deliberate.js?v=20260708g"></script>
-<script src="knowledge.js?v=20260708g"></script>
-<script src="acquire.js?v=20260708g"></script>
-<script src="sound.js?v=20260708g"></script>
-<script src="hullmodels.js?v=20260708g"></script>
-<script src="knowledge_hud.js?v=20260708g"></script>
-<script src="thoughts.js?v=20260708g"></script>
-<script src="tami_battle_ui.js?v=20260708g"></script>
-<script src="power_panel.js?v=20260708g"></script>
-<script src="panels.js?v=20260708g"></script>
+<script src="speech_tier.js?v=20260708h"></script>
+<script src="inhabitant.js?v=20260708h"></script>
+<script src="passenger.js?v=20260708h"></script>
+<script src="gamemod.js?v=20260708h"></script>
+<script src="chatter.js?v=20260708h"></script>
+<script src="speech_input.js?v=20260708h"></script>
+<script src="vision.js?v=20260708h"></script>
+<script src="deliberate.js?v=20260708h"></script>
+<script src="knowledge.js?v=20260708h"></script>
+<script src="acquire.js?v=20260708h"></script>
+<script src="sound.js?v=20260708h"></script>
+<script src="hullmodels.js?v=20260708h"></script>
+<script src="knowledge_hud.js?v=20260708h"></script>
+<script src="thoughts.js?v=20260708h"></script>
+<script src="tami_battle_ui.js?v=20260708h"></script>
+<script src="power_panel.js?v=20260708h"></script>
+<script src="panels.js?v=20260708h"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708g"></script>
-<script src="conquest.js?v=20260708g"></script>
-<script src="missions.js?v=20260708g"></script>
-<script src="planetmenu.js?v=20260708g"></script>
-<script src="textquests.js?v=20260708g"></script>
+<script src="starmap.js?v=20260708h"></script>
+<script src="conquest.js?v=20260708h"></script>
+<script src="missions.js?v=20260708h"></script>
+<script src="planetmenu.js?v=20260708h"></script>
+<script src="textquests.js?v=20260708h"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -693,6 +693,7 @@ function completeDock(s,p,isBase){
   if(isBase){ s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
   if(p.rep<=CFG.REP_HOSTILE && !p.isPirateStation){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }   // a pirate station's whole business model is welcoming ships everyone else refuses - see makePirateStation()
   s.docked=p; s.obj=null; contractDeliver(p);
+  if(s.role==='player') recordObservedPrices(p);   // SR-M7: the moment of docking is a real observation, whether or not the market panel happens to be open
   if(s.role==='player' && contraCount(s)>0 && rand(0,1)<CFG.SCAN_CHANCE) scanBust(s,p);   // M10: coalition customs
   // SR-M9 TEXT QUESTS (REQUIREMENTS_SR.md, "SR2's signature feature"): a chance to offer a branching quest on
   // every player dock at a non-base world - only fires if nothing is already active (tryOffer no-ops otherwise).
@@ -3156,14 +3157,27 @@ if(window.PANELS){
   const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9 });
 }
+// SR-M7 (REQUIREMENTS_SR.md) "honest-economy rule": the overview grid used to call priceOf() live for EVERY
+// planet regardless of whether you'd ever been there - an omniscient read (the exact thing the P4 economy
+// pillar's "no-cheat" law forbids elsewhere in this codebase). recordObservedPrices() snapshots what you can
+// ACTUALLY see (the planet you're currently docked at); every other cell falls back to the last snapshot you
+// personally took there, or "?" if you never have. planetmenu.js's own docked MARKET tab already has full
+// click-to-trade with quantity (same buy/sell HOST.runCmd path the terminal uses) - this grid is the read-only
+// overview, so it's the one that needed the honesty fix, not a trading rebuild.
+function recordObservedPrices(p){ if(!p||!p.stock) return; p._obs=p._obs||{}; for(const g of GOODS) p._obs[g.k]={price:priceOf(p,g.k),atT:T0}; }
 function buildMarket(){ const el=document.getElementById('market'), body=document.getElementById('marketBody'); if(!planets.length){ el.style.display='none'; return; }
-  let h='<div class="mkt-h">GALAXY MARKET · price/unit <span class="mkt-k">green=cheap (buy) · red=dear (sell) · drag the pin ▾ to keep this open</span></div><table><tr><th>good</th>';
+  let h='<div class="mkt-h">GALAXY MARKET · price/unit <span class="mkt-k">green=cheap (buy) · red=dear (sell) · dim/? = last observed there, not live (dock to refresh) · drag the pin ▾ to keep this open</span></div><table><tr><th>good</th>';
   for(const p of planets) h+=`<th>${p.name}<br><span class="mkt-t">${p.type.t}</span></th>`; h+='</tr>';
   for(const g of GOODS){ h+=`<tr><td class="mkt-g">${g.n}</td>`; for(let pi=0;pi<planets.length;pi++) h+=`<td id="mk_${g.k}_${pi}">–</td>`; h+='</tr>'; }
   h+='</table><div class="mkt-s" id="mkt-war"></div><div class="mkt-s" id="mkt-planets"></div><div class="mkt-s" id="mkt-ship"></div>'; body.innerHTML=h; }
 function updateMarket(){ if(!marketOn||!planets.length) return;
-  for(const g of GOODS) for(let pi=0;pi<planets.length;pi++){ const pr=priceOf(planets[pi],g.k), c=document.getElementById(`mk_${g.k}_${pi}`);
-    if(c){ c.textContent=Math.round(pr); const rel=pr/g.base; c.style.color= rel<0.82?'#7dffa6':rel>1.25?'#ff8a8a':'#cfe2f5'; } }
+  const P0=ships[0], live=P0&&P0.docked&&!P0.docked._base?P0.docked:null; if(live) recordObservedPrices(live);
+  for(let pi=0;pi<planets.length;pi++){ const p=planets[pi];
+    for(const g of GOODS){ const c=document.getElementById(`mk_${g.k}_${pi}`); if(!c) continue;
+      if(p===live){ const pr=priceOf(p,g.k); c.textContent=Math.round(pr); c.style.fontStyle='normal'; const rel=pr/g.base; c.style.color=rel<0.82?'#7dffa6':rel>1.25?'#ff8a8a':'#cfe2f5'; continue; }
+      const obs=p._obs&&p._obs[g.k];
+      if(!obs){ c.textContent='?'; c.style.color='#5f7189'; c.style.fontStyle='normal'; continue; }
+      c.textContent=Math.round(obs.price); c.style.fontStyle='italic'; const rel=obs.price/g.base; c.style.color=rel<0.82?'#4a9a70':rel>1.25?'#a05050':'#7d93ad'; } }
   const wr=document.getElementById('mkt-war'); if(wr){ const nHeg=ships.filter(s=>s.alive&&s.team==='pirate').length, T=HEG_TIERS[hegTier()], cc=systems.filter(sy=>sy.contested).length;
     wr.innerHTML=`<b style="color:#ff6a6a">⚔ HEGEMON</b> esc ${Math.floor(escalation)} · <b>${T.n}</b>-class · ${nHeg}/${enemyCap()} hostile · `+systems.map(sy=>`${sy.name} <b style="color:${sy.contested?'#ff6a6a':'#7fdc8a'}">${sy.contested?'✖':'●'}</b>`).join(' ')+` · front <b style="color:${warScore<0?'#ff6a6a':'#7fdc8a'}">${warScore>=0?'+':''}${warScore.toFixed(1)}</b>/±${CFG.WIN_THRESHOLD} · camp ${campaign}`+(stronghold?` · <b style="color:#ff6a6a">☠STRONGHOLD ${Math.round(100*stronghold.hull/stronghold.maxHull)}%</b>`:''); }
   const pl=document.getElementById('mkt-planets'); if(pl) pl.innerHTML='PLANETS · '+planets.map(p=>`<b style="color:#${new T.Color(p.type.col).getHexString()}">${p.name}</b> Lv${p.dev} ${Math.round(p.wealth)}c${p.underThreat?' <span style="color:#ff5a6e">⚠</span>':''}`).join('  ·  ');
