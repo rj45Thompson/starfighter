@@ -839,6 +839,24 @@ function renderAll(){ renderHead(); renderSide(); renderTabs(); renderBody(); }
 /* ------------------------------------------------ PUBLIC API */
 function init(){ ensureDom(); }
 
+// user 2026-07-08 "I still don't see the item shop on the planet": the HANGAR tab itself renders correctly
+// (verified directly and via the real dock-button click path) - the real bug is that the floating combat panels
+// never suspend while docked, and this overlay (pmRoot) is wide/tall enough at common viewport sizes that the
+// power panel (a moment-to-moment FLIGHT hud with no purpose while docked, and just made much bigger this same
+// session) sits ON TOP of real menu real estate. Suspend it (and the redundant floating MARKET overview, which
+// duplicates the MARKET tab below anyway) while docked, restore only the ones that were actually open before.
+var _panelsSuspended = null;
+function suspendFlightPanels(){
+  if(typeof window==='undefined' || !window.PANELS || _panelsSuspended) return;
+  _panelsSuspended = { market: !!window.PANELS.isOpen('market'), powerpanel: !!window.PANELS.isOpen('powerpanel') };
+  window.PANELS.close('market'); window.PANELS.close('powerpanel');
+}
+function restoreFlightPanels(){
+  if(typeof window==='undefined' || !window.PANELS || !_panelsSuspended) return;
+  if(_panelsSuspended.market) window.PANELS.open('market');
+  if(_panelsSuspended.powerpanel) window.PANELS.open('powerpanel');
+  _panelsSuspended = null;
+}
 function openMenu(planet,opts){
   if(!ensureDom()) return;
   var P=player();
@@ -846,13 +864,14 @@ function openMenu(planet,opts){
   S.isBase = !!(opts && opts.isBase);
   S.tab = S.isBase ? 'hangar' : 'market';     /* the base has no commodity market */
   S.tHead=0; S.tBody=0;
-  if(!S.open){ S.open=true; S.el.root.style.display='flex'; sfx('dock'); }
+  if(!S.open){ S.open=true; S.el.root.style.display='flex'; sfx('dock'); suspendFlightPanels(); }
   renderAll(); }
 
 function closeMenu(){
   if(!S.open) return;
   S.open=false;
   if(S.el.root) S.el.root.style.display='none';
+  restoreFlightPanels();
   sfx('ui'); }
 
 function isOpen(){ return !!S.open; }

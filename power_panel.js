@@ -27,10 +27,10 @@
 // ---- CONFIG (every tunable is a named constant; no magic numbers buried in logic) -----------------------------
 var CFG = {
   UPDATE_MS: 250,            // live-refresh interval for the bars/readouts (game render loop is NOT accessible)
-  PANEL_W: 168,               // panel width (px)
-  BAR_H: 108,                 // track height per bar (px) -- vertical bars
-  BAR_GAP: 10,                // gap between the three bar tracks (px)
-  TRACK_W: 30,                // track width per bar (px)
+  PANEL_W: 260,               // panel width (px) - user 2026-07-08 "too small of a window": was 168, a cramped fit for 3 bars + the balance bar + 2 capacitor gauges
+  BAR_H: 160,                 // track height per bar (px) -- vertical bars (was 108)
+  BAR_GAP: 14,                // gap between the three bar tracks (px) (was 10)
+  TRACK_W: 40,                // track width per bar (px) (was 30)
   POS_BOTTOM: 14,             // CSS position constants -- hedge for easy repositioning by the host
   POS_RIGHT: 14,              // (bottom-right: the market panel is top-center, terminal/log is bottom-left,
   Z: 12,                      //  roster is top-left, so bottom-right reads as clear real estate)

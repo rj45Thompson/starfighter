@@ -53,6 +53,17 @@ if(!store.__migratedDefaultPinned2026_07_08){
   for(const id of ['khud','powerpanel']){ if(store[id]) store[id].pinned=false; }
   store.__migratedDefaultPinned2026_07_08=true; save();
 }
+// SECOND MIGRATION (user 2026-07-08 "the power window is stuck when you close it"): the one above force-unpinned
+// powerpanel, which turned out to be the wrong call for it specifically - unpinned means it auto-hides ~1.6s after
+// opening whenever the mouse isn't over it, which for a combat HUD read WHILE FLYING (not hovering with a mouse)
+// is exactly "keeps closing on its own." powerpanel's registration now omits defaultPinned again (pinned by
+// default, like market/roster/ticker) - but anyone who already ran the migration above has pinned:false SAVED,
+// which would silently outrank that reverted default forever, same recurring class of bug. khud is deliberately
+// NOT touched here - auto-hide genuinely is correct for that one (a secondary/debug view, not read mid-flight).
+if(!store.__migratedPowerpanelRepin2026_07_08){
+  if(store.powerpanel){ store.powerpanel.pinned=true; store.powerpanel.open=true; }   // also force back OPEN, not just pinned - anyone hitting this bug almost certainly has it saved closed from the auto-hide cycle, and the whole point of this panel is defaultOpen:true
+  store.__migratedPowerpanelRepin2026_07_08=true; save();
+}
 
 if(!document.getElementById('pnl-style')){
   const st=document.createElement('style'); st.id='pnl-style';
