@@ -254,7 +254,16 @@ function ask(text) {
   text = String(text || '').trim(); if (!text) return;
   stopSteps(); clearHl();
   if (KO.askOut) KO.askOut.innerHTML = '';
-  var graph = KO.graph || buildGraph(); KO.graph = graph;
+  // ground against the FULL store, not the drawn subset - the canvas caps at MAX_NODES most-recent facts for
+  // legibility, but "what do you know about X" must see everything (caught live: 'android' stopped grounding the
+  // moment later GLM/learned commits pushed the AWB facts out of the 130-node draw window). Highlights still only
+  // land on nodes that happen to be drawn - draw() ignores ids it doesn't hold, which is fine.
+  var all = allEdges();
+  var graph = { nodes: {}, edges: [] };
+  for (var gi = 0; gi < all.length; gi++) { var ge = all[gi];
+    if (!graph.nodes[ge.s]) graph.nodes[ge.s] = { id: ge.s, tier: ge._tier };
+    if (!graph.nodes[ge.o]) graph.nodes[ge.o] = { id: ge.o, tier: ge._tier };
+    graph.edges.push({ a: ge.s, b: ge.o, r: ge.r, tier: ge._tier }); }
   askLine('<b style="color:' + CFG.COL_HL + '">&gt; ' + esc(text) + '</b>');
   feedLog('ask', 'QUERY: ' + esc(clip(text, 60)));
   var ents = groundEntities(text, graph);
@@ -272,8 +281,12 @@ function ask(text) {
     if (!touching.length) steps.push({ note: esc(A) + ' is known but has no committed relations yet.', col: CFG.COL_WARN });
     for (var i = 0; i < touching.length; i++) {
       var e = touching[i];
+      // KRIPKE DIAMOND (2026-07-09): each walked relation carries its modal verdict - □ every mind knows it,
+      // ◇ some mind's secret (hover the terminal `kripke` command for exactly who) - the port of the missed pillar
+      var modal = '';
+      if (win() && win().KRIPKE) { try { var kv = win().KRIPKE.verdict(e.a, e.r, e.b); modal = ' <b title="' + esc(kv.reading) + '" style="color:' + (kv.modality === 'box' ? CFG.COL_SHARED : CFG.COL_HL) + '">' + kv.glyph + '</b>'; } catch (er) {} }
       steps.push({ edge: e, note: esc(e.a) + ' <span style="color:' + CFG.COL_DIM + '">' + esc(e.r) + '</span> ' + esc(e.b) +
-        ' <span style="color:' + (e.tier === 'shared' ? CFG.COL_SHARED : CFG.COL_PRIV) + '">[' + e.tier + ']</span>' });
+        ' <span style="color:' + (e.tier === 'shared' ? CFG.COL_SHARED : CFG.COL_PRIV) + '">[' + e.tier + ']</span>' + modal });
     }
     steps.push({ note: 'done - ' + touching.length + ' verified relation' + (touching.length === 1 ? '' : 's') + ' shown.', col: CFG.COL_OK });
   } else {

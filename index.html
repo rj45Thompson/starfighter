@@ -166,40 +166,41 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709h"></script>
-<script src="fflate.min.js?v=20260709h"></script>
-<script src="fbxloader.js?v=20260709h"></script>
+<script src="three.min.js?v=20260709i"></script>
+<script src="fflate.min.js?v=20260709i"></script>
+<script src="fbxloader.js?v=20260709i"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709h"></script>
-<script src="inhabitant.js?v=20260709h"></script>
-<script src="passenger.js?v=20260709h"></script>
-<script src="gamemod.js?v=20260709h"></script>
-<script src="chatter.js?v=20260709h"></script>
-<script src="speech_input.js?v=20260709h"></script>
-<script src="vision.js?v=20260709h"></script>
-<script src="deliberate.js?v=20260709h"></script>
-<script src="knowledge.js?v=20260709h"></script>
-<script src="acquire.js?v=20260709h"></script>
-<script src="sound.js?v=20260709h"></script>
-<script src="hullmodels.js?v=20260709h"></script>
-<script src="knowledge_hud.js?v=20260709h"></script>
-<script src="knowledge_screen.js?v=20260709h"></script>
-<script src="centroid_mind.js?v=20260709h"></script>
-<script src="thoughts.js?v=20260709h"></script>
-<script src="tami_battle_ui.js?v=20260709h"></script>
-<script src="power_panel.js?v=20260709h"></script>
-<script src="panels.js?v=20260709h"></script>
-<script src="engbay.js?v=20260709h"></script>
+<script src="speech_tier.js?v=20260709i"></script>
+<script src="inhabitant.js?v=20260709i"></script>
+<script src="passenger.js?v=20260709i"></script>
+<script src="gamemod.js?v=20260709i"></script>
+<script src="chatter.js?v=20260709i"></script>
+<script src="speech_input.js?v=20260709i"></script>
+<script src="vision.js?v=20260709i"></script>
+<script src="deliberate.js?v=20260709i"></script>
+<script src="knowledge.js?v=20260709i"></script>
+<script src="acquire.js?v=20260709i"></script>
+<script src="sound.js?v=20260709i"></script>
+<script src="hullmodels.js?v=20260709i"></script>
+<script src="knowledge_hud.js?v=20260709i"></script>
+<script src="knowledge_screen.js?v=20260709i"></script>
+<script src="centroid_mind.js?v=20260709i"></script>
+<script src="kripke_mind.js?v=20260709i"></script>
+<script src="thoughts.js?v=20260709i"></script>
+<script src="tami_battle_ui.js?v=20260709i"></script>
+<script src="power_panel.js?v=20260709i"></script>
+<script src="panels.js?v=20260709i"></script>
+<script src="engbay.js?v=20260709i"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709h"></script>
-<script src="conquest.js?v=20260709h"></script>
-<script src="missions.js?v=20260709h"></script>
-<script src="planetmenu.js?v=20260709h"></script>
-<script src="textquests.js?v=20260709h"></script>
+<script src="starmap.js?v=20260709i"></script>
+<script src="conquest.js?v=20260709i"></script>
+<script src="missions.js?v=20260709i"></script>
+<script src="planetmenu.js?v=20260709i"></script>
+<script src="textquests.js?v=20260709i"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -259,6 +260,7 @@ const CFG = {
   LASER_CAP_MAX:100, LASER_CAP_PER_SHOT:8, LASER_CAP_REGEN:10,   // weapons energy capacitor: each shot costs this much charge, capacitor regens %/s scaled by weapons power - hits 0 -> can't fire until it climbs back up
   ENGINE_CAP_MAX:100, ENGINE_CAP_DRAIN:24, ENGINE_CAP_REGEN:14,   // user: "when I hold shift I don't want my recharge rates to change, it would just go through my engine capacitor" - nitro drains ITS OWN pool now, decoupled from the shared weapons/engines/shields power route entirely
   NITRO_SND_CD:2.5,   // BURST SFX (user 2026-07-09): min seconds between warp-sample retriggers while bursting - kills the overlapping-tails spam when the capacitor bounces off 0 mid-hold
+  NITRO_TRAIL_EVERY:0.04, NITRO_TRAIL_N:2, NITRO_TRAIL_SPD:6, NITRO_TRAIL_SZ:1.4, NITRO_TRAIL_BACK:2.6,   // COOL FACTOR (user 2026-07-09): afterburner particle trail while bursting - emitted at the ship's tail (camera shake on hits already existed: CAM_SHAKE_MAG)
   GIZMO_SLOTS:2, ECM_DODGE_CHANCE:0.22, SHIELD_BOOST_MULT:1.4,   // ENGINEERING BAY (user 2026-07-08): a real 2-slot electronics bay, not an uncapped bag; ECM's dodge is a flat per-hit chance, not evasion stacking with anything else
   // STANDARD GEAR SLOTS (user 2026-07-08, SR "A War Apart" gear list): E/S/M damage-type susceptibility per hull,
   // missile ammo (player-only - AI keeps infinite ammo, this is a player strategic resource), point-defense vs
@@ -2018,6 +2020,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'analyze', desc:'identify artifacts at the science station: analyze, identify, research, the lab, unidentified artifact - costs cores; unidentified artifacts refuse to equip until analyzed at Athenaeum Station', usage:'analyze · analyze all (docked at Athenaeum)'},
   {name:'probes', desc:'mineral probes + cores: probes, cores, salvage, probe network, passive mining - buy probes at Athenaeum with cores (from Hegemon wrecks), deploy at a world, collect ore later; keeps mining across reloads on the real clock', usage:'probes · buyprobe · deployprobe · collectprobe'},
   {name:'mind', desc:'the centroid category mind: mind, classify, learn, eval, centroid, AGI test, held-out accuracy, iron rule - the proven geometry-proposes/verifier-commits mechanism running over the knowledge graph incl. the HuggingFace dataset facts; abstains rather than fabricate', usage:'mind eval · mind classify <entity> · mind learn'},
+  {name:'kripke', desc:'the Kripke diamond: kripke, modal, box, diamond, necessary, possible, possible worlds, who knows what, epistemic logic - one world per mind; box = every mind knows it (shared), diamond = some mind\'s secret (names who), nowhere = no world holds it', usage:'kripke · kripke <s> <r> <o>'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2903,6 +2906,16 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       term(`🧠 MIND LEARN: committed <b>${r.committed.length}</b> gate-passed classifications into the store (${r.correct} match ground truth · ${r.abstained} abstained under the iron rule) - watch them land in the <b>observatory</b> feed`,'sys');
       r.committed.slice(0,8).forEach(x=>term(`&nbsp;&nbsp;${x.correct?'✓':'✗'} ${x.entity} inferred_in_task ${x.cat} <span style="opacity:.5">[${x.tier}] ${x.evidence} evidence</span>`,'sys')); return; }
     term('usage: <b>mind eval</b> [relation] · <b>mind classify &lt;entity&gt;</b> [relation] · <b>mind learn</b> [relation]','sys'); return; }
+  // KRIPKE DIAMOND (user 2026-07-09 "I was expecting we had kripke diamond but it was on a totally different
+  // repo!"): modal verdicts over the two-tier store - one possible world per mind, □=every mind knows it (shared
+  // tier), ◇=some mind's secret (names exactly who), ✗=no world holds it (and it will not be invented).
+  if(c==='kripke'||c==='modal'){ if(!window.KRIPKE){ term('kripke_mind.js not loaded','err'); return; }
+    if(!a[1]){ const sm=KRIPKE.summary(); if(!sm){ term('knowledge store offline','err'); return; }
+      term(`◇ <b>KRIPKE FRAME</b> - ${sm.worlds} possible worlds (one per mind) · <b style="color:#37e0ff">□ ${sm.box_facts}</b> necessary facts (all minds) · <b style="color:#b98cff">◇ ${sm.diamond_only_facts}</b> private facts across ${Object.keys(sm.per_mind).length} minds`,'sys');
+      term('&nbsp;&nbsp;usage: <b>kripke &lt;s&gt; &lt;r&gt; &lt;o&gt;</b> - e.g. kripke sun isa star · a ◇ verdict names exactly which minds hold the secret','sys'); return; }
+    if(!need(a[3],'kripke &lt;subject&gt; &lt;relation&gt; &lt;object&gt;')) return;
+    const v=KRIPKE.verdict(a[1],a[2],a.slice(3).join('_'));
+    term(`${v.glyph} <b>${a[1]} ${a[2]} ${a.slice(3).join('_')}</b> → ${v.reading}`,'sys'); return; }
   if(c==='starmap'||c==='galaxy2'||c==='sm'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } else term('starmap.js not loaded','err'); return; }
   if(c==='missions'||c==='board'){ if(window.MISSIONS&&MISSIONS.board){ term('<b style="color:#8fd0ff">★ RANGER COMMAND - MISSION BOARD</b> <span style="opacity:.55">(rank-gated · <b>accept m&lt;n&gt;</b> e.g. accept m1 · one active at a time)</span>','sys'); term(MISSIONS.board(),''); } else term('missions.js not loaded','err'); return; }
   if(c==='accept'&&window.MISSIONS&&MISSIONS.accept&&/^m\d+$/i.test(a[1]||'')){ const r=MISSIONS.accept(parseInt(String(a[1]).slice(1),10)); term(r&&r.msg?r.msg:'(no such mission)', r&&r.ok?'sys':'err'); return; }   // accept m1..m4 = mission board · plain numbers stay CONTRACTS
@@ -4499,7 +4512,14 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   // Two-part fix: the flag only resets when Shift is genuinely RELEASED (not when the cap dips), and a real
   // cooldown (CFG.NITRO_SND_CD seconds) hard-gates retriggers no matter what the flag does.
   if(nitroWanted && s.capEngine>0){ s.capEngine=Math.max(0,s.capEngine-CFG.ENGINE_CAP_DRAIN*dt);
-    if(window.SOUND&&!s._nitroSounded&&T0>=(s._nitroSndT||0)){ SOUND.play('warp'); s._nitroSounded=true; s._nitroSndT=T0+CFG.NITRO_SND_CD; } }
+    if(window.SOUND&&!s._nitroSounded&&T0>=(s._nitroSndT||0)){ SOUND.play('warp'); s._nitroSounded=true; s._nitroSndT=T0+CFG.NITRO_SND_CD; }
+    // COOL FACTOR (user 2026-07-09 "make the game cooler"): afterburner trail - amber/white puffs streaming off the
+    // tail while the burst is live, throttled on its own timer so particle count stays bounded at any framerate
+    s._trailT=(s._trailT||0)-dt;
+    if(s._trailT<=0){ s._trailT=CFG.NITRO_TRAIL_EVERY;
+      const tail=_v2.copy(s.pos).addScaledVector(FWD.clone().applyQuaternion(s.quat),-CFG.NITRO_TRAIL_BACK);
+      burst(tail, 0xffb054, CFG.NITRO_TRAIL_N, CFG.NITRO_TRAIL_SPD, CFG.NITRO_TRAIL_SZ);
+      burst(tail, 0xfff2d0, 1, CFG.NITRO_TRAIL_SPD*0.6, CFG.NITRO_TRAIL_SZ*0.7); } }
   else if(!nitroWanted) s._nitroSounded=false;
   s.fire-=dt;
   if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
