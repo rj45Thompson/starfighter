@@ -65,7 +65,11 @@ function createStore(opts){
     private_total:Object.values(S.priv).reduce((a,p)=>a+Object.keys(p).length,0) }; }
   function forget(){ S={version:VERSION, shared:{}, priv:{}}; dirty=true; persist(); }   // explicit wipe only
 
-  return { commit, know, has, tierOf, classify, stats, persist, forget, _state:()=>S };
+  // bulk-load support (HF ingest 2026-07-09): commit() reads opts.deferSave LIVE off the captured opts object, so
+  // flipping it here really does batch - setDefer(false) flushes once. (Reassigning store.persist from outside
+  // does NOT work - commit calls the closure-local persist, which is exactly the trap this helper exists to avoid.)
+  function setDefer(v){ opts.deferSave=!!v; if(!v) persist(); }
+  return { commit, know, has, tierOf, classify, stats, persist, setDefer, forget, _state:()=>S };
 }
 
 const api = { createStore, VERSION };

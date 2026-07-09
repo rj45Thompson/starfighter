@@ -28,7 +28,7 @@ var CFG = {
   FUEL_WARN_FRAC: 0.3,          // fuel below this fraction of cap renders amber in the header
   HULL_WARN_FRAC: 0.4,          // hull below this fraction renders red in the header
   TABS: [ {k:'market',   n:'MARKET'},
-          {k:'hangar',   n:'HANGAR'},
+          {k:'hangar',   n:'SHOP'},                    /* 2026-07-09: the flat SR:AWA store (shopHtml) - key stays 'hangar' so every existing setTab/openMenu caller keeps working */
           {k:'missions', n:'MISSIONS'},
           {k:'quests',   n:'QUESTS'},
           {k:'ground',   n:'GROUND'},
@@ -493,6 +493,75 @@ function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
   if(!P || !P.lvl || !c || c.UP_COST_BASE==null || c.UP_COST_GROW==null) return NaN;
   return Math.round(c.UP_COST_BASE*Math.pow(c.UP_COST_GROW, num(P.lvl[k],1)-1)); }
 
+/* ------------------------------------------------ TAB: SHOP (SR:AWA-style, 2026-07-09)
+   User: "where is the item shop? ... the way you buy a hull is complicated, annoying and confusing. just copy
+   space rangers a war apart. it's rather simple." This REPLACES the old 13-collapsible-section hangarHtml as the
+   docked buying surface: ONE flat scroll, thin group headers, every purchasable a single row
+   [name - stat - price - BUY]. No expanding, no nesting. LAYOUT editing (mounts/slots/specializations) is the
+   Engineering Bay's job and is deliberately NOT here - and hull purchases are deliberately NOT in the Bay. */
+function shopRow(name, stat, cost, cmd, tag){
+  var P=player(); var afford = cost==null || num(P&&P.credits,0)>=cost;
+  return '<div class="pm-row"><div class="pm-grow"><b>'+esc(name)+'</b>'
+    + (stat?(' <span class="pm-sub">'+stat+'</span>'):'') + '</div>'
+    + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+';min-width:56px;text-align:right">'+(cost?fmtC(cost):'free')+'</div>'
+    + (tag==='fitted' ? '<span class="pm-tag mk" style="min-width:52px;text-align:center">FITTED</span>'
+       : '<button class="pm-b" data-act="cmd" data-cmd="'+esc(cmd)+'" style="min-width:52px">BUY</button>')
+    + '</div>'; }
+function shopHdr(t, sub){ return '<div style="margin:10px 0 4px 0;font-weight:800;letter-spacing:.1em;color:'+COL.HEAD+';font-size:11px">'+t
+  + (sub?(' <span style="color:'+COL.DIM+';font-weight:400;letter-spacing:0">'+sub+'</span>'):'') + '</div>'; }
+function shopHtml(){
+  var P=player(), h=H();
+  if(!P||!h) return '<div class="pm-note">No dock link.</div>';
+  var html='<div class="pm-note">Pick a thing, hit <b>BUY</b> - that\'s the whole shop. Slot LAYOUT (mounts, specializations, what goes where) is the <b>ENGINEERING BAY</b> [E], like a character screen.</div>';
+  /* HULLS - the hull command's own gate is atBase, so the section only exists where buying actually works */
+  if(S.isBase){
+    html+=shopHdr('HULLS','swap the skeleton - components transfer, upgrade levels reset (Starblast rule)');
+    var hk=(typeof h.shopHullKeys==='function')?h.shopHullKeys():(h.HULL_ORDER||[]);
+    for(var i=0;i<hk.length;i++){ var k=hk[i], HH=h.HULLS&&h.HULLS[k]; if(!HH) continue;
+      html+=shopRow(HH.n, 'hull '+HH.hp+' · hold '+HH.hold+' · spd ×'+HH.speed, HH.cost||0, 'hull '+k, (P.hullClass===k)?'fitted':null); } }
+  else html+=shopHdr('HULLS','sold at Ranger Command only - fly home to swap ships');
+  /* PRIMARY WEAPON */
+  html+=shopHdr('PRIMARY WEAPON','your main gun - one fitted at a time');
+  var wo=h.WEAPON_ORDER||[];
+  for(var w=0;w<wo.length;w++){ var wk=wo[w], W=h.WEAPONS[wk];
+    html+=shopRow(W.n, 'dmg '+W.dmg+(W.homing?' · homing':'')+(W.splash?' · splash':''), W.cost||0, 'weapon '+wk, ((P.weaponType||'energy')===wk)?'fitted':null); }
+  /* ENGINES */
+  if(h.ENGINES&&h.ENGINE_KEYS){ html+=shopHdr('ENGINE DRIVE','speed vs hyperjump-fuel tradeoff');
+    for(var e2=0;e2<h.ENGINE_KEYS.length;e2++){ var ek=h.ENGINE_KEYS[e2], E=h.ENGINES[ek];
+      html+=shopRow(E.n, esc(E.desc||''), E.cost||0, 'engine '+ek, ((P.engineType||'standard')===ek)?'fitted':null); } }
+  /* SINGLE-SLOT GEAR (series excluded - that's a permanent specialization, fitted in the Bay) */
+  for(var g=0;g<GEAR_SLOTS.length;g++){ var def=GEAR_SLOTS[g]; if(def[0]==='series') continue;
+    var tbl=h[def[2]], keys=h[def[3]]; if(!tbl||!keys) continue;
+    html+=shopHdr(def[1],'');
+    for(var g2=0;g2<keys.length;g2++){ var gk=keys[g2], it=tbl[gk]; if(!it) continue;
+      html+=shopRow(it.n, esc(it.desc||''), it.cost||0, def[6]+' '+gk, ((P[def[4]]||def[5])===gk)?'fitted':null); } }
+  /* GIZMOS + HARDPOINT GUNS - buying MOUNTS them into the next free slot (same command the Bay's pickers use) */
+  if(h.GIZMOS&&h.GIZMO_KEYS){ html+=shopHdr('GIZMOS','buy = mounts into a free gizmo slot · unmount/sell in YOUR SHIP below');
+    for(var z=0;z<h.GIZMO_KEYS.length;z++){ var zk=h.GIZMO_KEYS[z], Z=h.GIZMOS[zk];
+      html+=shopRow(Z.n, esc(Z.desc||''), Z.cost||0, 'gizmo mount '+zk, (typeof h.hasGizmo==='function'&&h.hasGizmo(P,zk))?'fitted':null); } }
+  html+=shopHdr('HARDPOINT GUNS','extra mounted weapons beyond the primary');
+  for(var q=0;q<wo.length;q++){ var qk=wo[q], QW=h.WEAPONS[qk];
+    html+=shopRow(QW.n+' (hardpoint)', 'dmg '+QW.dmg, QW.cost||0, 'hardpoint mount '+qk, null); }
+  /* UPGRADES - same three rows the old hangar had, flat */
+  var upCap=(h.CFG&&h.CFG.UP_LVL_CAP)||Infinity;
+  html+=shopHdr('UPGRADES','level up what\'s already fitted');
+  for(var u2=0;u2<CFG.UP_KINDS.length;u2++){ var u=CFG.UP_KINDS[u2];
+    var lvl=(P.lvl&&typeof P.lvl[u.k]==='number')?P.lvl[u.k]:1, atCap=lvl>=upCap, cost=upCostEst(P,u.k);
+    html+= atCap ? shopRow(u.n+' Lv'+lvl, 'MAX', null, '', 'fitted')
+                 : shopRow(u.n+' Lv'+lvl+' → '+(lvl+1), u.d, cost, 'upgrade '+u.k, null); }
+  /* YOUR SHIP - the sell/unmount side, flat */
+  html+=shopHdr('YOUR SHIP','what\'s aboard - unmount refunds a fraction');
+  var gsl=P.gizmoSlots||[];
+  for(var y=0;y<gsl.length;y++){ if(!gsl[y]) continue; var GY=h.GIZMOS[gsl[y]];
+    html+='<div class="pm-row"><div class="pm-grow"><b>'+esc(GY?GY.n:gsl[y])+'</b> <span class="pm-sub">gizmo slot '+(y+1)+'</span></div>'
+      +'<button class="pm-b" data-act="cmd" data-cmd="gizmo unmount '+(y+1)+'">SELL</button></div>'; }
+  var wsl=P.weaponSlots||[];
+  for(var y2=0;y2<wsl.length;y2++){ if(!wsl[y2]) continue; var WY=h.WEAPONS[wsl[y2]];
+    html+='<div class="pm-row"><div class="pm-grow"><b>'+esc(WY?WY.n:wsl[y2])+'</b> <span class="pm-sub">hardpoint '+(y2+1)+'</span></div>'
+      +'<button class="pm-b" data-act="cmd" data-cmd="hardpoint unmount '+(y2+1)+'">SELL</button></div>'; }
+  if(!gsl.some(Boolean)&&!wsl.some(Boolean)) html+='<div class="pm-note">Nothing mounted beyond the primary loadout.</div>';
+  return html; }
+
 /* Space-Rangers-style loadout data: equipment is stable game data, hardcoded here to mirror EQUIP in the host
    (host now exposes EQUIP directly too - kept as a literal list here so this file doesn't have to defend against
    HOST being unavailable at first paint, same reasoning HULLS/WEAPONS sections already read live but this one
@@ -945,7 +1014,7 @@ function renderBody(){
   if(!S.el.body) return;
   var h='';
   if(S.tab==='market') h=marketHtml();
-  else if(S.tab==='hangar') h=hangarHtml();
+  else if(S.tab==='hangar') h=shopHtml();   /* 2026-07-09: the flat SHOP replaced the 13-section hangar as the buying surface (hangarHtml stays defined for reference, no longer rendered) */
   else if(S.tab==='missions') h=missionsHtml();
   else if(S.tab==='quests') h=questsHtml();
   else if(S.tab==='ground') h=groundHtml();

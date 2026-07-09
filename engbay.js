@@ -271,11 +271,14 @@ function render() {
   }
   left += '</div>';
 
-  var w = win(); var pm = w && w.PLANETMENU;
-  var right = '<div style="flex:1 1 380px;min-width:320px;max-width:640px;border-left:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-left:14px">';
-  if (s.docked && pm && typeof pm.hangarHtml === 'function') {
-    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>SHOP - ' + esc(s.docked.name || 'docked') + '</b></div>' +
-      '<div id="engbayShop" data-engbay-shop="1">' + pm.hangarHtml() + '</div>';
+  // SHOP REMOVED (user 2026-07-09 "I don't want to see hull purchases in engineering bay - that is just for
+  // editing the component slots and layout like diablo character control"): the Bay is LOADOUT-ONLY now - the
+  // schematic + paperdoll grid above. BUYING lives in the docked planet menu's SHOP tab (flat SR:AWA store).
+  var right = '<div style="flex:1 1 300px;min-width:260px;max-width:480px;border-left:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-left:14px">';
+  if (s.docked) {
+    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>THIS IS YOUR CHARACTER SCREEN</b></div>' +
+      '<div style="font-size:11px;color:' + CFG.COL_DIM + '">Fit, swap, and arrange what you already own here.<br><br>' +
+      '🛒 To BUY new hulls, weapons, or gear: close this (ESC) and open the docked menu\'s <b style="color:' + CFG.COL_TEXT + '">SHOP</b> tab - one flat list, one BUY button each.</div>';
   } else {
     right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>NEAREST STATION</b></div>' + nearestStationHtml(h, s);
   }
@@ -316,14 +319,8 @@ function wireClicks() {
     if (gridPickEl) { onGridPick(EB.gridPick, gridPickEl.getAttribute('data-gridpick')); return; }
     var gridEl = ev.target.closest && ev.target.closest('[data-grid]');
     if (gridEl) { onGridClick(gridEl.getAttribute('data-grid')); return; }
-    // FULLSCREEN SHOP ATTACH: the embedded hangarHtml() markup uses data-act="cmd"/"tab"/"slot" (planetmenu.js's
-    // OWN click vocabulary, disjoint from data-pick/data-mount above) - delegate straight into PLANETMENU's real
-    // dispatcher so a click here has IDENTICAL effect to the same click inside the docked menu itself. The embedded
-    // shop HTML is a snapshot taken at the last render() - PLANETMENU's own dispatch mutates ITS OWN S.slotOpen/
-    // renders ITS OWN (now-hidden-behind-engbay) body, not this snapshot, so a manual render() right after is
-    // needed for the click to feel instant instead of waiting up to POLL_MS for the next poll tick to catch up.
-    var actEl = ev.target.closest && ev.target.closest('[data-act]');
-    if (actEl) { var w = win(); var pm = w && w.PLANETMENU; if (pm && typeof pm.onClick === 'function') { pm.onClick(ev); render(); } return; }
+    // (2026-07-09: the embedded-shop data-act delegation is GONE with the shop itself - the Bay is loadout-only;
+    // buying happens in the docked menu's SHOP tab.)
   });
 }
 

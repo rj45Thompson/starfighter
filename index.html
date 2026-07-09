@@ -166,39 +166,40 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709g"></script>
-<script src="fflate.min.js?v=20260709g"></script>
-<script src="fbxloader.js?v=20260709g"></script>
+<script src="three.min.js?v=20260709h"></script>
+<script src="fflate.min.js?v=20260709h"></script>
+<script src="fbxloader.js?v=20260709h"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709g"></script>
-<script src="inhabitant.js?v=20260709g"></script>
-<script src="passenger.js?v=20260709g"></script>
-<script src="gamemod.js?v=20260709g"></script>
-<script src="chatter.js?v=20260709g"></script>
-<script src="speech_input.js?v=20260709g"></script>
-<script src="vision.js?v=20260709g"></script>
-<script src="deliberate.js?v=20260709g"></script>
-<script src="knowledge.js?v=20260709g"></script>
-<script src="acquire.js?v=20260709g"></script>
-<script src="sound.js?v=20260709g"></script>
-<script src="hullmodels.js?v=20260709g"></script>
-<script src="knowledge_hud.js?v=20260709g"></script>
-<script src="knowledge_screen.js?v=20260709g"></script>
-<script src="thoughts.js?v=20260709g"></script>
-<script src="tami_battle_ui.js?v=20260709g"></script>
-<script src="power_panel.js?v=20260709g"></script>
-<script src="panels.js?v=20260709g"></script>
-<script src="engbay.js?v=20260709g"></script>
+<script src="speech_tier.js?v=20260709h"></script>
+<script src="inhabitant.js?v=20260709h"></script>
+<script src="passenger.js?v=20260709h"></script>
+<script src="gamemod.js?v=20260709h"></script>
+<script src="chatter.js?v=20260709h"></script>
+<script src="speech_input.js?v=20260709h"></script>
+<script src="vision.js?v=20260709h"></script>
+<script src="deliberate.js?v=20260709h"></script>
+<script src="knowledge.js?v=20260709h"></script>
+<script src="acquire.js?v=20260709h"></script>
+<script src="sound.js?v=20260709h"></script>
+<script src="hullmodels.js?v=20260709h"></script>
+<script src="knowledge_hud.js?v=20260709h"></script>
+<script src="knowledge_screen.js?v=20260709h"></script>
+<script src="centroid_mind.js?v=20260709h"></script>
+<script src="thoughts.js?v=20260709h"></script>
+<script src="tami_battle_ui.js?v=20260709h"></script>
+<script src="power_panel.js?v=20260709h"></script>
+<script src="panels.js?v=20260709h"></script>
+<script src="engbay.js?v=20260709h"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709g"></script>
-<script src="conquest.js?v=20260709g"></script>
-<script src="missions.js?v=20260709g"></script>
-<script src="planetmenu.js?v=20260709g"></script>
-<script src="textquests.js?v=20260709g"></script>
+<script src="starmap.js?v=20260709h"></script>
+<script src="conquest.js?v=20260709h"></script>
+<script src="missions.js?v=20260709h"></script>
+<script src="planetmenu.js?v=20260709h"></script>
+<script src="textquests.js?v=20260709h"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -257,6 +258,7 @@ const CFG = {
   SHIELD_ARC_BASE:20, SHIELD_DIVERT_MULT:2.2,   // user 2026-07-08 "same as tie fighter xwing": real fore/aft POOLS (half of SHIELD_BASE each), not one pool with an efficiency weight; diverting concentrates regen on one arc at ~2.2x, pausing the other
   LASER_CAP_MAX:100, LASER_CAP_PER_SHOT:8, LASER_CAP_REGEN:10,   // weapons energy capacitor: each shot costs this much charge, capacitor regens %/s scaled by weapons power - hits 0 -> can't fire until it climbs back up
   ENGINE_CAP_MAX:100, ENGINE_CAP_DRAIN:24, ENGINE_CAP_REGEN:14,   // user: "when I hold shift I don't want my recharge rates to change, it would just go through my engine capacitor" - nitro drains ITS OWN pool now, decoupled from the shared weapons/engines/shields power route entirely
+  NITRO_SND_CD:2.5,   // BURST SFX (user 2026-07-09): min seconds between warp-sample retriggers while bursting - kills the overlapping-tails spam when the capacitor bounces off 0 mid-hold
   GIZMO_SLOTS:2, ECM_DODGE_CHANCE:0.22, SHIELD_BOOST_MULT:1.4,   // ENGINEERING BAY (user 2026-07-08): a real 2-slot electronics bay, not an uncapped bag; ECM's dodge is a flat per-hit chance, not evasion stacking with anything else
   // STANDARD GEAR SLOTS (user 2026-07-08, SR "A War Apart" gear list): E/S/M damage-type susceptibility per hull,
   // missile ammo (player-only - AI keeps infinite ammo, this is a player strategic resource), point-defense vs
@@ -2015,6 +2017,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'hirewing', desc:'hire a wingman at the bar: wingman, wing, hire a pilot, escort me, recruit, sign a wing contract - a squad pilot escorts you and engages your target, for upfront pay + upkeep (BAR tab while docked)', usage:'hirewing <pilot> · dismisswing [pilot|all]'},
   {name:'analyze', desc:'identify artifacts at the science station: analyze, identify, research, the lab, unidentified artifact - costs cores; unidentified artifacts refuse to equip until analyzed at Athenaeum Station', usage:'analyze · analyze all (docked at Athenaeum)'},
   {name:'probes', desc:'mineral probes + cores: probes, cores, salvage, probe network, passive mining - buy probes at Athenaeum with cores (from Hegemon wrecks), deploy at a world, collect ore later; keeps mining across reloads on the real clock', usage:'probes · buyprobe · deployprobe · collectprobe'},
+  {name:'mind', desc:'the centroid category mind: mind, classify, learn, eval, centroid, AGI test, held-out accuracy, iron rule - the proven geometry-proposes/verifier-commits mechanism running over the knowledge graph incl. the HuggingFace dataset facts; abstains rather than fabricate', usage:'mind eval · mind classify <entity> · mind learn'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2880,8 +2883,26 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='agi'||c==='knowhud'||c==='khud'){ if(window.PANELS&&window.KHUD){ const v=PANELS.toggle('khud'); term(`◈ AGI-test knowledge HUD ${v?'shown':'hidden'} - the reasoning substrate (shared/private facts, pillars, growth) is what this really is. Its own edge tab (right side) opens/closes it too. Fullscreen version: <b>observatory</b>.`,'sys'); if(window.SOUND) SOUND.play('ui'); } else term('knowledge_hud.js not loaded','err'); return; }
   // KNOWLEDGE OBSERVATORY (user 2026-07-09): the fullscreen knowledge-graph screen - graph + the fed novel + live
   // commit feed + a talk-to-it box that replays real deliberations step by step. ESC or ✕ closes it.
-  if(c==='observatory'||c==='kobs'||c==='mind'){ if(!window.KOBS){ term('knowledge_screen.js not loaded','err'); return; }
+  if(c==='observatory'||c==='kobs'){ if(!window.KOBS){ term('knowledge_screen.js not loaded','err'); return; }
     const v=KOBS.toggle(); term(`◈ KNOWLEDGE OBSERVATORY ${v?'opened - the minds under the game, live. ESC closes.':'closed.'}`,'sys'); return; }
+  // CENTROID MIND (user 2026-07-09 "audit it all and put it in the game"): the ecosystem's PROVEN category
+  // mechanism (one-hot typed-fact vectors, centroid proposes, iron-rule gate verifies or ABSTAINS) running over
+  // the live GAME_KNOW store - including the ingested HuggingFace facts. `mind eval` = the honest held-out number.
+  if(c==='mind'){ if(!window.CENTROID){ term('centroid_mind.js not loaded','err'); return; }
+    const sub=(a[1]||'eval').toLowerCase(), rel=a[3]||'in_task';
+    if(sub==='eval'){ const r=CENTROID.evalHoldout(a[2]||'in_task');
+      term(`🧠 <b>CENTROID MIND - held-out eval</b> over relation <b>${a[2]||'in_task'}</b> (${r.categories} categories · ${r.trainN} train / ${r.testN} held out)`,'sys');
+      term(`&nbsp;&nbsp;raw accuracy <b>${(r.raw_accuracy*100).toFixed(0)}%</b> · gated <b style="color:#7fdc8a">${(r.gated_accuracy*100).toFixed(0)}%</b> on ${r.answered} answered (${r.abstained} honest abstains) · majority baseline ${(r.majority_baseline*100).toFixed(0)}% (${r.majority_cat})`,'sys');
+      r.results.slice(0,10).forEach(x=>term(`&nbsp;&nbsp;${x.verdict==='claim'?(x.proposed===x.truth?'✓':'✗'):'·'} ${x.entity} → ${x.verdict==='claim'?x.proposed:('abstain: '+String(x.why||'').slice(0,60))} <span style="opacity:.5">(truth ${x.truth})</span>`,'sys'));
+      if(r.results.length>10) term(`&nbsp;&nbsp;<span style="opacity:.5">…${r.results.length-10} more (mind learn commits the gate-passed ones)</span>`,'sys'); return; }
+    if(sub==='classify'){ const ent=a[2]; if(!need(ent,'mind classify &lt;entity&gt; [relation]')) return;
+      const g=CENTROID.classify(ent, rel);
+      if(g.verdict==='claim') term(`🧠 <b>${ent}</b> → <b style="color:#7fdc8a">${g.cat}</b> (cos ${g.cos.toFixed(3)}, margin ${g.margin.toFixed(3)}, ${g.evidence.length} independent evidence links: ${g.evidence.slice(0,4).join(', ')})`,'sys');
+      else term(`🧠 <b>${ent}</b> → <b style="color:#ffb454">${g.verdict.toUpperCase()}</b> - ${g.why||g.cat||''}`,'sys'); return; }
+    if(sub==='learn'){ const r=CENTROID.learn(a[2]||'in_task'); if(r.error){ term(r.error,'err'); return; }
+      term(`🧠 MIND LEARN: committed <b>${r.committed.length}</b> gate-passed classifications into the store (${r.correct} match ground truth · ${r.abstained} abstained under the iron rule) - watch them land in the <b>observatory</b> feed`,'sys');
+      r.committed.slice(0,8).forEach(x=>term(`&nbsp;&nbsp;${x.correct?'✓':'✗'} ${x.entity} inferred_in_task ${x.cat} <span style="opacity:.5">[${x.tier}] ${x.evidence} evidence</span>`,'sys')); return; }
+    term('usage: <b>mind eval</b> [relation] · <b>mind classify &lt;entity&gt;</b> [relation] · <b>mind learn</b> [relation]','sys'); return; }
   if(c==='starmap'||c==='galaxy2'||c==='sm'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } else term('starmap.js not loaded','err'); return; }
   if(c==='missions'||c==='board'){ if(window.MISSIONS&&MISSIONS.board){ term('<b style="color:#8fd0ff">★ RANGER COMMAND - MISSION BOARD</b> <span style="opacity:.55">(rank-gated · <b>accept m&lt;n&gt;</b> e.g. accept m1 · one active at a time)</span>','sys'); term(MISSIONS.board(),''); } else term('missions.js not loaded','err'); return; }
   if(c==='accept'&&window.MISSIONS&&MISSIONS.accept&&/^m\d+$/i.test(a[1]||'')){ const r=MISSIONS.accept(parseInt(String(a[1]).slice(1),10)); term(r&&r.msg?r.msg:'(no such mission)', r&&r.ok?'sys':'err'); return; }   // accept m1..m4 = mission board · plain numbers stay CONTRACTS
@@ -4319,6 +4340,23 @@ passengerInit();   // 🜏 the Passenger wakes in YOU - registry+telemetry+speec
 // 🜁 the shared, PERSISTENT knowledge store - one for all pilots; survives page reloads + sim resets (localStorage);
 // generic facts are shared by every AGI, witnessed facts stay private. The deliberate/acquire cascade reads+grows it.
 window.GAME_KNOW = window.KNOWLEDGE ? KNOWLEDGE.createStore({ key:'KNOWLEDGE_v1' }) : null;
+// HF DATASET INGEST (user 2026-07-09 "start training it with these datasets... fill the graph"): hf_facts.json is
+// baked OFFLINE by bake_hf_facts.js (mechanical extraction, no LLM - see its iron-rule header) from
+// Qwen/AgentWorldBench + Jackrong/GLM-5.1-Reasoning-1M-Cleaned. Soft-fail fetch like TAMIDATA/NOVELDATA; a marker
+// fact skips re-ingest on every later boot; persist() is muted during the bulk (one localStorage write at the end,
+// not one per fact - knowledge.js persists per-commit by default and 1000+ full-store serializations would stall boot).
+(function(){ if(!window.GAME_KNOW) return;
+  const K=GAME_KNOW, MARK={s:'hf_ingest',r:'isa',o:'done_v1'};
+  if(K.has(MARK,'_system')){ console.log('[hf] facts already ingested (marker present)'); return; }
+  fetch('./hf_facts.json').then(r=>r.ok?r.json():null).catch(()=>null).then(j=>{
+    if(!j||!Array.isArray(j.facts)||!j.facts.length) return;
+    if(typeof K.setDefer==='function') K.setDefer(true);   // batch: one localStorage write at the end, not one per fact (knowledge.js's own bulk-load helper - reassigning K.persist does NOT mute the closure-internal calls)
+    let added=0;
+    try{ for(const f of j.facts){ const r=K.commit({s:f.s,r:f.r,o:f.o},{source:f.src||'hf-dataset'}); if(r&&r.isNew) added++; }
+      K.commit(MARK,{source:'hf-ingest-marker'}); }
+    finally{ if(typeof K.setDefer==='function') K.setDefer(false); }
+    console.log(`[hf] ingested ${added}/${j.facts.length} dataset facts (GIVEN, ${j.baked_at||'?'}) - observatory/mind can now reason over them`);
+    ev(`🧠 <b>${added}</b> HuggingFace dataset facts filled the knowledge graph (AgentWorldBench + GLM-Reasoning, mechanically extracted). Try <b>observatory</b>, <b>mind eval</b>.`); }); })();
 // ◈ the AGI-test knowledge HUD (knowledge_hud.js) - mounts hidden; `agi` command or the update timer surfaces it
 if(window.KHUD){ KHUD.mount(); if(!KHUD.visible()) KHUD.toggle(); setInterval(function(){ if(window.KHUD) KHUD.update(); }, 500); }   // force display:block ONCE - PANELS below owns visibility from here via its slide transform, not display
 if(window.POWERPANEL){ POWERPANEL.mount(); POWERPANEL.show(); }   // same pattern - the X-Wing power panel is now a first-class window-standard panel too
@@ -4455,8 +4493,14 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   if(s.capEngine==null) s.capEngine=CFG.ENGINE_CAP_MAX;
   const nitroWanted=!!MAN.nitro;
   s._nitroActive=nitroWanted && s.capEngine>0;
-  if(nitroWanted && s.capEngine>0){ s.capEngine=Math.max(0,s.capEngine-CFG.ENGINE_CAP_DRAIN*dt); if(window.SOUND&&!s._nitroSounded){ SOUND.play('warp'); s._nitroSounded=true; } }
-  else s._nitroSounded=false;
+  // BURST SFX FIX (user 2026-07-09 "when you're bursting with shift it plays a sound effect overlapping which is
+  // annoying"): the old dedupe flag reset in the else-branch, which fires every time the capacitor bounces off 0
+  // mid-hold (drain one tick, regen the next) - each bounce replayed the LONG warp sample on top of its own tail.
+  // Two-part fix: the flag only resets when Shift is genuinely RELEASED (not when the cap dips), and a real
+  // cooldown (CFG.NITRO_SND_CD seconds) hard-gates retriggers no matter what the flag does.
+  if(nitroWanted && s.capEngine>0){ s.capEngine=Math.max(0,s.capEngine-CFG.ENGINE_CAP_DRAIN*dt);
+    if(window.SOUND&&!s._nitroSounded&&T0>=(s._nitroSndT||0)){ SOUND.play('warp'); s._nitroSounded=true; s._nitroSndT=T0+CFG.NITRO_SND_CD; } }
+  else if(!nitroWanted) s._nitroSounded=false;
   s.fire-=dt;
   if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
   if(MAN.fire && s.fire<=0 && s.capLaser>0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
