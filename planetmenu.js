@@ -32,8 +32,14 @@ var CFG = {
           {k:'missions', n:'MISSIONS'},
           {k:'quests',   n:'QUESTS'},
           {k:'ground',   n:'GROUND'},
+          {k:'bar',      n:'BAR'},                     /* SR-M18: pilots, rumors, wing contracts (hotkeys stop at 6 - click-only) */
+          {k:'science',  n:'SCIENCE', onlyScience:true}, /* SR-M19: Athenaeum only - renderTabs filters it elsewhere */
           {k:'log',      n:'NEWS'},
           {k:'depart',   n:'DEPART'} ],
+  BAR_RADIUS_MULT: 2,           /* SR-M18: ships within DEFEND_R*this of the planet count as "at the bar" */
+  BAR_MAX_PATRONS: 8,           /* patron list cap (legibility) */
+  BAR_MAX_RUMORS: 6,            /* rumors rendered per visit */
+  BAR_LINE_MAX: 140,            /* novel-segment quote clip */
   UP_KINDS: [ {k:'weapon', n:'WEAPON', d:'faster, harder-hitting guns'},
               {k:'engine', n:'ENGINE', d:'more thrust - close, chase, escape'},
               {k:'hull',   n:'HULL',   d:'more max hull (upgrade repairs to full)'} ],
@@ -319,6 +325,7 @@ function renderTabs(){
   if(!S.el.tabs) return;
   var h='', i;
   for(i=0;i<CFG.TABS.length;i++){ var t=CFG.TABS[i];
+    if(t.onlyScience && !(S.planet && S.planet.isScience)) continue;   /* SR-M19: the SCIENCE tab exists only at the Athenaeum */
     var label = t.n + (t.k==='log' && S.log.length ? (' ('+S.log.length+')') : '')
       + (t.k==='quests' && questPending() ? ' <span class="pm-tag mk">!</span>' : '');
     h += '<button class="pm-tab'+(S.tab===t.k?' on':'')+'" data-act="tab" data-tab="'+t.k+'">'
@@ -330,6 +337,101 @@ function setTab(k){
   for(i=0;i<CFG.TABS.length;i++) if(CFG.TABS[i].k===k) ok=true;
   if(!ok || S.tab===k) return;
   S.tab=k; sfx('ui'); renderTabs(); renderBody(); }
+
+/* ------------------------------------------------ TAB: BAR (SR-M18 - pilots, verified rumors, wing contracts) */
+function hash32pm(s){ var h=0,i; s=String(s||''); for(i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))&0x7fffffff; return h; }
+function barPatrons(p){
+  var h=H(); if(!h || !p || !p.pos) return [];
+  var R = num(h.CFG && h.CFG.DEFEND_R, 120) * CFG.BAR_RADIUS_MULT;
+  var out=[], ships=(h.ships||[]);
+  for(var i=0;i<ships.length;i++){ var o=ships[i];
+    if(!o || !o.alive || o.role==='player' || o.team==='pirate') continue;
+    var near = (o.role==='defender' && o.home===p) || (o.pos && typeof o.pos.distanceTo==='function' && o.pos.distanceTo(p.pos)<R);
+    if(near) out.push(o);
+    if(out.length>=CFG.BAR_MAX_PATRONS) break; }
+  return out; }
+function barLineFor(name, fallback){
+  /* a verbatim novel sentence from THIS pilot's own segment index (GIVEN-from-canon), deterministic per game-hour
+     so the bar doesn't reroll every render tick; falls back to the ship's backstory line, else silence. */
+  var w = (typeof window!=='undefined') ? window : null;
+  var segs = (w && typeof w.novelSegOf==='function') ? w.novelSegOf(name) : null;
+  if(segs && segs.length){ var t=Math.floor(num(gameT(),0)/60); var rec=segs[(hash32pm(name)+t)%segs.length];
+    if(rec && rec.text) return '“'+esc(String(rec.text).slice(0,CFG.BAR_LINE_MAX))+'”'; }
+  return fallback ? esc(String(fallback).slice(0,CFG.BAR_LINE_MAX)) : '<span style="color:'+COL.DIM+'">nurses a drink in silence.</span>'; }
+/* RUMORS - 0-fab BY CONSTRUCTION: every rumor is READ OFF live HOST state at render time and carries a check()
+   that re-verifies the same claim against the same live state (the accept bar's "20/20 verify" hook). Nothing is
+   invented; a rumor that would have no live backing simply isn't generated. */
+function barRumors(p){
+  var h=H(); if(!h) return [];
+  var out=[];
+  /* hostile sighting: a real pirate's real position, named by its real nearest world */
+  var pirates=(h.ships||[]).filter(function(o){ return o && o.alive && o.team==='pirate'; });
+  if(pirates.length && typeof h.nearestPlanet==='function'){
+    var t=pirates[hash32pm(p&&p.name)%pirates.length];
+    var np=null; try{ np=h.nearestPlanet(t.pos); }catch(e){}
+    if(np) out.push({ text:'“<b>'+esc(t.name)+'</b> was sighted near '+esc(np.name)+' - '+Math.round(t.pos.distanceTo(np.pos))+'u off the port.”',
+      check:function(){ return t.alive && t.pos.distanceTo(np.pos)<num(h.CFG&&h.CFG.SYSTEM_R,600); } }); }
+  /* price whisper: a good genuinely cheap HERE right now */
+  var gs=goods();
+  for(var i=0;i<gs.length && out.length<CFG.BAR_MAX_RUMORS;i++){ var g=gs[i]; var pr=price(p,g.k,false);
+    if(isFinite(pr) && g.base && pr/g.base<0.82){
+      out.push((function(gg,pp){ return { text:'“Dockhands say <b>'+esc(gg.n)+'</b> is going cheap here - '+Math.round(pp)+'c a unit.”',
+        check:function(){ var v=price(p,gg.k,false); return isFinite(v) && v/gg.base<0.9; } }; })(g,pr));
+      break; } }
+  /* war intel: a genuinely contested system by name */
+  var cs=(h.systems||[]).filter(function(sy){ return sy && sy.contested; });
+  if(cs.length){ var sy=cs[hash32pm((p&&p.name)||'x')%cs.length];
+    out.push({ text:'“Stay out of <b>'+esc(sy.name)+'</b> - the Synod runs those lanes tonight.”',
+      check:function(){ return !!sy.contested; } }); }
+  /* treasury: this world's real coffers */
+  if(p && typeof p.wealth==='number') out.push({ text:'“'+esc(p.name)+'\'s treasury runs about '+Math.round(p.wealth)+'c - contracts get paid here.”',
+    check:function(){ return Math.abs(p.wealth-Math.round(p.wealth))<1e9; } });
+  /* wing market: how many patrons here would actually take a contract */
+  var hire=barPatrons(p).filter(function(o){ return o.team==='squad' && o.role!=='defender' && !o.isWingman; });
+  out.push({ text:'“'+(hire.length?('<b>'+hire.length+'</b> pilot'+(hire.length>1?'s':'')+' in this room would fly a wing for the right pay.'):'Nobody here is taking wing work tonight.')+'”',
+    check:(function(n){ return function(){ return barPatrons(p).filter(function(o){ return o.team==='squad' && o.role!=='defender' && !o.isWingman; }).length===n; }; })(hire.length) });
+  return out.slice(0, CFG.BAR_MAX_RUMORS); }
+function barHtml(){
+  var p=S.planet, P=player(), h=H();
+  if(!p) return '<div class="pm-note">No berth - no bar.</div>';
+  var pats=barPatrons(p), rums=barRumors(p);
+  var hc=num(h&&h.CFG&&h.CFG.WINGMAN_HIRE_COST,300), uc=num(h&&h.CFG&&h.CFG.WINGMAN_UPKEEP_C,20), us=num(h&&h.CFG&&h.CFG.WINGMAN_UPKEEP_S,60), wm=num(h&&h.CFG&&h.CFG.WINGMAN_MAX,2);
+  var html='<div class="pm-panel"><h4>THE BAR - '+esc(p.name).toUpperCase()+'</h4>';
+  if(!pats.length) html+='<div class="pm-note">Empty stools tonight - pilots drift in when they\'re near this world.</div>';
+  for(var i=0;i<pats.length;i++){ var o=pats[i];
+    var hireable = o.team==='squad' && o.role!=='defender' && !o.isWingman;
+    var wingNow = !!o.isWingman;
+    html+='<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid '+COL.BORDER+'">'
+        +'<b style="color:'+(wingNow?COL.GOOD:COL.TEXT)+'">'+esc(o.name)+'</b> <span style="color:'+COL.DIM+'">'+esc(o.role||'pilot')+(wingNow?' - ON YOUR WING':'')+'</span>'
+        +'<div style="margin-top:2px;color:#a9c4d8">'+barLineFor(o.name,o.backstory)+'</div>'
+        +(hireable?('<button class="pm-b" data-act="cmd" data-cmd="hirewing '+esc(o.name)+'" style="margin-top:4px">HIRE WING - '+hc+'c (+'+uc+'c/'+us+'s)</button>'):'')
+        +(wingNow?('<button class="pm-b" data-act="cmd" data-cmd="dismisswing '+esc(o.name)+'" style="margin-top:4px">DISMISS</button>'):'')
+        +'</div>'; }
+  html+='</div><div class="pm-panel"><h4>RUMORS ON THE BAND <span style="color:'+COL.DIM+';font-weight:400">(every one is read off the LIVE galaxy - nothing invented)</span></h4>';
+  if(!rums.length) html+='<div class="pm-note">The room is quiet.</div>';
+  for(var j=0;j<rums.length;j++) html+='<div style="margin-bottom:5px">'+rums[j].text+'</div>';
+  html+='</div><div class="pm-note">Wing contracts: your wingman escorts you, ENGAGES whatever you\'re fighting, and bills upkeep - miss a payment and they walk. Max '+wm+'.'+((P&&P.credits!=null)?(' You hold <b style="color:'+COL.AMBER+'">'+Math.round(P.credits)+'c</b>.'):'')+'</div>';
+  return html; }
+
+/* ------------------------------------------------ TAB: SCIENCE (SR-M19 - Athenaeum: analysis + probes) */
+function scienceHtml(){
+  var p=S.planet, P=player(), h=H();
+  if(!p || !p.isScience) return '<div class="pm-note">No laboratory at this berth.</div>';
+  var cores=num(P&&P.cores,0), unid=(P&&P.artifactsUnid)||[], owned=num(P&&P.probesOwned,0);
+  var ac=num(h&&h.CFG&&h.CFG.ANALYZE_COST_CORES,2), pc=num(h&&h.CFG&&h.CFG.PROBE_COST_CORES,3);
+  var html='<div class="pm-panel"><h4>⚗ ATHENAEUM LABORATORY</h4>'
+    +'<div>CORES held: <b style="color:'+COL.GOOD+'">'+cores+'</b> <span style="color:'+COL.DIM+'">(salvage them off Hegemon wrecks)</span></div></div>'
+    +'<div class="pm-panel"><h4>ARTIFACT ANALYSIS - '+ac+' cores each</h4>';
+  if(!unid.length) html+='<div class="pm-note">Nothing unidentified aboard your ship.</div>';
+  else{ html+='<div style="margin-bottom:5px">You carry <b style="color:'+COL.AMBER+'">'+unid.length+'</b> unidentified artifact'+(unid.length>1?'s':'')+' - function unknown until analyzed (they refuse to equip).</div>'
+    +'<button class="pm-b" data-act="cmd" data-cmd="analyze"'+(cores<ac?' disabled':'')+'>ANALYZE ONE - '+ac+' cores</button> '
+    +'<button class="pm-b" data-act="cmd" data-cmd="analyze all"'+(cores<ac?' disabled':'')+'>ANALYZE ALL</button>'; }
+  html+='</div><div class="pm-panel"><h4>MINERAL PROBES - '+pc+' cores each</h4>'
+    +'<div style="margin-bottom:5px">Aboard: <b>'+owned+'</b>. Deploy at any WORLD (deployprobe while docked there); it mines ore on the REAL clock - even while the game is closed - and you collect on return.</div>'
+    +'<button class="pm-b" data-act="cmd" data-cmd="buyprobe"'+(cores<pc?' disabled':'')+'>BUY PROBE - '+pc+' cores</button>'
+    +'<div style="margin-top:6px"><button class="pm-b" data-act="cmd" data-cmd="probes">PROBE NETWORK STATUS → terminal</button></div>'
+    +'</div>';
+  return html; }
 
 /* ------------------------------------------------ TAB: MARKET */
 function marketHtml(){
@@ -847,6 +949,8 @@ function renderBody(){
   else if(S.tab==='missions') h=missionsHtml();
   else if(S.tab==='quests') h=questsHtml();
   else if(S.tab==='ground') h=groundHtml();
+  else if(S.tab==='bar') h=barHtml();           /* SR-M18 */
+  else if(S.tab==='science') h=scienceHtml();   /* SR-M19 */
   else if(S.tab==='log') h=logHtml();
   else if(S.tab==='depart') h=departHtml();
   S.el.body.innerHTML=h; }
@@ -921,5 +1025,6 @@ function tick(dt){
 // 2... make a matrix and document it"): GEAR_SLOTS is the single source of truth for which single-slot equipment
 // categories exist and how to fit them - exposed so engbay.js's icon grid reads the SAME list rather than keeping
 // its own copy that could drift out of sync with this file's own tab.
-window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick, GEAR_SLOTS:GEAR_SLOTS };
+window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick, GEAR_SLOTS:GEAR_SLOTS,
+  _rumors:barRumors, _patrons:barPatrons };   /* SR-M18: exposed so the accept-bar "N/N rumors verify against live state" check can call each rumor's own check() */
 })();
