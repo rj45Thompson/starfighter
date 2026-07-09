@@ -266,6 +266,20 @@ function ask(text) {
     graph.edges.push({ a: ge.s, b: ge.o, r: ge.r, tier: ge._tier }); }
   askLine('<b style="color:' + CFG.COL_HL + '">&gt; ' + esc(text) + '</b>');
   feedLog('ask', 'QUERY: ' + esc(clip(text, 60)));
+  // SOBER PRE-GATE (AGI_SALVAGE port, 2026-07-09): the 3-check refuse-BEFORE-answer gate fronts everything -
+  // a query with a fabricated identifier or uncoverable content is refused AT THE DOOR with the exact reason,
+  // instead of falling through to a generic abstain. Two independent gates (this + the iron-rule gate inside
+  // the mind) = over-determination at the SYSTEM level.
+  if (win() && win().SOBER) {
+    var sv = null; try { sv = win().SOBER.check(text); } catch (e) {}
+    if (sv && sv.decision !== 'commit') {
+      var col = sv.decision === 'refuse_unaddressable' ? CFG.COL_WARN : CFG.COL_DIM;
+      askLine('<b style="color:' + CFG.COL_WARN + '">SOBER GATE: ' + esc(sv.decision.toUpperCase()) + '</b> - ' + esc(sv.reason), col);
+      if (sv.grounded && sv.grounded.length) askLine('grounded so far: ' + sv.grounded.map(esc).join(', ') + ' - narrow the question to those and I can walk them.', CFG.COL_DIM);
+      feedLog('ask', 'SOBER ' + sv.decision + ': ' + esc(clip(sv.reason, 70)));
+      return;
+    }
+  }
   var ents = groundEntities(text, graph);
   var steps = [];
   if (!ents.length) {

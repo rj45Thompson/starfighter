@@ -67,6 +67,7 @@ only over-determined (≥2 edge-disjoint evidence) or the mind ABSTAINS; GIVEN v
 | 2026-07-09 | Centroid category mind (one-hot + centroid + gate) | llmextractor exp1 proven pattern (NOT the below-chance SVD/chain) | `mind eval / classify / learn` | gated 100% on answered, 11 abstains, 6/6 learned facts correct |
 | 2026-07-09 | HF dataset training under iron rule | new | `mind eval` over `in_task` | see P10 row |
 | 2026-07-09 | **Kripke diamond** (modal □/◇ over minds-as-worlds) | TDRE/sober-ai Kripke *idea* | `kripke` / `kripke <s> <r> <o>` + □/◇ glyphs in observatory walks | 6/6 self-test; live verdicts name exactly which minds hold a secret |
+| 2026-07-09 | **sober_check gate** (3-check refuse-BEFORE-answer: grounding floor → identifier existence → prefix-stem coverage; NLI fallback honestly NOT ported - no model in-browser) | `sober-ai-complete\baseline_1\sober_ai_api.py:163`, source read verbatim first | `sober <question>` + pre-gate fronting every Observatory ask (two independent gates = system-level over-determination) | 8/8 self-test incl. two LIVE-caught adaptation fixes (identifier verdict must outrank the bare floor so fabricated names get NAMED; compound node ids must split before stemming or plain-word queries can't be covered by the facts that ground them); live: fake tool refused by name, real queries commit |
 
 ## How we handle "stuff all over, some might work, some might not"
 1. **Name everything here** — an implementation listed as 🪦 is not lost; it's credited and findable.

@@ -501,7 +501,13 @@ function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
    Engineering Bay's job and is deliberately NOT here - and hull purchases are deliberately NOT in the Bay. */
 function shopRow(name, stat, cost, cmd, tag){
   var P=player(); var afford = cost==null || num(P&&P.credits,0)>=cost;
-  return '<div class="pm-row"><div class="pm-grow"><b>'+esc(name)+'</b>'
+  /* SR:AWA parity slice (2026-07-09): every row carries a hover tooltip with the full item card - name, stats,
+     price, affordability - the way SR surfaces item info without opening anything. Composed from the row's own
+     data, so no caller changes and no second source of truth. */
+  var tip = name + (stat? (' | ' + String(stat).replace(/<[^>]*>/g,'')) : '')
+    + ' | ' + (cost? (cost + 'c' + (afford? '' : ' (you hold ' + Math.round(num(P&&P.credits,0)) + 'c - short ' + Math.round(cost-num(P&&P.credits,0)) + 'c)')) : 'free')
+    + (tag==='fitted' ? ' | currently fitted' : (cmd? (' | buys via: ' + cmd) : ''));
+  return '<div class="pm-row" title="'+esc(tip)+'"><div class="pm-grow"><b>'+esc(name)+'</b>'
     + (stat?(' <span class="pm-sub">'+stat+'</span>'):'') + '</div>'
     + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+';min-width:56px;text-align:right">'+(cost?fmtC(cost):'free')+'</div>'
     + (tag==='fitted' ? '<span class="pm-tag mk" style="min-width:52px;text-align:center">FITTED</span>'
