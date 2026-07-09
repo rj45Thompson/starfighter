@@ -299,11 +299,16 @@ function build(parentEl) {
   var title = el('div', 'font-weight:800;letter-spacing:.02em;color:' + CFG.COL_ACCENT + ';text-shadow:0 0 12px ' + CFG.COL_ACCENT + '66');
   title.innerHTML = '◈ AGI TEST - <span style="color:#dff2ff">reasoning substrate</span> ' +
     '<span style="color:' + CFG.COL_ONLINE + ';font-size:9px;letter-spacing:.14em">LIVE</span>';
+  // KNOWLEDGE OBSERVATORY (user 2026-07-09): expand this small HUD into the fullscreen screen (knowledge_screen.js)
+  var expandBtn = el('div',
+    'cursor:pointer;color:#7fa6bd;font-weight:800;padding:0 4px;line-height:1;margin-left:auto;margin-right:2px', '⛶');
+  expandBtn.title = 'FULLSCREEN observatory - big graph + the fed novel + live activity + talk to it (command: observatory)';
+  expandBtn.onclick = function () { var w = win(); if (w && w.KOBS && typeof w.KOBS.open === 'function') w.KOBS.open(); };
   var closeBtn = el('div',
     'cursor:pointer;color:#7fa6bd;font-weight:800;padding:0 4px;line-height:1', '✕');
   closeBtn.title = 'hide (toggle: knowhud command / K key)';
   closeBtn.onclick = function () { hide(); };
-  head.appendChild(title); head.appendChild(closeBtn);
+  head.appendChild(title); head.appendChild(expandBtn); head.appendChild(closeBtn);
   root.appendChild(head);
 
   // sub-caption: makes the intent explicit - this is a probe, not a game panel
