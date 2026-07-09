@@ -77,6 +77,13 @@
     background:#0a1420ee; border:1px solid #3a6a8a; color:#eaf2ff; }
   #micBtn.live{ background:#5a1e2ccc; border-color:#ff6a6e; animation:micpulse 1.1s ease-in-out infinite; }
   @keyframes micpulse{ 0%,100%{ opacity:1; } 50%{ opacity:.5; } }
+  /* 🔊 voice-OUTPUT toggle (chatter.js speechSynthesis) - was terminal-command-only (`voices on`), which meant the
+     ONLY visible voice affordance (the mic, STT input) never turned on the reply-aloud half - a real "speech never
+     worked" trap since clicking the one thing you can see gets you a silent text reply. Docks beside #micBtn. */
+  #voiceBtn{ position:fixed; z-index:7; bottom:12px; width:34px; height:34px; border-radius:9px; font-size:16px;
+    line-height:32px; text-align:center; padding:0; cursor:pointer; pointer-events:auto;
+    background:#0a1420ee; border:1px solid #3a6a8a; color:#eaf2ff; }
+  #voiceBtn.on{ background:#123a2ccc; border-color:#7fdc8a; }
   #market{ position:fixed; top:10px; transform:translateX(-50%); z-index:6; pointer-events:none;
     background:#0a1420dd; border:1px solid #223span; border:1px solid #22344a; border-radius:9px; padding:8px 10px;
     max-width:min(94vw,860px); max-height:80vh; overflow:auto; }   /* SR wave grew to 16 planets - the table now exceeds the main viewport; scroll rather than run off-screen unreachably */
@@ -135,6 +142,7 @@
 <div id="vdiv"></div><div id="hdiv"></div>
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="type anything - commands run ('help')  ·  ask ORION what are you doing  ·  orders in plain English  ·  everything else reaches the thing living behind your ears">
 <button id="micBtn" type="button" title="talk instead of type - click for one line, or `talk on` for a hands-free conversation">🎤</button>
+<button id="voiceBtn" type="button" title="hear the Passenger and pilots speak ALOUD (off by default - click to toggle, or type `voices on`)">🔇</button>
 <div id="touchbar">
   <button id="tbView"  title="cycle view">VIEW</button>
   <button id="tbDock"  title="dock nearest / base">DOCK</button>
@@ -150,38 +158,38 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708at"></script>
-<script src="fflate.min.js?v=20260708at"></script>
-<script src="fbxloader.js?v=20260708at"></script>
+<script src="three.min.js?v=20260709a"></script>
+<script src="fflate.min.js?v=20260709a"></script>
+<script src="fbxloader.js?v=20260709a"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708at"></script>
-<script src="inhabitant.js?v=20260708at"></script>
-<script src="passenger.js?v=20260708at"></script>
-<script src="gamemod.js?v=20260708at"></script>
-<script src="chatter.js?v=20260708at"></script>
-<script src="speech_input.js?v=20260708at"></script>
-<script src="vision.js?v=20260708at"></script>
-<script src="deliberate.js?v=20260708at"></script>
-<script src="knowledge.js?v=20260708at"></script>
-<script src="acquire.js?v=20260708at"></script>
-<script src="sound.js?v=20260708at"></script>
-<script src="hullmodels.js?v=20260708at"></script>
-<script src="knowledge_hud.js?v=20260708at"></script>
-<script src="thoughts.js?v=20260708at"></script>
-<script src="tami_battle_ui.js?v=20260708at"></script>
-<script src="power_panel.js?v=20260708at"></script>
-<script src="panels.js?v=20260708at"></script>
-<script src="engbay.js?v=20260708at"></script>
+<script src="speech_tier.js?v=20260709a"></script>
+<script src="inhabitant.js?v=20260709a"></script>
+<script src="passenger.js?v=20260709a"></script>
+<script src="gamemod.js?v=20260709a"></script>
+<script src="chatter.js?v=20260709a"></script>
+<script src="speech_input.js?v=20260709a"></script>
+<script src="vision.js?v=20260709a"></script>
+<script src="deliberate.js?v=20260709a"></script>
+<script src="knowledge.js?v=20260709a"></script>
+<script src="acquire.js?v=20260709a"></script>
+<script src="sound.js?v=20260709a"></script>
+<script src="hullmodels.js?v=20260709a"></script>
+<script src="knowledge_hud.js?v=20260709a"></script>
+<script src="thoughts.js?v=20260709a"></script>
+<script src="tami_battle_ui.js?v=20260709a"></script>
+<script src="power_panel.js?v=20260709a"></script>
+<script src="panels.js?v=20260709a"></script>
+<script src="engbay.js?v=20260709a"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708at"></script>
-<script src="conquest.js?v=20260708at"></script>
-<script src="missions.js?v=20260708at"></script>
-<script src="planetmenu.js?v=20260708at"></script>
-<script src="textquests.js?v=20260708at"></script>
+<script src="starmap.js?v=20260709a"></script>
+<script src="conquest.js?v=20260709a"></script>
+<script src="missions.js?v=20260709a"></script>
+<script src="planetmenu.js?v=20260709a"></script>
+<script src="textquests.js?v=20260709a"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -295,12 +303,17 @@ const CFG = {
   // appear... once the hegemon main base... is destroyed they will fight it out shortly after... to make the game
   // end" - explicitly flagged as a first pass, "for now we might change that"). MATCH_DURATION_S force-spawns the
   // Stronghold (the existing M12 boss node - "the hegemon main base") if it hasn't already risen naturally via
-  // escalation by then, so a calm playthrough still gets a boss on a predictable clock. Destroying the Stronghold
-  // now triggers an IMMEDIATE decisive warWin() (was previously just a warScore nudge toward the tug-of-war
-  // threshold) - genre logic: kill the boss, the campaign ends, full stop, rather than requiring the front to also
-  // separately tip past WIN_THRESHOLD. MATCH_END_DELAY_S is the "fight it out shortly after" beat - the victory/
-  // defeat banner has time to read before the galaxy actually resets under the player.
+  // escalation by then, so a calm playthrough still gets a boss on a predictable clock. MATCH_END_DELAY_S is the
+  // "fight it out shortly after" beat - the victory/defeat banner has time to read before the galaxy resets.
   MATCH_DURATION_S:1200, MATCH_END_DELAY_S:7,
+  // STARBLAST-STYLE FINALE (user 2026-07-09 "destroy it's base and then a huge enemy will appear like starblast -
+  // follow the starblast ending rules" - this game's own stated original inspiration): destroying the Stronghold no
+  // longer decisively ends the match by itself (that was the first pass, explicitly flagged as changeable above) -
+  // instead ONE huge one-off enemy emerges from the wreckage (spawnFinaleEnemy, reuses addPirate()'s full ships[]/
+  // AI/collision plumbing rather than a bespoke entity), and killing THAT is what actually calls warWin() (see the
+  // isFinale check in killByShip). Multipliers are relative to the top standing Hegemon tier (Warlord) so the
+  // finale always scales with however tough the difficulty passes have made that tier.
+  FINALE_HP_MULT:6, FINALE_DMG_MULT:3, FINALE_SCALE:3.4, FINALE_BOUNTY:500, FINALE_NAME:'Hegemon Devastator',
   // SR-M20 campaign score formula (documented per the milestone's own accept bar): CAMPAIGN_SCORE = war*W_WAR +
   // wealth*W_WEALTH + rank*W_RANK + missions*W_MISSION + quests*W_QUEST + discoveries*W_DISCOVERY. Reflects the
   // player's whole career THIS GENERATION (no per-campaign snapshotting exists yet), evaluated fresh at each
@@ -1029,7 +1042,7 @@ function addDefender(p,target){ if(ships.length>=CFG.MAX_SHIPS) return null;
   const o=spriteText('',26,'#fff',{bg:'rgba(9,16,28,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS}); o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o;
   shipBlips[s.id]=topBlip('#cfe0f0',8,1); if(ASSETS.ready) applyShipModel(s); say(s,`${p.name} defense scrambled - intercepting.`); return s; }
 let pirateCd=0, chainSpeakCd=3;
-function addPirate(){ if(ships.filter(s=>s.team==='pirate').length>=enemyCap()) return null;
+function addPirate(force){ if(!force && ships.filter(s=>s.team==='pirate').length>=enemyCap()) return null;   // force: bypass the population cap for a guaranteed one-off spawn (the finale enemy - see spawnFinaleEnemy)
   const ti=Math.max(0, hegTier()-(rand(0,1)<0.4?1:0)), HT=HEG_TIERS[ti];   // mostly current tier, some lower
   const lawlessSys=systems.find(sy=>sy.lawless);
   const sys=(lawlessSys && rand(0,1)<CFG.LAWLESS_SPAWN_BIAS) ? lawlessSys : (systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()});
@@ -1049,6 +1062,28 @@ function addPirate(){ if(ships.filter(s=>s.team==='pirate').length>=enemyCap()) 
   novelSeedDispos();   // N3: e.g. PYXIS.rel.MOROS (betrayed) seeds the moment MOROS actually flies
   const o=spriteText('',26,'#fff',{bg:'rgba(30,9,9,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS}); o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o;
   shipBlips[s.id]=topBlip('#'+new T.Color(HT.col).getHexString(),9+ti*3,1); if(ASSETS.ready) applyShipModel(s); return s; }
+// STARBLAST-STYLE FINALE: the one huge enemy that emerges when the Stronghold falls (see destroyStronghold).
+// Reuses addPirate(force=true) for the full ships[]/AI/collision/rendering plumbing rather than a bespoke entity
+// (matching the codebase's own spawn-then-relocate-then-restat idiom already used for Stronghold reinforcements),
+// then overrides stats/appearance to something genre-appropriately huge. Marked s.isFinale so killByShip knows
+// THIS particular kill is what should call warWin(), not the Stronghold's destruction itself anymore.
+function spawnFinaleEnemy(pos,sys){
+  const p=addPirate(true); if(!p) return null;
+  const HT=HEG_TIERS[HEG_TIERS.length-1];   // scale off the top standing tier (Warlord) so difficulty passes always carry through
+  p.pos.copy(pos); p.hp=p.maxHp=HT.hp*CFG.FINALE_HP_MULT; p.tierDmg=HT.dmg*CFG.FINALE_DMG_MULT; p.tier=HEG_TIERS.length;
+  p.bounty=CFG.FINALE_BOUNTY; p.isFinale=true; p.name=CFG.FINALE_NAME; p.weaponType='flame';
+  p.mesh.scale.setScalar(CFG.FINALE_SCALE);   // .scale is safe on any Object3D/Group regardless of mesh structure
+  // recolor is BEST-EFFORT only: addPirate() may already have swapped p.mesh from the simple placeholder to a
+  // loaded FBX model (applyShipModel, when ASSETS.ready) - a real multi-mesh hierarchy with no guaranteed
+  // children[0].material shape, unlike the placeholder the rest of addPirate()'s OWN recolor code assumes. The
+  // finale is still fully correct without this (name/hp/dmg/isFinale/scale are what the mechanic depends on).
+  try{ p.mesh.children[0].material.color.set(0x1a0505); p.mesh.children[0].material.emissive.set(0xff2200).multiplyScalar(0.55); }catch(e){}
+  if(shipBlips[p.id]){ shipBlips[p.id].material.color.set(0xff2200); shipBlips[p.id].scale.setScalar(30); }
+  if(sys) sys.contested=true;
+  ev(`<b>☠☠ ${CFG.FINALE_NAME} HAS EMERGED</b> from the Stronghold's wreckage - destroy it to end this.`);
+  flashBanner('☠☠ '+CFG.FINALE_NAME.toUpperCase()+'<br><span style="font-size:17px;font-weight:600">the wreckage was a shell - a war-titan claws free</span>','#ff3020');
+  if(window.SOUND) try{ SOUND.play('alarm'); }catch(e){}
+  return p; }
 function removeShip(s){ const i=ships.indexOf(s); if(i<0) return; scene.remove(s.mesh);
   if(SPEAK[s.id]){ scene.remove(SPEAK[s.id].sp); delete SPEAK[s.id]; } if(shipBlips[s.id]){ scene.remove(shipBlips[s.id]); delete shipBlips[s.id]; }
   delete shipById[s.id]; ships.splice(i,1); if(focus>=ships.length) focus=Math.max(0,ships.length-1); }
@@ -1110,7 +1145,7 @@ function makeStronghold(sys){ const c=sys.center.clone().add(new T.Vector3(rand(
   stronghold={ pos:c, system:sys, hull:CFG.STRONGHOLD_HULL, maxHull:CFG.STRONGHOLD_HULL, hullT:0, alive:true, name:'Stronghold', mesh:m, halo, label:lab, blip:topBlip('#ff3020',22,1) }; stronghold.blip.position.copy(c);
   sys.contested=true; ev(`<b>☠ A HEGEMON STRONGHOLD has risen in ${sys.name}</b> - assault it (assault) to break the front.`);
   flashBanner('☠ HEGEMON STRONGHOLD<br><span style="font-size:17px;font-weight:600">risen in '+sys.name+' - assault it</span>','#ff6a6a'); }
-function destroyStronghold(killer){ if(!stronghold) return; const sys=stronghold.system; stronghold.alive=false;
+function destroyStronghold(killer){ if(!stronghold) return; const sys=stronghold.system, pos=stronghold.pos.clone(); stronghold.alive=false;
   if(window.MISSIONS&&MISSIONS.onStrongholdDown) try{ MISSIONS.onStrongholdDown(); }catch(e){}   // ASSAULT missions complete here
   scene.remove(stronghold.mesh); if(stronghold.label) scene.remove(stronghold.label.sp); if(stronghold.blip) scene.remove(stronghold.blip);
   burst(stronghold.pos,0xff5a30,60,40,7); burst(stronghold.pos,0xffcf52,40,30,5);
@@ -1122,11 +1157,13 @@ function destroyStronghold(killer){ if(!stronghold) return; const sys=stronghold
   flashBanner('★ STRONGHOLD DESTROYED ★<br><span style="font-size:17px;font-weight:600">the Hegemon front buckles (+'+CFG.STRONGHOLD_REWARD+'c)</span>','#8fffa8');
   ev(`STRONGHOLD DESTROYED in ${sys?sys.name:'the front'} - escalation −${CFG.STRONGHOLD_ESC_CUT}, front +${CFG.STRONGHOLD_WARSCORE}, +${CFG.STRONGHOLD_REWARD}c.`);
   term(`☠→★ You broke the Hegemon Stronghold. +${CFG.STRONGHOLD_REWARD}c, escalation crushed.`,'sys'); stronghold=null;
-  // MATCH STRUCTURE (user 2026-07-08): the boss node IS "the hegemon main base" - destroying it now decisively ends
-  // the match (immediate warWin()) rather than only nudging the front tug-of-war toward WIN_THRESHOLD. Guarded on
-  // matchEndCd==null so a same-frame collision with warTick's OWN independent threshold check (front tug-of-war
-  // happened to also cross WIN_THRESHOLD the instant the stronghold died) can't double-fire campaign++ / the banner.
-  if(matchEndCd==null) warWin(); }
+  // STARBLAST-STYLE FINALE (user 2026-07-09): the boss node IS "the hegemon main base", but destroying it no longer
+  // decisively ends the match by itself (that was the first pass - see CFG's own note on FINALE_* above). Instead
+  // ONE huge finale enemy emerges from the wreckage; killing THAT is the real win condition (killByShip's isFinale
+  // check). Guarded on matchEndCd==null so a same-frame collision with warTick's OWN independent threshold check
+  // (front tug-of-war happened to also cross WIN_THRESHOLD the instant the stronghold died) can't spawn a finale
+  // that immediately outlives a reset already underway from the other path.
+  if(matchEndCd==null) spawnFinaleEnemy(pos,sys); }
 function strongholdTick(dt){
   if(!stronghold){ if(escalation>=CFG.STRONGHOLD_ESC || T0>=CFG.MATCH_DURATION_S){ const cs=systems.filter(sy=>sy.contested), sy=cs.length?cs[randi(0,cs.length-1)]:systems[randi(0,systems.length-1)]; if(sy) makeStronghold(sy); } return; }
   if(T0-(stronghold.hullT||0)>3 && stronghold.hull<stronghold.maxHull) stronghold.hull=Math.min(stronghold.maxHull, stronghold.hull+CFG.STRONGHOLD_REGEN*dt);   // self-heals unless under fire
@@ -1676,7 +1713,11 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   if(killer&&killer.alive){ killer.score+=CFG.KILL_BOUNTY+(wasPirate?(victim.tier||0):0); checkRankUp(killer); if(killer.inhabitant) INH.onKill(victim);   // M5: kills advance rank · I2: destroyed_foe episode
     if(wasPirate){ const bty=victim.bounty||CFG.PIRATE_LOOT; killer.credits+=bty; say(killer,`Splashed ${victim.name} - +${bty}c bounty!`);
       if(killer.team==='squad'){ const np=nearestPlanet(victim.pos); if(np) repAdd(np,CFG.REP_KILL_HEG); if(killer.role==='player') contractKill(); } }   // M2 standing + M4 bounty
-    else say(killer,`Splashed ${victim.name}!`); } }
+    else say(killer,`Splashed ${victim.name}!`); }
+  // STARBLAST-STYLE FINALE: this ship WAS the one-off boss spawned when the Stronghold fell (spawnFinaleEnemy) -
+  // its death is the real win condition now, not the Stronghold's. Guarded the same way as the old Stronghold path.
+  if(victim.isFinale && matchEndCd==null){ ev(`<b>☠☠→★ ${CFG.FINALE_NAME} DESTROYED</b> - the Hegemon's last stand is broken.`);
+    term(`★★ You destroyed the ${CFG.FINALE_NAME}. The Hegemon's back is broken.`,'sys'); warWin(); } }
 function destroyAsteroid(i,owner){ const a=asteroids[i]; if(owner) owner.score+=a.level;
   if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
@@ -1887,6 +1928,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'voices', desc:'hear the pilots and me speak ALOUD: voices, voice, audio, sound, speech, talk out loud, text-to-speech, tts, mute, unmute, silence, hear the radio - per-pilot voices, mine low and slow', usage:'voices on|off · voice test <pilot>'},
   {name:'talk',   desc:'hands-free voice conversation with me: talk, mic, microphone, listen, speech-to-text, stt, speech recognition, voice input, speak to me out loud instead of typing - click the 🎤 for one line, or talk on for a full back-and-forth', usage:'talk on|off · click 🎤 for one line'},
   {name:'leaderboard', desc:'the ranger leaderboard: hall of fame, rankings, top pilots, high scores, best rangers ever, standings across every generation/epoch - you\'re on it too', usage:'leaderboard · leaderboard 25 (top 25)'},
+  {name:'newgame', desc:'start a fresh campaign on demand: newgame, restart, reset the galaxy, new campaign, start over - resets the war front/territory/your ship, but the knowledge graphs (every shared+private fact the minds earned) persist, same as a normal generation reset', usage:'newgame · newgame confirm'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2773,6 +2815,15 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const P=ships[0], mine=rows.filter(r=>r.isPlayer);
     if(P && mine.length){ const best=mine[0], bestRank=rows.indexOf(best)+1; term(`&nbsp;&nbsp;<span style="opacity:.6">your best: #${bestRank} · score ${best.score} · generation ${best.generation}</span>`,'sys'); }
     return; }
+  // MANUAL RESET (user 2026-07-09 "add ability to start a new game" - previously only fired automatically at
+  // match-end via matchEndTick). Reuses the SAME HOST.onNewGeneration() every automatic reset already goes
+  // through (galaxy/war/territory reset, GAME_KNOW untouched by design) - no second reset path to keep in sync.
+  // Confirm-gated via a second typed word (`newgame confirm`) rather than a browser confirm() popup - no other
+  // terminal command in this game triggers a native dialog, and a mid-terminal-flow one would be jarring.
+  if(c==='newgame'||c==='restart'){
+    if((a[1]||'').toLowerCase()!=='confirm'){ term('⚠ this ends your current campaign now and resets the war front/territory/your ship - the knowledge graphs (every shared+private fact the minds earned) are NOT affected. Type <b>newgame confirm</b> to proceed.','sys'); return; }
+    if(window.HOST&&typeof HOST.onNewGeneration==='function') HOST.onNewGeneration();
+    term('🌌 new campaign started on request.','sys'); return; }
   if(c==='mute'){ if(window.SOUND){ const m=SOUND.toggleMute?SOUND.toggleMute():(SOUND.setMute(!SOUND.muted()),SOUND.muted()); term(`sound ${m?'muted':'on'}.`,'sys'); } return; }
   if(c==='volume'||c==='vol'){ if(window.SOUND){ const v=Math.max(0,Math.min(1,parseFloat(a[1])||0.6)); SOUND.setVolume(v); SOUND.play('ui'); term(`volume ${Math.round(v*100)}%.`,'sys'); } return; }
   if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
@@ -3975,8 +4026,9 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
     lt.style.display=soloView==='top'?'block':'none'; lb.style.display=soloView==='brain'?'block':'none';
     lt.style.left='10px'; lt.style.top='34px'; lb.style.left='10px'; lb.style.top='34px';
     document.getElementById('vdiv').style.display='none'; document.getElementById('hdiv').style.display='none'; }
-  { const ce=document.getElementById('chat'), mb=document.getElementById('micBtn');   // 🎤 always docks just right of #chat's ACTUAL rendered edge (works under the mobile !important override too)
-    if(ce&&mb) mb.style.left=(ce.offsetLeft+ce.offsetWidth+6)+'px'; } }
+  { const ce=document.getElementById('chat'), mb=document.getElementById('micBtn'), vb=document.getElementById('voiceBtn');   // 🎤 always docks just right of #chat's ACTUAL rendered edge (works under the mobile !important override too); 🔊 docks just right of #micBtn the same way
+    if(ce&&mb) mb.style.left=(ce.offsetLeft+ce.offsetWidth+6)+'px';
+    if(mb&&vb) vb.style.left=(mb.offsetLeft+mb.offsetWidth+6)+'px'; } }
 function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
 function renderAll(){ renderer.setScissorTest(true); renderView(VIEW.main,scene,chaseCam); renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam); renderer.setScissorTest(false); }
 
@@ -4267,7 +4319,21 @@ chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
 (function(){ const mb=document.getElementById('micBtn'); if(!mb) return;
   mb.onclick=()=>{ if(!window.SPEECH_IN||!SPEECH_IN.supported){ term('no speech recognition in this browser (try Chrome/Edge)','err'); return; }
     if(SPEECH_IN.continuous){ SPEECH_IN.setContinuous(false); term('🎙 talk mode off.','sys'); return; }   // clicking during hands-free mode is the natural "stop"
+    // clicking the mic to TALK is an unambiguous "I want a voice interaction" signal - opt into HEARING the reply
+    // too, same as `talk on` already does. Without this, the only visible voice affordance produced silent text
+    // replies unless the player separately knew the hidden `voices on` command existed.
+    if(!SPEECH_IN.listening && window.CHATTER) CHATTER.setVoices(true);
     SPEECH_IN.toggle(); }; })();
+// 🔊 visible voice-OUTPUT toggle (independent of the mic - lets ambient pilot chatter/Passenger lines speak aloud
+// without needing to talk into the mic at all, or know the terminal command). Polls CHATTER.voicesOn() every
+// 500ms (matching this codebase's existing HOST-state-poll idiom, e.g. engbay.js/power_panel.js) so it stays in
+// sync no matter which of the 3 other paths (this button, `voices on/off`, `talk on/off`, the mic auto-enable
+// above) last changed it - no pub/sub wiring needed for a value this cheap to re-check.
+(function(){ const vb=document.getElementById('voiceBtn'); if(!vb) return;
+  function paint(){ const on=!!(window.CHATTER&&CHATTER.voicesOn()); vb.classList.toggle('on',on); vb.textContent=on?'🔊':'🔇'; }
+  vb.onclick=()=>{ if(!window.CHATTER) return; CHATTER.setVoices(!CHATTER.voicesOn()); paint();
+    term(CHATTER.voicesOn()?'🔊 voices ON - the Passenger and pilots will speak aloud.':'🔇 voices off.','sys'); };
+  setInterval(paint,500); paint(); })();
 
 // ---- interactive TOP-DOWN + REASONING views: wheel=zoom, drag=pan, click=inspect (top-down), dbl-click=reset ----
 const canvas=renderer.domElement;
