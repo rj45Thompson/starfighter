@@ -13,6 +13,20 @@
   .hud{ position:fixed; pointer-events:none; text-shadow:0 1px 3px #000b; z-index:5; }
   #creditsHud{ right:14px; top:12px; font:800 15px/1 ui-monospace,monospace; letter-spacing:.04em; color:#ffcf52;
     background:#0c1623cc; border:1px solid #3a3020; border-radius:7px; padding:6px 12px; }   /* user 2026-07-08: "I can't see my credits on the main screen" - always-visible, not buried inside the market panel */
+  /* BACKLOG 2026-07-08 "gear-icon options menu with Reset Layout button": mirrors #rosterWrap's left:14px;top:44px
+     placement on the right side, one row below #creditsHud so the two never collide. */
+  #gearBtn{ position:fixed; right:14px; top:44px; z-index:20; width:30px; height:30px; pointer-events:auto; cursor:pointer;
+    background:#0c1623cc; border:1px solid #29405a; border-radius:7px; color:#8fb0cc; font-size:15px;
+    display:flex; align-items:center; justify-content:center; }
+  #gearBtn:hover{ border-color:var(--cyan); color:var(--cyan); }
+  #gearMenu{ position:fixed; right:14px; top:80px; z-index:20; display:none; pointer-events:auto;
+    background:#0c1623ee; border:1px solid #29405a; border-radius:8px; padding:8px; min-width:170px;
+    font:11px ui-monospace,monospace; color:#cfe2f5; box-shadow:0 6px 26px #000a; }
+  #gearMenu.open{ display:block; }
+  #gearMenu .gm-hdr{ font-size:9px; letter-spacing:.1em; color:#6f93a8; margin-bottom:6px; }
+  #gearMenu button{ display:block; width:100%; text-align:left; background:#152234; border:1px solid #29405a;
+    color:#cfe2f5; border-radius:5px; padding:6px 8px; cursor:pointer; font:11px ui-monospace,monospace; }
+  #gearMenu button:hover{ border-color:var(--red); color:var(--red); }
   #pillars{ left:14px; top:12px; display:flex; gap:7px; flex-wrap:wrap; max-width:52%; }
   .pill{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.1em; color:#8fb0cc;
     border:1px solid #29405a; background:#0c1623aa; border-radius:5px; padding:4px 7px; }
@@ -110,6 +124,8 @@
 <div id="stage"></div>
 <div id="hitfx" style="position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .05s linear"></div>
 <div class="hud" id="creditsHud">0c</div>
+<button id="gearBtn" type="button" title="options">⚙</button>
+<div id="gearMenu"><div class="gm-hdr">OPTIONS</div><button id="resetLayoutBtn">RESET LAYOUT</button></div>
 <div class="hud" id="pillars"></div>
 <div class="hud" id="rosterWrap"><div id="roster"></div></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
@@ -134,38 +150,38 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708ap"></script>
-<script src="fflate.min.js?v=20260708ap"></script>
-<script src="fbxloader.js?v=20260708ap"></script>
+<script src="three.min.js?v=20260708as"></script>
+<script src="fflate.min.js?v=20260708as"></script>
+<script src="fbxloader.js?v=20260708as"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708ap"></script>
-<script src="inhabitant.js?v=20260708ap"></script>
-<script src="passenger.js?v=20260708ap"></script>
-<script src="gamemod.js?v=20260708ap"></script>
-<script src="chatter.js?v=20260708ap"></script>
-<script src="speech_input.js?v=20260708ap"></script>
-<script src="vision.js?v=20260708ap"></script>
-<script src="deliberate.js?v=20260708ap"></script>
-<script src="knowledge.js?v=20260708ap"></script>
-<script src="acquire.js?v=20260708ap"></script>
-<script src="sound.js?v=20260708ap"></script>
-<script src="hullmodels.js?v=20260708ap"></script>
-<script src="knowledge_hud.js?v=20260708ap"></script>
-<script src="thoughts.js?v=20260708ap"></script>
-<script src="tami_battle_ui.js?v=20260708ap"></script>
-<script src="power_panel.js?v=20260708ap"></script>
-<script src="panels.js?v=20260708ap"></script>
-<script src="engbay.js?v=20260708ap"></script>
+<script src="speech_tier.js?v=20260708as"></script>
+<script src="inhabitant.js?v=20260708as"></script>
+<script src="passenger.js?v=20260708as"></script>
+<script src="gamemod.js?v=20260708as"></script>
+<script src="chatter.js?v=20260708as"></script>
+<script src="speech_input.js?v=20260708as"></script>
+<script src="vision.js?v=20260708as"></script>
+<script src="deliberate.js?v=20260708as"></script>
+<script src="knowledge.js?v=20260708as"></script>
+<script src="acquire.js?v=20260708as"></script>
+<script src="sound.js?v=20260708as"></script>
+<script src="hullmodels.js?v=20260708as"></script>
+<script src="knowledge_hud.js?v=20260708as"></script>
+<script src="thoughts.js?v=20260708as"></script>
+<script src="tami_battle_ui.js?v=20260708as"></script>
+<script src="power_panel.js?v=20260708as"></script>
+<script src="panels.js?v=20260708as"></script>
+<script src="engbay.js?v=20260708as"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708ap"></script>
-<script src="conquest.js?v=20260708ap"></script>
-<script src="missions.js?v=20260708ap"></script>
-<script src="planetmenu.js?v=20260708ap"></script>
-<script src="textquests.js?v=20260708ap"></script>
+<script src="starmap.js?v=20260708as"></script>
+<script src="conquest.js?v=20260708as"></script>
+<script src="missions.js?v=20260708as"></script>
+<script src="planetmenu.js?v=20260708as"></script>
+<script src="textquests.js?v=20260708as"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -1903,7 +1919,11 @@ function passengerPowerTick(t){   // R2D2 MOMENT (user 2026-07-07): the parasite
   const P=ships[0]; if(P) setPower(P, p.sys, p.target);                  // the ACTUAL reroute - not just talk
   const col = p.urgency>=2?'#ff9a9a':(p.urgency>=1?'#ffcf8a':'#7fd0ff');
   paraLine('worm', `<span style="color:${col}">⚡ ${String(p.reason).replace(/</g,'&lt;')}</span>`);
-  if(window.CHATTER && CHATTER.voiceOn && CHATTER.voiceOn() && CHATTER.speakAloud) CHATTER.speakAloud('PASSENGER', p.reason);
+  // BUGFIX 2026-07-08 (user: "TTS/STT not working with Parasite"): this called CHATTER.voiceOn()/speakAloud(),
+  // neither of which the real chatter.js export has (it's voicesOn()/voiceSay()/voiceWorm()) - a silent dead call
+  // ever since this hook was written, confirmed via audit. voiceWorm is the exact function line 1836 already uses
+  // for this same "worm"/Parasite character, and it already internally checks voicesOn - no pre-check needed here.
+  if(window.CHATTER) CHATTER.voiceWorm(p.reason);
   if(window.SOUND) SOUND.play(p.urgency>=2?'alarm':'thought'); }
 function passengerAdviseTick(dt){
   if(!window.PASSENGER||!PASSENGER.adviceOn||!PASSENGER.adviceOn()) return;
@@ -1917,7 +1937,7 @@ function passengerAdviseTick(dt){
     _advLastKey=a.key; _advLastT=now;
     const col = a.urgency>=2?'#ff9a9a':(a.urgency>=1?'#ffcf8a':'#c9a0ff');
     paraLine('worm', `<span style="color:${col}">▸ ${String(a.text).replace(/</g,'&lt;')}</span>`);
-    if(window.CHATTER && CHATTER.voiceOn && CHATTER.voiceOn() && CHATTER.speakAloud) CHATTER.speakAloud('PASSENGER', a.text);
+    if(window.CHATTER) CHATTER.voiceWorm(a.text);   // BUGFIX 2026-07-08: same dead CHATTER.voiceOn()/speakAloud() call as passengerPowerTick above - see that fix's comment
   }
 }
 async function passengerSpeak(req){   // Qwen tier via the speech sidecar; server-side entity/number guard applies
@@ -3869,7 +3889,7 @@ let marketOn=true;
 // the M hotkey - that fixes "user don't know to hit M to lose the menu". A slider top-right drives transparency.
 if(window.PANELS){
   PANELS.register('market', document.getElementById('market'), { title:'MARKET', edge:'top', centerX:true, rgb:[10,20,32],
-    defaultOpacity:0.86, hotkeyLabel:'M',
+    defaultOpacity:0.86, hotkeyLabel:'M', resizable:true,   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
     onOpenChange:(open)=>{ marketOn=open; if(open) updateMarket(); } });
   PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
     defaultOpacity:0.91, hotkeyLabel:'`', resizable:true,   // user 2026-07-08: "make the terminal sizable and it should not change size unless I size it" - drag the corner grip
@@ -3879,7 +3899,7 @@ if(window.PANELS){
   // #rosterWrap (never touched) instead of #roster itself (which buildRoster() wipes wholesale with
   // innerHTML='' on every rebuild - ship deaths, Tab-cycling focus, etc.) so the pin/opacity chrome survives.
   const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
-    defaultOpacity:0.9 });
+    defaultOpacity:0.9, resizable:true });   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
 }
 // SR-M7 (REQUIREMENTS_SR.md) "honest-economy rule": the overview grid used to call priceOf() live for EVERY
 // planet regardless of whether you'd ever been there - an omniscient read (the exact thing the P4 economy
@@ -4061,7 +4081,7 @@ if(window.ENGBAY){ ENGBAY.mount(); }   // SHIP LAYOUT: starts unmounted-from-vie
 // HERE (after mount()) since PANELS needs the real DOM node, which only exists once each module has built it.
 if(window.PANELS){
   const khudEl=document.getElementById('khud'); if(khudEl) PANELS.register('khud', khudEl, { title:'KNOWLEDGE HUD', edge:'right', rgb:[10,14,24],
-    defaultOpacity:0.9, defaultOpen:false, defaultPinned:false, hotkeyLabel:'agi',
+    defaultOpacity:0.9, defaultOpen:false, defaultPinned:false, hotkeyLabel:'agi', resizable:true,   // BACKLOG 2026-07-08: was missing resizable
     onOpenChange:(open)=>{ if(window.KHUD&&KHUD.setShown) KHUD.setShown(open); } });   // BUGFIX 2026-07-08: keep KHUD's own H.shown in sync with PANELS' real open state, whatever triggers it; defaultPinned:false so it starts like every other panel instead of stuck-open
   // defaultOpen:true (user 2026-07-07: "i don't see the star wars tie fighter or xwing bars for laser speed and
   // shields") - this is core moment-to-moment combat HUD, the exact X-Wing/TIE-Fighter reference the user asked
@@ -4229,6 +4249,14 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
   const hold=(el,on)=>{ if(!el) return; el.addEventListener('touchstart',e=>{ e.preventDefault(); on(true); manOn(); },{passive:false}); const o=e=>{ e.preventDefault(); on(false); }; el.addEventListener('touchend',o); el.addEventListener('touchcancel',o); };
   hold(thb,v=>MAN.thr=v?1:0); hold(fb,v=>MAN.fire=v); })();
 (function(){ const b=document.getElementById('dockPromptBtn'); if(b) b.onclick=()=>{ const P=ships[0]; if(P&&dockTarget&&!P.docked){ completeDock(P,dockTarget,dockTarget===base); if(window.SOUND) SOUND.play('dock'); } }; })();
+// BACKLOG 2026-07-08 "gear-icon options menu with Reset Layout button": a tiny dropdown, currently one action.
+// resetLayout() wipes every panel's saved size/position/pin/opacity and reloads - confirm() first since a reload
+// mid-session is disruptive even though no game-save data is at risk (SR-M1 autosave/loadGame are untouched by this).
+(function(){ const gb=document.getElementById('gearBtn'), gm=document.getElementById('gearMenu'), rl=document.getElementById('resetLayoutBtn');
+  if(!gb||!gm||!rl) return;
+  gb.onclick=(e)=>{ e.stopPropagation(); gm.classList.toggle('open'); };
+  document.addEventListener('click',(e)=>{ if(gm.classList.contains('open') && !gm.contains(e.target) && e.target!==gb) gm.classList.remove('open'); });
+  rl.onclick=()=>{ if(window.confirm('Reset all panel layouts to default? This reloads the page - your game save is not affected.')){ if(window.PANELS&&PANELS.resetLayout) PANELS.resetLayout(); } }; })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }

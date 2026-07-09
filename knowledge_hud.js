@@ -34,10 +34,10 @@ var CFG = {
   MAX_SHARED_FACTS: 20,      // most-recent shared facts drawn in the node-edge viz
   MAX_PRIV_FACTS: 6,         // a few private facts (violet) drawn alongside, to show the two-tier split
   MAX_NODES: 34,             // hard cap on nodes rendered (keeps the little canvas legible)
-  CANVAS_W: 300,             // logical canvas width  (device-pixel-scaled at draw time)
-  CANVAS_H: 190,             // logical canvas height
+  CANVAS_W: 420,             // logical canvas width  (device-pixel-scaled at draw time) - BACKLOG 2026-07-08: "default larger", was 300
+  CANVAS_H: 280,             // logical canvas height - was 190
   NODE_R: 4.5,               // node dot radius (px, logical)
-  PANEL_W: 330,              // panel width (px)
+  PANEL_W: 460,              // panel width (px) - was 330; now resizable too (see PANELS.register('khud',...))
   COL_SHARED: '#37e0ff',     // cyan - SHARED knowledge (every AGI holds it)
   COL_SHARED_DIM: '#1c6f80', // dim cyan for shared edges
   COL_PRIV: '#b98cff',       // violet - PRIVATE knowledge (one mind's secret)
@@ -197,6 +197,7 @@ function drawGraph() {
   var state = store ? store.state : { shared: {}, priv: {} };
   var graph = buildGraph(state);
   var pos = layout(graph, w, h);
+  H._lastPos = pos; H._lastGraph = graph;   // BACKLOG 2026-07-08: cached for the tooltip mousemove hit-test wired in build() - correctly empty {} when the graph is empty, no special-casing needed
 
   if (Object.keys(graph.nodes).length === 0) {
     ctx.fillStyle = '#4a6172'; ctx.font = '11px ui-monospace,Menlo,Consolas,monospace';
@@ -321,6 +322,35 @@ function build(parentEl) {
   H.canvas = cv;
   try { H.ctx = cv.getContext ? cv.getContext('2d') : null; } catch (e) { H.ctx = null; }
 
+  // BACKLOG 2026-07-08 "add tooltips to knowledge graph HUD clickable elements": a positioned overlay div inside
+  // cwrap (position:relative) - drawGraph() caches the latest node positions + edges in H._lastPos/H._lastGraph
+  // every frame; a mousemove listener here hit-tests the cursor against those cached positions (no per-node DOM
+  // elements needed - the graph itself stays canvas-drawn, only the tooltip is real DOM).
+  var tip = el('div', 'position:absolute;pointer-events:none;z-index:2;display:none;max-width:240px;' +
+    'background:rgba(6,14,22,0.96);border:1px solid #2a4a5e;border-radius:5px;padding:5px 7px;' +
+    'font:10px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#dff2ff;box-shadow:0 4px 14px #000a');
+  cwrap.appendChild(tip); H.tipEl = tip;
+  cv.addEventListener('mousemove', function (ev) {
+    if (!H._lastPos || !H._lastGraph) { tip.style.display = 'none'; return; }
+    var rect = cv.getBoundingClientRect();
+    var scaleX = CFG.CANVAS_W / rect.width, scaleY = CFG.CANVAS_H / rect.height;
+    var mx = (ev.clientX - rect.left) * scaleX, my = (ev.clientY - rect.top) * scaleY;
+    var hitId = null, hitDist = (CFG.NODE_R + 4) * (CFG.NODE_R + 4);
+    for (var id in H._lastPos) { if (!H._lastPos.hasOwnProperty(id)) continue;
+      var p = H._lastPos[id]; var dx = p.x - mx, dy = p.y - my, d2 = dx * dx + dy * dy;
+      if (d2 <= hitDist) { hitId = id; hitDist = d2; } }
+    if (!hitId) { tip.style.display = 'none'; return; }
+    var edges = H._lastGraph.edges.filter(function (e) { return e.a === hitId || e.b === hitId; }).slice(0, 6);
+    var node = H._lastGraph.nodes[hitId];
+    var lines = edges.map(function (e) { return esc(e.a) + ' <span style="color:#6f93a8">' + esc(e.r) + '</span> ' + esc(e.b); });
+    tip.innerHTML = '<b style="color:' + (node && node.tier === 'shared' ? CFG.COL_SHARED : CFG.COL_PRIV) + '">' + esc(hitId) + '</b>' +
+      (lines.length ? '<br>' + lines.join('<br>') : '<br><span style="color:#6f93a8">no known relations</span>');
+    var tipX = (mx / scaleX) + 12, tipY = (my / scaleY) + 12;
+    if (tipX + 240 > rect.width) tipX = (mx / scaleX) - 240 - 4;   // flip left near the right edge
+    tip.style.left = tipX + 'px'; tip.style.top = tipY + 'px'; tip.style.display = 'block';
+  });
+  cv.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+
   // counters block
   var counters = el('div', 'margin-bottom:5px');
   root.appendChild(counters); H.counters = counters;
@@ -372,6 +402,8 @@ if (typeof require !== 'undefined' && require.main === module) {
     return {
       style: { cssText: '' }, children: [], innerHTML: '', textContent: '', title: '', id: '', width: 0, height: 0,
       appendChild: function (c) { this.children.push(c); return c; },
+      addEventListener: function () {},   // BACKLOG 2026-07-08: the new tooltip mousemove/mouseleave listeners need this stubbed
+      getBoundingClientRect: function () { return { left: 0, top: 0, width: CFG.CANVAS_W, height: CFG.CANVAS_H }; },
       getContext: function () {
         return {
           setTransform: function () {}, clearRect: function () {}, beginPath: function () {},

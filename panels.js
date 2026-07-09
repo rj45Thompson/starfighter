@@ -119,6 +119,16 @@ function clearSize(id){
   if(r.open && r.grip) positionGrip(r);
 }
 
+// BACKLOG 2026-07-08 "gear-icon options menu with Reset Layout button": wipes every panel's saved
+// size/position/pin/opacity preference (the entire STORE_KEY blob, not per-panel) and reloads - the simplest
+// reliable way to get back to shipped defaults, since register() already re-derives every default fresh from
+// opts whenever nothing is saved. localStorage.removeItem is synchronous (unlike save()'s own 200ms debounce),
+// so this is safe to call immediately before a reload with no risk of the clear losing a race with the write.
+function resetLayout(){
+  try{ localStorage.removeItem(CFG.STORE_KEY); }catch(e){}
+  if(typeof location!=='undefined') location.reload();
+}
+
 function closedTransform(edge, centerX){
   const base=centerX?'translateX(-50%) ':'';
   if(edge==='top') return base+'translateY(-140%)';
@@ -316,7 +326,7 @@ function isOpen(id){ const r=PANELS_[id]; return r?r.open:null; }
 function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
 
-const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize };
+const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize, resetLayout };
 if(typeof window!=='undefined') window.PANELS=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;
 })();
