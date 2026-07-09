@@ -26,11 +26,11 @@
 
 var CFG = {
   VIEWBOX: 1.35,          // half-extent of the schematic's normalized coordinate space (mount coords run ~-1.2..1.2)
-  PANEL_W: 340, PANEL_H: 400,
+  PANEL_W: 320,           // width of the schematic column inside the fullscreen frame (was the whole panel's width pre-fullscreen)
+  Z: 80,                  // FULLSCREEN 2026-07-08: above planetmenu.js's pmRoot (Z_INDEX 74) so this modal always sits on top of the docked menu it's embedding
   DOT_R: 0.10,             // weapon/gizmo mount circle radius (normalized units)
   DOT_R_REF: 0.065,        // primary/engine reference-point radius (smaller, non-interactive)
   TICK_LEN: 0.22,          // facing-direction tick length off a weapon mount
-  Z: 13,
   COL_HULL_FILL: 'rgba(70,214,255,0.07)', COL_HULL_STROKE: '#3a5a78',
   COL_EMPTY: '#1c2a3c', COL_EMPTY_STROKE: '#46617e',
   COL_WEAPON: '#ff6a6a', COL_WEAPON_DIM: '#5a2e2e',
@@ -110,24 +110,55 @@ function pickerHtml(h, kind, idx) {
     '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">mount in ' + kind + ' slot ' + (idx + 1) + ' - click one:</div>' + rows + '</div>';
 }
 
+// FULLSCREEN SHOP ATTACH (user 2026-07-08 "make the item shop a fullscreen window that attaches to the engineering
+// bay... the items would be showing what's at the nearest ranger station perhaps. same menu for now... or it will
+// just open the nearest stores to you. but still you need to travel to the planet or something"): when genuinely
+// docked, the RIGHT column embeds PLANETMENU's own hangarHtml() output verbatim - the identical shop/loadout UI the
+// docked menu already shows, not a rebuild. When not docked, it shows a READ-ONLY nearest-station name/distance
+// hint instead of any buy UI - deliberately no price list or mutate path here, since that would let a player shop
+// from anywhere; the existing dock-gated commands (hardpoint/gizmo mount, hull, upgrade, ...) remain the only way
+// to actually transact, same as always. "Still need to travel" is preserved by construction, not by a new check.
+function nearestStationHtml(h, s) {
+  var ns = (typeof h.nearestStation === 'function') ? h.nearestStation(s.pos) : null;
+  if (!ns) return '<div style="color:' + CFG.COL_DIM + '">no station data yet.</div>';
+  return '<div style="color:' + CFG.COL_TEXT + '"><b>' + esc(ns.name) + '</b>' + (ns.isBase ? ' <span style="color:' + CFG.COL_DIM + '">(Ranger Command)</span>' : '') +
+    '</div><div style="color:' + CFG.COL_DIM + ';margin-top:4px">' + ns.dist + 'u away - fly there and dock to browse and buy. ' +
+    'The shop only shows real, live stock while you\'re actually there - this is a distance hint, not a catalog.</div>';
+}
+
 function render() {
   if (!EB.body) return;
   var h = HOST();
   if (!h) { EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">waiting for game...</div>'; return; }
   var s = shipOr(h);
   if (!s) { EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">no ship.</div>'; return; }
-  if (!s.docked) {
-    EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">dock at a planet to edit your loadout (fly there, then reopen).</div>';
-    EB.pickIdx = null; return;
-  }
+
   var schema = mountSchema(h, s);
   var hull = h.HULLS[s.hullClass || 'fighter'];
-  var html = '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:4px"><b>' + esc(hull ? hull.n : s.hullClass) + '</b> - ' +
-    schema.weaponPoints.length + ' weapon mount' + (schema.weaponPoints.length === 1 ? '' : 's') + ', ' + schema.gizmoPoints.length + ' gizmo mount' + (schema.gizmoPoints.length === 1 ? '' : 's') + '</div>';
-  html += schematicSvg(h, s, schema);
-  html += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary weapon / engine, not editable here) - red = weapon hardpoint, blue = gizmo. Click empty to mount, filled to unmount.</div>';
-  if (EB.pickIdx != null && EB.pickType) html += pickerHtml(h, EB.pickType, EB.pickIdx);
-  EB.body.innerHTML = html;
+  var left = '<div style="width:' + CFG.PANEL_W + 'px;max-width:100%;flex:0 0 auto">' +
+    '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:4px"><b>' + esc(hull ? hull.n : s.hullClass) + '</b> - ' +
+    schema.weaponPoints.length + ' weapon mount' + (schema.weaponPoints.length === 1 ? '' : 's') + ', ' + schema.gizmoPoints.length + ' gizmo mount' + (schema.gizmoPoints.length === 1 ? '' : 's') + '</div>' +
+    schematicSvg(h, s, schema);
+  if (!s.docked) {
+    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dock at a planet or base to edit your loadout.</div>';
+    EB.pickIdx = null;
+  } else {
+    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary weapon / engine, not editable here) - red = weapon hardpoint, blue = gizmo. Click empty to mount, filled to unmount.</div>';
+    if (EB.pickIdx != null && EB.pickType) left += pickerHtml(h, EB.pickType, EB.pickIdx);
+  }
+  left += '</div>';
+
+  var w = win(); var pm = w && w.PLANETMENU;
+  var right = '<div style="flex:1 1 380px;min-width:320px;max-width:640px;border-left:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-left:14px">';
+  if (s.docked && pm && typeof pm.hangarHtml === 'function') {
+    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>SHOP - ' + esc(s.docked.name || 'docked') + '</b></div>' +
+      '<div id="engbayShop" data-engbay-shop="1">' + pm.hangarHtml() + '</div>';
+  } else {
+    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>NEAREST STATION</b></div>' + nearestStationHtml(h, s);
+  }
+  right += '</div>';
+
+  EB.body.innerHTML = left + right;
 }
 
 function onMountClick(kind, idx) {
@@ -155,35 +186,49 @@ function wireClicks() {
     if (pickEl) { onPick(EB.pickType, EB.pickIdx, pickEl.getAttribute('data-pick')); return; }
     var mountEl = ev.target.closest && ev.target.closest('[data-mount]');
     if (mountEl) { onMountClick(mountEl.getAttribute('data-mount'), parseInt(mountEl.getAttribute('data-idx'), 10)); return; }
+    // FULLSCREEN SHOP ATTACH: the embedded hangarHtml() markup uses data-act="cmd"/"tab"/"slot" (planetmenu.js's
+    // OWN click vocabulary, disjoint from data-pick/data-mount above) - delegate straight into PLANETMENU's real
+    // dispatcher so a click here has IDENTICAL effect to the same click inside the docked menu itself. The embedded
+    // shop HTML is a snapshot taken at the last render() - PLANETMENU's own dispatch mutates ITS OWN S.slotOpen/
+    // renders ITS OWN (now-hidden-behind-engbay) body, not this snapshot, so a manual render() right after is
+    // needed for the click to feel instant instead of waiting up to POLL_MS for the next poll tick to catch up.
+    var actEl = ev.target.closest && ev.target.closest('[data-act]');
+    if (actEl) { var w = win(); var pm = w && w.PLANETMENU; if (pm && typeof pm.onClick === 'function') { pm.onClick(ev); render(); } return; }
   });
 }
 
 function build() {
   if (EB.mounted) return;
   var d = doc(); if (!d) return;
-  var root = el('div', 'position:fixed;width:' + CFG.PANEL_W + 'px;max-height:' + CFG.PANEL_H + 'px;overflow-y:auto;' +
-    'background:#0a1220dd;border:1px solid #22344a;border-radius:8px;padding:8px;font:12px ui-monospace,monospace;z-index:' + CFG.Z + ';display:none;pointer-events:auto');
-  root.id = 'engbay';
-  var title = el('div', 'font-weight:800;color:#8fd0ff;margin-bottom:4px;letter-spacing:.04em', '◈ ENGINEERING BAY - SHIP LAYOUT');
-  var body = el('div', '');
-  root.appendChild(title); root.appendChild(body);
-  (d.body || d.documentElement).appendChild(root);
-  EB.root = root; EB.body = body; EB.mounted = true;
+  var backdrop = el('div', 'position:fixed;inset:0;z-index:' + CFG.Z + ';display:none;align-items:center;justify-content:center;' +
+    'background:rgba(4,8,14,0.82);pointer-events:auto');
+  backdrop.id = 'engbay';
+  var frame = el('div', 'position:relative;width:min(1150px,95vw);height:min(780px,92vh);display:flex;flex-direction:column;' +
+    'background:#0a1220ee;border:1px solid #22344a;border-radius:10px;padding:14px;font:12px ui-monospace,monospace;box-shadow:0 0 60px rgba(0,0,0,0.7)');
+  var head = el('div', 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex:0 0 auto');
+  var title = el('div', 'font-weight:800;color:#8fd0ff;letter-spacing:.04em;font-size:14px', '◈ ENGINEERING BAY - SHIP LAYOUT &amp; FITTING');
+  var closeBtn = el('button', 'background:#1c2a3c;border:1px solid #46617e;color:#cfe2f5;border-radius:6px;padding:6px 16px;cursor:pointer;font:12px ui-monospace,monospace;font-weight:700', '✕ CLOSE (E)');
+  closeBtn.addEventListener('click', function () { hide(); });
+  head.appendChild(title); head.appendChild(closeBtn);
+  var body = el('div', 'flex:1 1 auto;overflow-y:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap');
+  frame.appendChild(head); frame.appendChild(body);
+  backdrop.appendChild(frame);
+  backdrop.addEventListener('click', function (ev) { if (ev.target === backdrop) hide(); });   // click the dim backdrop (outside the frame) to close, same convention as most fullscreen modals
+  (d.body || d.documentElement).appendChild(backdrop);
+  EB.root = backdrop; EB.body = body; EB.mounted = true;
   wireClicks();
 }
 
+// FULLSCREEN 2026-07-08: self-managed, same pattern as planetmenu.js's own pmRoot - no PANELS involvement (a
+// fullscreen modal doesn't have an edge/pin/resize-grip concept to opt into).
 function show() {
   build();
-  var w = win();
-  if (w && w.PANELS && typeof w.PANELS.open === 'function') { w.PANELS.open('engbay'); }
-  else if (EB.root) { EB.root.style.display = 'block'; }
+  if (EB.root) EB.root.style.display = 'flex';
   EB.shown = true; render();
   clearInterval(EB.pollT); EB.pollT = setInterval(function () { if (EB.shown) render(); }, CFG.POLL_MS);
 }
 function hide() {
-  var w = win();
-  if (w && w.PANELS && typeof w.PANELS.close === 'function') { w.PANELS.close('engbay'); }
-  else if (EB.root) { EB.root.style.display = 'none'; }
+  if (EB.root) EB.root.style.display = 'none';
   EB.shown = false; clearInterval(EB.pollT); EB.pollT = null;
 }
 function toggle() { if (EB.shown) hide(); else show(); return EB.shown; }

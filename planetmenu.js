@@ -675,14 +675,20 @@ function hangarHtml(){
     + '<button class="pm-b pm-go" data-act="cmd" data-cmd="refuel"'+((fneed<1||S.isBase)?' disabled':'')+'>TOP OFF</button></div>';
   /* upgrades */
   var i;
+  // BALANCE 2026-07-08: reflect the new per-stat level cap here too - was showing an always-clickable UPGRADE
+  // button with no ceiling. NOTE: must call H() here, not reference the bare `h` - this function's own local `h`
+  // (line ~650) is the HTML STRING ACCUMULATOR, not the host accessor - a real bug caught by live-verifying the
+  // rendered button (showed no MAX state at all) rather than trusting the diff looked right.
+  var hostCfg = H(); var upCap = (hostCfg&&hostCfg.CFG&&hostCfg.CFG.UP_LVL_CAP)||Infinity;
   for(i=0;i<CFG.UP_KINDS.length;i++){ var u=CFG.UP_KINDS[i];
     var lvl=(P.lvl&&typeof P.lvl[u.k]==='number')?P.lvl[u.k]:1;
+    var atCap = lvl>=upCap;
     var cost=upCostEst(P,u.k);
     var afford=isFinite(cost)&&num(P.credits,0)>=cost;
-    h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.VIOLET+'">'+u.n+'</b> <span class="pm-sub">Lv'+lvl+'</span>'
+    h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.VIOLET+'">'+u.n+'</b> <span class="pm-sub">Lv'+lvl+(atCap?' (MAX)':'')+'</span>'
       + '<div class="pm-sub">'+u.d+'</div></div>'
-      + '<div style="color:'+COL.AMBER+'">'+fmtC(cost)+'</div>'
-      + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford)?' disabled':'')+'>UPGRADE</button></div>'; }
+      + '<div style="color:'+COL.AMBER+'">'+(atCap?'-':fmtC(cost))+'</div>'
+      + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford||atCap)?' disabled':'')+'>'+(atCap?'MAX':'UPGRADE')+'</button></div>'; }
   h += '<div class="pm-note">'+(S.isBase
       ? 'Hull, weapons and equipment fit through the LOADOUT slots below. Upgrades are planetside; terraforming is on the MARKET tab.'
       : 'Weapons and equipment fit through the LOADOUT slots below.')
@@ -899,5 +905,11 @@ function tick(dt){
   if(S.tBody>=CFG.REFRESH_CONTENT_S){ S.tBody=0;
     if(S.tab==='market'||S.tab==='log'||S.tab==='ground') renderBody(); } }
 
-window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog };
+// FULLSCREEN ENGINEERING BAY (user 2026-07-08 "make the item shop a fullscreen window that attaches to the
+// engineering bay... same menu for now"): hangarHtml/onClick exposed so engbay.js can embed the EXACT same HANGAR
+// tab content/dispatch inside its own fullscreen window, rather than re-implementing shop UI a second time. Since
+// engbay is only reachable while genuinely docked (S.planet/S.isBase are already correct in that case - the same
+// invariant the docked pmRoot menu itself already relies on), calling these from outside pmRoot's own DOM tree is
+// safe: onClick reads e.target.closest(...) off the passed event, not off pmRoot specifically.
+window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick };
 })();
