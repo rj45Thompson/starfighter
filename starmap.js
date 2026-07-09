@@ -225,19 +225,50 @@ function rebuildLayout() {
     nodes[i].x = ox + (nodes[i].wx - minX) * s;
     nodes[i].y = oy + (nodes[i].wz - minZ) * s;
   }
-  // nearest-N jump graph (deduped)
-  var seen = {};
-  for (i = 0; i < nodes.length; i++) {
+  links = nearestNeighborLinks(nodes.map(function (nd) { return { x: nd.x, z: nd.y }; }), CFG.NEIGHBORS);
+  laySig = galaxySig();
+}
+// nearest-N jump graph (deduped) - extracted so SR-M16's headless neighborsOf() below can compute the EXACT same
+// topology without needing a canvas/open starmap UI at all. Works identically on canvas coords (px) or raw world
+// coords (units) - a uniform affine transform (rebuildLayout's own scale+offset) preserves nearest-neighbor
+// ranking, so the two call sites always agree on which systems are lane-connected.
+function nearestNeighborLinks(pts, n) {
+  var links = [], seen = {};
+  for (var i = 0; i < pts.length; i++) {
     var ds = [];
-    for (j = 0; j < nodes.length; j++) if (j !== i) ds.push({ j: j, d: dist2XZ({ x: nodes[i].x, z: nodes[i].y }, { x: nodes[j].x, z: nodes[j].y }) });
+    for (var j = 0; j < pts.length; j++) if (j !== i) ds.push({ j: j, d: dist2XZ(pts[i], pts[j]) });
     ds.sort(function (a, b) { return a.d - b.d; });
-    var take = Math.min(CFG.NEIGHBORS, ds.length);
-    for (j = 0; j < take; j++) {
-      var a = Math.min(i, ds[j].j), b = Math.max(i, ds[j].j), k = a + '-' + b;
-      if (!seen[k]) { seen[k] = 1; links.push({ a: a, b: b }); }
+    var take = Math.min(n, ds.length);
+    for (var k = 0; k < take; k++) {
+      var a = Math.min(i, ds[k].j), b = Math.max(i, ds[k].j), key = a + '-' + b;
+      if (!seen[key]) { seen[key] = 1; links.push({ a: a, b: b }); }
     }
   }
-  laySig = galaxySig();
+  return links;
+}
+// SR-M16 (REQUIREMENTS_SR.md "grow 3 -> 8+ systems... starmap shows lanes; war spreads along them"): the jump-lane
+// graph already existed for DRAWING but was read nowhere else (confirmed via full-repo grep before writing this) -
+// gameplay (jump-gating, war-spread) needs it even when the player has never opened the starmap UI, so this is a
+// headless, world-space-only recomputation - independent of `nodes`/`links`/`cssW`/`cssH`, which only populate
+// while `openFlag` is true (see tick() above). Cheap enough to recompute on every call at this system count (O(n^2)
+// on ~9 systems) - no cache/invalidation complexity needed.
+function neighborsOf(sysName) {
+  var h = H(); var arr = (h && h.systems && h.systems.length) ? h.systems : [];
+  var pts = [], sysIdx = -1;
+  for (var i = 0; i < arr.length; i++) {
+    if (!arr[i]) continue;
+    var c = centroidOf(arr[i], i, arr.length);
+    if (arr[i].name === sysName) sysIdx = pts.length;
+    pts.push({ x: c.x, z: c.z, sys: arr[i] });
+  }
+  if (sysIdx < 0) return [];
+  var lk = nearestNeighborLinks(pts, CFG.NEIGHBORS);
+  var out = [];
+  for (var i = 0; i < lk.length; i++) {
+    if (lk[i].a === sysIdx) out.push(pts[lk[i].b].sys.name);
+    else if (lk[i].b === sysIdx) out.push(pts[lk[i].a].sys.name);
+  }
+  return out;
 }
 function playerNodeIndex() {
   var h = H(); var pp = (h && h.P) ? posOf(h.P) : null; if (!pp) return -1;
@@ -678,6 +709,7 @@ var api = {
   ownerOf: ownerOf,
   territory: territory,
   safePlanet: safePlanet,
+  neighborsOf: neighborsOf,   // SR-M16: jump-lane graph, headless (works whether or not the starmap UI has ever been opened)
   generation: lsGetGen,
 };
 
