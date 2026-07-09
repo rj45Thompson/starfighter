@@ -34,6 +34,9 @@ const CFG = {
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
   RESIZE_GRIP:16,              // resize-handle footprint (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it")
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
+  DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
+  EDGE_OFFSET:14,              // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
+  EDGE_HL_THICK:6,             // drag-feedback strip thickness along the candidate edge
 };
 const COL={ cyan:'#46d6ff', ink:'#080a10', txt:'#cfe2f5', dim:'#6f88a4', border:'#22344a' };
 
@@ -226,6 +229,57 @@ function reflowEdge(edge){
   }
 }
 
+// DRAG-TO-REDOCK (user 2026-07-09 "make sure they dock in spots that make sense and you can move the dock
+// around to each side of the screen top left bottom and make them sizable"): grab a panel's existing TAB (already
+// the one always-findable handle, per this file's own opening docblock) and drag near a screen edge to re-anchor
+// the panel there. A plain click (movement stays under DRAG_THRESHOLD) still toggles open/closed exactly as
+// before - only a real drag engages redocking, so nothing about the existing click-to-open behavior changes for
+// anyone not dragging.
+function nearestEdge(x,y){
+  const w=window.innerWidth, h=window.innerHeight;
+  const d={ top:y, bottom:h-y, left:x, right:w-x };
+  let best='top', bd=Infinity; for(const k in d){ if(d[k]<bd){ bd=d[k]; best=k; } } return best;
+}
+function showEdgeHighlight(edge){
+  let hl=document.getElementById('pnl-edge-hl');
+  if(!hl){ hl=document.createElement('div'); hl.id='pnl-edge-hl';
+    hl.style.position='fixed'; hl.style.zIndex=(CFG.Z+2); hl.style.background=COL.cyan+'55'; hl.style.pointerEvents='none';
+    document.body.appendChild(hl); }
+  hl.style.top=''; hl.style.bottom=''; hl.style.left=''; hl.style.right=''; hl.style.width=''; hl.style.height='';
+  const T=CFG.EDGE_HL_THICK;
+  if(edge==='top'){ hl.style.top='0'; hl.style.left='0'; hl.style.right='0'; hl.style.height=T+'px'; }
+  else if(edge==='bottom'){ hl.style.bottom='0'; hl.style.left='0'; hl.style.right='0'; hl.style.height=T+'px'; }
+  else if(edge==='left'){ hl.style.left='0'; hl.style.top='0'; hl.style.bottom='0'; hl.style.width=T+'px'; }
+  else { hl.style.right='0'; hl.style.top='0'; hl.style.bottom='0'; hl.style.width=T+'px'; }
+  hl.style.display='block';
+}
+function hideEdgeHighlight(){ const hl=document.getElementById('pnl-edge-hl'); if(hl) hl.style.display='none'; }
+// sets the panel's actual on-screen anchor for its (possibly new) edge - the two properties NOT relevant to this
+// edge are cleared so they can never silently fight the two that are (e.g. a leftover `right` from a previous
+// dock outranking the `left` this dock just set).
+function applyDockPosition(rec, edge, pos){
+  const el=rec.el; el.style.top=''; el.style.bottom=''; el.style.left=''; el.style.right='';
+  if(edge==='top'){ el.style.top=CFG.EDGE_OFFSET+'px'; el.style.left=pos+'px'; }
+  else if(edge==='bottom'){ el.style.bottom=CFG.EDGE_OFFSET+'px'; el.style.left=pos+'px'; }
+  else if(edge==='left'){ el.style.left=CFG.EDGE_OFFSET+'px'; el.style.top=pos+'px'; }
+  else { el.style.right=CFG.EDGE_OFFSET+'px'; el.style.top=pos+'px'; }
+}
+function redock(rec, edge, x, y){
+  const oldEdge=rec.edge;
+  if(oldEdge!==edge){
+    const arr=EDGE_MEMBERS[oldEdge]; const i=arr?arr.indexOf(rec):-1; if(i>=0) arr.splice(i,1);
+    (EDGE_MEMBERS[edge]=EDGE_MEMBERS[edge]||[]).push(rec); rec.edge=edge;
+  }
+  rec.centerX=false;   // manual placement is inherently incompatible with auto-centering (only market ever used centerX, and only for its old "always top-center" default)
+  const w=rec.el.offsetWidth||CFG.RESIZE_MIN_W, h=rec.el.offsetHeight||CFG.RESIZE_MIN_H;
+  const horiz=(edge==='top'||edge==='bottom');
+  const pos=horiz ? Math.max(CFG.GAP, Math.min(window.innerWidth-w-CFG.GAP, x-w/2))
+                  : Math.max(CFG.GAP, Math.min(window.innerHeight-h-CFG.GAP, y-h/2));
+  applyDockPosition(rec, edge, pos);
+  store[rec.id]=store[rec.id]||{}; store[rec.id].edge=edge; store[rec.id].pos=Math.round(pos); store[rec.id].manualDock=true; save();
+  applyVisual(rec); reflowEdge(oldEdge); reflowEdge(edge);
+}
+
 // -------------------------------------------------------------------------------------------------------------
 // register(id, el, opts) - el must be a persistent element (never wholesale innerHTML-replaced by the caller;
 // content that DOES get rebuilt should live in a child, e.g. #marketBody inside #market).
@@ -243,7 +297,10 @@ function register(id, el, opts){
   // this never overrides a real preference, only the un-set initial default) - a phone starts clean, every panel
   // still one tap away on its edge tab exactly as before.
   const touchDefaultOpen = !IS_TOUCH && opts.defaultOpen!==false, touchDefaultPinned = !IS_TOUCH && opts.defaultPinned!==false;
-  const rec={ id, el, edge:opts.edge||'top', centerX:!!opts.centerX, rgb:opts.rgb||[9,17,27], title:opts.title||id,
+  // DRAG-TO-REDOCK: once a panel has been manually dragged to an edge at least once (store[id].manualDock), that
+  // choice outranks opts.edge/opts.centerX forever - same "your own action beats the shipped default" convention
+  // the resize grip already established for w/h.
+  const rec={ id, el, edge:(saved.manualDock&&saved.edge)||opts.edge||'top', centerX: saved.manualDock?false:!!opts.centerX, rgb:opts.rgb||[9,17,27], title:opts.title||id,
     open: saved.open!=null?saved.open:touchDefaultOpen, pinned: saved.pinned!=null?saved.pinned:touchDefaultPinned,
     opacity: clamp01(saved.opacity!=null?saved.opacity:(opts.defaultOpacity!=null?opts.defaultOpacity:0.88)),
     onOpenChange:opts.onOpenChange||null, keepOpenWhile:opts.keepOpenWhile||null, hovering:false, hideT:null };
@@ -264,6 +321,7 @@ function register(id, el, opts){
   const body=document.body||document.documentElement;
   rec.resizable=!!opts.resizable;
   if(rec.resizable && saved.w!=null && saved.h!=null) applyStoredSize(el, saved.w, saved.h);   // a size you set yourself sticks across reloads - the whole point of the feature
+  if(saved.manualDock && saved.pos!=null) applyDockPosition(rec, rec.edge, saved.pos);   // a dock spot you dragged yourself sticks across reloads, same convention
   const ctl=document.createElement('div'); ctl.className='pnl-ctl'; body.appendChild(ctl);           // fixed + body-level: immune to el's own scroll/slide
   const pinBtn=document.createElement('button'); pinBtn.className='pnl-btn'; pinBtn.title='pin (stay open) / unpin (auto-hide when idle)';
   const op=document.createElement('input'); op.type='range'; op.className='pnl-op'; op.min=CFG.OP_MIN; op.max=CFG.OP_MAX; op.step=CFG.OP_STEP; op.title='transparency';
@@ -299,7 +357,27 @@ function register(id, el, opts){
   pinBtn.onclick=(e)=>{ e.stopPropagation(); setPinned(rec, !rec.pinned); };
   xBtn.onclick=(e)=>{ e.stopPropagation(); setOpen(rec, false); };
   op.addEventListener('input', ()=>setOpacity(rec, parseFloat(op.value)));
-  tab.onclick=()=>setOpen(rec, !rec.open);
+  // DRAG-TO-REDOCK on the tab itself (mirrors the resize grip's own mousedown/mousemove/mouseup + touch-equivalent
+  // pattern below). `moved` gates whether the eventual click is a real drag (redock, click suppressed) or a plain
+  // press-release (existing open/close toggle, unchanged).
+  { let dragging=false, moved=false, sx=0, sy=0;
+    const onMove=(ev)=>{ if(!dragging) return;
+      const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+      if(!moved && Math.hypot(x-sx,y-sy)<CFG.DRAG_THRESHOLD) return;
+      moved=true; showEdgeHighlight(nearestEdge(x,y));
+      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+    const endDrag=(ev)=>{ if(!dragging) return; dragging=false;
+      document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
+      document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag);
+      hideEdgeHighlight();
+      if(moved){ const x=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientX:ev.clientX,
+        y=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientY:ev.clientY; redock(rec, nearestEdge(x,y), x, y); } };
+    const startDrag=(ev)=>{ dragging=true; moved=false;
+      sx=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; sy=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+      document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
+      document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag); };
+    tab.addEventListener('mousedown',startDrag); tab.addEventListener('touchstart',startDrag,{passive:true});
+    tab.addEventListener('click',(ev)=>{ if(moved){ ev.stopPropagation(); return; } setOpen(rec, !rec.open); }); }
   const stayAwake=()=>{ rec.hovering=true; clearTimeout(rec.hideT); };
   const mayDoze=()=>{ rec.hovering=false; if(rec.open&&!rec.pinned) armAutoHide(rec); };
   el.addEventListener('mouseenter',stayAwake); el.addEventListener('mouseleave',mayDoze);
