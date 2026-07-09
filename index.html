@@ -134,38 +134,38 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260708ai"></script>
-<script src="fflate.min.js?v=20260708ai"></script>
-<script src="fbxloader.js?v=20260708ai"></script>
+<script src="three.min.js?v=20260708aj"></script>
+<script src="fflate.min.js?v=20260708aj"></script>
+<script src="fbxloader.js?v=20260708aj"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260708ai"></script>
-<script src="inhabitant.js?v=20260708ai"></script>
-<script src="passenger.js?v=20260708ai"></script>
-<script src="gamemod.js?v=20260708ai"></script>
-<script src="chatter.js?v=20260708ai"></script>
-<script src="speech_input.js?v=20260708ai"></script>
-<script src="vision.js?v=20260708ai"></script>
-<script src="deliberate.js?v=20260708ai"></script>
-<script src="knowledge.js?v=20260708ai"></script>
-<script src="acquire.js?v=20260708ai"></script>
-<script src="sound.js?v=20260708ai"></script>
-<script src="hullmodels.js?v=20260708ai"></script>
-<script src="knowledge_hud.js?v=20260708ai"></script>
-<script src="thoughts.js?v=20260708ai"></script>
-<script src="tami_battle_ui.js?v=20260708ai"></script>
-<script src="power_panel.js?v=20260708ai"></script>
-<script src="panels.js?v=20260708ai"></script>
-<script src="engbay.js?v=20260708ai"></script>
+<script src="speech_tier.js?v=20260708aj"></script>
+<script src="inhabitant.js?v=20260708aj"></script>
+<script src="passenger.js?v=20260708aj"></script>
+<script src="gamemod.js?v=20260708aj"></script>
+<script src="chatter.js?v=20260708aj"></script>
+<script src="speech_input.js?v=20260708aj"></script>
+<script src="vision.js?v=20260708aj"></script>
+<script src="deliberate.js?v=20260708aj"></script>
+<script src="knowledge.js?v=20260708aj"></script>
+<script src="acquire.js?v=20260708aj"></script>
+<script src="sound.js?v=20260708aj"></script>
+<script src="hullmodels.js?v=20260708aj"></script>
+<script src="knowledge_hud.js?v=20260708aj"></script>
+<script src="thoughts.js?v=20260708aj"></script>
+<script src="tami_battle_ui.js?v=20260708aj"></script>
+<script src="power_panel.js?v=20260708aj"></script>
+<script src="panels.js?v=20260708aj"></script>
+<script src="engbay.js?v=20260708aj"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260708ai"></script>
-<script src="conquest.js?v=20260708ai"></script>
-<script src="missions.js?v=20260708ai"></script>
-<script src="planetmenu.js?v=20260708ai"></script>
-<script src="textquests.js?v=20260708ai"></script>
+<script src="starmap.js?v=20260708aj"></script>
+<script src="conquest.js?v=20260708aj"></script>
+<script src="missions.js?v=20260708aj"></script>
+<script src="planetmenu.js?v=20260708aj"></script>
+<script src="textquests.js?v=20260708aj"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -664,7 +664,7 @@ function makePlanets(){ makeSystems();
 // M8: RANGER COMMAND - the coalition's central star base (a hub distinct from planets)
 let base=null;
 function makeBase(){ if(!systems.length) return; const c=systems[0].center.clone().add(new T.Vector3(CFG.SUN_R*3.4,CFG.SUN_R*0.6,0));
-  base={ pos:c, name:'Ranger Command' };
+  base={ pos:c, name:'Ranger Command', _base:true };   // BUGFIX 2026-07-08: completeDock's isBase branch now sets s.docked=base (see completeDock) - _base:true is what line ~3849's existing recordObservedPrices guard already checked for (P0.docked&&!P0.docked._base), so this was a pre-anticipated field nothing had ever actually set
   const m=new T.Mesh(new T.TorusKnotGeometry(6,1.7,72,10), new T.MeshStandardMaterial({color:0x9fd8ff,emissive:0x235a8c,emissiveIntensity:0.55,metalness:0.75,roughness:0.28})); m.position.copy(c); scene.add(m); base.mesh=m;
   const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0x9fd8ff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.7})); halo.scale.setScalar(34); m.add(halo);
   const ring=new T.Mesh(new T.TorusGeometry(CFG.BASE_R,0.5,8,60), new T.MeshBasicMaterial({color:0x9fd8ff,transparent:true,opacity:0.25})); ring.position.copy(c); ring.rotation.x=Math.PI/2; scene.add(ring);
@@ -776,7 +776,13 @@ function creditsHudTick(){ const P=ships[0]; const el=document.getElementById('c
 // Shared arrival logic (base hub OR a planet's rep-gated market) - used by BOTH auto-dock and a `go`-commanded
 // arrival, so the two paths can never drift apart. Returns {mode,aimDir,ease} for the caller to apply.
 function completeDock(s,p,isBase){
-  if(isBase){ s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
+  // BUGFIX 2026-07-08 (user: "open engineering bay did not work"): this branch called dockMenu(p,true) but never
+  // set s.docked, unlike the planet branch below it. The HANGAR tab still rendered fine (its hull/gear SECTIONS
+  // gate on the separate, purely distance-based atBase() check) but EVERY loadout-mutation terminal command -
+  // engbay/loadout, hardpoint mount/unmount, gizmo mount/unmount, tank/radar/scanner/shieldgen/droid/hook/series -
+  // gates on `dockedP=P.docked`, which stayed null forever while docked at Ranger Command specifically (planets
+  // never had this bug - their branch already set it). Silent no-op, not a crash, so it read as "didn't work."
+  if(isBase){ s.docked=p; s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
   if(p.rep<=CFG.REP_HOSTILE && !p.isPirateStation){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }   // a pirate station's whole business model is welcoming ships everyone else refuses - see makePirateStation()
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player') recordObservedPrices(p);   // SR-M7: the moment of docking is a real observation, whether or not the market panel happens to be open
