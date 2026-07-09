@@ -45,7 +45,7 @@ function HOST() { var w = win(); return w && w.HOST; }
 function el(tag, style, html) { var d = doc(); var e = d.createElement(tag); if (style) e.style.cssText = style; if (html != null) e.innerHTML = html; return e; }
 function esc(s) { return String(s == null ? '' : s).replace(/</g, '&lt;'); }
 
-var EB = { root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null };
+var EB = { root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null, gridPick: null };
 
 function shipOr(h) { return (h && h.P) || null; }
 
@@ -110,6 +110,85 @@ function pickerHtml(h, kind, idx) {
     '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">mount in ' + kind + ' slot ' + (idx + 1) + ' - click one:</div>' + rows + '</div>';
 }
 
+// DIABLO-2-STYLE SLOT GRID (user 2026-07-08 "make a visual UI of putting the components in sort of like diablo
+// 2... each hull has different slots that items can fit... make a matrix and document it - basically we are
+// copying space rangers 2"): a grid of labeled icon-boxes for every SINGLE-SLOT equipment category (as opposed to
+// the spatial schematic above, which already covers the two MULTI-SLOT categories - weapon hardpoints and gizmos -
+// as clickable mount points). Click an empty/swappable box to open a picker (same interaction as the schematic);
+// click a PERMANENT box (locked Hull Series, or Manufacturer/Micromodules which are always read-only) does nothing.
+// Reuses PLANETMENU.GEAR_SLOTS as the single source of truth for tank/radar/scanner/shieldgen/droid/hook/series so
+// this grid can never drift out of sync with the HANGAR tab's own list of the same categories.
+var GRID_GLYPH = { primaryweapon:'⚔', tank:'⛽', radar:'📡', scanner:'🔍', shieldgen:'🛡', droid:'🔧', hook:'🪝', series:'⚙', manufacturer:'🏭', micromodule:'✦' };
+function gridSlotDefs(h) {
+  var defs = [ { kind:'primaryweapon', label:'PRIMARY WEAPON', table:h.WEAPONS, keys:h.WEAPON_ORDER, field:'weaponType', defKey:'energy', cmd:'weapon', lockField:null } ];
+  (h && Array.isArray(win() && win().PLANETMENU && win().PLANETMENU.GEAR_SLOTS) ? win().PLANETMENU.GEAR_SLOTS : []).forEach(function (g) {
+    defs.push({ kind:g[0], label:g[1], table:h[g[2]], keys:h[g[3]], field:g[4], defKey:g[5], cmd:g[6], lockField:g[7] || null });
+  });
+  // MANUFACTURER: no standalone fit command exists (only bundled into `hull <class> <manufacturer>`, see
+  // starfighter.html's own comment on MANUFACTURERS) - read-only by omitting cmd, same as the audit found.
+  if (h.MANUFACTURERS && h.MANUFACTURER_KEYS) defs.push({ kind:'manufacturer', label:'MANUFACTURER', table:h.MANUFACTURERS, keys:null, field:'manufacturer', defKey:'human', cmd:null, lockField:null });
+  return defs;
+}
+function gridBoxHtml(h, s, def) {
+  var locked = !!(def.lockField && s[def.lockField]);
+  var readOnly = !def.cmd;   // manufacturer/micromodules have no fit command - display only
+  var it = def.table && def.table[(s && s[def.field]) || def.defKey];
+  var filled = it && ((s[def.field] || def.defKey) !== def.defKey);
+  var glyph = GRID_GLYPH[def.kind] || '◇';
+  var boxCol = readOnly ? CFG.COL_REF : (locked ? '#ff9a9a' : (filled ? CFG.COL_GIZMO : CFG.COL_EMPTY_STROKE));
+  var attrs = (readOnly ? '' : ' data-grid="' + def.kind + '"') + ' style="' + (readOnly ? '' : 'cursor:pointer;') +
+    'border:1px solid ' + boxCol + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px"';
+  return '<div' + attrs + '>' +
+    '<div style="font-size:20px">' + glyph + (locked ? ' 🔒' : '') + '</div>' +
+    '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">' + esc(def.label) + '</div>' +
+    '<div style="font-size:10px;color:' + (filled ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(it ? it.n : 'empty') + '</div>' +
+    '</div>';
+}
+function micromoduleGridHtml(h, s) {
+  var mods = s.micromodules || [];
+  var glyph = GRID_GLYPH.micromodule;
+  var label = mods.length ? mods.map(function (k) { return (h.MICROMODULES && h.MICROMODULES[k] && h.MICROMODULES[k].n) || k; }).join(', ') : 'none yet';
+  return '<div style="border:1px solid ' + CFG.COL_REF + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px">' +
+    '<div style="font-size:20px">' + glyph + (mods.length ? ' 🔒' : '') + '</div>' +
+    '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">MICROMODULES</div>' +
+    '<div style="font-size:10px;color:' + (mods.length ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(label) + '</div></div>';
+}
+function slotGridHtml(h, s) {
+  var defs = gridSlotDefs(h);
+  var boxes = defs.map(function (def) { return gridBoxHtml(h, s, def); }).join('');
+  boxes += micromoduleGridHtml(h, s);
+  var html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">' + boxes + '</div>';
+  var gp = EB.gridPick;
+  if (gp) {
+    var def = defs.filter(function (d) { return d.kind === gp; })[0];
+    if (def && def.keys) {
+      var rows = def.keys.map(function (k) {
+        var it2 = def.table[k]; if (!it2) return '';
+        return '<div data-gridpick="' + esc(k) + '" style="padding:4px 8px;cursor:pointer;border-radius:4px" ' +
+          'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' +
+          '<b style="color:' + CFG.COL_TEXT + '">' + esc(it2.n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + (it2.cost ? it2.cost + 'c' : 'free') + ' - ' + esc(it2.desc || '') + '</span></div>';
+      }).join('');
+      html += '<div style="border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:6px;padding:6px;background:#0c1623;margin-bottom:6px">' +
+        '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">fit ' + esc(def.label) + ' - click one:</div>' + rows + '</div>';
+    }
+  }
+  return html;
+}
+function onGridClick(kind) {
+  var h = HOST(); var s = shipOr(h); if (!h || !s) return;
+  var def = gridSlotDefs(h).filter(function (d) { return d.kind === kind; })[0]; if (!def || !def.cmd) return;
+  if (def.lockField && s[def.lockField]) return;   // PERMANENT SLOT - no picker, nothing to do
+  EB.gridPick = (EB.gridPick === kind) ? null : kind;   // click again to close the same picker
+  render();
+}
+function onGridPick(kind, key) {
+  var h = HOST(); if (!h) return;
+  var def = gridSlotDefs(h).filter(function (d) { return d.kind === kind; })[0]; if (!def) return;
+  h.runCmd(def.cmd + ' ' + key);
+  EB.gridPick = null;
+  render();
+}
+
 // FULLSCREEN SHOP ATTACH (user 2026-07-08 "make the item shop a fullscreen window that attaches to the engineering
 // bay... the items would be showing what's at the nearest ranger station perhaps. same menu for now... or it will
 // just open the nearest stores to you. but still you need to travel to the planet or something"): when genuinely
@@ -132,6 +211,10 @@ function render() {
   if (!h) { EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">waiting for game...</div>'; return; }
   var s = shipOr(h);
   if (!s) { EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">no ship.</div>'; return; }
+
+  var top = '<div style="width:100%;order:-1">' +
+    '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:6px">LOADOUT - click a box to fit, 🔒 = permanent for this hull</div>' +
+    slotGridHtml(h, s) + '</div>';
 
   var schema = mountSchema(h, s);
   var hull = h.HULLS[s.hullClass || 'fighter'];
@@ -158,7 +241,7 @@ function render() {
   }
   right += '</div>';
 
-  EB.body.innerHTML = left + right;
+  EB.body.innerHTML = top + left + right;
 }
 
 function onMountClick(kind, idx) {
@@ -186,6 +269,13 @@ function wireClicks() {
     if (pickEl) { onPick(EB.pickType, EB.pickIdx, pickEl.getAttribute('data-pick')); return; }
     var mountEl = ev.target.closest && ev.target.closest('[data-mount]');
     if (mountEl) { onMountClick(mountEl.getAttribute('data-mount'), parseInt(mountEl.getAttribute('data-idx'), 10)); return; }
+    // DIABLO-2-STYLE SLOT GRID: data-grid/data-gridpick are this section's own vocabulary, disjoint from
+    // data-pick/data-mount (schematic) and data-act (embedded shop) above/below - checked in the same
+    // closest-match-and-return chain so exactly one handler ever fires per click.
+    var gridPickEl = ev.target.closest && ev.target.closest('[data-gridpick]');
+    if (gridPickEl) { onGridPick(EB.gridPick, gridPickEl.getAttribute('data-gridpick')); return; }
+    var gridEl = ev.target.closest && ev.target.closest('[data-grid]');
+    if (gridEl) { onGridClick(gridEl.getAttribute('data-grid')); return; }
     // FULLSCREEN SHOP ATTACH: the embedded hangarHtml() markup uses data-act="cmd"/"tab"/"slot" (planetmenu.js's
     // OWN click vocabulary, disjoint from data-pick/data-mount above) - delegate straight into PLANETMENU's real
     // dispatcher so a click here has IDENTICAL effect to the same click inside the docked menu itself. The embedded

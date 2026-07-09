@@ -489,10 +489,15 @@ function engineSectionHtml(P){
    six more single-slot fits, all structurally identical to ENGINE above (list-or-fitted row, BUY button) - one
    generic renderer instead of six near-duplicate functions; each reads its table straight off HOST (H().FUEL_TANKS
    etc, exposed the same live way as HULLS/WEAPONS/ENGINES/GIZMOS) so this file never hardcodes a second copy. -- */
-function simpleSlotSectionHtml(P, tableProp, keysProp, field, defKey, cmdVerb){
+function simpleSlotSectionHtml(P, tableProp, keysProp, field, defKey, cmdVerb, lockField){
   var h=H(); var TABLE=h&&h[tableProp], KEYS=h&&h[keysProp];
   if(!TABLE || !Array.isArray(KEYS) || !KEYS.length) return '<div class="pm-note">(registry offline)</div>';
-  var rows='', i;
+  // PERMANENT SLOTS (user 2026-07-08, SR2-style): lockField is only set for HULL SERIES today - once P[lockField]
+  // is true, every other option in this slot is permanently un-pickable until the next real hull swap resets it
+  // (see applyHull's seriesLocked reset). Every other GEAR_SLOTS entry omits lockField and renders exactly as before.
+  var locked = !!(lockField && P && P[lockField]);
+  var rows = locked ? '<div class="pm-note" style="border:1px solid #ff9a9a55;background:#ff9a9a14;padding:6px 10px;margin-bottom:6px"><b style="color:#ff9a9a">🔒 PERMANENTLY FITTED</b> - buy a new hull to pick a different one.</div>' : '';
+  var i;
   for(i=0;i<KEYS.length;i++){ var key=KEYS[i], it=TABLE[key]; if(!it) continue;
     var isCurrent = P && (P[field]||defKey)===key;
     var afford = num(P&&P.credits,0) >= num(it.cost,0);
@@ -502,16 +507,16 @@ function simpleSlotSectionHtml(P, tableProp, keysProp, field, defKey, cmdVerb){
       + '<div class="pm-sub">'+esc(it.desc||'')+'</div></div>'
       + '<div style="color:'+costCol+'">'+(num(it.cost,0)>0?fmtC(it.cost):'free')+'</div>'
       + '<button class="pm-b" data-act="cmd" data-cmd="'+cmdVerb+' '+key+'"'
-      + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
+      + ((isCurrent||!afford||locked)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
   return rows; }
-var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cmdVerb]
+var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cmdVerb, lockField(optional)]
   ['tank',      'FUEL TANK',        'FUEL_TANKS',    'FUEL_TANK_KEYS',    'fuelTankType', 'standard', 'tank'],
   ['radar',     'RADAR',            'RADARS',        'RADAR_KEYS',        'radarType',    'basic',    'radar'],
   ['scanner',   'SCANNER',          'SCANNERS',      'SCANNER_KEYS',      'scannerType',  'none',     'scanner'],
   ['shieldgen', 'SHIELD GENERATOR', 'SHIELD_GENS',   'SHIELD_GEN_KEYS',   'shieldGenType','none',     'shieldgen'],
   ['droid',     'REPAIR DROID',     'REPAIR_DROIDS', 'REPAIR_DROID_KEYS', 'droidType',    'none',     'droid'],
   ['hook',      'CARGO HOOK',       'CARGO_HOOKS',   'CARGO_HOOK_KEYS',   'cargoHookType','none',     'hook'],
-  ['series',    'HULL SERIES',      'HULL_SERIES',   'HULL_SERIES_KEYS',  'hullSeries',   'standard', 'series'] ];   // SR "Acrynic" specialization - same single-slot pattern, no new renderer needed
+  ['series',    'HULL SERIES',      'HULL_SERIES',   'HULL_SERIES_KEYS',  'hullSeries',   'standard', 'series', 'seriesLocked'] ];   // SR "Acrynic" specialization - the one GEAR_SLOTS entry with a lockField (PERMANENT SLOTS, 2026-07-08): every other slot type omits index 7 and stays freely swappable
 
 /* -- WEAPON HARDPOINTS: extra weapon slots BEYOND the primary (weaponSectionHtml above still fits that one) -
    a real n-slot bay, mount/unmount/sell, same shape as GIZMOS just against the WEAPONS table. -- */
@@ -544,7 +549,8 @@ function hardpointSectionHtml(P){
 function gearSlotHeaderRow(P, def){
   var h=H(); var TABLE=h&&h[def[2]]; if(!TABLE) return '';
   var it=TABLE[(P&&P[def[4]])||def[5]]; if(!it) return '';
-  return loadoutSlotHtml(def[0], def[1]+' (1 fitted)', '<b style="color:'+COL.HEAD+'">'+esc(it.n)+'</b>', esc(it.desc||''), S.slotOpen[def[0]]); }
+  var locked = !!(def[7] && P && P[def[7]]);
+  return loadoutSlotHtml(def[0], def[1]+' (1 fitted)'+(locked?' 🔒':''), '<b style="color:'+COL.HEAD+'">'+esc(it.n)+'</b>', esc(it.desc||''), S.slotOpen[def[0]]); }
 
 /* -- GIZMOS: the REAL slot-based bay (mount/unmount/sell) - unlike EQUIPMENT above, a gizmo already
    mounted in every slot blocks buying another until you free one. -- */
@@ -708,7 +714,7 @@ function hangarHtml(){
   if(S.slotOpen.hull)   h += '<div class="pm-panel"><h4>HULL - CHOOSE REPLACEMENT</h4>'+hullSectionHtml(P)+'</div>';
   if(S.slotOpen.weapon) h += '<div class="pm-panel"><h4>WEAPON - CHOOSE REPLACEMENT</h4>'+weaponSectionHtml(P)+'</div>';
   if(S.slotOpen.engine) h += '<div class="pm-panel"><h4>ENGINE - CHOOSE DRIVE</h4>'+engineSectionHtml(P)+'</div>';
-  GEAR_SLOTS.forEach(function(def){ if(S.slotOpen[def[0]]) h += '<div class="pm-panel"><h4>'+def[1]+' - CHOOSE FITTING</h4>'+simpleSlotSectionHtml(P,def[2],def[3],def[4],def[5],def[6])+'</div>'; });
+  GEAR_SLOTS.forEach(function(def){ if(S.slotOpen[def[0]]) h += '<div class="pm-panel"><h4>'+def[1]+' - CHOOSE FITTING</h4>'+simpleSlotSectionHtml(P,def[2],def[3],def[4],def[5],def[6],def[7])+'</div>'; });
   if(S.slotOpen.hardpoint) h += '<div class="pm-panel"><h4>WEAPON HARDPOINTS</h4>'+hardpointSectionHtml(P)+'</div>';
   if(S.slotOpen.gizmo)  h += '<div class="pm-panel"><h4>ELECTRONICS BAY</h4>'+gizmoSectionHtml(P)+'</div>';
   if(S.slotOpen.equip)  h += '<div class="pm-panel"><h4>EQUIPMENT - INSTALL MORE</h4>'+equipSectionHtml(P)+'</div>';
@@ -911,5 +917,9 @@ function tick(dt){
 // engbay is only reachable while genuinely docked (S.planet/S.isBase are already correct in that case - the same
 // invariant the docked pmRoot menu itself already relies on), calling these from outside pmRoot's own DOM tree is
 // safe: onClick reads e.target.closest(...) off the passed event, not off pmRoot specifically.
-window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick };
+// DIABLO-2-STYLE SLOT GRID (user 2026-07-08 "make a visual UI of putting the components in sort of like diablo
+// 2... make a matrix and document it"): GEAR_SLOTS is the single source of truth for which single-slot equipment
+// categories exist and how to fit them - exposed so engbay.js's icon grid reads the SAME list rather than keeping
+// its own copy that could drift out of sync with this file's own tab.
+window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick, GEAR_SLOTS:GEAR_SLOTS };
 })();
