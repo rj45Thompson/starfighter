@@ -37,6 +37,12 @@ var CFG = {
   COL_GIZMO: '#5ac8ff', COL_GIZMO_DIM: '#233c4e',
   COL_REF: '#8fa2b8', COL_TEXT: '#cfe2f5', COL_DIM: '#6f88a4',
   POLL_MS: 400,            // re-render cadence while open (cheap - just reflects HOST.P state, no animation)
+  // SHIELD ARCS (task #83, "shield coverage as spatial arcs on the same schematic"): a bubble drawn around the
+  // FIXED generic hull silhouette (not per-hull mount extents, which vary too much across the 57 hull classes) -
+  // sized to stay inside VIEWBOX with margin regardless of hull class. Same violet-blue as power_panel.js's
+  // CFG.COL_SHIELDS so the two panels read as the same "shield" color language.
+  COL_SHIELD: '#9fe6ff', COL_SHIELD_DIM: 'rgba(159,230,255,0.16)',
+  SHIELD_CY: -0.025, SHIELD_RX: 0.82, SHIELD_RY: 1.28, SHIELD_STROKE: 0.07,
 };
 
 function win() { return (typeof window !== 'undefined') ? window : null; }
@@ -80,9 +86,43 @@ function refPointSvg(pt, glyph) {
     '<text x="' + pt.x + '" y="' + (pt.y + 0.2 * (pt.y < 0 ? -1 : 1)) + '" font-size="0.08" text-anchor="middle" fill="' + CFG.COL_REF + '">' + glyph + '</text>';
 }
 
+// SHIELD ARCS: two half-ellipse paths wrapping the hull silhouette, one for the nose-side (forward) arc and one
+// for the tail-side (aft) arc - the REAL fwd/aft charge pools from the X-Wing shield rewrite (s.shieldFwd/
+// shieldAft via HOST.shieldArcsOf), not a cosmetic placeholder. Each half draws a dim full-strength outline (max
+// capacity) plus a bright overlay whose length is proportional to current charge, using pathLength="100" so the
+// dasharray fraction maps directly to charge% regardless of the arc's real SVG path length.
+function shieldArcPaths() {
+  var cx = 0, cy = CFG.SHIELD_CY, rx = CFG.SHIELD_RX, ry = CFG.SHIELD_RY;
+  return {
+    fwd: 'M ' + (cx - rx) + ',' + cy + ' A ' + rx + ',' + ry + ' 0 0,1 ' + (cx + rx) + ',' + cy,   // left -> top(nose) -> right
+    aft: 'M ' + (cx + rx) + ',' + cy + ' A ' + rx + ',' + ry + ' 0 0,1 ' + (cx - rx) + ',' + cy,   // right -> bottom(tail) -> left
+  };
+}
+function shieldArcSvg(h, s) {
+  if (!h || typeof h.shieldArcsOf !== 'function') return '';
+  var arcs = h.shieldArcsOf(s); if (!arcs || !arcs.max) return '';
+  var fwdFrac = Math.max(0, Math.min(1, arcs.fwd / arcs.max));
+  var aftFrac = Math.max(0, Math.min(1, arcs.aft / arcs.max));
+  var p = shieldArcPaths(), sw = CFG.SHIELD_STROKE;
+  var dim = ' stroke="' + CFG.COL_SHIELD_DIM + '" stroke-width="' + sw + '" fill="none"';
+  function bright(frac) { return ' stroke="' + CFG.COL_SHIELD + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round" pathLength="100" stroke-dasharray="' + Math.round(frac * 100) + ' 100" style="filter:drop-shadow(0 0 0.03px ' + CFG.COL_SHIELD + ')"'; }
+  return '<path d="' + p.fwd + '"' + dim + ' />' + '<path d="' + p.aft + '"' + dim + ' />' +
+    '<path d="' + p.fwd + '"' + bright(fwdFrac) + ' />' + '<path d="' + p.aft + '"' + bright(aftFrac) + ' />';
+}
+// numeric readout below the schematic - the arcs above are the spatial view, this is the precise value (avoids
+// cramming text into the SVG where it could collide with the PRI/ENG reference labels on tall/short hulls).
+function shieldReadoutHtml(h, s) {
+  if (!h || typeof h.shieldArcsOf !== 'function') return '';
+  var arcs = h.shieldArcsOf(s); if (!arcs || !arcs.max) return '';
+  var pct = function (v) { return Math.round(100 * Math.max(0, Math.min(1, v / arcs.max))); };
+  var divert = (typeof h.shieldDivertOf === 'function' && h.shieldDivertOf(s)) || null;
+  return '<div style="font-size:10px;color:' + CFG.COL_SHIELD + ';margin-top:2px">SHIELDS - FWD ' + Math.round(arcs.fwd) + '/' + Math.round(arcs.max) + ' (' + pct(arcs.fwd) + '%) · AFT ' + Math.round(arcs.aft) + '/' + Math.round(arcs.max) + ' (' + pct(arcs.aft) + '%)' +
+    (divert ? ' · diverting to ' + esc(divert) : '') + '</div>';
+}
 function schematicSvg(h, s, schema) {
   var vb = -CFG.VIEWBOX + ' ' + -CFG.VIEWBOX + ' ' + (2 * CFG.VIEWBOX) + ' ' + (2 * CFG.VIEWBOX);
-  var body = '<polygon points="' + hullPolygon() + '" fill="' + CFG.COL_HULL_FILL + '" stroke="' + CFG.COL_HULL_STROKE + '" stroke-width="0.025" />';
+  var body = shieldArcSvg(h, s);
+  body += '<polygon points="' + hullPolygon() + '" fill="' + CFG.COL_HULL_FILL + '" stroke="' + CFG.COL_HULL_STROKE + '" stroke-width="0.025" />';
   body += refPointSvg(schema.primary, 'PRI');
   body += refPointSvg(schema.engine, 'ENG');
   var gs = (s && s.gizmoSlots) || [];
@@ -221,12 +261,12 @@ function render() {
   var left = '<div style="width:' + CFG.PANEL_W + 'px;max-width:100%;flex:0 0 auto">' +
     '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:4px"><b>' + esc(hull ? hull.n : s.hullClass) + '</b> - ' +
     schema.weaponPoints.length + ' weapon mount' + (schema.weaponPoints.length === 1 ? '' : 's') + ', ' + schema.gizmoPoints.length + ' gizmo mount' + (schema.gizmoPoints.length === 1 ? '' : 's') + '</div>' +
-    schematicSvg(h, s, schema);
+    schematicSvg(h, s, schema) + shieldReadoutHtml(h, s);
   if (!s.docked) {
     left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dock at a planet or base to edit your loadout.</div>';
     EB.pickIdx = null;
   } else {
-    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary weapon / engine, not editable here) - red = weapon hardpoint, blue = gizmo. Click empty to mount, filled to unmount.</div>';
+    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary weapon / engine, not editable here) - red = weapon hardpoint, blue = gizmo, cyan bubble = shield charge (fwd/aft). Click empty to mount, filled to unmount.</div>';
     if (EB.pickIdx != null && EB.pickType) left += pickerHtml(h, EB.pickType, EB.pickIdx);
   }
   left += '</div>';
@@ -378,7 +418,7 @@ if (typeof require !== 'undefined' && require.main === module) {
     createElement: function (tag) { return new StubEl(tag); },
     body: new StubEl('body'), documentElement: new StubEl('html'),
   };
-  var fakeShip = { hullClass: 'interceptor', docked: { name: 'Test Base' }, credits: 5000, gizmoSlots: [null, null, null], weaponSlots: [null, null], weaponType: 'energy' };
+  var fakeShip = { hullClass: 'interceptor', docked: { name: 'Test Base' }, credits: 5000, gizmoSlots: [null, null, null], weaponSlots: [null, null], weaponType: 'energy', shieldFwd: 15, shieldAft: 8, shieldDivert: 'fwd' };
   var cmds = [];
   var HULLS = { interceptor: { n: 'Interceptor' } };
   var HULL_MOUNTS = { interceptor: { primary: { x: 0, y: -1.05, facingDeg: 0 }, engine: { x: 0, y: 1, facingDeg: 180 },
@@ -391,6 +431,8 @@ if (typeof require !== 'undefined' && require.main === module) {
     WEAPONS: WEAPONS, WEAPON_ORDER: ['energy', 'ballistic', 'missile'],
     hasGizmo: function (s, k) { return (s.gizmoSlots || []).indexOf(k) >= 0; },
     hasHardpoint: function (s, k) { return (s.weaponSlots || []).indexOf(k) >= 0; },
+    shieldArcsOf: function (s) { s = s || fakeShip; return { fwd: s.shieldFwd, aft: s.shieldAft, max: 20 }; },
+    shieldDivertOf: function (s) { s = s || fakeShip; return s.shieldDivert || null; },
     runCmd: function (str) {
       cmds.push(str);
       var parts = str.split(' ');
@@ -408,6 +450,17 @@ if (typeof require !== 'undefined' && require.main === module) {
   show();
   check('shown after show()', EB.shown === true);
   check('docked ship renders the schematic, not the dock-gate message', EB.body._html.indexOf('dock at a planet') === -1);
+  // ---- shield arcs (task #83): fwd 15/20=75%, aft 8/20=40%, both driven by the REAL HOST.shieldArcsOf pool -------
+  check('shield arc bright dasharray reflects fwd charge (15/20=75%)', EB.body._html.indexOf('stroke-dasharray="75 100"') >= 0);
+  check('shield arc bright dasharray reflects aft charge (8/20=40%)', EB.body._html.indexOf('stroke-dasharray="40 100"') >= 0);
+  check('shield readout line shows real fwd/aft numeric values', EB.body._html.indexOf('FWD 15/20') >= 0 && EB.body._html.indexOf('AFT 8/20') >= 0);
+  check('shield readout shows the active divert mode', EB.body._html.indexOf('diverting to fwd') >= 0);
+  check('shield arcs update live when charge changes', (function () {
+    fakeShip.shieldFwd = 20; render();
+    var updated = EB.body._html.indexOf('stroke-dasharray="100 100"') >= 0 && EB.body._html.indexOf('FWD 20/20') >= 0;
+    fakeShip.shieldFwd = 15; render();
+    return updated;
+  })());
   check('undocked ship shows the dock-gate message', (function () {
     var wasDocked = fakeShip.docked; fakeShip.docked = null; render();
     var gated = EB.body._html.indexOf('dock at a planet') >= 0;
