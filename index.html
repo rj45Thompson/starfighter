@@ -33,6 +33,9 @@
   .pill b{ color:var(--cyan); }
   #rosterWrap{ left:14px; top:44px; pointer-events:auto; }   /* OUTER persistent box (registered w/ PANELS) - buildRoster() wipes the INNER #roster's innerHTML on every rebuild, so the panel chrome lives one level up, same wrapper pattern as #market/#marketBody and #ticker/#logbody */
   #roster{ display:flex; flex-direction:column; gap:4px; }
+  #missionlog{ left:14px; top:340px; max-width:min(90vw,420px); max-height:46vh; overflow-y:auto; pointer-events:auto;
+    background:#0a1420dd; border:1px solid #22344a; border-radius:9px; padding:8px 10px; }   /* task #66 - defaults closed, same left edge as roster/ticker; the new drag-to-redock lets a player move it if this default collides with their layout */
+  #missionlog .mlog-empty{ color:#5f7a98; font:500 11px ui-monospace,monospace; }
   .rs{ display:flex; align-items:center; gap:7px; font:700 11px/1 ui-monospace,monospace; cursor:pointer;
     background:#0c1623bb; border:1px solid #23344a; border-radius:6px; padding:4px 8px; width:182px; transition:.1s; }
   .rs:hover{ border-color:#3a567a; } .rs.foc{ border-color:var(--cyan); box-shadow:0 0 0 1px #46d6ff44 inset; }
@@ -130,11 +133,16 @@
 <body>
 <div id="stage"></div>
 <div id="hitfx" style="position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .05s linear"></div>
+<div id="missionArrow" style="position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:8;pointer-events:none;text-align:center;opacity:0;transition:opacity .25s">
+  <div id="missionArrowGlyph" style="font-size:22px;color:#ffd27a;text-shadow:0 0 8px #000,0 0 3px #000;transition:transform .12s linear">▲</div>
+  <div id="missionArrowLabel" style="font:600 10px/1.2 ui-monospace,monospace;color:#ffd27a;text-shadow:0 1px 3px #000;margin-top:1px;white-space:nowrap"></div>
+</div>
 <div class="hud" id="creditsHud">0c</div>
 <button id="gearBtn" type="button" title="options">⚙</button>
 <div id="gearMenu"><div class="gm-hdr">OPTIONS</div><button id="resetLayoutBtn">RESET LAYOUT</button></div>
 <div class="hud" id="pillars"></div>
 <div class="hud" id="rosterWrap"><div id="roster"></div></div>
+<div class="hud" id="missionlog"><div id="missionlogBody"></div></div>
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
 <div id="market"><div id="marketBody"></div></div>
 <div class="vlabel" id="lblTop">TOP-DOWN <span>· scroll zoom · drag pan · click select · dbl-click reset</span></div>
@@ -158,38 +166,38 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709b"></script>
-<script src="fflate.min.js?v=20260709b"></script>
-<script src="fbxloader.js?v=20260709b"></script>
+<script src="three.min.js?v=20260709c"></script>
+<script src="fflate.min.js?v=20260709c"></script>
+<script src="fbxloader.js?v=20260709c"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709b"></script>
-<script src="inhabitant.js?v=20260709b"></script>
-<script src="passenger.js?v=20260709b"></script>
-<script src="gamemod.js?v=20260709b"></script>
-<script src="chatter.js?v=20260709b"></script>
-<script src="speech_input.js?v=20260709b"></script>
-<script src="vision.js?v=20260709b"></script>
-<script src="deliberate.js?v=20260709b"></script>
-<script src="knowledge.js?v=20260709b"></script>
-<script src="acquire.js?v=20260709b"></script>
-<script src="sound.js?v=20260709b"></script>
-<script src="hullmodels.js?v=20260709b"></script>
-<script src="knowledge_hud.js?v=20260709b"></script>
-<script src="thoughts.js?v=20260709b"></script>
-<script src="tami_battle_ui.js?v=20260709b"></script>
-<script src="power_panel.js?v=20260709b"></script>
-<script src="panels.js?v=20260709b"></script>
-<script src="engbay.js?v=20260709b"></script>
+<script src="speech_tier.js?v=20260709c"></script>
+<script src="inhabitant.js?v=20260709c"></script>
+<script src="passenger.js?v=20260709c"></script>
+<script src="gamemod.js?v=20260709c"></script>
+<script src="chatter.js?v=20260709c"></script>
+<script src="speech_input.js?v=20260709c"></script>
+<script src="vision.js?v=20260709c"></script>
+<script src="deliberate.js?v=20260709c"></script>
+<script src="knowledge.js?v=20260709c"></script>
+<script src="acquire.js?v=20260709c"></script>
+<script src="sound.js?v=20260709c"></script>
+<script src="hullmodels.js?v=20260709c"></script>
+<script src="knowledge_hud.js?v=20260709c"></script>
+<script src="thoughts.js?v=20260709c"></script>
+<script src="tami_battle_ui.js?v=20260709c"></script>
+<script src="power_panel.js?v=20260709c"></script>
+<script src="panels.js?v=20260709c"></script>
+<script src="engbay.js?v=20260709c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709b"></script>
-<script src="conquest.js?v=20260709b"></script>
-<script src="missions.js?v=20260709b"></script>
-<script src="planetmenu.js?v=20260709b"></script>
-<script src="textquests.js?v=20260709b"></script>
+<script src="starmap.js?v=20260709c"></script>
+<script src="conquest.js?v=20260709c"></script>
+<script src="missions.js?v=20260709c"></script>
+<script src="planetmenu.js?v=20260709c"></script>
+<script src="textquests.js?v=20260709c"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -3951,6 +3959,9 @@ if(window.PANELS){
   // innerHTML='' on every rebuild - ship deaths, Tab-cycling focus, etc.) so the pin/opacity chrome survives.
   const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9, resizable:true });   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+  PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
+    defaultOpacity:0.9, resizable:true, defaultOpen:false,   // closed by default (task #66) - an already-busy screen shouldn't gain a 4th open-by-default left-edge panel; one click on its tab opens it
+    onOpenChange:(open)=>{ missionlogOn=open; if(open) updateMissionLog(); } });
 }
 // SR-M7 (REQUIREMENTS_SR.md) "honest-economy rule": the overview grid used to call priceOf() live for EVERY
 // planet regardless of whether you'd ever been there - an omniscient read (the exact thing the P4 economy
@@ -3982,6 +3993,42 @@ function updateMarket(){ if(!marketOn||!planets.length) return;
   // in runCmd) - it should always show YOUR stats, regardless of who's currently focused for the reasoning graph.
   const s=ships[0], el=document.getElementById('mkt-ship'); if(s&&el){ const cg=Object.keys(s.cargo).map(k=>`${GKEY[k].n} ${s.cargo[k]}`).join(' · ')||'empty';
     el.innerHTML=`<b style="color:hsl(${s.hue*360},80%,68%)">${s.name}</b> · ${s.role} · <span style="color:#ffcf52">${s.credits}c</span> · fuel ${Math.round(s.fuel)}/${s.fuelCap||CFG.FUEL_CAP} · hold: ${cg}`; } }
+
+// task #66 (backlog): pinnable mission log window - reuses MISSIONS.board()'s existing HTML wholesale (the exact
+// same content the docked planet-menu MISSIONS tab and the `missions`/`board` terminal command already render),
+// so this is purely a new VIEW, not a second copy of the board-rendering logic.
+let missionlogOn=false;
+function updateMissionLog(){ if(!missionlogOn) return;
+  const body=document.getElementById('missionlogBody'); if(!body) return;
+  body.innerHTML = window.MISSIONS ? MISSIONS.board() : '<span class="mlog-empty">no mission module loaded.</span>'; }
+// task #67: resolve the active mission's real world position by type - `tgt` never stores raw coordinates (see
+// mkMission's generators above), only names/refs that must be resolved fresh each time since ships/planets move
+// or change state. ASSAULT has no tgt at all - its implicit target IS the Stronghold, so point at that directly
+// when one exists (matches ASSAULT's own mission text: "when the Iron Synod raises a Stronghold, assault it").
+function missionTargetPos(m){
+  if(!m) return null;
+  if(m.type==='ESCORT'||m.type==='BOUNTY'){ const t=m.tgt&&m.tgt.shipRef; return (t&&t.alive)?t.pos:null; }
+  if(m.type==='PATROL'||m.type==='LIBERATE'||m.type==='SUPPLY'){ const p=m.tgt&&m.tgt.planetName&&findPlanet(m.tgt.planetName); return p?p.pos:null; }
+  if(m.type==='ASSAULT'){ return stronghold?stronghold.pos:null; }
+  return null;
+}
+const missionArrowEl=document.getElementById('missionArrow'), missionArrowGlyphEl=document.getElementById('missionArrowGlyph'), missionArrowLabelEl=document.getElementById('missionArrowLabel');
+// bearing math mirrors triggerHitFx/updateHitFx's own established pattern (dot the to-target vector against the
+// ship's own RGT/FWD basis) - reused here for a compass-style arrow instead of a damage-direction glow.
+function updateMissionArrow(dt){
+  if(!missionArrowEl) return;
+  const P=ships[0]; const m=window.MISSIONS&&MISSIONS.active&&MISSIONS.active();
+  const tp = (P&&P.alive) ? missionTargetPos(m) : null;
+  if(!tp){ missionArrowEl.style.opacity='0'; return; }
+  _v.copy(tp).sub(P.pos); const dist=_v.length();
+  if(dist<1e-3){ missionArrowEl.style.opacity='0'; return; }
+  _v.normalize();
+  const rx=_v.dot(RGT.clone().applyQuaternion(P.quat)), fz=_v.dot(FWD.clone().applyQuaternion(P.quat));
+  const angDeg=Math.atan2(rx,fz)*180/Math.PI;   // 0 = straight ahead (glyph's own resting orientation), +90 = due right, matches triggerHitFx's RGT/FWD sign convention
+  missionArrowGlyphEl.style.transform='rotate('+angDeg.toFixed(1)+'deg)';
+  missionArrowLabelEl.textContent=(m.title||'MISSION')+' - '+Math.round(dist)+'u';
+  missionArrowEl.style.opacity='1';
+}
 
 // -------- NO-CHEAT economy self-check: prove prices are organic (buy raises, sell lowers, isolated drifts) --------
 function economyIsOrganic(){ if(planets.length<1) return true; const p=planets[0], g='ore';
@@ -4852,15 +4899,16 @@ function ambientDeliberateTick(dt){
     if(!c0.convergence.converged) ACQUIRE.acquire(fromShip.name||'agent', decision, world, GAME_KNOW, {latent, seed:known});
   }catch(e){}
 }
-let last=performance.now(), mktAcc=0;
+let last=performance.now(), mktAcc=0, mlogAcc=0;
 function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=0.05;
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
+  mlogAcc+=dt; if(mlogAcc>0.5){ mlogAcc=0; updateMissionLog(); }   // task #66 - matches mktAcc's own throttle pattern; board/progress text can change between polls while the panel is open
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
