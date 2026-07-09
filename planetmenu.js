@@ -408,7 +408,12 @@ function atBase(P){ var h=H(); if(h && typeof h.atBase==='function' && P){ try{ 
 
 /* -- HULLS: swap chassis, Ranger Command only -- */
 function hullSectionHtml(P){
-  var h=H(); var HULLS=h&&h.HULLS, ORDER=h&&h.HULL_ORDER;
+  var h=H(); var HULLS=h&&h.HULLS;
+  // PROCEDURAL HULL ROSTER: h.HULL_ORDER is now 57 long (7 standard + 50 generated) - a raw dump would bury this
+  // section under 57 button-rows and push every OTHER hangar section out of easy reach. shopHullKeys() is the
+  // same curated (7 + rotating 8) list the `hull` terminal command shows, falling back to the full list only if
+  // an older deploy hasn't shipped shopHullKeys() yet (never actually reachable once source/deploy are in sync).
+  var ORDER=h&&(typeof h.shopHullKeys==='function'?h.shopHullKeys():h.HULL_ORDER);
   if(!HULLS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(hull registry offline)</div>';
   var canRefit = atBase(P);
   var rows='', i;
