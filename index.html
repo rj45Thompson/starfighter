@@ -168,51 +168,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710j"></script>
-<script src="fflate.min.js?v=20260710j"></script>
-<script src="fbxloader.js?v=20260710j"></script>
+<script src="three.min.js?v=20260710k"></script>
+<script src="fflate.min.js?v=20260710k"></script>
+<script src="fbxloader.js?v=20260710k"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710j"></script>
-<script src="inhabitant.js?v=20260710j"></script>
-<script src="passenger.js?v=20260710j"></script>
-<script src="gamemod.js?v=20260710j"></script>
-<script src="chatter.js?v=20260710j"></script>
-<script src="speech_gen.js?v=20260710j"></script>
-<script src="speech_input.js?v=20260710j"></script>
-<script src="vision.js?v=20260710j"></script>
-<script src="deliberate.js?v=20260710j"></script>
-<script src="knowledge.js?v=20260710j"></script>
-<script src="acquire.js?v=20260710j"></script>
-<script src="sound.js?v=20260710j"></script>
-<script src="hullmodels.js?v=20260710j"></script>
-<script src="knowledge_hud.js?v=20260710j"></script>
-<script src="knowledge_screen.js?v=20260710j"></script>
-<script src="centroid_mind.js?v=20260710j"></script>
-<script src="kripke_mind.js?v=20260710j"></script>
-<script src="sober_gate.js?v=20260710j"></script>
-<script src="contradiction_ledger.js?v=20260710j"></script>
-<script src="kripke_planner.js?v=20260710j"></script>
-<script src="pillar_router.js?v=20260710j"></script>
-<script src="gravity_well.js?v=20260710j"></script>
-<script src="growth_loop.js?v=20260710j"></script>
-<script src="coop_proof.js?v=20260710j"></script>
-<script src="tom_test.js?v=20260710j"></script>
-<script src="thoughts.js?v=20260710j"></script>
-<script src="tami_battle_ui.js?v=20260710j"></script>
-<script src="power_panel.js?v=20260710j"></script>
-<script src="panels.js?v=20260710j"></script>
-<script src="item_icons.js?v=20260710j"></script>
-<script src="engbay.js?v=20260710j"></script>
+<script src="speech_tier.js?v=20260710k"></script>
+<script src="inhabitant.js?v=20260710k"></script>
+<script src="passenger.js?v=20260710k"></script>
+<script src="gamemod.js?v=20260710k"></script>
+<script src="chatter.js?v=20260710k"></script>
+<script src="speech_gen.js?v=20260710k"></script>
+<script src="speech_input.js?v=20260710k"></script>
+<script src="vision.js?v=20260710k"></script>
+<script src="deliberate.js?v=20260710k"></script>
+<script src="knowledge.js?v=20260710k"></script>
+<script src="acquire.js?v=20260710k"></script>
+<script src="sound.js?v=20260710k"></script>
+<script src="hullmodels.js?v=20260710k"></script>
+<script src="knowledge_hud.js?v=20260710k"></script>
+<script src="knowledge_screen.js?v=20260710k"></script>
+<script src="centroid_mind.js?v=20260710k"></script>
+<script src="kripke_mind.js?v=20260710k"></script>
+<script src="sober_gate.js?v=20260710k"></script>
+<script src="contradiction_ledger.js?v=20260710k"></script>
+<script src="kripke_planner.js?v=20260710k"></script>
+<script src="pillar_router.js?v=20260710k"></script>
+<script src="gravity_well.js?v=20260710k"></script>
+<script src="growth_loop.js?v=20260710k"></script>
+<script src="coop_proof.js?v=20260710k"></script>
+<script src="tom_test.js?v=20260710k"></script>
+<script src="thoughts.js?v=20260710k"></script>
+<script src="tami_battle_ui.js?v=20260710k"></script>
+<script src="power_panel.js?v=20260710k"></script>
+<script src="panels.js?v=20260710k"></script>
+<script src="item_icons.js?v=20260710k"></script>
+<script src="engbay.js?v=20260710k"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710j"></script>
-<script src="conquest.js?v=20260710j"></script>
-<script src="missions.js?v=20260710j"></script>
-<script src="planetmenu.js?v=20260710j"></script>
-<script src="textquests.js?v=20260710j"></script>
+<script src="starmap.js?v=20260710k"></script>
+<script src="conquest.js?v=20260710k"></script>
+<script src="missions.js?v=20260710k"></script>
+<script src="planetmenu.js?v=20260710k"></script>
+<script src="textquests.js?v=20260710k"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -230,7 +230,7 @@ const T = THREE;
 // SF_LAST_ERROR_v1, so the next crash hands us an exact stack instead of a silent frozen canvas. Diagnostic
 // only - never swallows the error (the console still gets it), never alters game state.
 (function(){ function report(kind,msg,src,line,col,stack){
-    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710j'})); }catch(e){}
+    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710k'})); }catch(e){}
     try{ let el=document.getElementById('sfCrashBanner');
       if(!el){ el=document.createElement('div'); el.id='sfCrashBanner';
         el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#3a0a12;color:#ffb4bc;border:1px solid #ff5a6e;border-radius:8px;padding:8px 14px;font:12px monospace;max-width:80vw;white-space:pre-wrap;';
@@ -1188,10 +1188,14 @@ function planTrade(s){ if(s.fuel<CFG.FUEL_LOW){ s.tradePlan={type:'refuel',plane
   s.tradePlan= bp?{type:'explore',planet:bp}:null; }
 // startWarp/advanceWarp REMOVED (user balance directive 2026-07-03): hyperspace let traders teleport arbitrage routes and
 // made merchants too powerful - everyone flies real-space now. `s.warping` stays as an always-false field (guards inert).
-const TRADER_EQUIP_ORDER=['cargo','fuel','droid','plating'];   // priority order: their job first (bigger hold, longer range), then survivability - never scanner/targeting (combat-flavored, not a merchant's business)
+// CRASH FIX 2026-07-10 (user hit :2942 'cannot read cost of undefined' via the crash trap): this list still named
+// 'fuel' and 'droid' - keys that were REMOVED from EQUIP when fuel-tank/repair-droid became their own gear slots.
+// A trader that couldn't afford 'cargo' fell through to 'fuel' -> equipCost -> EQUIP['fuel'].cost -> boom. Only the
+// two keys that still exist in EQUIP belong here; the `if(!EQUIP[k])` guard below is belt-and-suspenders.
+const TRADER_EQUIP_ORDER=['cargo','plating'];   // their job first (bigger hold), then survivability - the only two EQUIP still holds
 function tryTraderEquip(s,p){ s.equipCd=CFG.TRADER_EQUIP_CD*rand(0.8,1.4);
   if(s.credits<CFG.TRADER_EQUIP_RESERVE) return;
-  for(const k of TRADER_EQUIP_ORDER){ const cost=equipCost(s,k);
+  for(const k of TRADER_EQUIP_ORDER){ if(!EQUIP[k]) continue; const cost=equipCost(s,k);
     if(s.credits-cost>=CFG.TRADER_EQUIP_RESERVE*0.5){ s.credits-=cost; s.equip[k]=(s.equip[k]||0)+1; EQUIP[k].apply(s);
       say(s,`Invested in ${EQUIP[k].n} (-${cost}c) · ${EQUIP[k].desc} · profits at work`); return; } } }
 function doTrade(s,dt){ s.tradeCd=Math.max(0,s.tradeCd-dt); if(!s.tradePlan && s.tradeCd<=0) planTrade(s);
@@ -2941,7 +2945,7 @@ function autoAllocateSkill(s){ s.skills=s.skills||{}; while((s.skillPts||0)>0){
     for(const k of cand){ r-=(w[k]||0.1); if(r<=0){ pick=k; break; } }
     s.skills[pick]=Math.min(CFG.SKILL_MAX,(s.skills[pick]||0)+1); s.skillPts--; } }
 function skillLvl(s,k){ return (s&&s.skills&&s.skills[k])||0; }
-function equipCost(s,k){ return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip&&s.equip[k])||0)); }
+function equipCost(s,k){ if(!EQUIP[k]) return Infinity; return Math.round(EQUIP[k].cost*Math.pow(1.45, (s.equip&&s.equip[k])||0)); }   // guard: an unknown key returns Infinity (unaffordable -> skipped) instead of crashing on undefined.cost
 // AC1 (Round 10): live bench numbers. bench_results.json is BAKED by `node run_all.js --json` - the game only READS it,
 // so every badge below is a real suite number, never hand-typed. If the fetch fails (file://, offline, not yet deployed)
 // the surface commands render exactly as before (prose fallback).
