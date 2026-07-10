@@ -32,7 +32,7 @@ const CFG = {
   CHROME_RESERVE:24,   // user report "the terminal pinned box seems to overlap the parasite tab": the ctl cluster/tab float AT the panel's own top corner, which collided with the panel's OWN header content (market's title, the ticker's PARASITE/TERMINAL/... row) - reserving this much top padding on every registered panel gives the chrome a real strip instead of sitting on top of the content
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
-  RESIZE_GRIP:18,              // resize-handle footprint (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it"; bumped 16->18 + always-visible tint 2026-07-09 "still I can't resize" - an invisible-until-hover 16px target reads as "no resize exists")
+  RESIZE_GRIP:26,              // resize-handle footprint (bumped 16->18->26 across "still I can't resize" reports 2026-07-08/09/10 - now a bold, unmistakable corner handle, not a faint 18px hint)
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
   DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
   EDGE_OFFSET:14,              // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
@@ -92,10 +92,10 @@ if(!document.getElementById('pnl-style')){
     '.pnl-tab:hover{ color:'+COL.txt+'; border-color:#3a567a; }'+
     '.pnl-tab .pnl-pinned{ color:'+COL.cyan+'; }'+
     '.pnl-grip{ position:fixed; z-index:'+(CFG.Z+1)+'; width:'+CFG.RESIZE_GRIP+'px; height:'+CFG.RESIZE_GRIP+'px; cursor:nwse-resize; pointer-events:auto;'+
-      ' background-color:'+COL.cyan+'14;'+   // faint always-on tint (2026-07-09): the grip must be FINDABLE before you hover it
-      ' background-image:linear-gradient(135deg,transparent 0%,transparent 45%,'+COL.border+' 45%,'+COL.border+' 55%,transparent 55%,transparent 100%),'+
-      'linear-gradient(135deg,transparent 0%,transparent 65%,'+COL.border+' 65%,'+COL.border+' 75%,transparent 75%,transparent 100%); border-radius:6px; }'+
-    '.pnl-grip:hover{ background-color:'+COL.cyan+'33; }'+
+      ' background-color:'+COL.cyan+'2e;'+   // bold always-on tint (2026-07-10): the grip must be obviously grabbable, not a faint hint
+      ' border:1px solid '+COL.cyan+'88; box-shadow:0 0 8px '+COL.cyan+'55;'+   // a lit corner so the eye lands on it
+      ' background-image:repeating-linear-gradient(135deg,'+COL.cyan+'cc 0,'+COL.cyan+'cc 2px,transparent 2px,transparent 5px); background-position:bottom right; background-size:16px 16px; background-repeat:no-repeat; border-radius:6px; }'+
+    '.pnl-grip:hover{ background-color:'+COL.cyan+'55; box-shadow:0 0 12px '+COL.cyan+'99; }'+
     // ANDROID/TOUCH: the desktop sizes above (20x18 buttons, 16x16 grip) are well under a comfortable touch
     // target (~40px+) - fine for a mouse pointer, fiddly for a fingertip. `pointer:coarse` is the standard signal
     // for "primary input is imprecise" and degrades gracefully on hybrid devices (a touchscreen laptop with a

@@ -168,51 +168,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710b"></script>
-<script src="fflate.min.js?v=20260710b"></script>
-<script src="fbxloader.js?v=20260710b"></script>
+<script src="three.min.js?v=20260710c"></script>
+<script src="fflate.min.js?v=20260710c"></script>
+<script src="fbxloader.js?v=20260710c"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710b"></script>
-<script src="inhabitant.js?v=20260710b"></script>
-<script src="passenger.js?v=20260710b"></script>
-<script src="gamemod.js?v=20260710b"></script>
-<script src="chatter.js?v=20260710b"></script>
-<script src="speech_gen.js?v=20260710b"></script>
-<script src="speech_input.js?v=20260710b"></script>
-<script src="vision.js?v=20260710b"></script>
-<script src="deliberate.js?v=20260710b"></script>
-<script src="knowledge.js?v=20260710b"></script>
-<script src="acquire.js?v=20260710b"></script>
-<script src="sound.js?v=20260710b"></script>
-<script src="hullmodels.js?v=20260710b"></script>
-<script src="knowledge_hud.js?v=20260710b"></script>
-<script src="knowledge_screen.js?v=20260710b"></script>
-<script src="centroid_mind.js?v=20260710b"></script>
-<script src="kripke_mind.js?v=20260710b"></script>
-<script src="sober_gate.js?v=20260710b"></script>
-<script src="contradiction_ledger.js?v=20260710b"></script>
-<script src="kripke_planner.js?v=20260710b"></script>
-<script src="pillar_router.js?v=20260710b"></script>
-<script src="gravity_well.js?v=20260710b"></script>
-<script src="growth_loop.js?v=20260710b"></script>
-<script src="coop_proof.js?v=20260710b"></script>
-<script src="tom_test.js?v=20260710b"></script>
-<script src="thoughts.js?v=20260710b"></script>
-<script src="tami_battle_ui.js?v=20260710b"></script>
-<script src="power_panel.js?v=20260710b"></script>
-<script src="panels.js?v=20260710b"></script>
-<script src="item_icons.js?v=20260710b"></script>
-<script src="engbay.js?v=20260710b"></script>
+<script src="speech_tier.js?v=20260710c"></script>
+<script src="inhabitant.js?v=20260710c"></script>
+<script src="passenger.js?v=20260710c"></script>
+<script src="gamemod.js?v=20260710c"></script>
+<script src="chatter.js?v=20260710c"></script>
+<script src="speech_gen.js?v=20260710c"></script>
+<script src="speech_input.js?v=20260710c"></script>
+<script src="vision.js?v=20260710c"></script>
+<script src="deliberate.js?v=20260710c"></script>
+<script src="knowledge.js?v=20260710c"></script>
+<script src="acquire.js?v=20260710c"></script>
+<script src="sound.js?v=20260710c"></script>
+<script src="hullmodels.js?v=20260710c"></script>
+<script src="knowledge_hud.js?v=20260710c"></script>
+<script src="knowledge_screen.js?v=20260710c"></script>
+<script src="centroid_mind.js?v=20260710c"></script>
+<script src="kripke_mind.js?v=20260710c"></script>
+<script src="sober_gate.js?v=20260710c"></script>
+<script src="contradiction_ledger.js?v=20260710c"></script>
+<script src="kripke_planner.js?v=20260710c"></script>
+<script src="pillar_router.js?v=20260710c"></script>
+<script src="gravity_well.js?v=20260710c"></script>
+<script src="growth_loop.js?v=20260710c"></script>
+<script src="coop_proof.js?v=20260710c"></script>
+<script src="tom_test.js?v=20260710c"></script>
+<script src="thoughts.js?v=20260710c"></script>
+<script src="tami_battle_ui.js?v=20260710c"></script>
+<script src="power_panel.js?v=20260710c"></script>
+<script src="panels.js?v=20260710c"></script>
+<script src="item_icons.js?v=20260710c"></script>
+<script src="engbay.js?v=20260710c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710b"></script>
-<script src="conquest.js?v=20260710b"></script>
-<script src="missions.js?v=20260710b"></script>
-<script src="planetmenu.js?v=20260710b"></script>
-<script src="textquests.js?v=20260710b"></script>
+<script src="starmap.js?v=20260710c"></script>
+<script src="conquest.js?v=20260710c"></script>
+<script src="missions.js?v=20260710c"></script>
+<script src="planetmenu.js?v=20260710c"></script>
+<script src="textquests.js?v=20260710c"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -366,14 +366,32 @@ const CFG = {
   TOP_VIEW_SHARE:0.56,                             // of the right column ABOVE the power dock, the system map's share (rest = the smaller REASONING view)
   POWER_DOCK_H:252,                                // px reserved at the right column's bottom for the always-on power dock (radial hull ring + tick bars)
   KILLER_MARK_S:12,                                // how long the pilot who killed you stays ringed on the radar (Starblast-style)
+  HITVFX_R:320,                                    // only draw shield/hull impact VFX for ships within this range of you (perf)
+  // STARBLAST GEMS-AS-HULL (user 2026-07-10 "when a ship loses hull another hit will drop his gems... his gems being
+  // like a small extra hull, each bullet dropping a percentage"): a WOUNDED ship carrying wealth spills gems as a
+  // buffer - shooting it makes gems fly (grab them!) while still wearing it down.
+  GEM_HULL_THRESH:0.5,                             // only kicks in below this hull fraction
+  GEM_HULL_FRAC:0.4,                               // of an incoming hull hit, this fraction is absorbed by spilling gems instead of hull
+  GEM_HULL_CREDIT_MULT:1.3,                        // credits spilled per point of damage the gems absorbed (so grabbing them is worth it)
+  GEM_HULL_MIN_CREDITS:6,                          // a near-broke ship has no gem buffer - it just takes the hull damage
+  // SCANNER-GATED ENEMY HEALTH (user 2026-07-10 "scanners should allow you to see enemy health; for low-level ships
+  // when you're really close you maybe see a rough estimate without the right scanner"): the scanner's power must
+  // beat the target's shield-screen (which grows with its tier) to read a PRECISE hull+shield bar; otherwise you
+  // only get a ROUGH band, and only when very close to a low-tier ship.
+  SCAN_SCREEN_PER_TIER:25,                          // shield-screen strength per enemy tier - scanner power must exceed it
+  SCAN_HEALTH_R_BASE:170,                           // base range a fitted scanner can read health at
+  SCAN_HEALTH_R_PER_POWER:3.0,                      // + this range per point of scanner power
+  SCAN_ROUGH_R:55,                                  // "really close" range for a naked-eye rough estimate (no scanner)
+  HP_BAR_MAX:10,                                    // cap of live floating health bars drawn at once (perf)
   TOP_ZOOM:1.08,                                   // top-down ortho margin past the arena
   // PERIPHERAL LENS (user 2026-07-10 "when turning at max speed the ship almost faces the other way but you only
   // see ahead - can the screen edges see more range? like fisheye only on the first/last 15%"): render the chase
   // view at a WIDER fov into an offscreen buffer, then a warp shader keeps the center rectilinear and smoothly
   // compresses the outer strips so the SIDES come into view. C1-continuous at the seam = no visible break.
   PERIPH_ON:true,             // on by default so the wider view is there when you turn hard (toggle: `periph`)
-  PERIPH_WIDE:1.85,           // peripheral capture multiplier: 1.85x more world-angle than the base fov
-  PERIPH_CENTER:0.66,         // fraction of the half-width kept perfectly rectilinear (outer ~34% warps)
+  PERIPH_WIDE:2.1,            // peripheral capture multiplier: 2.1x more world-angle than the base fov (was 1.85 - user "didn't seem to land", boosted so it's unmistakable)
+  PERIPH_CENTER:0.58,         // fraction of the half-width kept perfectly rectilinear (outer ~42% warps - was 0.66)
+  PERIPH_VIGNETTE:0.5,        // darkening of the extreme peripheral edges so the wide-angle zone READS even over empty starfield (a fisheye lens has visible edge falloff)
   PERIPH_DPR:1.5,             // pixel-ratio cap for the offscreen buffer (perf)
 };
 const FWD=new T.Vector3(0,0,-1), UPL=new T.Vector3(0,1,0), RGT=new T.Vector3(1,0,0), WUP=new T.Vector3(0,1,0);
@@ -440,20 +458,21 @@ const PERIPH = (function(){
   let rt=null, rtW=0, rtH=0;
   const quadScene=new T.Scene();
   const mat=new T.ShaderMaterial({
-    uniforms:{ tDiffuse:{value:null}, uCenter:{value:0.66}, uZoom:{value:0.54}, uSlope:{value:0.6}, uEdgeTint:{value:0.16} },
+    uniforms:{ tDiffuse:{value:null}, uCenter:{value:0.58}, uZoom:{value:0.48}, uSlope:{value:0.6}, uEdgeTint:{value:0.22}, uVig:{value:0.5} },
     depthTest:false, depthWrite:false,
     vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }`,
     fragmentShader:`precision highp float; varying vec2 vUv; uniform sampler2D tDiffuse;
-      uniform float uCenter, uZoom, uSlope, uEdgeTint;
+      uniform float uCenter, uZoom, uSlope, uEdgeTint, uVig;
       // abs-coord a in 0..1 -> source-sample coord 0..1. Center is linear (a/uCenter*uZoom); the outer strip uses a
       // quadratic f(p)=uSlope*p+(1-uSlope)*p^2 with f(0)=0, f'(0)=uSlope (matched to the centre slope for C1), f(1)=1.
       float remap(float a){ if(a<=uCenter) return (a/uCenter)*uZoom;
         float p=(a-uCenter)/(1.0-uCenter); float f=uSlope*p+(1.0-uSlope)*p*p; return uZoom+f*(1.0-uZoom); }
       void main(){ vec2 c=vUv*2.0-1.0; float su=sign(c.x)*remap(abs(c.x)), sv=sign(c.y)*remap(abs(c.y));
         vec2 uv=vec2(su,sv)*0.5+0.5; vec4 col=texture2D(tDiffuse,uv);
-        // a faint cool tint that grows through the warped strips, so the peripheral zone reads as "wide-angle glass"
+        // how deep into the warped peripheral strip this pixel is (0 in the sharp centre -> 1 at the extreme edge)
         float e=max(smoothstep(uCenter,1.0,abs(c.x)), smoothstep(uCenter,1.0,abs(c.y)));
-        col.rgb=mix(col.rgb, col.rgb*vec3(0.82,0.90,1.08), e*uEdgeTint);
+        col.rgb=mix(col.rgb, col.rgb*vec3(0.80,0.90,1.10), e*uEdgeTint);   // cool "wide-angle glass" tint
+        col.rgb*=(1.0 - uVig*e*e);                                          // edge vignette so the lens zone READS even over empty starfield
         gl_FragColor=col; } `
   });
   const quad=new T.Mesh(new T.PlaneGeometry(2,2), mat); quad.frustumCulled=false; quadScene.add(quad);
@@ -461,6 +480,7 @@ const PERIPH = (function(){
   function recompute(){ const wide=Math.max(1.01, CFG.PERIPH_WIDE); const zoom=1/wide;
     const ctr=Math.min(0.95, Math.max(0.2, CFG.PERIPH_CENTER));
     mat.uniforms.uCenter.value=ctr; mat.uniforms.uZoom.value=zoom;
+    if(CFG.PERIPH_VIGNETTE!=null) mat.uniforms.uVig.value=CFG.PERIPH_VIGNETTE;
     // matched-slope for C1 continuity at the seam: center slope = zoom/ctr; edge slope f'(0) makes them equal
     mat.uniforms.uSlope.value=(zoom*(1.0-ctr))/(ctr*(1.0-zoom)); }
   recompute();
@@ -483,7 +503,7 @@ const PERIPH = (function(){
     renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(quadScene,quadCam);
     return true; }
   return { renderInto, recompute, mat,
-    set(k,v){ if(k==='wide') CFG.PERIPH_WIDE=Math.max(1.0,v); else if(k==='center') CFG.PERIPH_CENTER=v; else if(k==='tint') mat.uniforms.uEdgeTint.value=v; else if(k==='on') CFG.PERIPH_ON=!!v; recompute(); },
+    set(k,v){ if(k==='wide') CFG.PERIPH_WIDE=Math.max(1.0,v); else if(k==='center') CFG.PERIPH_CENTER=v; else if(k==='tint') mat.uniforms.uEdgeTint.value=v; else if(k==='vignette') CFG.PERIPH_VIGNETTE=Math.max(0,v); else if(k==='on') CFG.PERIPH_ON=!!v; recompute(); },
     toggle(){ CFG.PERIPH_ON=!CFG.PERIPH_ON; return CFG.PERIPH_ON; } };
 })();
 
@@ -765,6 +785,21 @@ function segDistSq(a,b,p){ const abx=b.x-a.x, aby=b.y-a.y, abz=b.z-a.z; const L=
 function burst(pos,col,n,spd,sz){ for(let i=0;i<n;i++){ const m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
   const s=sz*rand(0.5,1.2); m.scale.set(s,s,1); m.position.copy(pos); scene.add(m);
   parts.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(spd*rand(0.3,1)), life:rand(0.3,0.8), max:0.8, mesh:m, s }); } }
+// HIT FEEDBACK (user 2026-07-10 "make an effect when shields absorb shots vs hull"): a shot stopped by the shield
+// throws a cool-blue expanding RIPPLE ring at the impact; a shot that reaches HULL throws hot orange SPARKS + a
+// red chip. Gated to near the player so distant AI dogfights don't flood the particle pool.
+let _vfxTmp=new T.Vector3();
+function hitVfx(ship, pos, absorbed, hullDmg){
+  const P=ships[0]; if(!P||!ship) return;
+  if(P.pos.distanceTo(ship.pos) > CFG.HITVFX_R) return;                 // only render impacts you could actually see
+  if(absorbed>0.5){                                                     // SHIELD absorb -> blue ripple ring
+    const mag=Math.min(2.2, 0.9+absorbed*0.05);
+    const m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0x8fd6ff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.95}));
+    const s=3.0*mag; m.scale.set(s,s,1); m.position.copy(pos); scene.add(m);
+    parts.push({ pos:pos.clone(), vel:new T.Vector3(), life:0.32, max:0.32, mesh:m, s, ring:true }); }
+  if(hullDmg>0.5){                                                      // HULL hit -> orange sparks + a red chip
+    burst(pos, 0xffb454, 5, 11, 1.5*Math.min(2,0.8+hullDmg*0.04));
+    burst(pos, 0xff5a4e, 3, 7, 1.2); } }
 
 // =================================================================================================
 //  TRADING ECONOMY - organic supply/demand. GIVEN: good base values + a planet's economy TYPE.
@@ -895,10 +930,14 @@ function drainShield(s,dmg,fromPos){
   let isFront=true;
   if(fromPos){ _vhit.copy(fromPos).sub(s.pos); if(_vhit.lengthSq()>1e-6){ _vhit.normalize(); isFront=_vhit.dot(FWD.clone().applyQuaternion(s.quat))>0; } }
   const arcKey=isFront?'shieldFwd':'shieldAft';
+  let absorbed=0;
   if(s[arcKey]>0){
-    const absorb=Math.min(s[arcKey],dmg); s[arcKey]-=absorb; dmg-=absorb;
+    absorbed=Math.min(s[arcKey],dmg); s[arcKey]-=absorbed; dmg-=absorbed;
     s.shield=s.shieldFwd+s.shieldAft;
-  } return dmg; }   // returns the LEFTOVER damage that spills to hull
+  }
+  const impact=_vfxTmp.copy(s.pos); if(fromPos){ impact.addScaledVector(_vhit.copy(fromPos).sub(s.pos).normalize(), (s.r||3)*0.7); }   // impact point on the facing toward the shooter
+  hitVfx(s, impact, absorbed, dmg);   // blue ripple for shield absorb, orange sparks for the hull leftover
+  return dmg; }   // returns the LEFTOVER damage that spills to hull
 // SR X-WING CAPACITORS (user 2026-07-08: "copy xwing... show the power capacitor levels for lasers shields and engine
 // speed"): two independent energy pools, separate from the weapons/engines/shields ALLOCATION sliders above (which now
 // govern RECHARGE RATE, not just efficiency) - LASER drains per shot fired and hard-blocks firing at 0; ENGINE drains
@@ -922,8 +961,11 @@ function dockPromptTick(){ const P=ships[0]; const btn=document.getElementById('
   // BASE_R*1.15 while hull/blackmarket/repair all gate on the plain atBase() check (<BASE_R) - clicking DOCK from
   // that gap opened the loadout screen with everything already disabled, no way to tell why. Every candidate below
   // uses a radius comfortably INSIDE its own real gate, so the button never promises access the menu can't give.
-  if(base){ const d=P.pos.distanceTo(base.pos); if(d<=CFG.BASE_R*0.85 && d<bestD){ bestD=d; dockTarget=base; } }
-  for(const p of planets){ const d=P.pos.distanceTo(p.pos); if(d<=CFG.DOCK_R*0.85 && d<bestD){ bestD=d; dockTarget=p; } }
+  // DOCK ASSIST (user 2026-07-10 "can't seem to land sometimes, maybe because I'm under attack"): show the DOCK
+  // button out to a GENEROUS grab radius so you can grab it while maneuvering under fire - clicking it snaps you
+  // in (completeDock zeroes velocity + pulls you to the ring), so you never have to precisely hover a tight ring.
+  if(base){ const d=P.pos.distanceTo(base.pos); if(d<=CFG.BASE_R*1.15 && d<bestD){ bestD=d; dockTarget=base; } }
+  for(const p of planets){ const d=P.pos.distanceTo(p.pos); if(d<=CFG.DOCK_R*1.5 && d<bestD){ bestD=d; dockTarget=p; } }
   if(!dockTarget){ btn.style.display='none'; return; }
   btn.textContent = dockTarget===base ? '⌂ DOCK AT RANGER COMMAND' : dockTarget.isPirateStation ? ('☠ DOCK AT '+dockTarget.name) : ('⬇ LAND ON '+dockTarget.name);
   btn.style.display='block'; }
@@ -944,6 +986,8 @@ function completeDock(s,p,isBase){
   // never had this bug - their branch already set it). Silent no-op, not a crash, so it read as "didn't work."
   if(isBase){ s.docked=p; s.obj=null; s.vel.set(0,0,0); if(s.role==='player'&&window.KPLAN) KPLAN.observe('dock:'+p.name); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
   if(p.rep<=CFG.REP_HOSTILE && !p.isPirateStation){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }   // a pirate station's whole business model is welcoming ships everyone else refuses - see makePirateStation()
+  if(s.role==='player'){ _v.copy(s.pos).sub(p.pos); if(_v.lengthSq()<1e-6) _v.set(1,0,0); _v.normalize();   // direction FIRST (before s.pos is overwritten - eval-order aliasing)
+    s.pos.copy(p.pos).addScaledVector(_v, (p.radius||0)+CFG.DOCK_R*0.8); s.vel.set(0,0,0); }   // DOCK ASSIST: snap to just outside the planet body on the ring + kill velocity so a knock under fire can't bounce you back out
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player') recordObservedPrices(p);   // SR-M7: the moment of docking is a real observation, whether or not the market panel happens to be open
   observePlanetPrices(s,p);   // IRON LAW: the SAME per-ship price memory for everyone - the player's autopilot trade plans from this too, exactly like the AI
@@ -1878,7 +1922,10 @@ function step(dt){
     if(!g.perm && g.age>CFG.GEM_LIFE){ scene.remove(g.mesh); gems.splice(i,1); } }   // perm stash persists until a ship collects it
   updateCargoPods(dt);
   for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.life-=dt; p.pos.addScaledVector(p.vel,dt); p.vel.multiplyScalar(Math.exp(-3*dt)); p.mesh.position.copy(p.pos);
-    const k=Math.max(0,p.life/p.max); p.mesh.material.opacity=k; p.mesh.scale.setScalar(p.s*(0.4+k)); if(p.life<=0){ scene.remove(p.mesh); parts.splice(i,1); } }
+    const k=Math.max(0,p.life/p.max);
+    p.mesh.material.opacity=p.ring?k*0.95:k;
+    p.mesh.scale.setScalar(p.ring ? p.s*(1+(1-k)*3.4) : p.s*(0.4+k));   // ring parts (shield ripple) GROW as they fade; sparks shrink
+    if(p.life<=0){ scene.remove(p.mesh); parts.splice(i,1); } }
   escalation+=CFG.ESC_RATE*dt;                                       // the Hegemon rises over time (arms race)
   pirateCd-=dt; if(pirateCd<=0 && ships.filter(s=>s.team==='pirate').length<enemyCap()){ pirateCd=CFG.PIRATE_SPAWN_CD; addPirate(); }
   warTick(dt); wingmanTick(dt);   // SR-M18: wing contracts bill/lapse on the same cadence the war front updates
@@ -1900,7 +1947,25 @@ function step(dt){
   planetDefense();                                                    // planets scramble hired guns against nearby attackers
   for(let i=ships.length-1;i>=0;i--){ if(ships[i].despawn) removeShip(ships[i]); }   // retire defenders/pirates that died / stood down
 }
-function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d); s.hp-=drainShield(s,d,fromPos)*(1-shieldGenPctFor(s)); if(s.hp<=0) killShip(s); }   // DOCKED = safe harbor - no combat damage while docked; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
+function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d);   // DOCKED = safe harbor - no combat damage while docked
+  let hullDmg=drainShield(s,d,fromPos)*(1-shieldGenPctFor(s));   // X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
+  // STARBLAST GEMS-AS-HULL: a wounded ship still carrying wealth spills gems as a buffer - each hit that reaches
+  // hull knocks a chunk of its credits out as collectible gems AND that gem chunk EATS the equivalent hull damage,
+  // so shooting a rich low-hull enemy makes gems fly (grab them!) while you still wear it down.
+  if(hullDmg>0 && s.hp>0 && s.maxHp>0 && (s.hp/s.maxHp)<CFG.GEM_HULL_THRESH && (s.credits||0)>=CFG.GEM_HULL_MIN_CREDITS){
+    const eaten=hullDmg*CFG.GEM_HULL_FRAC;
+    const spill=Math.min(s.credits, Math.max(1, Math.round(eaten*CFG.GEM_HULL_CREDIT_MULT)));
+    s.credits-=spill; spillGems(s,spill,fromPos); hullDmg-=eaten; }
+  s.hp-=hullDmg; if(s.hp<=0) killShip(s); }
+// eject `credits` worth of gems off a wounded ship, thrown AWAY from the shooter so they scatter into space to be
+// chased down (Starblast salvage). Small chunks so a burst of hits sprays a trail of gems.
+function spillGems(s,credits,fromPos){ credits=Math.round(credits); if(credits<=0) return;
+  const n=clamp(Math.ceil(credits/CFG.GEM_HULL_MIN_CREDITS),1,3), per=credits/n;
+  const away=fromPos?_vhit.copy(s.pos).sub(fromPos).normalize():FWD.clone().applyQuaternion(s.quat);
+  const before=gems.length;
+  for(let k=0;k<n;k++){ spawnGem(s.pos.clone().add(new T.Vector3(rand(-1.5,1.5),rand(-1.5,1.5),rand(-1.5,1.5))), per/CFG.GEM_CREDIT_PER_SCALE); }
+  for(let i=before;i<gems.length;i++){ gems[i].credits=Math.max(1,Math.round(per)); gems[i].vel.copy(away).multiplyScalar(rand(6,12)).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))); }
+  if(window.SOUND) SOUND.play('ui'); }
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   dropCargo(s);                                                     // spill the hold as salvage pods
@@ -2459,6 +2524,22 @@ const SCANNERS={
 const SCANNER_KEYS=Object.keys(SCANNERS);
 function scannerOf(s){ return SCANNERS[s.scannerType||'none']||SCANNERS.none; }
 function scanBlockPct(o){ return clamp(Math.round((shieldMaxFor(o)/CFG.SHIELD_BASE)*CFG.SCAN_BLOCK_PER_SHIELD),0,CFG.SCAN_BLOCK_MAX); }
+// SCANNER-GATED ENEMY HEALTH: can `viewer` read `o`'s health, and how well? Returns {mode:'precise'|'rough'|'none',...}.
+// precise (exact hull+shield %) needs a scanner whose power beats o's tier-scaled shield-screen AND o in range;
+// rough (a band, no numbers) is the naked-eye read of a LOW-TIER ship at point-blank; else you get nothing.
+function healthReadout(viewer,o){
+  if(!viewer||!o) return {mode:'none'};
+  const sp=(scannerOf(viewer).power)||0, dist=viewer.pos.distanceTo(o.pos), tier=o.tier||0;
+  const screen=tier*CFG.SCAN_SCREEN_PER_TIER, range=CFG.SCAN_HEALTH_R_BASE+sp*CFG.SCAN_HEALTH_R_PER_POWER;
+  const hull=o.maxHp>0?clamp(Math.round(o.hp/o.maxHp*100),0,100):0;
+  if(sp>0 && sp>=screen && dist<=range){
+    const smax=shieldMaxFor(o), spct=smax>0?Math.round(((o.shield==null?smax:o.shield)/smax)*100):null;
+    return {mode:'precise', hull:hull, shield:spct}; }
+  const small=['scout','fighter','interceptor','shuttle'].indexOf(o.hullClass)>=0;
+  if(dist<=CFG.SCAN_ROUGH_R && tier<=0 && small){ const f=o.hp/o.maxHp;
+    return {mode:'rough', band: f>0.66?'strong':(f>0.33?'damaged':'critical'), hull:hull}; }
+  return {mode:'none'};
+}
 
 // SHIELD GENERATOR: a flat %-damage-reduction layer, distinct from (and stacking AFTER) the fore/aft capacitor
 // shield pools above - "shields absorb first, then a hull damage-reduction layer" (see the bullet-hit pipeline).
@@ -3576,13 +3657,18 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const k=a[1].toLowerCase(), v=parseFloat(a[2]);
     if(k==='on'){ PERIPH.set('on',true); term('🐟 lens ON','sys'); return; }
     if(k==='off'){ PERIPH.set('on',false); term('🐟 lens OFF','sys'); return; }
-    if((k==='wide'||k==='center'||k==='tint')&&isFinite(v)){ PERIPH.set(k,v); term(`🐟 lens ${k} = ${v} <span style="opacity:.6">(wide=${CFG.PERIPH_WIDE}, center=${CFG.PERIPH_CENTER})</span>`,'sys'); return; }
+    if((k==='wide'||k==='center'||k==='tint'||k==='vignette')&&isFinite(v)){ PERIPH.set(k,v); term(`🐟 lens ${k} = ${v} <span style="opacity:.6">(wide=${CFG.PERIPH_WIDE}, center=${CFG.PERIPH_CENTER}, vignette=${CFG.PERIPH_VIGNETTE})</span>`,'sys'); return; }
     term('usage: periph [on|off] · periph wide <1.2-3> · periph center <0.4-0.9> · periph tint <0-0.5>','err'); return; }
   if(c==='scan'){ const ps=planets.map(p=>`${p.name}(${p.type.t} Lv${p.dev})${p.hegemon?' ☠SYNOD':''} ${Math.round(P.pos.distanceTo(p.pos))}u`).join(' · ');
     const inrange=ships.filter(o=>o!==P&&o.alive&&P.pos.distanceTo(o.pos)<CFG.SENSE_R*1.6).sort((a,b)=>P.pos.distanceTo(a.pos)-P.pos.distanceTo(b.pos));
     // the Passenger reads each hostile: hull %, weapon tier - and paints a scan BADGE (shield/hull bars) above them
-    const sh=inrange.map(o=>{ const hp=Math.round((o.hp/o.maxHp)*100), threat=o.team==='pirate'?'☠':'·';
-      const smax=shieldMaxFor(o), spct=smax>0?Math.round(((o.shield==null?smax:o.shield)/smax)*100):null;   // X-WING POWER: scan now shows real shield%, not just hull
+    const sh=inrange.map(o=>{ const threat=o.team==='pirate'?'☠':'·';
+      // SCANNER-GATED: only a good-enough scanner reads exact hull/shield; else a rough band, or nothing.
+      const hr=healthReadout(P,o);
+      let health;
+      if(hr.mode==='precise') health=`${hr.hull}% hull${hr.shield!=null?` · <span style="color:#7fd0ff">${hr.shield}% shield</span>`:''}`;
+      else if(hr.mode==='rough') health=`<span style="opacity:.8" title="rough naked-eye read - fit a scanner for exact numbers">~${hr.band}</span>`;
+      else health=`<span style="opacity:.5" title="fit a Scanner (dock) to read this ship's health - stronger ships need a stronger scanner">health ???</span>`;
       // GROWTH pillar, LOAD-BEARING: a grow-learned rule pre-classifies this contact's role from its hull class.
       // This scan IS a real observation, so it VERIFIES or REFUTES the mind's presumption - never masks a refutation.
       //  - rule role matches what the scan reveals -> green "✓ role (rule confirmed)"
@@ -3592,7 +3678,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
         if(pr){ if(o.role&&pr.role===o.role) roleTag=` · <span style="color:#8fe38f" title="grow-learned rule ${pr.rule} (support ${pr.support}) - this scan confirms the presumption">✓ ${o.role}</span>`;
           else if(o.role) roleTag=` · <span style="color:#ff9a9a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - this scan REFUTES the presumption">REFUTED: guessed ${pr.role}, is ${o.role}</span>`;
           else roleTag=` · <span style="color:#ffd27a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - defeasible, a scan can refute it">PRESUMED ${pr.role}</span>`; } } }catch(e){}
-      return `${threat} ${o.name} ${hp}% hull${spct!=null?` · <span style="color:#7fd0ff">${spct}% shield</span>`:''} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u${roleTag}`; }).join('<br>&nbsp;&nbsp;')||'none';
+      return `${threat} ${o.name} ${health} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u${roleTag}`; }).join('<br>&nbsp;&nbsp;')||'none';
     if(window.HULLMODELS&&HULLMODELS.scanBadge){ for(const o of inrange.slice(0,6)){ try{ if(o._scanBadge){ o.mesh.remove(o._scanBadge); } o._scanBadge=HULLMODELS.scanBadge(T,o); o.mesh.add(o._scanBadge); o._scanBadgeT=(typeof T0!=='undefined'?T0:0)+8; }catch(e){} } }
     if(window.SOUND) SOUND.play('ui');
     term('<b style="color:#8fd0ff">◈ SCAN</b> <span style="opacity:.55"> - the Passenger reads what your sensors touch; badges painted over live contacts for 8s</span>','sys');
@@ -3982,6 +4068,30 @@ function updateKillerMark(){
   if(km&&km.s&&km.s.alive&&T0<km.until){ killerHalo.visible=true; killerHalo.position.copy(km.s.pos);
     const p=0.5+0.5*Math.sin(T0*8); killerHalo.scale.setScalar(22+12*p); killerHalo.material.opacity=0.30+0.5*p; }
   else { killerHalo.visible=false; if(km&&(T0>=km.until||!(km.s&&km.s.alive))) killerMark=null; } }
+// SCANNER-GATED LIVE HEALTH BARS (Starblast style): a floating hull(+shield) bar over each nearby ship the player's
+// scanner can actually read. Precise scanner -> bright bar with a shield strip; naked-eye rough read of a low-tier
+// ship point-blank -> a dim banded bar; can't read it -> no bar. World-space (never tumbles with the ship).
+const _hpbars={}; const _hpUp=new T.Vector3(0,1,0);
+function makeHpBar(){ const c=document.createElement('canvas'); c.width=84; c.height=18; const g=c.getContext('2d');
+  const tex=new T.CanvasTexture(c); tex.minFilter=T.LinearFilter;
+  const sp=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false,opacity:0.95}));
+  sp.scale.set(10,2.1,1); sp.renderOrder=16; scene.add(sp);
+  return {sprite:sp,canvas:c,ctx:g,tex,lastHull:-1,lastSh:-2}; }
+function drawHpBar(bar,hull,shield){ const g=bar.ctx,W=84; g.clearRect(0,0,W,18);
+  const hf=clamp(hull/100,0,1), col=hull>60?'#7fdc8a':hull>30?'#ffcf52':'#ff6a6a';
+  g.fillStyle='rgba(0,0,0,0.55)'; g.fillRect(0,0,W,10); g.fillStyle=col; g.fillRect(1,1,(W-2)*hf,8);
+  if(shield!=null){ g.fillStyle='rgba(0,0,0,0.55)'; g.fillRect(0,11,W,6); g.fillStyle='#7fd0ff'; g.fillRect(1,12,(W-2)*clamp(shield/100,0,1),4); }
+  bar.tex.needsUpdate=true; }
+function updateEnemyHealthBars(){ const P=ships[0]; if(!P||!P.alive){ for(const id in _hpbars){ _hpbars[id].sprite.visible=false; } return; }
+  const near=ships.filter(o=>o!==P&&o.alive&&o.name).sort((a,b)=>P.pos.distanceTo(a.pos)-P.pos.distanceTo(b.pos)).slice(0,CFG.HP_BAR_MAX);
+  const keep={};
+  for(const o of near){ const hr=healthReadout(P,o); if(hr.mode==='none') continue;
+    let bar=_hpbars[o.id]; if(!bar){ bar=_hpbars[o.id]=makeHpBar(); } keep[o.id]=1; bar.sprite.visible=true;
+    bar.sprite.position.copy(o.pos).addScaledVector(_hpUp,(o.r||3)+3.5);
+    const shield=hr.mode==='precise'?hr.shield:null;
+    if(hr.hull!==bar.lastHull||shield!==bar.lastSh){ drawHpBar(bar,hr.hull,shield); bar.lastHull=hr.hull; bar.lastSh=shield; }
+    bar.sprite.material.opacity=hr.mode==='rough'?0.45:0.95; }
+  for(const id in _hpbars){ if(!keep[id]){ const b=_hpbars[id]; if(b.sprite.parent) b.sprite.parent.remove(b.sprite); b.tex.dispose(); b.sprite.material.dispose(); delete _hpbars[id]; } } }
 
 // =================================================================================================
 //  REASONING GRAPH - a three.js scene (virtual 600x470, y-up). No 2D canvas.
@@ -5654,7 +5764,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
