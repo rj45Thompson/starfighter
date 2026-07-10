@@ -166,50 +166,50 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709u"></script>
-<script src="fflate.min.js?v=20260709u"></script>
-<script src="fbxloader.js?v=20260709u"></script>
+<script src="three.min.js?v=20260709v"></script>
+<script src="fflate.min.js?v=20260709v"></script>
+<script src="fbxloader.js?v=20260709v"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709u"></script>
-<script src="inhabitant.js?v=20260709u"></script>
-<script src="passenger.js?v=20260709u"></script>
-<script src="gamemod.js?v=20260709u"></script>
-<script src="chatter.js?v=20260709u"></script>
-<script src="speech_gen.js?v=20260709u"></script>
-<script src="speech_input.js?v=20260709u"></script>
-<script src="vision.js?v=20260709u"></script>
-<script src="deliberate.js?v=20260709u"></script>
-<script src="knowledge.js?v=20260709u"></script>
-<script src="acquire.js?v=20260709u"></script>
-<script src="sound.js?v=20260709u"></script>
-<script src="hullmodels.js?v=20260709u"></script>
-<script src="knowledge_hud.js?v=20260709u"></script>
-<script src="knowledge_screen.js?v=20260709u"></script>
-<script src="centroid_mind.js?v=20260709u"></script>
-<script src="kripke_mind.js?v=20260709u"></script>
-<script src="sober_gate.js?v=20260709u"></script>
-<script src="contradiction_ledger.js?v=20260709u"></script>
-<script src="kripke_planner.js?v=20260709u"></script>
-<script src="pillar_router.js?v=20260709u"></script>
-<script src="gravity_well.js?v=20260709u"></script>
-<script src="growth_loop.js?v=20260709u"></script>
-<script src="tom_test.js?v=20260709u"></script>
-<script src="thoughts.js?v=20260709u"></script>
-<script src="tami_battle_ui.js?v=20260709u"></script>
-<script src="power_panel.js?v=20260709u"></script>
-<script src="panels.js?v=20260709u"></script>
-<script src="item_icons.js?v=20260709u"></script>
-<script src="engbay.js?v=20260709u"></script>
+<script src="speech_tier.js?v=20260709v"></script>
+<script src="inhabitant.js?v=20260709v"></script>
+<script src="passenger.js?v=20260709v"></script>
+<script src="gamemod.js?v=20260709v"></script>
+<script src="chatter.js?v=20260709v"></script>
+<script src="speech_gen.js?v=20260709v"></script>
+<script src="speech_input.js?v=20260709v"></script>
+<script src="vision.js?v=20260709v"></script>
+<script src="deliberate.js?v=20260709v"></script>
+<script src="knowledge.js?v=20260709v"></script>
+<script src="acquire.js?v=20260709v"></script>
+<script src="sound.js?v=20260709v"></script>
+<script src="hullmodels.js?v=20260709v"></script>
+<script src="knowledge_hud.js?v=20260709v"></script>
+<script src="knowledge_screen.js?v=20260709v"></script>
+<script src="centroid_mind.js?v=20260709v"></script>
+<script src="kripke_mind.js?v=20260709v"></script>
+<script src="sober_gate.js?v=20260709v"></script>
+<script src="contradiction_ledger.js?v=20260709v"></script>
+<script src="kripke_planner.js?v=20260709v"></script>
+<script src="pillar_router.js?v=20260709v"></script>
+<script src="gravity_well.js?v=20260709v"></script>
+<script src="growth_loop.js?v=20260709v"></script>
+<script src="tom_test.js?v=20260709v"></script>
+<script src="thoughts.js?v=20260709v"></script>
+<script src="tami_battle_ui.js?v=20260709v"></script>
+<script src="power_panel.js?v=20260709v"></script>
+<script src="panels.js?v=20260709v"></script>
+<script src="item_icons.js?v=20260709v"></script>
+<script src="engbay.js?v=20260709v"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709u"></script>
-<script src="conquest.js?v=20260709u"></script>
-<script src="missions.js?v=20260709u"></script>
-<script src="planetmenu.js?v=20260709u"></script>
-<script src="textquests.js?v=20260709u"></script>
+<script src="starmap.js?v=20260709v"></script>
+<script src="conquest.js?v=20260709v"></script>
+<script src="missions.js?v=20260709v"></script>
+<script src="planetmenu.js?v=20260709v"></script>
+<script src="textquests.js?v=20260709v"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2237,7 +2237,17 @@ const EQUIP={ cargo:{n:'Cargo Pod',cost:120,desc:'+15 hold',apply:s=>s.holdCap+=
 const ENGINES={
   standard:{n:'Standard Drive', cost:0,   speedMult:1.00, fuelMult:1.00, desc:'balanced - the factory drive'},
   after:   {n:'Afterburner Drive', cost:480, speedMult:1.22, fuelMult:1.4, desc:'faster top speed + accel - burns hyperjump fuel harder'},
-  ion:     {n:'Ion Drive', cost:520, speedMult:0.85, fuelMult:0.6, desc:'slower - sips hyperjump fuel, real range between refuels'} };
+  ion:     {n:'Ion Drive', cost:520, speedMult:0.85, fuelMult:0.6, desc:'slower - sips hyperjump fuel, real range between refuels'},
+  // SR-M21 (user 2026-07-09, real Space Rangers ladder): the full T1-T8 engine line. Real SR names; speed climbs
+  // engine speed 400->1000 in SR, mapped to our speedMult, and jump range 17->41 mapped to better fuelMult.
+  diving:    {n:'Diving Engine',    cost:300,  speedMult:1.02, fuelMult:1.00, tier:1, desc:'T1 - SR engine speed 400, jump 17'},
+  singular:  {n:'Singular Engine',  cost:520,  speedMult:1.10, fuelMult:0.96, tier:2, desc:'T2 - speed 450, jump 19'},
+  gillnozzle:{n:'Gillnozzle Engine',cost:800,  speedMult:1.18, fuelMult:0.92, tier:3, desc:'T3 - speed 500, jump 21'},
+  flow:      {n:'Flow Engine',      cost:1150, speedMult:1.28, fuelMult:0.88, tier:4, desc:'T4 - speed 600, jump 25'},
+  splash:    {n:'Splash Engine',    cost:1550, speedMult:1.38, fuelMult:0.84, tier:5, desc:'T5 - speed 700, jump 29'},
+  graviton:  {n:'Graviton Engine',  cost:1950, speedMult:1.48, fuelMult:0.78, tier:6, desc:'T6 - speed 800, jump 33'},
+  stensor:   {n:'Stensor Engine',   cost:2350, speedMult:1.58, fuelMult:0.72, tier:7, desc:'T7 - speed 900, jump 37'},
+  temporal:  {n:'Temporal Engine',  cost:2900, speedMult:1.70, fuelMult:0.64, tier:8, desc:'T8 - speed 1000, jump 41 - the apex drive'} };
 const ENGINE_KEYS=Object.keys(ENGINES);
 function engineOf(s){ return ENGINES[s.engineType||'standard']||ENGINES.standard; }
 // GIZMOS: the electronics bay - GIZMO_SLOTS mount points (see CFG.GIZMO_SLOTS), each holding at most one gizmo key.
@@ -2273,7 +2283,16 @@ function unmountGizmo(s,idx){ if(!s.gizmoSlots||idx<0||idx>=s.gizmoSlots.length|
 const FUEL_TANKS={
   standard:{n:'Standard Tank',  cost:0,   bonus:0,   desc:'factory tank - baseline range between refuels'},
   extended:{n:'Extended Tank',  cost:220, bonus:60,  desc:'+60 fuel capacity - fewer trips back to a gas giant'},
-  reserve: {n:'Reserve Tank',   cost:420, bonus:120, desc:'+120 fuel capacity - real range in deep space'} };
+  reserve: {n:'Reserve Tank',   cost:420, bonus:120, desc:'+120 fuel capacity - real range in deep space'},
+  // SR-M21: the full T1-T8 fuel-tank line (SR capacity ratio 1:1 -> 3:1), mapped to our flat +fuel bonus.
+  hyperliquid:  {n:'Hyper Liquid Fuel Tank', cost:180,  bonus:30,  tier:1, desc:'T1 - SR ratio 1:1'},
+  condensed:    {n:'Condensed Fuel Tank',    cost:340,  bonus:55,  tier:2, desc:'T2 - ratio 1.05:1'},
+  reductional:  {n:'Reductional Fuel Tank',  cost:540,  bonus:85,  tier:3, desc:'T3 - ratio 1.2:1'},
+  protovesicular:{n:'Protovesicular Tank',   cost:780,  bonus:120, tier:4, desc:'T4 - ratio 1.3:1'},
+  positional:   {n:'Positional Fuel Tank',   cost:1050, bonus:160, tier:5, desc:'T5 - ratio 1.4:1'},
+  endoclustered:{n:'Endoclustered Tank',     cost:1400, bonus:210, tier:6, desc:'T6 - ratio 1.6:1'},
+  gyroscopic:   {n:'Gyroscopic Fuel Tank',   cost:1800, bonus:280, tier:7, desc:'T7 - ratio 1.9:1'},
+  tecronic:     {n:'Tecronic Fuel Tank',     cost:2400, bonus:380, tier:8, desc:'T8 - ratio 3:1 - deep-space reach'} };
 const FUEL_TANK_KEYS=Object.keys(FUEL_TANKS);
 function fitFuelTank(s,key){ const old=FUEL_TANKS[s.fuelTankType||'standard'], neu=FUEL_TANKS[key]; if(!neu) return false;
   s.fuelCap=(s.fuelCap||CFG.FUEL_CAP)-(old.bonus||0)+(neu.bonus||0); s.fuelTankType=key; return true; }
@@ -2281,7 +2300,16 @@ function fitFuelTank(s,key){ const old=FUEL_TANKS[s.fuelTankType||'standard'], n
 const RADARS={
   basic:    {n:'Basic Radar',     cost:0,   bonus:0,  desc:'factory array - stock detection range'},
   longrange:{n:'Long-Range Radar',cost:260, bonus:45, desc:'+45 sensor range - see hostiles coming from further out'},
-  deepscan: {n:'Deep Scan Array', cost:520, bonus:90, desc:'+90 sensor range - the widest picture on the field'} };
+  deepscan: {n:'Deep Scan Array', cost:520, bonus:90, desc:'+90 sensor range - the widest picture on the field'},
+  // SR-M21: the full T1-T8 radar line (SR range 1200->3000), mapped to our flat +sensor bonus.
+  undular:   {n:'Undular Radar',    cost:160,  bonus:30,  tier:1, desc:'T1 - SR range 1200'},
+  subtransfer:{n:'Subtransfer Radar',cost:320, bonus:45,  tier:2, desc:'T2 - range 1400'},
+  octonic:   {n:'Octonic Radar',    cost:520,  bonus:60,  tier:3, desc:'T3 - range 1600'},
+  fascicular:{n:'Fascicular Radar', cost:760,  bonus:78,  tier:4, desc:'T4 - range 1800'},
+  cathauric: {n:'Cathauric Radar',  cost:1050, bonus:98,  tier:5, desc:'T5 - range 2100'},
+  neurolinear:{n:'Neurolinear Radar',cost:1400,bonus:120, tier:6, desc:'T6 - range 2400'},
+  ethane:    {n:'Ethane Radar',     cost:1800, bonus:145, tier:7, desc:'T7 - range 2700'},
+  zerocontact:{n:'Zero-Contact Radar',cost:2300,bonus:175,tier:8, desc:'T8 - range 3000 - the whole system on your scope'} };
 const RADAR_KEYS=Object.keys(RADARS);
 function fitRadar(s,key){ const old=RADARS[s.radarType||'basic'], neu=RADARS[key]; if(!neu) return false;
   s.senseR=(s.senseR||CFG.SENSE_R)-(old.bonus||0)+(neu.bonus||0); s.radarType=key; return true; }
@@ -2290,7 +2318,16 @@ const REPAIR_DROIDS={
   none:{n:'No Repair Droid', cost:0,   bonus:0,   desc:'no automatic hull regen'},
   mk1: {n:'Repair Droid Mk1',cost:170, bonus:2.5, desc:'+2.5 hull/s regen in flight and combat'},
   mk2: {n:'Repair Droid Mk2',cost:360, bonus:5,   desc:'+5 hull/s regen'},
-  mk3: {n:'Repair Droid Mk3',cost:640, bonus:8.5, desc:'+8.5 hull/s regen - sustains real combat without docking'} };
+  mk3: {n:'Repair Droid Mk3',cost:640, bonus:8.5, desc:'+8.5 hull/s regen - sustains real combat without docking'},
+  // SR-M21: the full T1-T8 droid line (SR repair 5->60/day), mapped to our hull/s regen.
+  biotic:    {n:'Biotic Droid',    cost:150,  bonus:2,  tier:1, desc:'T1 - SR 5/day'},
+  suspensory:{n:'Suspensory Droid',cost:320,  bonus:3.5,tier:2, desc:'T2 - 10/day'},
+  tracking:  {n:'Tracking Droid',  cost:520,  bonus:5,  tier:3, desc:'T3 - 15/day'},
+  tubular:   {n:'Tubular Droid',   cost:780,  bonus:6.5,tier:4, desc:'T4 - 20/day'},
+  bolide:    {n:'Bolide Droid',    cost:1100, bonus:8.5,tier:5, desc:'T5 - 30/day'},
+  tensor:    {n:'Tensor Droid',    cost:1500, bonus:11, tier:6, desc:'T6 - 40/day'},
+  dowel:     {n:'Dowel Droid',     cost:1950, bonus:14, tier:7, desc:'T7 - 50/day'},
+  duplex:    {n:'Duplex Droid',    cost:2500, bonus:18, tier:8, desc:'T8 - 60/day - out-heals sustained fire'} };
 const REPAIR_DROID_KEYS=Object.keys(REPAIR_DROIDS);
 function fitDroid(s,key){ const old=REPAIR_DROIDS[s.droidType||'none'], neu=REPAIR_DROIDS[key]; if(!neu) return false;
   s.regenBonus=(s.regenBonus||0)-(old.bonus||0)+(neu.bonus||0); s.droidType=key; return true; }
@@ -2301,7 +2338,16 @@ const SCANNERS={
   none:      {n:'No Scanner',      cost:0,   power:0,  desc:'no cargo/equipment inspection capability'},
   basic:     {n:'Basic Scanner',   cost:200, power:30, desc:'inspects weaker-shielded ships - try: probe <name>'},
   advanced:  {n:'Advanced Scanner',cost:480, power:55, desc:'punches through most shield screens'},
-  penetrator:{n:'Penetrator Array',cost:900, power:85, desc:'reads almost anything short of a capital-grade screen'} };
+  penetrator:{n:'Penetrator Array',cost:900, power:85, desc:'reads almost anything short of a capital-grade screen'},
+  // SR-M21: the full T1-T8 scanner line (SR scanner power 11->32), scaled to our 0-95 power range.
+  tracer:    {n:'Tracer Scanner',    cost:180,  power:20, tier:1, desc:'T1 - SR power 11'},
+  vortexscan:{n:'Vortex Scanner',    cost:340,  power:30, tier:2, desc:'T2 - power 14'},
+  neuroprobic:{n:'Neuroprobic Scanner',cost:540,power:40, tier:3, desc:'T3 - power 17'},
+  molecular: {n:'Molecular Scanner', cost:780,  power:50, tier:4, desc:'T4 - power 20'},
+  colloidal: {n:'Colloidal Scanner', cost:1050, power:60, tier:5, desc:'T5 - power 23'},
+  tecoral:   {n:'Tecoral Scanner',   cost:1400, power:70, tier:6, desc:'T6 - power 26'},
+  deatomic:  {n:'Deatomic Scanner',  cost:1800, power:80, tier:7, desc:'T7 - power 29'},
+  quantifying:{n:'Quantifying Scanner',cost:2300,power:95,tier:8, desc:'T8 - power 32 - reads a capital screen'} };
 const SCANNER_KEYS=Object.keys(SCANNERS);
 function scannerOf(s){ return SCANNERS[s.scannerType||'none']||SCANNERS.none; }
 function scanBlockPct(o){ return clamp(Math.round((shieldMaxFor(o)/CFG.SHIELD_BASE)*CFG.SCAN_BLOCK_PER_SHIELD),0,CFG.SCAN_BLOCK_MAX); }
@@ -2312,7 +2358,16 @@ const SHIELD_GENS={
   none:      {n:'No Shield Generator',   cost:0,   pct:0,    desc:'no flat damage-reduction layer'},
   basic:     {n:'Basic Shield Generator',cost:340, pct:0.08, desc:'-8% on any damage that gets past your capacitor shields'},
   reinforced:{n:'Reinforced Generator',  cost:650, pct:0.15, desc:'-15% on any damage that gets past your capacitor shields'},
-  aegis:     {n:'Aegis Generator',       cost:1100,pct:0.24, desc:'-24% on any damage that gets past your capacitor shields'} };
+  aegis:     {n:'Aegis Generator',       cost:1100,pct:0.24, desc:'-24% on any damage that gets past your capacitor shields'},
+  // SR-M21: the full T1-T8 shield-generator line (SR shield 11%->31%), mapped straight to our pct reduction.
+  shortwave: {n:'Shortwave Shield Gen',  cost:300,  pct:0.11, tier:1, desc:'T1 - SR shield 11%'},
+  polarizing:{n:'Polarizing Shield Gen', cost:520,  pct:0.13, tier:2, desc:'T2 - 13%'},
+  mesonic:   {n:'Mesonic Shield Gen',    cost:780,  pct:0.16, tier:3, desc:'T3 - 16%'},
+  mesh:      {n:'Mesh Shield Gen',       cost:1100, pct:0.19, tier:4, desc:'T4 - 19%'},
+  polygon:   {n:'Polygon Shield Gen',    cost:1450, pct:0.22, tier:5, desc:'T5 - 22%'},
+  zone:      {n:'Zone Shield Gen',       cost:1850, pct:0.25, tier:6, desc:'T6 - 25%'},
+  microlevel:{n:'Microlevel Shield Gen', cost:2300, pct:0.28, tier:7, desc:'T7 - 28%'},
+  ultraplasmic:{n:'Ultraplasmic Shield Gen',cost:2900,pct:0.31,tier:8,desc:'T8 - 31% - a capital-grade screen'} };
 const SHIELD_GEN_KEYS=Object.keys(SHIELD_GENS);
 function shieldGenOf(s){ return SHIELD_GENS[s.shieldGenType||'none']||SHIELD_GENS.none; }
 function hullResFor(s,dmgType){ const base=(HULLS[s.hullClass]&&HULLS[s.hullClass].res&&HULLS[s.hullClass].res[dmgType])||1;
@@ -2328,7 +2383,16 @@ const CARGO_HOOKS={
   none: {n:'No Cargo Hook',    cost:0,   range:0,  pull:0,  maxMass:1, desc:'no tractor beam - fly directly over loot to grab it'},
   short:{n:'Short-Range Hook', cost:150, range:6,  pull:8,  maxMass:2, desc:'a modest tractor beam for nearby salvage'},
   long: {n:'Long-Range Hook',  cost:380, range:14, pull:16, maxMass:3, desc:'reaches further, pulls loot in faster'},
-  heavy:{n:'Heavy Gripper',    cost:700, range:14, pull:22, maxMass:5, desc:'the strongest pull - won\'t drop even the heaviest salvage'} };
+  heavy:{n:'Heavy Gripper',    cost:700, range:14, pull:22, maxMass:5, desc:'the strongest pull - won\'t drop even the heaviest salvage'},
+  // SR-M21: the full T1-T8 gripper line (SR gripper power 40->500, range 100->200), scaled to our range/pull/mass.
+  activating:  {n:'Activating Gripper', cost:150,  range:6,  pull:8,  maxMass:2, tier:1, desc:'T1 - SR power 40, range 100'},
+  telekinetic: {n:'Telekinetic Gripper',cost:320,  range:8,  pull:10, maxMass:2, tier:2, desc:'T2 - power 50'},
+  plasmathread:{n:'Plasmathread Gripper',cost:520, range:10, pull:12, maxMass:3, tier:3, desc:'T3 - power 60'},
+  ectogenic:   {n:'Ectogenic Gripper',  cost:780,  range:12, pull:15, maxMass:3, tier:4, desc:'T4 - power 80'},
+  piezotropic: {n:'Piezotropic Gripper', cost:1050,range:14, pull:18, maxMass:4, tier:5, desc:'T5 - power 90'},
+  erimetric:   {n:'Erimetric Gripper',  cost:1400, range:16, pull:22, maxMass:4, tier:6, desc:'T6 - power 100'},
+  optoundular: {n:'Optoundular Gripper', cost:1850,range:18, pull:28, maxMass:5, tier:7, desc:'T7 - power 150'},
+  microtonal:  {n:'Microtonal Gripper', cost:2400, range:22, pull:40, maxMass:6, tier:8, desc:'T8 - power 500, range 200 - pulls anything'} };
 const CARGO_HOOK_KEYS=Object.keys(CARGO_HOOKS);
 function hookOf(s){ return CARGO_HOOKS[s.cargoHookType||'none']||CARGO_HOOKS.none; }
 function pickRFor(s){ return CFG.GEM_PICK_R+hookOf(s).range; }
@@ -2425,8 +2489,23 @@ const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT
   // 46*0.42 = 19.3 units, a fraction of every other weapon's reach (energy 130, ballistic 203, missile 184) - pirates
   // had to be nearly touching you before it could connect at all. speed/life now give ~64 units reach (still the
   // shortest of the four, keeping it a close/mid-range weapon, just no longer point-blank-only) and dmg is up ~70%.
-  flame:    {n:'Incinerator',    dmg:12, cd:0.09, speed:75,  life:0.85, range:0.48, col:0xff7a2a, r:3.8, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.9, dmgType:'energy'} };
-const WEAPON_ORDER=['energy','ballistic','missile'];   // player-purchasable, in `weapon` shop order - flame is Hegemon-only, see addPirate()
+  flame:    {n:'Incinerator',    dmg:12, cd:0.09, speed:75,  life:0.85, range:0.48, col:0xff7a2a, r:3.8, twin:false, homing:0,   splash:0,  cost:0,   shape:'flame',  flash:0.9, dmgType:'energy'},
+  // SR-M21 (user 2026-07-09, real Space Rangers weapon roster): more player weapons, each reusing one of the three
+  // existing projectile FAMILIES (bolt=energy, tracer=fragment, orb=missile) so the family icon + look stay shared -
+  // exactly the SR ladder from Industry Laser up to the apex Vertix. Stats scaled to sit in our existing curve.
+  // -- ENERGY family (bolt) --
+  industrylaser:{n:'Industry Laser', dmg:11, cd:0.24, speed:120, life:1.05, range:0.65, col:0x9fe0ff, r:2.0, twin:false, homing:0, splash:0, cost:120,  shape:'bolt', boltLen:3.0, flash:1.3, dmgType:'energy'},
+  disintegrator:{n:'Disintegrator',  dmg:42, cd:0.52, speed:160, life:1.7,  range:1.35, col:0x66ffd0, r:2.4, twin:false, homing:0, splash:0, cost:1500, shape:'bolt', boltLen:5.0, flash:2.2, dmgType:'energy'},
+  turbogravir:  {n:'Turbogravir',    dmg:60, cd:0.72, speed:150, life:1.3,  range:1.05, col:0xffb04a, r:3.0, twin:false, homing:0, splash:0, cost:2600, shape:'bolt', boltLen:4.2, flash:3.0, dmgType:'energy'},
+  vertix:       {n:'Vertix',         dmg:56, cd:0.78, speed:140, life:1.6,  range:1.45, col:0xc0a0ff, r:3.4, twin:false, homing:0, splash:16, cost:3400, shape:'bolt', boltLen:4.6, flash:3.4, dmgType:'energy'},
+  // -- FRAGMENT family (tracer) --
+  multiresonator:{n:'Multi-Resonator',dmg:33, cd:0.55, speed:140, life:1.3, range:1.0,  col:0xff8a4a, r:2.9, twin:false, homing:0, splash:9,  cost:900,  shape:'tracer', tracerLen:2.6, trail:0xffa860, trailCd:0.05, flash:2.4, dmgType:'frag'},
+  imho9000:     {n:'IMHO-9000',      dmg:45, cd:0.62, speed:150, life:1.35, range:1.1,  col:0xffd24a, r:3.1, twin:false, homing:0, splash:13, cost:1900, shape:'tracer', tracerLen:2.8, trail:0xffe090, trailCd:0.05, flash:2.8, dmgType:'frag'},
+  // -- MISSILE family (orb) --
+  lirecron:     {n:'Lirecron',       dmg:38, cd:0.70, speed:88,  life:2.1,  range:1.1,  col:0xff7ac0, r:3.4, twin:true,  homing:2.1, splash:8,  cost:820,  shape:'orb', trail:0x8a8f99, trailCd:0.05, flash:2.0, dmgType:'missile'},
+  torpedo:      {n:'Torpedo Apparatus',dmg:74,cd:1.20, speed:96,  life:2.7,  range:1.55, col:0xff5030, r:4.0, twin:false, homing:1.6, splash:16, cost:1700, shape:'orb', trail:0x9a6a4a, trailCd:0.05, flash:2.6, dmgType:'missile'} };
+// player-purchasable, in `weapon` shop order - the 3 starters first (cheap->dear), then the SR ladder; flame is Hegemon-only (see addPirate()).
+const WEAPON_ORDER=['energy','ballistic','missile','industrylaser','multiresonator','lirecron','disintegrator','imho9000','torpedo','turbogravir','vertix'];
 // M6: ARTIFACTS - rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
   core:   {n:'Hegemon Core',  desc:'+18% fire rate',  apply:s=>s.artFire=(s.artFire||0)+0.18},
@@ -3486,7 +3565,9 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
     if(!wt){ term('WEAPONS (fit at dock):','sys'); WEAPON_ORDER.forEach(kk=>{ const W=WEAPONS[kk]; term(`  ${kk} - ${W.n} · dmg ${W.dmg} · ${W.homing?'homing ':''}${W.splash?'splash ':''}range ${(W.range*100)|0}% · ${W.cost?W.cost+'c':'free'}${(P.weaponType||'energy')===kk?'  [fitted]':''}`,'sys'); }); return; }
     const key=WEAPON_ORDER.find(kk=>kk.startsWith(wt)); if(!need(key,'weapon energy|ballistic|missile')) return; const W=WEAPONS[key];
-    const req=WEAPON_ORDER.indexOf(key); if(!need(rankIdx(P.score||0)>=req, `${W.n} requires ${RANKS[req].n} rank (see: rank)`)) return;   // M5: rank-gated gear
+    // M5 rank-gate: map the weapon's position across the REAL rank tiers (SR-M21 grew WEAPON_ORDER to 11 - the raw
+    // index would run past RANKS[5], so scale + clamp: starters early, the apex Vertix needs the top rank).
+    const req=Math.min(RANKS.length-1, Math.floor(WEAPON_ORDER.indexOf(key)/2)); if(!need(rankIdx(P.score||0)>=req, `${W.n} requires ${RANKS[req].n} rank (see: rank)`)) return;
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
     if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
     term(`Fitted ${W.n} (-${W.cost}c) - dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
