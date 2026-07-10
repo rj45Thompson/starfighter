@@ -166,50 +166,50 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709t"></script>
-<script src="fflate.min.js?v=20260709t"></script>
-<script src="fbxloader.js?v=20260709t"></script>
+<script src="three.min.js?v=20260709u"></script>
+<script src="fflate.min.js?v=20260709u"></script>
+<script src="fbxloader.js?v=20260709u"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709t"></script>
-<script src="inhabitant.js?v=20260709t"></script>
-<script src="passenger.js?v=20260709t"></script>
-<script src="gamemod.js?v=20260709t"></script>
-<script src="chatter.js?v=20260709t"></script>
-<script src="speech_gen.js?v=20260709t"></script>
-<script src="speech_input.js?v=20260709t"></script>
-<script src="vision.js?v=20260709t"></script>
-<script src="deliberate.js?v=20260709t"></script>
-<script src="knowledge.js?v=20260709t"></script>
-<script src="acquire.js?v=20260709t"></script>
-<script src="sound.js?v=20260709t"></script>
-<script src="hullmodels.js?v=20260709t"></script>
-<script src="knowledge_hud.js?v=20260709t"></script>
-<script src="knowledge_screen.js?v=20260709t"></script>
-<script src="centroid_mind.js?v=20260709t"></script>
-<script src="kripke_mind.js?v=20260709t"></script>
-<script src="sober_gate.js?v=20260709t"></script>
-<script src="contradiction_ledger.js?v=20260709t"></script>
-<script src="kripke_planner.js?v=20260709t"></script>
-<script src="pillar_router.js?v=20260709t"></script>
-<script src="gravity_well.js?v=20260709t"></script>
-<script src="growth_loop.js?v=20260709t"></script>
-<script src="tom_test.js?v=20260709t"></script>
-<script src="thoughts.js?v=20260709t"></script>
-<script src="tami_battle_ui.js?v=20260709t"></script>
-<script src="power_panel.js?v=20260709t"></script>
-<script src="panels.js?v=20260709t"></script>
-<script src="item_icons.js?v=20260709t"></script>
-<script src="engbay.js?v=20260709t"></script>
+<script src="speech_tier.js?v=20260709u"></script>
+<script src="inhabitant.js?v=20260709u"></script>
+<script src="passenger.js?v=20260709u"></script>
+<script src="gamemod.js?v=20260709u"></script>
+<script src="chatter.js?v=20260709u"></script>
+<script src="speech_gen.js?v=20260709u"></script>
+<script src="speech_input.js?v=20260709u"></script>
+<script src="vision.js?v=20260709u"></script>
+<script src="deliberate.js?v=20260709u"></script>
+<script src="knowledge.js?v=20260709u"></script>
+<script src="acquire.js?v=20260709u"></script>
+<script src="sound.js?v=20260709u"></script>
+<script src="hullmodels.js?v=20260709u"></script>
+<script src="knowledge_hud.js?v=20260709u"></script>
+<script src="knowledge_screen.js?v=20260709u"></script>
+<script src="centroid_mind.js?v=20260709u"></script>
+<script src="kripke_mind.js?v=20260709u"></script>
+<script src="sober_gate.js?v=20260709u"></script>
+<script src="contradiction_ledger.js?v=20260709u"></script>
+<script src="kripke_planner.js?v=20260709u"></script>
+<script src="pillar_router.js?v=20260709u"></script>
+<script src="gravity_well.js?v=20260709u"></script>
+<script src="growth_loop.js?v=20260709u"></script>
+<script src="tom_test.js?v=20260709u"></script>
+<script src="thoughts.js?v=20260709u"></script>
+<script src="tami_battle_ui.js?v=20260709u"></script>
+<script src="power_panel.js?v=20260709u"></script>
+<script src="panels.js?v=20260709u"></script>
+<script src="item_icons.js?v=20260709u"></script>
+<script src="engbay.js?v=20260709u"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709t"></script>
-<script src="conquest.js?v=20260709t"></script>
-<script src="missions.js?v=20260709t"></script>
-<script src="planetmenu.js?v=20260709t"></script>
-<script src="textquests.js?v=20260709t"></script>
+<script src="starmap.js?v=20260709u"></script>
+<script src="conquest.js?v=20260709u"></script>
+<script src="missions.js?v=20260709u"></script>
+<script src="planetmenu.js?v=20260709u"></script>
+<script src="textquests.js?v=20260709u"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -1129,6 +1129,11 @@ function spawnFinaleEnemy(pos,sys){
   ev(`<b>☠☠ ${CFG.FINALE_NAME} HAS EMERGED</b> from the Stronghold's wreckage - destroy it to end this.`);
   flashBanner('☠☠ '+CFG.FINALE_NAME.toUpperCase()+'<br><span style="font-size:17px;font-weight:600">the wreckage was a shell - a war-titan claws free</span>','#ff3020');
   if(window.SOUND) try{ SOUND.play('alarm'); }catch(e){}
+  endgameActive=true;   // the titan IS the endgame - once it exists we are in the finale (guards beginEndgame from a second spawn)
+  // EVERYONE JOINS IN (user: "a big boss fight that everyone has to join in"): every living squad pilot converges
+  // on the titan - a real death-match swarm, not just the player. huntUntil is set effectively forever so they
+  // stay committed until it (or they) die; the AI's own SENSE_R/hp gates still apply, so hurt pilots peel off.
+  for(const o of ships){ if(o.alive && o!==p && o.role!=='player' && o.team==='squad'){ o.huntTarget=p; o.huntUntil=T0+1e12; } }
   return p; }
 function removeShip(s){ const i=ships.indexOf(s); if(i<0) return; scene.remove(s.mesh);
   if(SPEAK[s.id]){ scene.remove(SPEAK[s.id].sp); delete SPEAK[s.id]; } if(shipBlips[s.id]){ scene.remove(shipBlips[s.id]); delete shipBlips[s.id]; }
@@ -1158,14 +1163,37 @@ function renderCampaignScore(endedCampaign,P,warFinal,won){ const b=campaignScor
   term(`<b style="color:#8fd0ff">◈ CAMPAIGN ${endedCampaign} SCORE: ${b.total}</b> <span style="opacity:.7">(${won?'victory':'defeat'})</span>`,'sys');
   term(`&nbsp;&nbsp;war front ${b.war.toFixed(1)}×${CFG.CAMPAIGN_SCORE_W_WAR} + wealth ${b.wealth}c×${CFG.CAMPAIGN_SCORE_W_WEALTH} + rank ${b.rank}(${RANKS[b.rank].n})×${CFG.CAMPAIGN_SCORE_W_RANK} + missions ${b.missions}×${CFG.CAMPAIGN_SCORE_W_MISSION} + quests ${b.quests}×${CFG.CAMPAIGN_SCORE_W_QUEST} + discoveries ${b.discoveries}×${CFG.CAMPAIGN_SCORE_W_DISCOVERY}`,'sys');
   ev(`Campaign ${endedCampaign} ended in ${won?'victory':'defeat'} - score <b>${b.total}</b>.`); return b; }
-// MATCH STRUCTURE: matchEndCd counts down the "fight it out shortly after" beat between a decisive warWin()/
-// warLose() and the actual reset - null means no reset pending. Set at the bottom of both functions below.
+// MATCH STRUCTURE: matchEndCd counts down the beat between the war-titan's DEATH and the actual reset - null
+// means no reset pending. Set ONLY by endgameConclude() (the boss falling), never by a bare win/lose anymore.
 let matchEndCd=null;
+// ENDGAME GATE (user 2026-07-09: "it should restart the entire game rules... but only after a death match final
+// round and a big boss fight that everyone has to join in"). A decisive campaign outcome no longer resets the
+// galaxy directly - it BEGINS the endgame: the war-titan boss rises and every pilot converges on it. Only when
+// that boss is destroyed does the full game-rules restart fire (endgameConclude -> matchEndCd -> onNewGeneration).
+let endgameActive=false, endgameVerdict=null;
+function beginEndgame(verdict, pos, sys){
+  if(endgameActive){ if(verdict) endgameVerdict=verdict; return; }   // already in the finale - never spawn a second titan
+  endgameActive=true; endgameVerdict=verdict||'win';
+  const P=ships[0];
+  const sy0 = sys || systems.find(s=>s.contested) || (systems.length?systems[randi(0,systems.length-1)]:null);
+  let spawnPos;
+  if(pos) spawnPos=pos;
+  else if(sy0&&sy0.center) spawnPos=sy0.center.clone().add(new T.Vector3(rand(-30,30),rand(-10,10),rand(-30,30)));
+  else spawnPos=(P?P.pos.clone().add(new T.Vector3(80,0,0)):new T.Vector3());
+  flashBanner('☠ FINAL SHOWDOWN - DEATH MATCH ☠<br><span style="font-size:17px;font-weight:600">the war-titan rises - EVERY pilot into the fight</span>','#ff3020');
+  term('<b style="color:#ff5a6e">☠ DEATH MATCH</b> - the campaign is decided, but the Hegemon has one last horror. A war-titan emerges; the whole fleet is converging on it. <b>Kill it to reset the galaxy</b> - your ship starts fresh, the minds keep every fact they learned.','sys');
+  spawnFinaleEnemy(spawnPos, sy0);   // sets endgameActive (already true) + orders every squad pilot to converge
+}
+function endgameConclude(){
+  if(matchEndCd!=null) return;                                        // already counting down to the reset
+  matchEndCd=CFG.MATCH_END_DELAY_S;
+  flashBanner('★ THE WAR-TITAN FALLS ★<br><span style="font-size:17px;font-weight:600">the galaxy is reborn - a fresh ship, the minds\' memory intact</span>','#8fffa8');
+}
 function warWin(){ const P=ships[0]; const warFinal=warScore, endedCampaign=campaign; P.credits+=CFG.WIN_REWARD; P.score+=20; checkRankUp(P); campaign++; warScore=0; escalation=Math.max(0,escalation-CFG.WIN_ESC_CUT);
   for(const sy of systems){ sy.contested=false; sy.clearT=0; }
   flashBanner('★ COALITION VICTORY ★<br><span style="font-size:17px;font-weight:600">the Hegemon front is broken - campaign '+campaign+'</span>','#8fffa8');
   term(`★ COALITION VICTORY - the Hegemon is routed. +${CFG.WIN_REWARD}c, +20 score. Campaign ${campaign} begins.`,'sys'); ev(`COALITION VICTORY - campaign ${campaign} begins.`);
-  renderCampaignScore(endedCampaign,P,warFinal,true); matchEndCd=CFG.MATCH_END_DELAY_S; }
+  renderCampaignScore(endedCampaign,P,warFinal,true); beginEndgame('win'); }   // decisive front win -> the death-match finale, NOT an immediate reset
 function warLose(){ const P=ships[0]; const warFinal=warScore, endedCampaign=campaign; campaign++; warScore=0;
   // HEGEMON CONQUEST (user 2026-07-07): when the Hegemon wins, the worlds of the front fall UNDER ITS CONTROL - their standing is forced HOSTILE, so you can no longer dock, refuel or repair there until they are liberated.
   let taken=0; const front=planets.slice().sort((a,b)=>(a.rep||0)-(b.rep||0));   // the weakest-held worlds fall first
@@ -1176,7 +1204,7 @@ function warLose(){ const P=ships[0]; const warFinal=warScore, endedCampaign=cam
   flashBanner('THE HEGEMON PREVAILS<br><span style="font-size:17px;font-weight:600">'+taken+' worlds fall under Iron Synod control - campaign '+campaign+'</span>','#ff6a6a');
   term(`<b style="color:#ff7a8a">THE HEGEMON PREVAILS</b> - ${taken} worlds are now UNDER IRON SYNOD CONTROL: no docking, no fuel, no repair there until you liberate them (clear their system of pirates). Campaign ${campaign} - hold the line.`,'err'); ev(`THE HEGEMON PREVAILS - ${taken} worlds conquered.`);
   if(window.SOUND) SOUND.play('alarm');
-  renderCampaignScore(endedCampaign,P,warFinal,false); matchEndCd=CFG.MATCH_END_DELAY_S; }
+  renderCampaignScore(endedCampaign,P,warFinal,false); beginEndgame('lose'); }   // decisive front loss -> the death-match finale, NOT an immediate reset
 // MATCH STRUCTURE: the actual reset, "shortly after" a decisive win/lose - reuses HOST.onNewGeneration() (already
 // built, already keeps GAME_KNOW untouched by design - see that function's own docblock) rather than writing a
 // second reset path. Called once per pending match-end, driven by the game's own T0 clock (not setTimeout, which
@@ -1229,7 +1257,7 @@ function destroyStronghold(killer){ if(!stronghold) return; const sys=stronghold
   // check). Guarded on matchEndCd==null so a same-frame collision with warTick's OWN independent threshold check
   // (front tug-of-war happened to also cross WIN_THRESHOLD the instant the stronghold died) can't spawn a finale
   // that immediately outlives a reset already underway from the other path.
-  if(matchEndCd==null) spawnFinaleEnemy(pos,sys); }
+  if(matchEndCd==null) beginEndgame('win',pos,sys); }   // stronghold broken = a decisive win -> the death-match finale (the titan claws free of the wreckage)
 function strongholdTick(dt){
   if(!stronghold){ if(escalation>=CFG.STRONGHOLD_ESC || T0>=CFG.MATCH_DURATION_S){ const cs=systems.filter(sy=>sy.contested), sy=cs.length?cs[randi(0,cs.length-1)]:systems[randi(0,systems.length-1)]; if(sy) makeStronghold(sy); } return; }
   if(T0-(stronghold.hullT||0)>3 && stronghold.hull<stronghold.maxHull) stronghold.hull=Math.min(stronghold.maxHull, stronghold.hull+CFG.STRONGHOLD_REGEN*dt);   // self-heals unless under fire
@@ -1816,7 +1844,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   // STARBLAST-STYLE FINALE: this ship WAS the one-off boss spawned when the Stronghold fell (spawnFinaleEnemy) -
   // its death is the real win condition now, not the Stronghold's. Guarded the same way as the old Stronghold path.
   if(victim.isFinale && matchEndCd==null){ ev(`<b>☠☠→★ ${CFG.FINALE_NAME} DESTROYED</b> - the Hegemon's last stand is broken.`);
-    term(`★★ You destroyed the ${CFG.FINALE_NAME}. The Hegemon's back is broken.`,'sys'); warWin(); } }
+    term(`★★ You destroyed the ${CFG.FINALE_NAME}. The galaxy will be reborn - a fresh ship, the minds keep everything they learned.`,'sys'); endgameConclude(); } }   // the boss falling is the ONLY reset trigger now (never a bare warWin, which would spawn a second titan)
 function destroyAsteroid(i,owner){ const a=asteroids[i]; if(owner) owner.score+=a.level;
   if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
@@ -4593,7 +4621,25 @@ window.HOST={
     for(const sy of systems){ sy.contested=false; sy.clearT=0; }
     for(const p of planets){ if(p.isPirateStation) continue;   // stays permanently hostile - not swept into the coalition/Hegemon reset
       p.hegemon=false; p.owner=null; p._cq=null; p.rep=Math.max(-1, Math.round((p.rep||0)*0.3)); p.underThreat=false; if(p.hull!=null&&p.maxHull!=null) p.hull=p.maxHull; }
-    const P=ships[0]; if(P){ P.alive=true; P.hp=P.maxHp; P.fuel=P.fuelCap; P.docked=null; P.obj=null;
+    endgameActive=false; endgameVerdict=null; matchEndCd=null;   // the finale is over - clear the gate for the next campaign
+    const P=ships[0]; if(P){
+      // FULL GAME-RULES RESTART (user 2026-07-09: "it should restart the entire game rules... my ship didn't
+      // revert and I kept my money"). The galaxy reset now reverts the SHIP to a fresh Warden - the same
+      // real-stakes wipe a player DEATH already does (money/hull/loadout are the run's stakes), PLUS the things
+      // death keeps (credits/score/skills/rank/equipped artifacts/career counters), because a generation reset is
+      // a total restart, not a respawn. ONLY the minds' KNOWLEDGE (GAME_KNOW) and the cross-generation LEADERBOARD
+      // persist - the run mattered (it is recorded), the ship starts over.
+      P.credits=500; P.score=0; P.skills={}; P.skillPts=0;
+      P.lvl={weapon:1,engine:1,hull:1}; P.weaponType='energy'; P.equip={}; P.contraband={}; P.cargo={};
+      P.artifacts=[]; P.artEquipped=[]; P.artifactsUnid=[]; P.cores=0; P.probesOwned=0;
+      P.fuelCap=CFG.FUEL_CAP; P.senseR=CFG.SENSE_R; P.warpEff=1; P.regenBonus=0;
+      P.engineType='standard'; P.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);
+      P.fuelTankType='standard'; P.radarType='basic'; P.scannerType='none'; P.shieldGenType='none'; P.droidType='none'; P.cargoHookType='none';
+      P.missileAmmo=CFG.MISSILE_AMMO_START; P.dmgMult=0; P.micromodules=[];
+      P.manufacturer='human'; P.hullSeries='standard'; P.weaponSlots=null; P.slotFire=null;
+      P.missionsCompleted=0; P.questsCompleted=0; P.discoveries=0; P.artFire=0;
+      applyHull(P,'fighter');   // recomputes maxHp/holdCap/hullSpeed/model from the reset lvl+equip; a stock Fighter again
+      P.alive=true; P.hp=P.maxHp; P.fuel=P.fuelCap; P.docked=null; P.obj=null; P.lock=null; P.huntTarget=null;
       if(typeof base!=='undefined'&&base&&base.pos) P.pos.copy(base.pos).add(new T.Vector3(rand(-1,1),0.2,rand(-1,1)).setLength(60)); P.vel.set(0,0,0); }
     const st=window.GAME_KNOW?GAME_KNOW.stats():null;
     notify(`GENERATION ${window.STARMAP&&STARMAP.generation?STARMAP.generation():campaign} - the galaxy is reborn. The minds remember${st?` (<b>${st.shared}</b> shared + <b>${st.private_total}</b> private facts persist)`:''}.`,'alert','#c9a0ff');
