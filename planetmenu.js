@@ -34,8 +34,10 @@ var CFG = {
           {k:'ground',   n:'GROUND'},
           {k:'bar',      n:'BAR'},                     /* SR-M18: pilots, rumors, wing contracts (hotkeys stop at 6 - click-only) */
           {k:'science',  n:'SCIENCE', onlyScience:true}, /* SR-M19: Athenaeum only - renderTabs filters it elsewhere */
-          {k:'log',      n:'NEWS'},
-          {k:'depart',   n:'DEPART'} ],
+          {k:'log',      n:'NEWS'} ],
+          /* DEPART left the tab row 2026-07-09 ("make the menus easier to use, simpler"): a tab whose entire body
+             was one button is a button wearing a tab costume - it's now the green button in the header, one click,
+             always visible, no tab switch first. */
   BAR_RADIUS_MULT: 2,           /* SR-M18: ships within DEFEND_R*this of the planet count as "at the bar" */
   BAR_MAX_PATRONS: 8,           /* patron list cap (legibility) */
   BAR_MAX_RUMORS: 6,            /* rumors rendered per visit */
@@ -131,6 +133,8 @@ function cssText(){
   '.pm-you{margin-left:auto;text-align:right;font-size:12px;line-height:1.6;white-space:nowrap}',
   '.pm-x{font:inherit;font-weight:700;color:'+COL.BAD+';background:#1a0f16;border:1px solid #5a2d36;border-radius:4px;padding:4px 12px;cursor:pointer;margin-left:12px}',
   '.pm-x:hover{background:#301820;color:#ffb0b0}',
+  '.pm-depart{font:inherit;font-weight:800;color:#04140c;background:linear-gradient(#8fe6b0,#4fd68a);border:1px solid #bff5d6;border-radius:4px;padding:4px 14px;cursor:pointer;margin-left:12px;letter-spacing:.05em}',
+  '.pm-depart:hover{background:linear-gradient(#a5f0c2,#63e29c)}',
   '.pm-main{display:flex;flex:1;min-height:0}',
   '.pm-side{width:264px;min-width:264px;border-right:1px solid '+COL.BORDER+';padding:16px;overflow-y:auto;background:rgba(7,12,21,.6)}',
   '.pm-right{display:flex;flex-direction:column;flex:1;min-width:0}',
@@ -185,7 +189,7 @@ function frameHtml(){
     +       '<div class="pm-body" id="pmBody"></div>'
     +     '</div>'
     +   '</div>'
-    +   '<div class="pm-foot">[1-6] tabs &nbsp;-&nbsp; [Esc] close &nbsp;-&nbsp; every action routes through the ship terminal (watch it for results)</div>'
+    +   '<div class="pm-foot">[1-8] tabs &nbsp;-&nbsp; [Esc] close &nbsp;-&nbsp; <span style="color:#7fd0b0">▲ DEPART</span> (top right) launches &nbsp;-&nbsp; every action routes through the ship terminal</div>'
     + '</div>'
     + '<div class="pm-fx"></div>'; }
 
@@ -210,7 +214,7 @@ function onKey(e){
   var tgt=e.target, typing = tgt && (tgt.tagName==='INPUT' || tgt.tagName==='TEXTAREA' || tgt.isContentEditable);
   if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeMenu(); return; }
   if(typing) return;
-  if(e.key>='1' && e.key<='6'){ var i=e.key.charCodeAt(0)-49;
+  if(e.key>='1' && e.key<='8'){ var i=e.key.charCodeAt(0)-49;   /* 2026-07-09: was 1-6, silently ignoring the last tabs */
     if(CFG.TABS[i]){ e.preventDefault(); e.stopPropagation(); setTab(CFG.TABS[i].k); } } }
 
 function onClick(e){
@@ -238,7 +242,7 @@ function tryAddDefense(){ var C=window.CONQUEST;
   if(!C || typeof C.addDefense!=='function' || !S.planet) return;
   try{ C.addDefense(S.planet); }catch(e){} }
 function doDepart(){ var nm=(S.planet && S.planet.name) ? S.planet.name : 'the berth';
-  closeMenu(); runCmd('launch');
+  closeMenu(); runCmd('depart');   /* 2026-07-09 live-caught: was runCmd('launch') = the AWAY-mission return, which never undocks a ship in space - the real `depart` host command exists now */
   notifyHost('Departed '+esc(nm)+' - the ship is yours again.','log'); }
 
 /* ------------------------------------------------ RENDER: HEADER */
@@ -280,7 +284,8 @@ function renderHead(){
     + '<div class="pm-sub">'+esc(typ)+dev+' - '+esc(sys)+'</div>'
     + '<div style="margin-top:5px">'+chips+'</div></div>'
     + you
-    + '<button class="pm-x" data-act="close" title="close (Esc)">X</button>'; }
+    + '<button class="pm-depart" data-act="depart" title="launch - undock and return to space">▲ DEPART</button>'
+    + '<button class="pm-x" data-act="close" title="close (Esc) - stay docked">X</button>'; }
 
 /* ------------------------------------------------ RENDER: LEFT SIDE (portrait + status + how-it-works) */
 function portraitHtml(){
@@ -1051,13 +1056,7 @@ function logHtml(){
   return h; }
 
 /* ------------------------------------------------ TAB: DEPART */
-function departHtml(){
-  var nm=(S.planet&&S.planet.name)?S.planet.name:'the berth';
-  return '<div class="pm-center">'
-    + '<div style="color:'+COL.DIM+'">All accounts settled at '+esc(nm)+'?</div>'
-    + '<button class="pm-b pm-big pm-go" data-act="depart">DEPART - RETURN TO SPACE</button>'
-    + '<div class="pm-sub">closes this screen and signals launch - [Esc] just closes without launching</div>'
-    + '</div>'; }
+/* (departHtml removed 2026-07-09 with its tab - DEPART is the header button now; doDepart unchanged.) */
 
 /* ------------------------------------------------ RENDER DISPATCH */
 function renderBody(){
@@ -1071,7 +1070,6 @@ function renderBody(){
   else if(S.tab==='bar') h=barHtml();           /* SR-M18 */
   else if(S.tab==='science') h=scienceHtml();   /* SR-M19 */
   else if(S.tab==='log') h=logHtml();
-  else if(S.tab==='depart') h=departHtml();
   S.el.body.innerHTML=h; }
 
 function renderAll(){ renderHead(); renderSide(); renderTabs(); renderBody(); }

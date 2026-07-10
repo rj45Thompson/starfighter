@@ -32,11 +32,11 @@ const CFG = {
   CHROME_RESERVE:24,   // user report "the terminal pinned box seems to overlap the parasite tab": the ctl cluster/tab float AT the panel's own top corner, which collided with the panel's OWN header content (market's title, the ticker's PARASITE/TERMINAL/... row) - reserving this much top padding on every registered panel gives the chrome a real strip instead of sitting on top of the content
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
-  RESIZE_GRIP:16,              // resize-handle footprint (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it")
+  RESIZE_GRIP:18,              // resize-handle footprint (user 2026-07-08: "make the terminal sizable and it should not change size unless I size it"; bumped 16->18 + always-visible tint 2026-07-09 "still I can't resize" - an invisible-until-hover 16px target reads as "no resize exists")
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
   DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
   EDGE_OFFSET:14,              // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
-  EDGE_HL_THICK:6,             // drag-feedback strip thickness along the candidate edge
+  EDGE_HL_THICK:10,            // drag-feedback strip thickness along the candidate edge (6->10 2026-07-09: "docking is still weak" - the old strip was easy to miss entirely)
 };
 const COL={ cyan:'#46d6ff', ink:'#080a10', txt:'#cfe2f5', dim:'#6f88a4', border:'#22344a' };
 
@@ -73,8 +73,17 @@ if(!document.getElementById('pnl-style')){
   st.textContent=
     // ctl is position:FIXED and appended to <body> (not a child of the panel) - a panel with overflow-y:auto
     // (the terminal) would otherwise drag an absolutely-positioned child along as its log content scrolls.
-    '.pnl-ctl{ position:fixed; display:flex; gap:5px; align-items:center; z-index:'+(CFG.Z+1)+'; pointer-events:auto; }'+
-    '.pnl-btn{ font:700 10px/1 ui-monospace,monospace; color:'+COL.dim+'; background:#0c1623dd; border:1px solid '+COL.border+'; border-radius:5px; width:20px; height:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }'+
+    // TITLE BAR (user 2026-07-09 "the docking is still weak... can't resize and dock the window"): the floating
+    // button cluster is now a real full-width window header - title on the left IS the move handle (drag it
+    // anywhere; the panel follows the cursor live and snap-docks to the nearest edge on release), buttons on the
+    // right. One coherent bar instead of chrome fragments = how every OS window already works.
+    '.pnl-ctl{ position:fixed; display:flex; gap:5px; align-items:center; z-index:'+(CFG.Z+1)+'; pointer-events:auto;'+
+      ' background:#0c1623cc; border:1px solid '+COL.border+'; border-radius:6px; padding:2px 4px; }'+
+    '.pnl-title{ flex:1 1 auto; font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.07em; color:'+COL.dim+';'+
+      ' cursor:grab; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:3px 4px; }'+
+    '.pnl-title:hover{ color:'+COL.txt+'; }'+
+    '.pnl-title:active{ cursor:grabbing; }'+
+    '.pnl-btn{ font:700 10px/1 ui-monospace,monospace; color:'+COL.dim+'; background:#0c1623dd; border:1px solid '+COL.border+'; border-radius:5px; width:20px; height:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; flex:0 0 auto; }'+
     '.pnl-btn:hover{ color:'+COL.txt+'; border-color:#3a567a; }'+
     '.pnl-btn.on{ color:'+COL.cyan+'; border-color:'+COL.cyan+'; }'+
     '.pnl-op{ width:46px; height:12px; cursor:pointer; accent-color:'+COL.cyan+'; }'+
@@ -83,9 +92,10 @@ if(!document.getElementById('pnl-style')){
     '.pnl-tab:hover{ color:'+COL.txt+'; border-color:#3a567a; }'+
     '.pnl-tab .pnl-pinned{ color:'+COL.cyan+'; }'+
     '.pnl-grip{ position:fixed; z-index:'+(CFG.Z+1)+'; width:'+CFG.RESIZE_GRIP+'px; height:'+CFG.RESIZE_GRIP+'px; cursor:nwse-resize; pointer-events:auto;'+
-      ' background:linear-gradient(135deg,transparent 0%,transparent 45%,'+COL.border+' 45%,'+COL.border+' 55%,transparent 55%,transparent 100%),'+
-      'linear-gradient(135deg,transparent 0%,transparent 65%,'+COL.border+' 65%,'+COL.border+' 75%,transparent 75%,transparent 100%); border-radius:0 0 6px 0; }'+
-    '.pnl-grip:hover{ background-color:'+COL.cyan+'22; }'+
+      ' background-color:'+COL.cyan+'14;'+   // faint always-on tint (2026-07-09): the grip must be FINDABLE before you hover it
+      ' background-image:linear-gradient(135deg,transparent 0%,transparent 45%,'+COL.border+' 45%,'+COL.border+' 55%,transparent 55%,transparent 100%),'+
+      'linear-gradient(135deg,transparent 0%,transparent 65%,'+COL.border+' 65%,'+COL.border+' 75%,transparent 75%,transparent 100%); border-radius:6px; }'+
+    '.pnl-grip:hover{ background-color:'+COL.cyan+'33; }'+
     // ANDROID/TOUCH: the desktop sizes above (20x18 buttons, 16x16 grip) are well under a comfortable touch
     // target (~40px+) - fine for a mouse pointer, fiddly for a fingertip. `pointer:coarse` is the standard signal
     // for "primary input is imprecise" and degrades gracefully on hybrid devices (a touchscreen laptop with a
@@ -153,9 +163,9 @@ function tabPosition(rec){
   return s;
 }
 function ctlPosition(rec){
-  // top-right corner of the panel's OWN current rect (only meaningful while open - hidden otherwise).
+  // TITLE BAR: spans the panel's full width inside the CHROME_RESERVE strip (only meaningful while open).
   const r=rec.el.getBoundingClientRect();
-  return { top:(r.top+4)+'px', left:'', right:(window.innerWidth-r.right+6)+'px' };
+  return { top:(r.top+3)+'px', left:(r.left+5)+'px', width:Math.max(80, r.width-10)+'px' };
 }
 
 function textOpacityFor(v){   // user 2026-07-07: "we want the text to be semi-transparent as well based on that slider" - tracks the same slider, with a soft floor (TEXT_OP_FLOOR) so a panel dragged to minimum never becomes fully unreadable/stuck.
@@ -172,15 +182,32 @@ function applyVisual(rec){
   rec.pinBtn.textContent = rec.pinned ? '📌' : '📍';   // filled pin (pinned) vs outline-ish (unpinned) - both render fine, distinct glyphs
   const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   rec.ctl.style.display = rec.open ? 'flex' : 'none';
-  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; }
+  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.right=''; rec.ctl.style.width=c.width; }
   if(rec.grip){ rec.grip.style.display=rec.open?'block':'none'; if(rec.open) positionGrip(rec); }
 }
-function positionGrip(rec){   // bottom-right corner of the panel's own current rect (only meaningful while open)
+// WHICH CORNER IS FREE? (2026-07-09 "still I can't resize"): the old grip lived at bottom-right and always grew
+// with +dx/+dy - for a panel ANCHORED at the screen's right or bottom edge that direction is pinned against the
+// screen, so those panels could only ever SHRINK. The anchor decides everything: the grip sits on the free
+// corner, and drag deltas grow AWAY from the anchored sides.
+function anchorOf(rec){
+  const el=rec.el, r=el.getBoundingClientRect();
+  const right = el.style.right!=='' && el.style.left==='' ? true
+    : el.style.left!=='' && el.style.right==='' ? false
+    : (window.innerWidth - r.right) < r.left;                       // no explicit style -> nearer screen edge wins
+  const bottom = el.style.bottom!=='' && el.style.top==='' ? true
+    : el.style.top!=='' && el.style.bottom==='' ? false
+    : (window.innerHeight - r.bottom) < r.top;
+  return { right, bottom };
+}
+function positionGrip(rec){   // the FREE corner of the panel's own current rect (only meaningful while open)
   const r=rec.el.getBoundingClientRect();
   // read the grip's OWN rendered size rather than assume CFG.RESIZE_GRIP - the touch media query above enlarges
   // it, and anchoring off the wrong (smaller) constant would leave it hanging partway off the panel's corner.
   const gw=rec.grip.offsetWidth||CFG.RESIZE_GRIP, gh=rec.grip.offsetHeight||CFG.RESIZE_GRIP;
-  rec.grip.style.top=(r.bottom-gh)+'px'; rec.grip.style.left=(r.right-gw)+'px';
+  const a=anchorOf(rec);
+  rec.grip.style.top =(a.bottom ? r.top : r.bottom-gh)+'px';
+  rec.grip.style.left=(a.right ? r.left : r.right-gw)+'px';
+  rec.grip.style.cursor = (a.right !== a.bottom) ? 'nesw-resize' : 'nwse-resize';
 }
 
 // BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
@@ -254,17 +281,20 @@ function showEdgeHighlight(edge){
   hl.style.display='block';
 }
 function hideEdgeHighlight(){ const hl=document.getElementById('pnl-edge-hl'); if(hl) hl.style.display='none'; }
-// sets the panel's actual on-screen anchor for its (possibly new) edge - the two properties NOT relevant to this
-// edge are cleared so they can never silently fight the two that are (e.g. a leftover `right` from a previous
-// dock outranking the `left` this dock just set).
+// sets the panel's actual on-screen anchor for its (possibly new) edge. Written with inline !important and the
+// two irrelevant sides forced to `auto` (2026-07-09 live-caught: #market's narrow-viewport stylesheet says
+// `left:50% !important` - a plain inline `right` LOST to it on reload and the panel snapped back to center;
+// only inline-!important on all four sides deterministically beats any stylesheet positioning).
+function setSide(el, side, val){ el.style.setProperty(side, val==null?'auto':val, 'important'); }
 function applyDockPosition(rec, edge, pos){
-  const el=rec.el; el.style.top=''; el.style.bottom=''; el.style.left=''; el.style.right='';
-  if(edge==='top'){ el.style.top=CFG.EDGE_OFFSET+'px'; el.style.left=pos+'px'; }
-  else if(edge==='bottom'){ el.style.bottom=CFG.EDGE_OFFSET+'px'; el.style.left=pos+'px'; }
-  else if(edge==='left'){ el.style.left=CFG.EDGE_OFFSET+'px'; el.style.top=pos+'px'; }
-  else { el.style.right=CFG.EDGE_OFFSET+'px'; el.style.top=pos+'px'; }
+  const el=rec.el;
+  setSide(el,'top',null); setSide(el,'bottom',null); setSide(el,'left',null); setSide(el,'right',null);
+  if(edge==='top'){ setSide(el,'top',CFG.EDGE_OFFSET+'px'); setSide(el,'left',pos+'px'); }
+  else if(edge==='bottom'){ setSide(el,'bottom',CFG.EDGE_OFFSET+'px'); setSide(el,'left',pos+'px'); }
+  else if(edge==='left'){ setSide(el,'left',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }
+  else { setSide(el,'right',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }
 }
-function redock(rec, edge, x, y){
+function redock(rec, edge, x, y, panelLeft, panelTop){
   const oldEdge=rec.edge;
   if(oldEdge!==edge){
     const arr=EDGE_MEMBERS[oldEdge]; const i=arr?arr.indexOf(rec):-1; if(i>=0) arr.splice(i,1);
@@ -273,11 +303,54 @@ function redock(rec, edge, x, y){
   rec.centerX=false;   // manual placement is inherently incompatible with auto-centering (only market ever used centerX, and only for its old "always top-center" default)
   const w=rec.el.offsetWidth||CFG.RESIZE_MIN_W, h=rec.el.offsetHeight||CFG.RESIZE_MIN_H;
   const horiz=(edge==='top'||edge==='bottom');
-  const pos=horiz ? Math.max(CFG.GAP, Math.min(window.innerWidth-w-CFG.GAP, x-w/2))
-                  : Math.max(CFG.GAP, Math.min(window.innerHeight-h-CFG.GAP, y-h/2));
+  // live move-drag passes the panel's actual dragged corner so the panel lands exactly where you left it (only
+  // snapped flush to the chosen edge); a bare tab-drag still centers on the cursor as before.
+  const want = horiz ? (panelLeft!=null?panelLeft:x-w/2) : (panelTop!=null?panelTop:y-h/2);
+  const pos=horiz ? Math.max(CFG.GAP, Math.min(window.innerWidth-w-CFG.GAP, want))
+                  : Math.max(CFG.GAP, Math.min(window.innerHeight-h-CFG.GAP, want));
   applyDockPosition(rec, edge, pos);
   store[rec.id]=store[rec.id]||{}; store[rec.id].edge=edge; store[rec.id].pos=Math.round(pos); store[rec.id].manualDock=true; save();
   applyVisual(rec); reflowEdge(oldEdge); reflowEdge(edge);
+}
+
+// LIVE MOVE-DRAG (2026-07-09 "the docking is still weak"): shared by the title bar AND the edge tab. The panel
+// itself follows the cursor while you drag (not just a thin stripe at the destination), the candidate edge
+// lights up, and release snap-docks it there. A sub-threshold press stays a plain click for the handle's own
+// click behavior (tab toggle), unchanged.
+function makeMoveDrag(rec, handle, isTab){
+  let dragging=false, moved=false, sx=0, sy=0, gdx=0, gdy=0;
+  const onMove=(ev)=>{ if(!dragging) return;
+    const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+    if(!moved){ if(Math.hypot(x-sx,y-sy)<CFG.DRAG_THRESHOLD) return;
+      moved=true;
+      if(!rec.open) setOpen(rec, true);                             // dragging a closed panel's tab pulls the real panel out to carry along
+      const r=rec.el.getBoundingClientRect(); gdx=sx-r.left; gdy=sy-r.top;
+      if(isTab){ gdx=Math.min(gdx, r.width/2); gdy=Math.min(gdy, 12); }   // tab sits outside the panel - carry it near the grab point instead of by a far-off corner
+      rec.el.style.transition='none'; rec.centerX=false;
+    }
+    rec.el.style.transform='none';
+    setSide(rec.el,'top',(y-gdy)+'px'); setSide(rec.el,'left',(x-gdx)+'px'); setSide(rec.el,'bottom',null); setSide(rec.el,'right',null);
+    const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
+    const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.width=c.width;
+    if(rec.grip) positionGrip(rec);
+    showEdgeHighlight(nearestEdge(x,y));
+    if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+  const endDrag=(ev)=>{ if(!dragging) return; dragging=false;
+    document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
+    document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag);
+    hideEdgeHighlight();
+    if(moved){ const x=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientX:ev.clientX,
+      y=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientY:ev.clientY;
+      const r=rec.el.getBoundingClientRect();
+      redock(rec, nearestEdge(x,y), x, y, r.left, r.top); } };
+  const startDrag=(ev)=>{
+    if(ev.target && ev.target.closest && ev.target.closest('.pnl-btn,.pnl-op')) return;   // buttons/slider keep their own behavior
+    dragging=true; moved=false;
+    sx=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; sy=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+    document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
+    document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag); };
+  handle.addEventListener('mousedown',startDrag); handle.addEventListener('touchstart',startDrag,{passive:true});
+  return { didMove:()=>moved };
 }
 
 // -------------------------------------------------------------------------------------------------------------
@@ -319,14 +392,16 @@ function register(id, el, opts){
   const existingPadTop=parseFloat(getComputedStyle(el).paddingTop)||0;
   el.style.paddingTop=(existingPadTop+CFG.CHROME_RESERVE)+'px';
   const body=document.body||document.documentElement;
-  rec.resizable=!!opts.resizable;
+  rec.resizable=opts.resizable!==false;   // 2026-07-09: resizable is the DEFAULT now - a window you can't resize is the exception, not the rule
   if(rec.resizable && saved.w!=null && saved.h!=null) applyStoredSize(el, saved.w, saved.h);   // a size you set yourself sticks across reloads - the whole point of the feature
   if(saved.manualDock && saved.pos!=null) applyDockPosition(rec, rec.edge, saved.pos);   // a dock spot you dragged yourself sticks across reloads, same convention
   const ctl=document.createElement('div'); ctl.className='pnl-ctl'; body.appendChild(ctl);           // fixed + body-level: immune to el's own scroll/slide
+  const titleSpan=document.createElement('div'); titleSpan.className='pnl-title'; titleSpan.textContent='⠿ '+rec.title;
+  titleSpan.title='drag to move - release near an edge to dock there';
   const pinBtn=document.createElement('button'); pinBtn.className='pnl-btn'; pinBtn.title='pin (stay open) / unpin (auto-hide when idle)';
   const op=document.createElement('input'); op.type='range'; op.className='pnl-op'; op.min=CFG.OP_MIN; op.max=CFG.OP_MAX; op.step=CFG.OP_STEP; op.title='transparency';
   const xBtn=document.createElement('button'); xBtn.className='pnl-btn'; xBtn.textContent='✕'; xBtn.title='close (tab stays to reopen)'+(opts.hotkeyLabel?(' · key '+opts.hotkeyLabel):'');
-  ctl.appendChild(pinBtn); ctl.appendChild(op); ctl.appendChild(xBtn);
+  ctl.appendChild(titleSpan); ctl.appendChild(pinBtn); ctl.appendChild(op); ctl.appendChild(xBtn);
   rec.ctl=ctl; rec.pinBtn=pinBtn; rec.opInput=op; op.value=rec.opacity;
 
   const tab=document.createElement('div'); tab.className='pnl-tab'; body.appendChild(tab);
@@ -336,17 +411,25 @@ function register(id, el, opts){
   if(rec.resizable){
     grip=document.createElement('div'); grip.className='pnl-grip'; grip.title='drag to resize'; body.appendChild(grip);
     rec.grip=grip;
-    let dragging=false, startX=0, startY=0, startW=0, startH=0;
+    // DIRECTION-AWARE RESIZE (2026-07-09 "still I can't resize"): deltas grow AWAY from the anchored sides -
+    // a right-docked panel grows leftward, a bottom-docked one grows upward. The old unconditional +dx/+dy
+    // meant panels docked at the right or bottom screen edge could only ever SHRINK (their growth direction was
+    // pinned against the screen) - the exact "can't resize" being reported.
+    let dragging=false, startX=0, startY=0, startW=0, startH=0, anch={right:false,bottom:false};
     const onMove=(ev)=>{ if(!dragging) return;
       const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
-      const w=Math.max(CFG.RESIZE_MIN_W, startW+(x-startX)), h=Math.max(CFG.RESIZE_MIN_H, startH+(y-startY));
+      const dw=anch.right ? (startX-x) : (x-startX), dh=anch.bottom ? (startY-y) : (y-startY);
+      const w=Math.max(CFG.RESIZE_MIN_W, startW+dw), h=Math.max(CFG.RESIZE_MIN_H, startH+dh);
       applyStoredSize(el, w, h); positionGrip(rec);
+      const c=ctlPosition(rec); ctl.style.top=c.top; ctl.style.left=c.left; ctl.style.width=c.width;   // the title bar tracks the live rect
       if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
     const endDrag=()=>{ if(!dragging) return; dragging=false;
       const r=el.getBoundingClientRect(); store[id]=store[id]||{}; store[id].w=Math.round(r.width); store[id].h=Math.round(r.height); save();
+      applyVisual(rec);
       document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
       document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag); };
     const startDrag=(ev)=>{ dragging=true; const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
+      anch=anchorOf(rec);
       startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
       document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
       document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag);
@@ -357,27 +440,11 @@ function register(id, el, opts){
   pinBtn.onclick=(e)=>{ e.stopPropagation(); setPinned(rec, !rec.pinned); };
   xBtn.onclick=(e)=>{ e.stopPropagation(); setOpen(rec, false); };
   op.addEventListener('input', ()=>setOpacity(rec, parseFloat(op.value)));
-  // DRAG-TO-REDOCK on the tab itself (mirrors the resize grip's own mousedown/mousemove/mouseup + touch-equivalent
-  // pattern below). `moved` gates whether the eventual click is a real drag (redock, click suppressed) or a plain
-  // press-release (existing open/close toggle, unchanged).
-  { let dragging=false, moved=false, sx=0, sy=0;
-    const onMove=(ev)=>{ if(!dragging) return;
-      const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
-      if(!moved && Math.hypot(x-sx,y-sy)<CFG.DRAG_THRESHOLD) return;
-      moved=true; showEdgeHighlight(nearestEdge(x,y));
-      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
-    const endDrag=(ev)=>{ if(!dragging) return; dragging=false;
-      document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
-      document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag);
-      hideEdgeHighlight();
-      if(moved){ const x=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientX:ev.clientX,
-        y=(ev.changedTouches&&ev.changedTouches[0])?ev.changedTouches[0].clientY:ev.clientY; redock(rec, nearestEdge(x,y), x, y); } };
-    const startDrag=(ev)=>{ dragging=true; moved=false;
-      sx=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; sy=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
-      document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
-      document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag); };
-    tab.addEventListener('mousedown',startDrag); tab.addEventListener('touchstart',startDrag,{passive:true});
-    tab.addEventListener('click',(ev)=>{ if(moved){ ev.stopPropagation(); return; } setOpen(rec, !rec.open); }); }
+  // LIVE MOVE-DRAG on BOTH handles: the tab (always findable, even closed) and the title bar (the natural
+  // "grab the window" target). A sub-threshold tab press stays the plain open/close click.
+  const tabDrag=makeMoveDrag(rec, tab, true);
+  makeMoveDrag(rec, ctl, false);
+  tab.addEventListener('click',(ev)=>{ if(tabDrag.didMove()){ ev.stopPropagation(); return; } setOpen(rec, !rec.open); });
   const stayAwake=()=>{ rec.hovering=true; clearTimeout(rec.hideT); };
   const mayDoze=()=>{ rec.hovering=false; if(rec.open&&!rec.pinned) armAutoHide(rec); };
   el.addEventListener('mouseenter',stayAwake); el.addEventListener('mouseleave',mayDoze);
@@ -387,6 +454,11 @@ function register(id, el, opts){
 
   PANELS_[id]=rec; (EDGE_MEMBERS[rec.edge]=EDGE_MEMBERS[rec.edge]||[]).push(rec);
   applyVisual(rec); reflowEdge(rec.edge);
+  // RESTORE WITHOUT THE ARRIVAL SLIDE (2026-07-09): a manually-docked panel used to TRANSITION 320ms from its
+  // stylesheet position to the saved dock on every load (and in a throttled/backgrounded tab that transition can
+  // freeze at t=0, stranding the panel at the wrong spot indefinitely - live-caught). Restored panels appear in
+  // place; the slide animation stays for interactive open/close only.
+  if(saved.manualDock){ el.style.transition='none'; setTimeout(()=>{ el.style.transition='transform '+CFG.SLIDE_MS+'ms ease, opacity .18s ease'; }, 60); }
   if(rec.onOpenChange) try{ rec.onOpenChange(rec.open); }catch(e){}   // sync callers (e.g. marketOn) to a state RESTORED from a prior session, not just the default
   if(rec.open && !rec.pinned) armAutoHide(rec);
   if(!retickT) retickT=setInterval(retickTabs, 450);            // follows size changes from OUTSIDE our API (e.g. the ticker's own .big toggle)
@@ -395,7 +467,7 @@ function register(id, el, opts){
 let retickT=null;
 function retickTabs(){ for(const id in PANELS_){ const rec=PANELS_[id]; const t=tabPosition(rec);
   rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
-  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.right=c.right; if(rec.grip) positionGrip(rec); } } }
+  if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.width=c.width; if(rec.grip) positionGrip(rec); } } }
 
 function open(id){ const r=PANELS_[id]; if(r) setOpen(r,true); }
 function close(id){ const r=PANELS_[id]; if(r) setOpen(r,false); }
@@ -404,7 +476,8 @@ function isOpen(id){ const r=PANELS_[id]; return r?r.open:null; }
 function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
 
-const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize, resetLayout };
+const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize, resetLayout,
+  isManual:(id)=>!!(store[id]&&store[id].manualDock) };   // 2026-07-09: lets legacy layout code ask "does the player own this panel's position?" before writing to it (the market re-center line was silently stomping manual docks on every viewport pass)
 if(typeof window!=='undefined') window.PANELS=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;
 })();

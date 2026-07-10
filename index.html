@@ -166,46 +166,46 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709n"></script>
-<script src="fflate.min.js?v=20260709n"></script>
-<script src="fbxloader.js?v=20260709n"></script>
+<script src="three.min.js?v=20260709o"></script>
+<script src="fflate.min.js?v=20260709o"></script>
+<script src="fbxloader.js?v=20260709o"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709n"></script>
-<script src="inhabitant.js?v=20260709n"></script>
-<script src="passenger.js?v=20260709n"></script>
-<script src="gamemod.js?v=20260709n"></script>
-<script src="chatter.js?v=20260709n"></script>
-<script src="speech_gen.js?v=20260709n"></script>
-<script src="speech_input.js?v=20260709n"></script>
-<script src="vision.js?v=20260709n"></script>
-<script src="deliberate.js?v=20260709n"></script>
-<script src="knowledge.js?v=20260709n"></script>
-<script src="acquire.js?v=20260709n"></script>
-<script src="sound.js?v=20260709n"></script>
-<script src="hullmodels.js?v=20260709n"></script>
-<script src="knowledge_hud.js?v=20260709n"></script>
-<script src="knowledge_screen.js?v=20260709n"></script>
-<script src="centroid_mind.js?v=20260709n"></script>
-<script src="kripke_mind.js?v=20260709n"></script>
-<script src="sober_gate.js?v=20260709n"></script>
-<script src="contradiction_ledger.js?v=20260709n"></script>
-<script src="kripke_planner.js?v=20260709n"></script>
-<script src="thoughts.js?v=20260709n"></script>
-<script src="tami_battle_ui.js?v=20260709n"></script>
-<script src="power_panel.js?v=20260709n"></script>
-<script src="panels.js?v=20260709n"></script>
-<script src="item_icons.js?v=20260709n"></script>
-<script src="engbay.js?v=20260709n"></script>
+<script src="speech_tier.js?v=20260709o"></script>
+<script src="inhabitant.js?v=20260709o"></script>
+<script src="passenger.js?v=20260709o"></script>
+<script src="gamemod.js?v=20260709o"></script>
+<script src="chatter.js?v=20260709o"></script>
+<script src="speech_gen.js?v=20260709o"></script>
+<script src="speech_input.js?v=20260709o"></script>
+<script src="vision.js?v=20260709o"></script>
+<script src="deliberate.js?v=20260709o"></script>
+<script src="knowledge.js?v=20260709o"></script>
+<script src="acquire.js?v=20260709o"></script>
+<script src="sound.js?v=20260709o"></script>
+<script src="hullmodels.js?v=20260709o"></script>
+<script src="knowledge_hud.js?v=20260709o"></script>
+<script src="knowledge_screen.js?v=20260709o"></script>
+<script src="centroid_mind.js?v=20260709o"></script>
+<script src="kripke_mind.js?v=20260709o"></script>
+<script src="sober_gate.js?v=20260709o"></script>
+<script src="contradiction_ledger.js?v=20260709o"></script>
+<script src="kripke_planner.js?v=20260709o"></script>
+<script src="thoughts.js?v=20260709o"></script>
+<script src="tami_battle_ui.js?v=20260709o"></script>
+<script src="power_panel.js?v=20260709o"></script>
+<script src="panels.js?v=20260709o"></script>
+<script src="item_icons.js?v=20260709o"></script>
+<script src="engbay.js?v=20260709o"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709n"></script>
-<script src="conquest.js?v=20260709n"></script>
-<script src="missions.js?v=20260709n"></script>
-<script src="planetmenu.js?v=20260709n"></script>
-<script src="textquests.js?v=20260709n"></script>
+<script src="starmap.js?v=20260709o"></script>
+<script src="conquest.js?v=20260709o"></script>
+<script src="missions.js?v=20260709o"></script>
+<script src="planetmenu.js?v=20260709o"></script>
+<script src="textquests.js?v=20260709o"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2040,6 +2040,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'contradictions', desc:'the contradiction quarantine ledger: contradictions, quarantine, conflicts, incompatible facts, truth conflicts - functional relations allow one value per subject per world; conflicts quarantine and every mind abstains on tainted keys', usage:'contradictions'},
   {name:'plan', desc:'the modal planner (Jobe Kripke port): plan, planner, how do i get, which action guarantees, necessity, necessarily - which observed action NECESSARILY makes a goal prop true; 2+ observations = proven, 1 = tentative, else observed route or honest abstain; learned from YOUR play only', usage:'plan <prop>'},
   {name:'ensures', desc:'per-action guarantees from the current state: ensures, action effects, what does docking guarantee, necessity per action - the []_a intersection over every observed outcome of each action taken from here', usage:'ensures'},
+  {name:'depart', desc:'undock and return to space: depart, undock, leave dock, leave planet, launch from orbit - clears the berth and hands back the helm (the planet screen DEPART button runs this)', usage:'depart'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -3198,6 +3199,18 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(pl._base){ term('Ranger Command is an orbital station - nothing to walk on. Land on a planet instead.','err'); return; }
     AWAY.enter(pl); return; }
   if(c==='launch'||c==='liftoff'||c==='takeoff'){ if(AWAY.active()){ AWAY.exit(); term('Back aboard your ship, in orbit.','sys'); } else term('You are already in your ship.','sys'); return; }
+  // DEPART (2026-07-09, live-caught: the planet screen's DEPART ran `launch`, the AWAY-mission return - for a
+  // ship docked in SPACE it printed "already in your ship" and undocked NOTHING. There was no real undock
+  // command at all; the only way out was manually flying past the dock radius.) This is it: clear the berth,
+  // place the ship just outside dock range pointing away, hand back the helm.
+  if(c==='depart'||c==='undock'){ if(!need(P.docked,'not docked - nothing to depart from')) return;
+    const from=P.docked, isB=!!from._base;
+    const dir=P.pos.clone().sub(from.pos); if(dir.lengthSq()<1) dir.set(1,0.1,0); dir.normalize();
+    P.docked=null; P.obj=null;
+    P.pos.copy(from.pos).add(dir.clone().multiplyScalar((isB?CFG.BASE_R:CFG.DOCK_R)*1.15));   // just past the auto-undock hysteresis so the berth doesn't instantly re-grab
+    P.vel.copy(dir.multiplyScalar(14));
+    if(window.KPLAN) KPLAN.observe('depart');   // a real completed action - the modal planner learns what departing guarantees
+    term(`Departed ${from.name} - helm is yours.`,'sys'); if(window.SOUND) SOUND.play('ui'); return; }
   if(c==='scan'){ const ps=planets.map(p=>`${p.name}(${p.type.t} Lv${p.dev})${p.hegemon?' ☠SYNOD':''} ${Math.round(P.pos.distanceTo(p.pos))}u`).join(' · ');
     const inrange=ships.filter(o=>o!==P&&o.alive&&P.pos.distanceTo(o.pos)<CFG.SENSE_R*1.6).sort((a,b)=>P.pos.distanceTo(a.pos)-P.pos.distanceTo(b.pos));
     // the Passenger reads each hostile: hull %, weapon tier - and paints a scan BADGE (shield/hull bars) above them
@@ -4297,7 +4310,7 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   vd.style.left=mw+'px'; vd.style.top='0'; vd.style.width='1px'; vd.style.height=H+'px';
   hd.style.left=mw+'px'; hd.style.top=hh+'px'; hd.style.width=rw+'px'; hd.style.height='1px';
   document.getElementById('chat').style.width=Math.max(240,mw-28-40)+'px';   // -40 reserves room for #micBtn beside it
-  document.getElementById('market').style.left=(mw*0.5)+'px';
+  if(!(window.PANELS&&PANELS.isManual&&PANELS.isManual('market'))) document.getElementById('market').style.left=(mw*0.5)+'px';   // LIVE-CAUGHT 2026-07-09 ("docking is still weak"): this legacy re-center ran on EVERY viewport pass and silently stomped a manually-docked market - once the player drags it anywhere, PANELS owns its position
   if(soloView){ const full={x:0,y:0,w:W,h:H}, z={x:0,y:0,w:0,h:0};   // MOBILE: render only the active view, full-screen
     VIEW.main = soloView==='main'?full:z; VIEW.top = soloView==='top'?full:z; VIEW.brain = soloView==='brain'?full:z;
     if(soloView==='main'){ chaseCam.aspect=W/H; chaseCam.updateProjectionMatrix(); } else if(soloView==='top'){ sizeTopCam(W,H); } else { sizeBrainCam(W,H); }
