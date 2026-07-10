@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>STARFIGHTER · AI squadron - 3D flight · top-down · reasoning (all WebGL)</title>
 <style>
+/* NO SCROLLBAR CHROME (user 2026-07-10 'there shouldn't be any scrollbars anywhere'): hide the bar on every
+   scrollable surface; content still scrolls via wheel/drag/touch, it just never shows a bar. */
+*{ scrollbar-width:none; -ms-overflow-style:none; }
+*::-webkit-scrollbar{ width:0; height:0; display:none; }
   :root{ --cyan:#46d6ff; --gold:#ffcf52; --red:#ff5a6e; --grn:#7dffa6; --ink:#080a10; }
   *{ box-sizing:border-box; }
   html,body{ margin:0; height:100%; overflow:hidden; background:var(--ink); color:#dfe9f5;
@@ -147,7 +151,7 @@
 <div class="hud" id="ticker"><div id="logtabs"></div><div id="logbody"></div></div>
 <div id="market"><div id="marketBody"></div></div>
 <div class="vlabel" id="lblTop">TOP-DOWN <span>· scroll zoom · drag pan · click select · dbl-click reset</span></div>
-<div class="vlabel" id="lblBrain">REASONING <span>· scroll zoom · drag pan</span></div>
+<div class="vlabel" id="lblBrain">SHIP CONTROLS <span>· scroll zoom · drag pan</span></div>
 <div id="vdiv"></div><div id="hdiv"></div><div id="hdiv2"></div>
 <div id="powerdock"></div><!-- always-on power dock: radial hull ring + TechSlider tick bars (power_panel.js docked mode) -->
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="type anything - commands run ('help')  ·  ask ORION what are you doing  ·  orders in plain English  ·  everything else reaches the thing living behind your ears">
@@ -168,51 +172,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710m"></script>
-<script src="fflate.min.js?v=20260710m"></script>
-<script src="fbxloader.js?v=20260710m"></script>
+<script src="three.min.js?v=20260710n"></script>
+<script src="fflate.min.js?v=20260710n"></script>
+<script src="fbxloader.js?v=20260710n"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710m"></script>
-<script src="inhabitant.js?v=20260710m"></script>
-<script src="passenger.js?v=20260710m"></script>
-<script src="gamemod.js?v=20260710m"></script>
-<script src="chatter.js?v=20260710m"></script>
-<script src="speech_gen.js?v=20260710m"></script>
-<script src="speech_input.js?v=20260710m"></script>
-<script src="vision.js?v=20260710m"></script>
-<script src="deliberate.js?v=20260710m"></script>
-<script src="knowledge.js?v=20260710m"></script>
-<script src="acquire.js?v=20260710m"></script>
-<script src="sound.js?v=20260710m"></script>
-<script src="hullmodels.js?v=20260710m"></script>
-<script src="knowledge_hud.js?v=20260710m"></script>
-<script src="knowledge_screen.js?v=20260710m"></script>
-<script src="centroid_mind.js?v=20260710m"></script>
-<script src="kripke_mind.js?v=20260710m"></script>
-<script src="sober_gate.js?v=20260710m"></script>
-<script src="contradiction_ledger.js?v=20260710m"></script>
-<script src="kripke_planner.js?v=20260710m"></script>
-<script src="pillar_router.js?v=20260710m"></script>
-<script src="gravity_well.js?v=20260710m"></script>
-<script src="growth_loop.js?v=20260710m"></script>
-<script src="coop_proof.js?v=20260710m"></script>
-<script src="tom_test.js?v=20260710m"></script>
-<script src="thoughts.js?v=20260710m"></script>
-<script src="tami_battle_ui.js?v=20260710m"></script>
-<script src="power_panel.js?v=20260710m"></script>
-<script src="panels.js?v=20260710m"></script>
-<script src="item_icons.js?v=20260710m"></script>
-<script src="engbay.js?v=20260710m"></script>
+<script src="speech_tier.js?v=20260710n"></script>
+<script src="inhabitant.js?v=20260710n"></script>
+<script src="passenger.js?v=20260710n"></script>
+<script src="gamemod.js?v=20260710n"></script>
+<script src="chatter.js?v=20260710n"></script>
+<script src="speech_gen.js?v=20260710n"></script>
+<script src="speech_input.js?v=20260710n"></script>
+<script src="vision.js?v=20260710n"></script>
+<script src="deliberate.js?v=20260710n"></script>
+<script src="knowledge.js?v=20260710n"></script>
+<script src="acquire.js?v=20260710n"></script>
+<script src="sound.js?v=20260710n"></script>
+<script src="hullmodels.js?v=20260710n"></script>
+<script src="knowledge_hud.js?v=20260710n"></script>
+<script src="knowledge_screen.js?v=20260710n"></script>
+<script src="centroid_mind.js?v=20260710n"></script>
+<script src="kripke_mind.js?v=20260710n"></script>
+<script src="sober_gate.js?v=20260710n"></script>
+<script src="contradiction_ledger.js?v=20260710n"></script>
+<script src="kripke_planner.js?v=20260710n"></script>
+<script src="pillar_router.js?v=20260710n"></script>
+<script src="gravity_well.js?v=20260710n"></script>
+<script src="growth_loop.js?v=20260710n"></script>
+<script src="coop_proof.js?v=20260710n"></script>
+<script src="tom_test.js?v=20260710n"></script>
+<script src="thoughts.js?v=20260710n"></script>
+<script src="tami_battle_ui.js?v=20260710n"></script>
+<script src="power_panel.js?v=20260710n"></script>
+<script src="panels.js?v=20260710n"></script>
+<script src="item_icons.js?v=20260710n"></script>
+<script src="engbay.js?v=20260710n"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710m"></script>
-<script src="conquest.js?v=20260710m"></script>
-<script src="missions.js?v=20260710m"></script>
-<script src="planetmenu.js?v=20260710m"></script>
-<script src="textquests.js?v=20260710m"></script>
+<script src="starmap.js?v=20260710n"></script>
+<script src="conquest.js?v=20260710n"></script>
+<script src="missions.js?v=20260710n"></script>
+<script src="planetmenu.js?v=20260710n"></script>
+<script src="textquests.js?v=20260710n"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -230,7 +234,7 @@ const T = THREE;
 // SF_LAST_ERROR_v1, so the next crash hands us an exact stack instead of a silent frozen canvas. Diagnostic
 // only - never swallows the error (the console still gets it), never alters game state.
 (function(){ function report(kind,msg,src,line,col,stack){
-    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710m'})); }catch(e){}
+    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710n'})); }catch(e){}
     try{ let el=document.getElementById('sfCrashBanner');
       if(!el){ el=document.createElement('div'); el.id='sfCrashBanner';
         el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#3a0a12;color:#ffb4bc;border:1px solid #ff5a6e;border-radius:8px;padding:8px 14px;font:12px monospace;max-width:80vw;white-space:pre-wrap;';
@@ -4171,11 +4175,8 @@ function buildBrain(){
   targetLine=lineSeg('#ffd24a',4); brainScene.add(targetLine.line);
   bLabel('PERCEPTION · bearing',12,'#5a7690',RC.x,RC.y-RR-16);
   // decision chain
-  selfCard=spriteText(' - ',22,'#9fe0ff',{bg:'#0e1722',border:true,pad:13,r:9,align:'center'}); selfCard.sp.position.set(452,408,3); selfCard.sp.renderOrder=5; brainScene.add(selfCard.sp);
-  intentCard=spriteText(' - ',20,'#ffb070',{bg:'#0e1722',border:true,pad:13,r:9,align:'center'}); intentCard.sp.position.set(452,322,3); intentCard.sp.renderOrder=5; brainScene.add(intentCard.sp);
+  // (removed 2026-07-10, user 'YOU -> Manual makes no sense'): the self/intent decision-chain cards + edge - this is the SHIP CONTROLS view now (gauges + perception), not a reasoning chain.
   tgtLabel=bLabel('',13,'#9fb6cc',452,293);
-  intentEdge=lineSeg('#ffb070',1); brainScene.add(intentEdge.line); intentEdge.set(452,386,452,346);
-  bLabel('intent',11,'#ffb070',486,366,'left');
   seekEdge=lineSeg('#ffd24a',1); brainScene.add(seekEdge.line);
   seekLabel=bLabel('seek',11,'#ffd24a',322,292);
   bLabel('ACTION → flight controls',12,'#5a7690',418,214,'center');
@@ -4726,7 +4727,6 @@ function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thou
     targetLine.line.visible=true; targetLine.set(RC.x,RC.y,selPos.x,selPos.y); targetLine.line.material.color.set(mc);
     seekEdge.line.visible=true; seekEdge.set(RC.x+RR*0.86,RC.y,330,322); seekEdge.line.material.color.set(mc); seekLabel.sp.visible=true; }
   else { selRing.visible=false; targetLine.line.visible=false; seekEdge.line.visible=false; seekLabel.sp.visible=false; }
-  selfCard.set(s.name,s.color.getStyle()); intentCard.set(b.mode,mc); intentEdge.line.material.color.set(mc);
   tgtLabel.set(b.target?('target · '+(b.target.name?('rival '+b.target.name):(b.target.credits!=null?b.target.credits+'c gem':'rock'))):'no target');
   setGauge(gauges[0],b.ctrl.thr); setGauge(gauges[1],b.ctrl.pitch); setGauge(gauges[2],b.ctrl.yaw);
   engLabel.set('“'+s.lastLine+'”',mc);
@@ -4748,7 +4748,7 @@ function buildRoster(){ rosterEl.innerHTML=''; ships.slice(0,CFG.NSHIPS).forEach
   el.title=`${s.name} · ${fac} - ${s.backstory||''}`;   // #21: backstory tooltip (desktop hover)
   el.innerHTML=`<span class="fac">${s.team==='pirate'?'✖':'◈'}</span><span class="dot" style="background:hsl(${s.hue*360},80%,60%)"></span><span class="nm">${s.name}</span>
     <span class="hp"><i id="rhp${i}" style="width:100%"></i></span><span class="cr" id="rcr${i}">0c</span>`;
-  el.onclick=()=>{ focus=i; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+s.name;
+  el.onclick=()=>{ focus=i; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+s.name;
     if(activeTab==='chronicle') renderLog();                                                                              // follow the selected pilot in the CHRONICLE
     if(s.backstory) term(`<b>${s.name}</b> · ${fac} <span style="opacity:.6">(GIVEN lore)</span> - ${s.backstory}.`,'sys'); };   // #21: backstory to terminal on select (works on touch)
   rosterEl.appendChild(el); }); }
@@ -5177,12 +5177,12 @@ buildSpeech(); buildBlips(); buildBrain(); buildRoster(); buildMarket(); buildTa
 term("<b style='color:#8fd0ff'>STARFIGHTER terminal online.</b> Fly <b>YOU</b>: <b>W</b> thrust · <b>A/D</b> turn · <b>↑/↓</b> pitch · <b>Space</b> fire (on a phone use the on-screen <b>stick</b> + <b>THR</b>/<b>FIRE</b>). Type <b>help</b>; order the AI squadron in plain English. <b>Dock/trade:</b> tap a planet or ⌂ base in the TOP-DOWN view (or the <b>DOCK</b> button) to fly there &amp; auto-dock, then <b>market</b> / <b>buy ore 10</b> / <b>sell</b>.","sys");
 term("Factions: <b style='color:#46d6ff'>◈ Coalition Wardens</b> (you) vs <b style='color:#ff5a6e'>✖ the Iron Synod</b> (Hegemon). Tap a roster pilot for its backstory. <span style='opacity:.6'>(lore = GIVEN flavor)</span>","sys");
 term("<span style='opacity:.7'>Note: this game is the <b>GIVEN visualizer</b> - a ship's replies are its own game-state (<span style='color:#8fd0ff'>🛰️ GIVEN·game-state</span>) or hand-written lore (<span style='color:#e8c37a'>📖 GIVEN·lore</span>), never fabricated. The <b>LEARNED AGI</b> (decoded from black boxes, verify-first) is the bench: <code>node converse_vec.js</code>.</span>","sys");
-document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name;
+document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name;
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
 const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false };
-function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[0].name; } }
+function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
   s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
   // SR X-WING CAPACITORS (user 2026-07-08: "when I hold shift I don't want my recharge rates to change it would just
@@ -5230,7 +5230,7 @@ function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
 addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
   if(AWAY.active()){ if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyF','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault(); AWAY.key(e,true); return; }
   if(e.key==='Enter'){ e.preventDefault(); const c=document.getElementById('chat'); if(c) c.focus(); return; }   // user 2026-07-07: "hitting enter will focus the typing terminal" - from anywhere in flight, not just while already typing
-  if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+ships[focus].name; return; }
+  if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[focus].name; return; }
   if(e.code==='KeyM'){ if(window.PANELS) PANELS.toggle('market'); else { marketOn=!marketOn; document.getElementById('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); } return; }
   if(e.code==='KeyG'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } return; }   // GALAXY map - the primary way to cross systems (user: "easier to access")
   if(e.code==='KeyE'){ if(window.ENGBAY) ENGBAY.toggle(); return; }   // SHIP LAYOUT: open/close the fullscreen Engineering Bay (self-managed, not a PANELS edge panel - see registration comment above)
@@ -5307,7 +5307,7 @@ canvas.addEventListener('dblclick',e=>{ const vp=viewAt(e.clientX,e.clientY);
   const db=$('tbDock'); if(db) db.onclick=()=>{ const P=ships[0]; MAN.active=false; const np=nearestPlanet(P.pos); const dB=base?P.pos.distanceTo(base.pos):1e9, dP=np?P.pos.distanceTo(np.pos):1e9;   // travel to & auto-dock the nearest port/base
     if(base && dB<=dP){ P.obj={type:'goto',planet:{pos:base.pos.clone(),name:'Ranger Command',_base:true}}; term('⌂ course set for Ranger Command.','sys'); }
     else if(np){ P.obj={type:'goto',planet:np}; term('Course set for '+np.name+' - auto-docking.','sys'); } };
-  const pb=$('tbPilot'); if(pb) pb.onclick=()=>{ focus=(focus+1)%CFG.NSHIPS; buildRoster(); $('lblBrain').textContent='REASONING · '+ships[focus].name; };
+  const pb=$('tbPilot'); if(pb) pb.onclick=()=>{ focus=(focus+1)%CFG.NSHIPS; buildRoster(); $('lblBrain').textContent='SHIP CONTROLS · '+ships[focus].name; };
   const mb=$('tbMkt'); if(mb) mb.onclick=()=>{ if(window.PANELS) PANELS.toggle('market'); else { marketOn=!marketOn; $('market').style.display=marketOn?'block':'none'; if(marketOn) updateMarket(); } };
   const lb=$('tbLog'); if(lb) lb.onclick=()=>{ if(window.PANELS) PANELS.clearSize('ticker'); $('ticker').classList.toggle('big'); };
   let td=null, pinchD=0;
@@ -5342,7 +5342,7 @@ function topClick(mx,my){ const w=topWorldAt(mx,my), wpp=(topCam.right-topCam.le
     if(base && !P.docked && P.pos.distanceTo(base.pos)<=CFG.BASE_R){ completeDock(P,base,true); return; }
     if(typeof MAN!=='undefined') MAN.active=false; P.obj={type:'goto',planet:{pos:base.pos.clone(),name:'Ranger Command',_base:true}};
     term('⌂ <b>Ranger Command</b> - course set; on arrival: base · hull &lt;class&gt; · blackmarket · repair.','sys'); }
-  else { const idx=ships.indexOf(best); if(idx>=0 && idx<CFG.NSHIPS){ focus=idx; buildRoster(); document.getElementById('lblBrain').textContent='REASONING · '+best.name; }
+  else { const idx=ships.indexOf(best); if(idx>=0 && idx<CFG.NSHIPS){ focus=idx; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+best.name; }
     term(`<b>${best.name}</b> · ${best.role} · ${best.mode} · hull ${Math.round(best.hp)} · ${best.credits}c${idx<CFG.NSHIPS?' · now focused':''}`,'sys'); } }
 
 // ==================================================================================================================
