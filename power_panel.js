@@ -52,7 +52,23 @@ var CFG = {
   DIVERT_ZONE: 0.33,          // SR X-WING SHIELDS: click/drag the outer third of the fwd/aft bar to divert, middle third = balanced
   COL_LASER: '#ffb454',       // capacitor gauge colors
   COL_ENGINE_CAP: '#46d6ff',
+  // UNITY TECH-SLIDER LOOK (user 2026-07-10 "use the tick marks in the original starfighter unity project"):
+  // every gauge fill is masked into discrete tick segments (the TechSlider.png repeat), and the hull readout is
+  // the RADIAL tick ring (techslidercircle.png pulled from Starfighter2/Assets/Textures) tinted by health.
+  TICK_H: 7, TICK_GAP: 3,     // vertical-bar tick segment height / gap (px)
+  TICK_W: 6, TICK_WGAP: 3,    // horizontal-gauge tick width / gap (px)
+  RADIAL: 96,                 // radial hull+shield gauge CSS size (px); canvas is 2x for sharpness
+  RADIAL_IMG: 'assets/techslidercircle.png',
+  COL_RADIAL_DIM: '#2a4258',  // unfilled remainder of the tick ring
+  COL_RADIAL_SHIELD: '#7fd0ff',
 };
+
+// CSS tick mask (the TechSlider segment look) for a gauge fill - `dir` is 'to top' (vertical) or 'to right'
+function tickMask(dir, seg, gap) {
+  var stop = '#000 0 ' + seg + 'px, transparent ' + seg + 'px ' + (seg + gap) + 'px';
+  return ';-webkit-mask-image:repeating-linear-gradient(' + dir + ', ' + stop + ');' +
+         'mask-image:repeating-linear-gradient(' + dir + ', ' + stop + ')';
+}
 
 var SYSTEMS = [
   { key: 'weapons', label: 'WEAPONS', col: CFG.COL_WEAPONS },
@@ -172,8 +188,8 @@ function playSound(name) {
 
 // ---- the singleton panel ---------------------------------------------------------------------------------------
 var PP = {
-  built: false, shown: false,
-  root: null, hullEl: null, shieldEl: null,
+  built: false, shown: false, docked: false,   // docked = lives inside a host-owned dock div (always visible, no PANELS)
+  root: null, hullEl: null, shieldEl: null, radial: null,
   bars: {},       // sys.key -> {fillEl, trackEl, pctEl, multEl}
   balance: null,  // {trackEl, fillFore, fillAft, labelEl} - the fore/aft shield-arc bar (now shows REAL charge, sets divert)
   capLaser: null, capEngine: null,   // {fillEl, pctEl} - SR X-WING CAPACITORS gauges
@@ -213,6 +229,69 @@ function renderStatus() {
   }
 }
 
+// tint the tick-ring PNG a solid color via source-in on a cached offscreen (the PNG has a true alpha channel -
+// verified: bg alpha 0, tick alpha 255 - so source-in recolors ONLY the ticks)
+function drawTinted(g, img, color, S) {
+  var d = doc(); if (!d || !d.createElement) return;
+  var oc = PP.radial._oc || (PP.radial._oc = d.createElement('canvas'));
+  if (!oc.getContext) return;
+  if (oc.width !== S) { oc.width = S; oc.height = S; }
+  var og = oc.getContext('2d'); if (!og) return;
+  og.clearRect(0, 0, S, S);
+  og.drawImage(img, 0, 0, S, S);
+  og.globalCompositeOperation = 'source-in';
+  og.fillStyle = color; og.fillRect(0, 0, S, S);
+  og.globalCompositeOperation = 'source-over';
+  g.drawImage(oc, 0, 0);
+}
+
+// the RADIAL hull+shield gauge: outer ring = the Unity techslidercircle tick ring, arc-clipped to hull fraction
+// (green -> red when low); inner arc stroke = shield charge; hull % dead center.
+function renderRadial() {
+  var r = PP.radial; if (!r || !r.cv) return;
+  var g = null;
+  try { g = (typeof r.cv.getContext === 'function') ? r.cv.getContext('2d') : null; } catch (e) { g = null; }
+  if (!g) return;                                        // node stub / no canvas2d: text readouts still cover it
+  var S = r.cv.width, c = S / 2, A0 = -Math.PI / 2;
+  g.clearRect(0, 0, S, S);
+  var hull = readHull();
+  var frac = (hull && hull.maxHp > 0) ? clamp(hull.hp / hull.maxHp, 0, 1) : 0;
+  var col = (frac <= CFG.HULL_LOW_FRAC) ? CFG.COL_HULL_LOW : CFG.COL_HULL_OK;
+  function ringPass(color, a0, a1, alpha) {
+    if (a1 - a0 <= 0.0001) return;
+    g.save();
+    g.beginPath(); g.moveTo(c, c); g.arc(c, c, S / 2, a0, a1, false); g.closePath(); g.clip();
+    g.globalAlpha = alpha;
+    if (r.imgOk && r.img) drawTinted(g, r.img, color, S);
+    else {                                              // procedural 36-tick fallback (same silhouette family)
+      g.fillStyle = color;
+      for (var i = 0; i < 36; i++) {
+        g.save(); g.translate(c, c); g.rotate(i / 36 * Math.PI * 2);
+        g.fillRect(-S * 0.012, -(S / 2) + S * 0.015, S * 0.024, S * 0.10);
+        g.restore();
+      }
+    }
+    g.globalAlpha = 1;
+    g.restore();
+  }
+  ringPass(col, A0, A0 + frac * Math.PI * 2, 1);                       // filled hull arc
+  ringPass(CFG.COL_RADIAL_DIM, A0 + frac * Math.PI * 2, A0 + Math.PI * 2, 0.55);   // dim remainder
+  var sh = readShield();
+  if (sh && sh.max > 0) {                                              // inner shield arc
+    var sf = clamp(sh.cur / sh.max, 0, 1);
+    if (sf > 0.002) {
+      g.beginPath(); g.strokeStyle = CFG.COL_RADIAL_SHIELD; g.lineWidth = S * 0.045; g.lineCap = 'round';
+      g.arc(c, c, S * 0.30, A0, A0 + sf * Math.PI * 2, false); g.stroke();
+    }
+  }
+  g.fillStyle = '#e6f2fb'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '800 ' + Math.round(S * 0.18) + 'px ui-monospace,Menlo,Consolas,monospace';
+  g.fillText(Math.round(frac * 100) + '%', c, c - S * 0.02);
+  g.fillStyle = CFG.COL_RADIAL_SHIELD;
+  g.font = '700 ' + Math.round(S * 0.08) + 'px ui-monospace,Menlo,Consolas,monospace';
+  g.fillText('HULL', c, c + S * 0.12);
+}
+
 function renderBars() {
   if (!PP.built) return;
   var power = readPower();
@@ -248,6 +327,7 @@ function renderCapacitors() {
 
 function renderAll() {
   try { renderStatus(); } catch (e) {}
+  try { renderRadial(); } catch (e) {}
   try { renderBars(); } catch (e) {}
   try { renderBalance(); } catch (e) {}
   try { renderCapacitors(); } catch (e) {}
@@ -332,10 +412,17 @@ function buildBar(sys) {
     'border:1px solid ' + CFG.COL_TRACK_BORDER + ';border-radius:5px;overflow:hidden;cursor:ns-resize;' +
     'touch-action:none;-webkit-user-select:none;user-select:none');
 
-  var fill = el('div',
-    'position:absolute;left:0;right:0;bottom:0;height:50%;background:' + sys.col + ';' +
-    'box-shadow:0 0 8px ' + sys.col + '88 inset;transition:background 0.15s');
+  // faint full-height tick underlay: the EMPTY segments still read as tick marks (Unity TechSlider track look)
+  var under = el('div',
+    'position:absolute;left:2px;right:2px;top:0;bottom:0;background:' + sys.col + ';opacity:0.14;pointer-events:none' +
+    tickMask('to top', CFG.TICK_H, CFG.TICK_GAP));
 
+  var fill = el('div',
+    'position:absolute;left:2px;right:2px;bottom:0;height:50%;background:' + sys.col + ';' +
+    'box-shadow:0 0 8px ' + sys.col + '88 inset;transition:background 0.15s' +
+    tickMask('to top', CFG.TICK_H, CFG.TICK_GAP));
+
+  track.appendChild(under);
   track.appendChild(fill);
 
   var pct = el('div', 'font:700 10px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-top:5px', '50%');
@@ -420,8 +507,8 @@ function buildBalanceBar() {
     'position:relative;height:12px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';' +
     'border-radius:5px;overflow:hidden;cursor:ew-resize;touch-action:none;-webkit-user-select:none;user-select:none');
   var divider = el('div', 'position:absolute;top:0;bottom:0;left:50%;width:1px;background:' + CFG.COL_TRACK_BORDER);
-  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:0%;background:' + CFG.COL_ENGINES + '55');
-  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:0%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset');
+  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:0%;background:' + CFG.COL_ENGINES + '55' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
+  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:0%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
   track.appendChild(fillAft); track.appendChild(fillFore); track.appendChild(divider);
   wrap.appendChild(label); wrap.appendChild(track);
   wireBalanceDrag(track);
@@ -435,7 +522,7 @@ function buildCapGauge(label0, col) {
   var wrap = el('div', 'margin-top:5px');
   var track = el('div',
     'position:relative;height:9px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';border-radius:4px;overflow:hidden');
-  var fill = el('div', 'position:absolute;top:0;bottom:0;left:0;width:100%;background:' + col + ';box-shadow:0 0 6px ' + col + '88 inset;transition:width 0.15s');
+  var fill = el('div', 'position:absolute;top:0;bottom:0;left:0;width:100%;background:' + col + ';box-shadow:0 0 6px ' + col + '88 inset;transition:width 0.15s' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
   var pct = el('div', 'font:700 8.5px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-top:2px;text-align:center', label0);
   track.appendChild(fill);
   wrap.appendChild(track); wrap.appendChild(pct);
@@ -472,23 +559,44 @@ function build(parentEl) {
   var closeBtn = el('div', 'cursor:pointer;color:#7fa6bd;font-weight:800;padding:0 4px;line-height:1', 'x');
   closeBtn.title = 'hide power panel';
   closeBtn.onclick = function () { hide(); };
+  if (PP.docked && closeBtn.style) closeBtn.style.display = 'none';   // a dock can't be closed away
   head.appendChild(title); head.appendChild(closeBtn);
   root.appendChild(head);
 
-  // hull / shield readout
-  var status = el('div',
-    'font-size:9.5px;color:' + CFG.COL_DIM + ';margin-bottom:8px;padding-bottom:7px;' +
-    'border-bottom:1px solid ' + CFG.COL_TRACK_BORDER + ';display:flex;flex-direction:column;gap:2px');
-  var hullEl = el('div', '', 'HULL --/--');
-  var shieldEl = el('div', '', 'SHIELD --/--');
-  status.appendChild(hullEl); status.appendChild(shieldEl);
-  root.appendChild(status);
+  // RADIAL HULL+SHIELD GAUGE (Starfighter2's techslidercircle tick ring, tinted by health) sitting beside the
+  // three allocation bars - one combined row keeps the docked panel compact (user 2026-07-10: radial health bar
+  // + power controls merged into the smaller reasoning column).
+  var mainRow = el('div', 'display:flex;align-items:flex-start;gap:12px');
+  var radialCol = el('div', 'display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto');
+  var cv = null, d2 = doc();
+  if (d2 && d2.createElement) {
+    cv = d2.createElement('canvas');
+    cv.width = CFG.RADIAL * 2; cv.height = CFG.RADIAL * 2;   // 2x backing store for sharpness
+    if (cv.style) cv.style.cssText = 'width:' + CFG.RADIAL + 'px;height:' + CFG.RADIAL + 'px';
+    radialCol.appendChild(cv);
+  }
+  var hullEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM, 'HULL --/--');
+  var shieldEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM, 'SHIELD --/--');
+  radialCol.appendChild(hullEl); radialCol.appendChild(shieldEl);
   PP.hullEl = hullEl; PP.shieldEl = shieldEl;
+  PP.radial = { cv: cv, img: null, imgOk: false, _oc: null };
+  // load the Unity tick-ring texture (best-effort; the procedural 36-tick ring below draws until/unless it arrives)
+  try {
+    var w2 = win();
+    if (w2 && typeof w2.Image === 'function') {
+      var im = new w2.Image();
+      im.onload = function () { PP.radial.imgOk = true; };
+      im.src = CFG.RADIAL_IMG;
+      PP.radial.img = im;
+    }
+  } catch (e) {}
 
   // three bars, side by side
-  var row = el('div', 'display:flex;justify-content:space-between;gap:' + CFG.BAR_GAP + 'px');
+  var row = el('div', 'display:flex;justify-content:space-between;gap:' + CFG.BAR_GAP + 'px;flex:1 1 auto');
   for (var i = 0; i < SYSTEMS.length; i++) row.appendChild(buildBar(SYSTEMS[i]));
-  root.appendChild(row);
+  mainRow.appendChild(radialCol);
+  mainRow.appendChild(row);
+  root.appendChild(mainRow);
 
   root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio"
   root.appendChild(buildCapacitorRow());   // user 2026-07-08: "show the power capacitor levels for lasers shields and engine speed"
@@ -511,20 +619,34 @@ function ensureTimer() {
 // panel is registered there so there's one visibility owner, falling back to raw display only when standalone.
 function show() {
   if (!PP.built) build();
-  if (win() && window.PANELS && typeof window.PANELS.open === 'function') { window.PANELS.open('powerpanel'); }
+  if (!PP.docked && win() && window.PANELS && typeof window.PANELS.open === 'function') { window.PANELS.open('powerpanel'); }
   else if (PP.root) { PP.root.style.display = 'block'; }
   PP.shown = true;
   ensureTimer();
   renderAll();
 }
 function hide() {
-  if (win() && window.PANELS && typeof window.PANELS.close === 'function') { window.PANELS.close('powerpanel'); }
+  if (!PP.docked && win() && window.PANELS && typeof window.PANELS.close === 'function') { window.PANELS.close('powerpanel'); }
   else if (PP.root) { PP.root.style.display = 'none'; }
   PP.shown = false;
 }
 
 // ---- public API --------------------------------------------------------------------------------------------
-function mount(parentEl) { var r = build(parentEl); ensureTimer(); return r; }
+// mount(parentEl, opts) - opts.docked:true builds the panel as an always-on inline dock (fills the parent,
+// no fixed positioning, no PANELS ownership) - the host lays the parent out (starfighter's right column).
+function mount(parentEl, opts) {
+  if (opts && opts.docked) PP.docked = true;
+  var r = build(parentEl);
+  if (PP.docked && r && r.style) {
+    r.style.cssText += ';position:relative;inset:auto;right:auto;bottom:auto;width:auto;height:100%;' +
+      'box-sizing:border-box;display:block;border-radius:0;border:0;border-top:1px solid ' + CFG.COL_BORDER + ';' +
+      'box-shadow:none;overflow:hidden';
+    PP.shown = true;
+  }
+  ensureTimer();
+  if (PP.docked) { try { renderAll(); } catch (e) {} }
+  return r;
+}
 function toggle() { if (!PP.built) build(); if (PP.shown) hide(); else show(); return PP.shown; }
 function visible() { return !!PP.shown; }
 function setShown(v) { PP.shown = !!v; if (PP.shown) try { renderAll(); } catch (e) {} }   // sync point for PANELS' onOpenChange

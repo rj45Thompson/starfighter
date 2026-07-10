@@ -100,7 +100,8 @@
   #market .mkt-s{ margin-top:6px; font:600 10.5px/1.4 ui-monospace,monospace; color:#b8c6d8; border-top:1px solid #1a2636; padding-top:5px; }
   .vlabel{ position:fixed; z-index:6; pointer-events:none; font:800 10px/1 ui-monospace,monospace; letter-spacing:.14em; color:#5f7fa6; }
   .vlabel span{ font-weight:600; letter-spacing:.02em; color:#3f5group; color:#3f5d72; }
-  #vdiv,#hdiv{ position:fixed; z-index:6; background:#1b2troops; background:#1b2a3c; }
+  #vdiv,#hdiv,#hdiv2{ position:fixed; z-index:6; background:#1b2a3c; }
+  #powerdock{ position:fixed; z-index:6; background:rgba(7,14,23,0.85); overflow:hidden; pointer-events:auto; }
   #boot{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50;
     background:var(--ink); font:600 14px/1 ui-monospace,monospace; color:#86a0bd; transition:opacity .5s; }
   /* ---- Android / touch ---- */
@@ -147,7 +148,8 @@
 <div id="market"><div id="marketBody"></div></div>
 <div class="vlabel" id="lblTop">TOP-DOWN <span>· scroll zoom · drag pan · click select · dbl-click reset</span></div>
 <div class="vlabel" id="lblBrain">REASONING <span>· scroll zoom · drag pan</span></div>
-<div id="vdiv"></div><div id="hdiv"></div>
+<div id="vdiv"></div><div id="hdiv"></div><div id="hdiv2"></div>
+<div id="powerdock"></div><!-- always-on power dock: radial hull ring + TechSlider tick bars (power_panel.js docked mode) -->
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="type anything - commands run ('help')  ·  ask ORION what are you doing  ·  orders in plain English  ·  everything else reaches the thing living behind your ears">
 <button id="micBtn" type="button" title="talk instead of type - click for one line, or `talk on` for a hands-free conversation">🎤</button>
 <button id="voiceBtn" type="button" title="hear the Passenger and pilots speak ALOUD (off by default - click to toggle, or type `voices on`)">🔇</button>
@@ -166,51 +168,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710a"></script>
-<script src="fflate.min.js?v=20260710a"></script>
-<script src="fbxloader.js?v=20260710a"></script>
+<script src="three.min.js?v=20260710b"></script>
+<script src="fflate.min.js?v=20260710b"></script>
+<script src="fbxloader.js?v=20260710b"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710a"></script>
-<script src="inhabitant.js?v=20260710a"></script>
-<script src="passenger.js?v=20260710a"></script>
-<script src="gamemod.js?v=20260710a"></script>
-<script src="chatter.js?v=20260710a"></script>
-<script src="speech_gen.js?v=20260710a"></script>
-<script src="speech_input.js?v=20260710a"></script>
-<script src="vision.js?v=20260710a"></script>
-<script src="deliberate.js?v=20260710a"></script>
-<script src="knowledge.js?v=20260710a"></script>
-<script src="acquire.js?v=20260710a"></script>
-<script src="sound.js?v=20260710a"></script>
-<script src="hullmodels.js?v=20260710a"></script>
-<script src="knowledge_hud.js?v=20260710a"></script>
-<script src="knowledge_screen.js?v=20260710a"></script>
-<script src="centroid_mind.js?v=20260710a"></script>
-<script src="kripke_mind.js?v=20260710a"></script>
-<script src="sober_gate.js?v=20260710a"></script>
-<script src="contradiction_ledger.js?v=20260710a"></script>
-<script src="kripke_planner.js?v=20260710a"></script>
-<script src="pillar_router.js?v=20260710a"></script>
-<script src="gravity_well.js?v=20260710a"></script>
-<script src="growth_loop.js?v=20260710a"></script>
-<script src="coop_proof.js?v=20260710a"></script>
-<script src="tom_test.js?v=20260710a"></script>
-<script src="thoughts.js?v=20260710a"></script>
-<script src="tami_battle_ui.js?v=20260710a"></script>
-<script src="power_panel.js?v=20260710a"></script>
-<script src="panels.js?v=20260710a"></script>
-<script src="item_icons.js?v=20260710a"></script>
-<script src="engbay.js?v=20260710a"></script>
+<script src="speech_tier.js?v=20260710b"></script>
+<script src="inhabitant.js?v=20260710b"></script>
+<script src="passenger.js?v=20260710b"></script>
+<script src="gamemod.js?v=20260710b"></script>
+<script src="chatter.js?v=20260710b"></script>
+<script src="speech_gen.js?v=20260710b"></script>
+<script src="speech_input.js?v=20260710b"></script>
+<script src="vision.js?v=20260710b"></script>
+<script src="deliberate.js?v=20260710b"></script>
+<script src="knowledge.js?v=20260710b"></script>
+<script src="acquire.js?v=20260710b"></script>
+<script src="sound.js?v=20260710b"></script>
+<script src="hullmodels.js?v=20260710b"></script>
+<script src="knowledge_hud.js?v=20260710b"></script>
+<script src="knowledge_screen.js?v=20260710b"></script>
+<script src="centroid_mind.js?v=20260710b"></script>
+<script src="kripke_mind.js?v=20260710b"></script>
+<script src="sober_gate.js?v=20260710b"></script>
+<script src="contradiction_ledger.js?v=20260710b"></script>
+<script src="kripke_planner.js?v=20260710b"></script>
+<script src="pillar_router.js?v=20260710b"></script>
+<script src="gravity_well.js?v=20260710b"></script>
+<script src="growth_loop.js?v=20260710b"></script>
+<script src="coop_proof.js?v=20260710b"></script>
+<script src="tom_test.js?v=20260710b"></script>
+<script src="thoughts.js?v=20260710b"></script>
+<script src="tami_battle_ui.js?v=20260710b"></script>
+<script src="power_panel.js?v=20260710b"></script>
+<script src="panels.js?v=20260710b"></script>
+<script src="item_icons.js?v=20260710b"></script>
+<script src="engbay.js?v=20260710b"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710a"></script>
-<script src="conquest.js?v=20260710a"></script>
-<script src="missions.js?v=20260710a"></script>
-<script src="planetmenu.js?v=20260710a"></script>
-<script src="textquests.js?v=20260710a"></script>
+<script src="starmap.js?v=20260710b"></script>
+<script src="conquest.js?v=20260710b"></script>
+<script src="missions.js?v=20260710b"></script>
+<script src="planetmenu.js?v=20260710b"></script>
+<script src="textquests.js?v=20260710b"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -360,7 +362,10 @@ const CFG = {
   HITFX_DUR:0.45, HITFX_MAX_OPACITY:0.55, HITFX_DMG_REF:14, CAM_SHAKE_MAG:0.85,   // user 2026-07-07 "flash red in the direction you are hit and rock the camera"
   SPEAK_SHOW:2.4, SPEECH_WS:0.03,                  // 3D speech bubble: only for meaningful events now, smaller
   NOTIFY_DEDUPE_S:2.5, TOAST_MAX:4, TOAST_LIFE_S:3.2,   // message-triage: collapse identical bursts; cap the corner toast stack
-  RIGHT_FRAC:0.4, RIGHT_MIN:340, RIGHT_MAX:600,    // right column width
+  RIGHT_FRAC:0.30, RIGHT_MIN:300, RIGHT_MAX:430,   // right column width - narrowed (user 2026-07-10: "two panels reduce the view from landscape") so the main view is wide
+  TOP_VIEW_SHARE:0.56,                             // of the right column ABOVE the power dock, the system map's share (rest = the smaller REASONING view)
+  POWER_DOCK_H:252,                                // px reserved at the right column's bottom for the always-on power dock (radial hull ring + tick bars)
+  KILLER_MARK_S:12,                                // how long the pilot who killed you stays ringed on the radar (Starblast-style)
   TOP_ZOOM:1.08,                                   // top-down ortho margin past the arena
   // PERIPHERAL LENS (user 2026-07-10 "when turning at max speed the ship almost faces the other way but you only
   // see ahead - can the screen edges see more range? like fisheye only on the first/last 15%"): render the chase
@@ -557,6 +562,7 @@ const PIXEL_URI='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfF
 function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
   for(const [pat,file] of TEX_MAP) if(u.includes(pat)) return ASSET_CFG.DIR+file;
   if(/\.(tif|tga|psd|bmp)$/.test(u)) return PIXEL_URI;                          // unmapped Unity refs → 1px, never 404
+  if(!u||/(^|\/)(undefined|null)$/.test(u)) return PIXEL_URI;                   // a NAMELESS Unity texture ref serialized as 'undefined' (arrives here already path-prefixed, e.g. 'assets/undefined') → was a 404 every boot
   return url; }
 // BUG FIX (user report "player ship appears black"): the old Unity FBX files never had their textures actually
 // EMBEDDED - Unity assigns materials via separate .mat files outside the mesh, so FBXLoader hands back a
@@ -1925,6 +1931,14 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   if(window.PASSENGER&&ships[0]&&ships[0].alive&&victim.pos.distanceTo(ships[0].pos)<=ships[0].senseR){ PASSENGER.onEvent('kill_seen'); if(window.GAMEMOD) GAMEMOD.emit('kill_seen'); if(window.CHATTER) CHATTER.onEvent('kill_seen',{victim,killer}); }   // the symbiont witnesses only what YOUR sensors touch
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
+  // STARBLAST-STYLE KILLER CALLOUT (user 2026-07-10 "when someone killed you say 'orion killed you' and then you
+  // can see him on radar"): name your killer big and loud, and RING him on the top-down radar for KILLER_MARK_S
+  // so you know exactly who to hunt when you respawn.
+  if(victim===ships[0]&&killer&&killer!==victim){
+    killerMark={s:killer,until:T0+CFG.KILLER_MARK_S};
+    showKillerBanner(`☠ ${killer.name.toUpperCase()} killed you`);
+    term(`☠ <b style="color:#ff5a6e">${killer.name}</b> killed you - ringed red on the radar for ${CFG.KILLER_MARK_S}s`,'err');
+    if(window.CHATTER&&typeof CHATTER.voiceWorm==='function') try{ CHATTER.voiceWorm(killer.name+' killed you. I marked him on the radar.'); }catch(e){} }   // the Passenger says it aloud (only when voices are on)
   if(window.MISSIONS&&MISSIONS.onKill) try{ MISSIONS.onKill(victim,killer); }catch(e){}     // bounty missions watch every kill
   if(killer===ships[0]&&killer!==victim&&window.KPLAN) KPLAN.observe('kill');               // MODAL PLANNER: a player kill is a real completed action
   killShip(victim);
@@ -3394,7 +3408,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`<b>YOU</b> · ${rankOf(P.score||0).n} · hull ${Math.round(P.hp)}/${Math.round(P.maxHp)} · <span style="color:#7fd0ff">shield ${spct}%</span> · <span style="color:#ffcf52">${P.credits}c</span> · fuel ${Math.round(P.fuel)}/${P.fuelCap} · hold ${cargoTotal(P)}/${P.holdCap} (${cg}) · ${P.docked?('DOCKED '+P.docked.name+' rep'+(P.docked.rep>0?'+':'')+Math.round(P.docked.rep)):('nearest '+(np?np.name+' '+Math.round(P.pos.distanceTo(np.pos))+'u':' - '))} · W${P.lvl.weapon}/E${P.lvl.engine}/H${P.lvl.hull} · ${WEAPONS[P.weaponType||'energy'].n} · ${HULLS[P.hullClass||'fighter'].n}${contraCount(P)?(' · <span style="color:#ff8a5a">contraband '+contraCount(P)+'</span>'):''} · type <b>power</b> to see/reroute the power plant`,'sys'); return; }
   if(c==='power'||c==='pwr'){   // X-WING POWER MANAGEMENT (user 2026-07-07): see + reroute weapons/engines/shields
     const p0=shipPower(P);
-    if(!a[1]){ if(window.PANELS&&window.POWERPANEL) PANELS.open('powerpanel');   // the visual 3-bar draggable panel - its own edge tab also opens/closes it
+    if(!a[1]){   // the visual panel is now permanently DOCKED bottom-right (radial hull ring + tick bars) - nothing to open
       term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool - routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
       for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
       const amax=shieldArcMaxFor(P), fwd=P.shieldFwd==null?amax:P.shieldFwd, aft=P.shieldAft==null?amax:P.shieldAft;
@@ -3951,7 +3965,23 @@ function buildBlips(){
 function updateBlips(){ for(const s of ships){ const b=shipBlips[s.id]; if(!b) continue; b.visible=s.alive; if(s.alive){ b.position.copy(s.pos);
     b.scale.setScalar(s===ships[focus]?17:(s.role==='defender'?8:11)); b.material.color.set(s.color.getStyle()); } }
   let gi=0; for(const g of gems){ if(gi>=gemBlips.length) break; const b=gemBlips[gi++]; b.visible=true; b.position.copy(g.pos); }
-  for(let i=gi;i<gemBlips.length;i++) gemBlips[i].visible=false; }
+  for(let i=gi;i<gemBlips.length;i++) gemBlips[i].visible=false;
+  updateKillerMark(); }
+// STARBLAST-STYLE KILLER MARK (user 2026-07-10): whoever killed you pulses RED on the top-down radar until the
+// timer runs out (or he dies) - so you always know who to hunt when you respawn.
+let killerMark=null, killerHalo=null, killerBannerEl=null, killerBannerT=null;
+function showKillerBanner(txt){
+  if(!killerBannerEl){ killerBannerEl=document.createElement('div');
+    killerBannerEl.style.cssText='position:fixed;left:38%;top:16%;transform:translateX(-50%);z-index:30;font:800 34px/1.2 ui-monospace,Menlo,Consolas,monospace;color:#ff5a6e;text-shadow:0 0 18px #ff2a3e88,0 2px 6px #000;letter-spacing:.05em;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap';
+    document.body.appendChild(killerBannerEl); }
+  killerBannerEl.textContent=txt; killerBannerEl.style.opacity='1';
+  if(killerBannerT) clearTimeout(killerBannerT); killerBannerT=setTimeout(()=>{ if(killerBannerEl) killerBannerEl.style.opacity='0'; },4200); }
+function updateKillerMark(){
+  if(!killerHalo){ killerHalo=topBlip('#ff2a2a',26,1); killerHalo.visible=false; killerHalo.renderOrder=14; }
+  const km=killerMark;
+  if(km&&km.s&&km.s.alive&&T0<km.until){ killerHalo.visible=true; killerHalo.position.copy(km.s.pos);
+    const p=0.5+0.5*Math.sin(T0*8); killerHalo.scale.setScalar(22+12*p); killerHalo.material.opacity=0.30+0.5*p; }
+  else { killerHalo.visible=false; if(km&&(T0>=km.until||!(km.s&&km.s.alive))) killerMark=null; } }
 
 // =================================================================================================
 //  REASONING GRAPH - a three.js scene (virtual 600x470, y-up). No 2D canvas.
@@ -4682,13 +4712,20 @@ const IS_TOUCH = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in wi
 let soloView = IS_TOUCH ? 'main' : null;   // MOBILE: one full-screen view at a time (toggled by the VIEW button)
 if(IS_TOUCH && document.body) document.body.classList.add('touch');
 function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
-  const rw=Math.round(clamp(W*CFG.RIGHT_FRAC,CFG.RIGHT_MIN,CFG.RIGHT_MAX)), mw=W-rw, hh=Math.round(H/2);
-  VIEW.main={x:0,y:0,w:mw,h:H}; VIEW.top={x:mw,y:hh,w:rw,h:H-hh}; VIEW.brain={x:mw,y:0,w:rw,h:hh};
-  chaseCam.aspect=mw/H; chaseCam.updateProjectionMatrix(); sizeTopCam(rw,H-hh); sizeBrainCam(rw,hh);
-  const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain'), vd=document.getElementById('vdiv'), hd=document.getElementById('hdiv');
-  lt.style.left=(mw+12)+'px'; lt.style.top='10px'; lb.style.left=(mw+12)+'px'; lb.style.top=(hh+10)+'px';
-  vd.style.left=mw+'px'; vd.style.top='0'; vd.style.width='1px'; vd.style.height=H+'px';
-  hd.style.left=mw+'px'; hd.style.top=hh+'px'; hd.style.width=rw+'px'; hd.style.height='1px';
+  // RIGHT COLUMN, top->bottom (user 2026-07-10 "reduce the size of reasoning... add the power controls into that"):
+  // SYSTEM MAP (th) / smaller REASONING (bh) / always-on POWER DOCK (ph, DOM - radial hull ring + tick bars).
+  const rw=Math.round(clamp(W*CFG.RIGHT_FRAC,CFG.RIGHT_MIN,CFG.RIGHT_MAX)), mw=W-rw;
+  const ph=Math.min(CFG.POWER_DOCK_H, Math.round(H*0.34));
+  const th=Math.round((H-ph)*CFG.TOP_VIEW_SHARE), bh=H-ph-th;
+  VIEW.main={x:0,y:0,w:mw,h:H}; VIEW.top={x:mw,y:H-th,w:rw,h:th}; VIEW.brain={x:mw,y:ph,w:rw,h:bh};   // GL y is bottom-origin
+  chaseCam.aspect=mw/H; chaseCam.updateProjectionMatrix(); sizeTopCam(rw,th); sizeBrainCam(rw,bh);
+  const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain'), vd=document.getElementById('vdiv'), hd=document.getElementById('hdiv'), hd2=document.getElementById('hdiv2'), pd=document.getElementById('powerdock');
+  lt.style.display='block'; lb.style.display='block';
+  lt.style.left=(mw+12)+'px'; lt.style.top='10px'; lb.style.left=(mw+12)+'px'; lb.style.top=(th+10)+'px';
+  vd.style.display='block'; vd.style.left=mw+'px'; vd.style.top='0'; vd.style.width='1px'; vd.style.height=H+'px';
+  hd.style.display='block'; hd.style.left=mw+'px'; hd.style.top=th+'px'; hd.style.width=rw+'px'; hd.style.height='1px';
+  if(hd2){ hd2.style.display='block'; hd2.style.left=mw+'px'; hd2.style.top=(th+bh)+'px'; hd2.style.width=rw+'px'; hd2.style.height='1px'; }
+  if(pd){ pd.style.display='block'; pd.style.left=mw+'px'; pd.style.top=(th+bh)+'px'; pd.style.width=rw+'px'; pd.style.height=ph+'px'; }
   document.getElementById('chat').style.width=Math.max(240,mw-28-40)+'px';   // -40 reserves room for #micBtn beside it
   if(!(window.PANELS&&PANELS.isManual&&PANELS.isManual('market'))) document.getElementById('market').style.left=(mw*0.5)+'px';   // LIVE-CAUGHT 2026-07-09 ("docking is still weak"): this legacy re-center ran on EVERY viewport pass and silently stomped a manually-docked market - once the player drags it anywhere, PANELS owns its position
   if(soloView){ const full={x:0,y:0,w:W,h:H}, z={x:0,y:0,w:0,h:0};   // MOBILE: render only the active view, full-screen
@@ -4698,7 +4735,9 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
     const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain');
     lt.style.display=soloView==='top'?'block':'none'; lb.style.display=soloView==='brain'?'block':'none';
     lt.style.left='10px'; lt.style.top='34px'; lb.style.left='10px'; lb.style.top='34px';
-    document.getElementById('vdiv').style.display='none'; document.getElementById('hdiv').style.display='none'; }
+    document.getElementById('vdiv').style.display='none'; document.getElementById('hdiv').style.display='none';
+    const hd2m=document.getElementById('hdiv2'), pdm=document.getElementById('powerdock');
+    if(hd2m) hd2m.style.display='none'; if(pdm) pdm.style.display='none'; }
   { const ce=document.getElementById('chat'), mb=document.getElementById('micBtn'), vb=document.getElementById('voiceBtn');   // 🎤 always docks just right of #chat's ACTUAL rendered edge (works under the mobile !important override too); 🔊 docks just right of #micBtn the same way
     if(ce&&mb) mb.style.left=(ce.offsetLeft+ce.offsetWidth+6)+'px';
     if(mb&&vb) vb.style.left=(mb.offsetLeft+mb.offsetWidth+6)+'px'; } }
@@ -4835,7 +4874,12 @@ if(window.CONTRA&&window.GAME_KNOW){ const cr=CONTRA.attach(GAME_KNOW); if(cr.co
     ev(`🧠 <b>${added}</b> HuggingFace dataset facts filled the knowledge graph (AgentWorldBench + GLM-Reasoning, mechanically extracted). Try <b>observatory</b>, <b>mind eval</b>.`); }); })();
 // ◈ the AGI-test knowledge HUD (knowledge_hud.js) - mounts hidden; `agi` command or the update timer surfaces it
 if(window.KHUD){ KHUD.mount(); if(!KHUD.visible()) KHUD.toggle(); setInterval(function(){ if(window.KHUD) KHUD.update(); }, 500); }   // force display:block ONCE - PANELS below owns visibility from here via its slide transform, not display
-if(window.POWERPANEL){ POWERPANEL.mount(); POWERPANEL.show(); }   // same pattern - the X-Wing power panel is now a first-class window-standard panel too
+// POWER DOCK (user 2026-07-10 "reduce the size of reasoning... add the power controls into that; make that menu
+// cooler.. use the tick marks"): the X-Wing power panel now lives DOCKED in the right column's bottom strip
+// (#powerdock, sized by resize()), always on - radial techslidercircle hull ring + TechSlider tick bars. Compact
+// bar geometry so the whole panel fits the dock height.
+if(window.POWERPANEL){ POWERPANEL.CFG.BAR_H=92; POWERPANEL.CFG.BAR_GAP=10; POWERPANEL.CFG.TRACK_W=34; POWERPANEL.CFG.RADIAL=96;
+  POWERPANEL.mount(document.getElementById('powerdock')||undefined, {docked:true}); }
 if(window.ENGBAY){ ENGBAY.mount(); }   // SHIP LAYOUT: starts unmounted-from-view (defaultOpen:false below) - open via the E key or the HANGAR tab's "Open Engineering Bay" link, same discovery pattern as khud/`agi`
 // user 2026-07-07: "why is the knowledge graph HUD not done... maybe it's here and I can't see it" - it WAS built
 // (the `agi` command), it just had no visible tab/pin like market/terminal do, so nobody found it. Same window
@@ -4845,13 +4889,11 @@ if(window.PANELS){
   const khudEl=document.getElementById('khud'); if(khudEl) PANELS.register('khud', khudEl, { title:'KNOWLEDGE HUD', edge:'right', rgb:[10,14,24],
     defaultOpacity:0.9, defaultOpen:false, defaultPinned:false, hotkeyLabel:'agi', resizable:true,   // BACKLOG 2026-07-08: was missing resizable
     onOpenChange:(open)=>{ if(window.KHUD&&KHUD.setShown) KHUD.setShown(open); } });   // BUGFIX 2026-07-08: keep KHUD's own H.shown in sync with PANELS' real open state, whatever triggers it; defaultPinned:false so it starts like every other panel instead of stuck-open
-  // defaultOpen:true (user 2026-07-07: "i don't see the star wars tie fighter or xwing bars for laser speed and
-  // shields") - this is core moment-to-moment combat HUD, the exact X-Wing/TIE-Fighter reference the user asked
-  // for, not a secondary/debug view like the knowledge HUD above - it should be on screen from the start, not
-  // something you have to already know to go find via an edge tab.
-  const ppEl=document.getElementById('powerpanel'); if(ppEl) PANELS.register('powerpanel', ppEl, { title:'POWER', edge:'right', rgb:[9,17,27],
-    defaultOpacity:0.9, defaultOpen:true, hotkeyLabel:'power', resizable:true,
-    onOpenChange:(open)=>{ if(window.POWERPANEL&&POWERPANEL.setShown) POWERPANEL.setShown(open); } });   // BUGFIX 2026-07-08 REVERTED (user: "the power window is stuck when you close it"): defaultPinned:false was the wrong call here - it made this panel auto-hide itself ~1.6s after opening whenever the mouse wasn't hovering it, which for a moment-to-moment combat HUD you read WHILE FLYING (not hovering with a mouse) reads as "keeps closing on its own / stuck." market/roster/ticker all default PINNED (they simply omit defaultPinned) - power should too, unlike khud (a secondary/debug view where auto-hide genuinely makes sense). The original stuck-PINNED bug this line referenced is still fixed via the display:none-bypass fix in power_panel.js itself, independent of this default.
+  // 2026-07-10: the power panel is no longer a PANELS floater - it lives permanently DOCKED in #powerdock (see the
+  // mount above), so it is deliberately NOT registered here (one visibility owner; a dock can't be closed away).
+  // History: it was defaultOpen:true PINNED per user 2026-07-07 ("i don't see the... xwing bars") + the 07-08
+  // stuck-when-closed revert - the always-on dock is the terminal state of that same "combat HUD must be on screen
+  // from the start" arc.
   // FULLSCREEN 2026-07-08 (user: "maybe engineering bay window a fullscreen window that closes"): Engineering Bay
   // is no longer an edge-docked ambient panel - it's a fullscreen modal (same visual class as planetmenu.js's own
   // pmRoot overlay), self-managed by engbay.js exactly the way pmRoot manages itself, not through PANELS' edge-tab/
