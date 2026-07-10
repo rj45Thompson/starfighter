@@ -57,7 +57,9 @@ var CFG = {
   // the RADIAL tick ring (techslidercircle.png pulled from Starfighter2/Assets/Textures) tinted by health.
   TICK_H: 7, TICK_GAP: 3,     // vertical-bar tick segment height / gap (px)
   TICK_W: 6, TICK_WGAP: 3,    // horizontal-gauge tick width / gap (px)
-  RADIAL: 96,                 // radial hull+shield gauge CSS size (px); canvas is 2x for sharpness
+  RADIAL: 92,                 // radial HULL gauge CSS size (px); canvas is 2x for sharpness
+  DIAL_L: 58,                 // radial POWER dial size (WEAPONS/ENGINES/SHIELDS) - user 2026-07-10 "make all the gauges radial"
+  CAP_L: 46,                  // radial capacitor + shield-arc dial size (LASER/ENGINE/FWD/AFT)
   RADIAL_IMG: 'assets/techslidercircle.png',
   COL_RADIAL_DIM: '#2a4258',  // unfilled remainder of the tick ring
   COL_RADIAL_SHIELD: '#7fd0ff',
@@ -198,13 +200,12 @@ var PP = {
   dragBalance: false, // is the fore/aft shield-arc bar being dragged
 };
 
-// value (0-100) -> fill fraction, top-anchored fill (bar fills from bottom up)
+// value (0-100) -> a radial power dial (arc fill + centre % + xMULT below)
 function applyBarVisual(sysKey, level, mult) {
   var b = PP.bars[sysKey]; if (!b) return;
   var frac = clamp(level, CFG.LEVEL_MIN, CFG.LEVEL_MAX) / CFG.LEVEL_MAX;
-  if (b.fillEl) b.fillEl.style.height = (frac * 100).toFixed(2) + '%';
-  if (b.pctEl) b.pctEl.textContent = round(level) + '%';
-  if (b.multEl) b.multEl.textContent = 'x' + (Math.round(mult * 100) / 100).toFixed(2);
+  b.lastLevel = round(level);
+  drawDial(b, frac, b.col, { value: round(level), label: b.label, sub: 'x' + (Math.round(mult * 100) / 100).toFixed(2), vfont: 0.22 });
 }
 
 function renderStatus() {
@@ -229,67 +230,78 @@ function renderStatus() {
   }
 }
 
-// tint the tick-ring PNG a solid color via source-in on a cached offscreen (the PNG has a true alpha channel -
-// verified: bg alpha 0, tick alpha 255 - so source-in recolors ONLY the ticks)
-function drawTinted(g, img, color, S) {
+// tint the tick-ring PNG a solid color via source-in on a per-dial offscreen (the PNG has a true alpha channel -
+// verified: bg alpha 0, tick alpha 255 - so source-in recolors ONLY the ticks). `oc` is the dial's own cache so
+// gauges of different sizes don't thrash a single shared offscreen.
+function drawTinted(g, img, color, S, oc) {
   var d = doc(); if (!d || !d.createElement) return;
-  var oc = PP.radial._oc || (PP.radial._oc = d.createElement('canvas'));
+  oc = oc || PP.radial._oc || (PP.radial._oc = d.createElement('canvas'));
   if (!oc.getContext) return;
   if (oc.width !== S) { oc.width = S; oc.height = S; }
   var og = oc.getContext('2d'); if (!og) return;
-  og.clearRect(0, 0, S, S);
+  og.clearRect(0, 0, S, S); og.globalCompositeOperation = 'source-over';
   og.drawImage(img, 0, 0, S, S);
   og.globalCompositeOperation = 'source-in';
   og.fillStyle = color; og.fillRect(0, 0, S, S);
   og.globalCompositeOperation = 'source-over';
   g.drawImage(oc, 0, 0);
 }
-
-// the RADIAL hull+shield gauge: outer ring = the Unity techslidercircle tick ring, arc-clipped to hull fraction
-// (green -> red when low); inner arc stroke = shield charge; hull % dead center.
+// one arc-clipped pass of the tick ring (the shared Unity techslidercircle texture, or a procedural 36-tick fallback)
+function tickRing(g, S, color, a0, a1, alpha, oc) {
+  if (a1 - a0 <= 0.0001) return;
+  var c = S / 2, r = PP.radial;
+  g.save();
+  g.beginPath(); g.moveTo(c, c); g.arc(c, c, S / 2, a0, a1, false); g.closePath(); g.clip();
+  g.globalAlpha = alpha;
+  if (r && r.imgOk && r.img) drawTinted(g, r.img, color, S, oc);
+  else {
+    g.fillStyle = color;
+    for (var i = 0; i < 36; i++) { g.save(); g.translate(c, c); g.rotate(i / 36 * Math.PI * 2); g.fillRect(-S * 0.012, -(S / 2) + S * 0.015, S * 0.024, S * 0.10); g.restore(); }
+  }
+  g.globalAlpha = 1; g.restore();
+}
+// THE generic radial gauge (user 2026-07-10 "make all the gauges radial"): a tick-ring arc filled to `frac`, dim
+// remainder, optional inner arc (e.g. shield on the hull dial), centre value + a label + a small sub-line.
+function drawDial(dial, frac, color, opts) {
+  opts = opts || {};
+  var cv = dial && dial.cv; if (!cv) return;
+  var g = null; try { g = (typeof cv.getContext === 'function') ? cv.getContext('2d') : null; } catch (e) { g = null; }
+  if (!g) return;                                        // node stub / no canvas2d
+  var S = cv.width, c = S / 2, A0 = -Math.PI / 2, TAU = Math.PI * 2;
+  frac = clamp(frac, 0, 1);
+  g.clearRect(0, 0, S, S);
+  tickRing(g, S, color, A0, A0 + frac * TAU, 1, dial.oc);
+  tickRing(g, S, CFG.COL_RADIAL_DIM, A0 + frac * TAU, A0 + TAU, 0.5, dial.oc);
+  if (opts.inner != null && opts.inner > 0.002) {
+    g.beginPath(); g.strokeStyle = opts.innerColor || CFG.COL_RADIAL_SHIELD; g.lineWidth = S * 0.05; g.lineCap = 'round';
+    g.arc(c, c, S * 0.29, A0, A0 + clamp(opts.inner, 0, 1) * TAU, false); g.stroke();
+  }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (opts.value != null) {
+    g.fillStyle = opts.valueColor || '#e6f2fb';
+    g.font = '800 ' + Math.round(S * (opts.vfont || 0.24)) + 'px ui-monospace,Menlo,Consolas,monospace';
+    g.fillText(String(opts.value), c, c - (opts.label ? S * 0.055 : 0));
+  }
+  if (opts.label) {
+    g.fillStyle = opts.labelColor || color;
+    g.font = '800 ' + Math.round(S * 0.125) + 'px ui-monospace,Menlo,Consolas,monospace';
+    g.fillText(opts.label, c, c + S * 0.15);
+  }
+  if (opts.sub) {
+    g.fillStyle = opts.subColor || CFG.COL_DIM;
+    g.font = '800 ' + Math.round(S * 0.11) + 'px ui-monospace,Menlo,Consolas,monospace';
+    g.fillText(opts.sub, c, c + S * 0.31);
+  }
+}
+// the HULL dial: green->red arc by hull %, shield charge as the inner arc, % dead centre.
 function renderRadial() {
   var r = PP.radial; if (!r || !r.cv) return;
-  var g = null;
-  try { g = (typeof r.cv.getContext === 'function') ? r.cv.getContext('2d') : null; } catch (e) { g = null; }
-  if (!g) return;                                        // node stub / no canvas2d: text readouts still cover it
-  var S = r.cv.width, c = S / 2, A0 = -Math.PI / 2;
-  g.clearRect(0, 0, S, S);
   var hull = readHull();
   var frac = (hull && hull.maxHp > 0) ? clamp(hull.hp / hull.maxHp, 0, 1) : 0;
   var col = (frac <= CFG.HULL_LOW_FRAC) ? CFG.COL_HULL_LOW : CFG.COL_HULL_OK;
-  function ringPass(color, a0, a1, alpha) {
-    if (a1 - a0 <= 0.0001) return;
-    g.save();
-    g.beginPath(); g.moveTo(c, c); g.arc(c, c, S / 2, a0, a1, false); g.closePath(); g.clip();
-    g.globalAlpha = alpha;
-    if (r.imgOk && r.img) drawTinted(g, r.img, color, S);
-    else {                                              // procedural 36-tick fallback (same silhouette family)
-      g.fillStyle = color;
-      for (var i = 0; i < 36; i++) {
-        g.save(); g.translate(c, c); g.rotate(i / 36 * Math.PI * 2);
-        g.fillRect(-S * 0.012, -(S / 2) + S * 0.015, S * 0.024, S * 0.10);
-        g.restore();
-      }
-    }
-    g.globalAlpha = 1;
-    g.restore();
-  }
-  ringPass(col, A0, A0 + frac * Math.PI * 2, 1);                       // filled hull arc
-  ringPass(CFG.COL_RADIAL_DIM, A0 + frac * Math.PI * 2, A0 + Math.PI * 2, 0.55);   // dim remainder
   var sh = readShield();
-  if (sh && sh.max > 0) {                                              // inner shield arc
-    var sf = clamp(sh.cur / sh.max, 0, 1);
-    if (sf > 0.002) {
-      g.beginPath(); g.strokeStyle = CFG.COL_RADIAL_SHIELD; g.lineWidth = S * 0.045; g.lineCap = 'round';
-      g.arc(c, c, S * 0.30, A0, A0 + sf * Math.PI * 2, false); g.stroke();
-    }
-  }
-  g.fillStyle = '#e6f2fb'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '800 ' + Math.round(S * 0.18) + 'px ui-monospace,Menlo,Consolas,monospace';
-  g.fillText(Math.round(frac * 100) + '%', c, c - S * 0.02);
-  g.fillStyle = CFG.COL_RADIAL_SHIELD;
-  g.font = '700 ' + Math.round(S * 0.08) + 'px ui-monospace,Menlo,Consolas,monospace';
-  g.fillText('HULL', c, c + S * 0.12);
+  var inner = (sh && sh.max > 0) ? clamp(sh.cur / sh.max, 0, 1) : null;
+  drawDial(r, frac, col, { value: Math.round(frac * 100) + '%', label: 'HULL', inner: inner, innerColor: CFG.COL_RADIAL_SHIELD, vfont: 0.19 });
 }
 
 function renderBars() {
@@ -305,24 +317,19 @@ function renderBars() {
   }
 }
 
+// the fore/aft SHIELD ARC dials: each shows its own arc's real charge; the diverted arc shows "DIVERT" underneath.
 function renderBalance() {
-  if (!PP.built || PP.dragBalance) return;   // skip re-reading while the user is actively dragging it (same rule as renderBars)
-  applyBalanceVisual(readShieldArcs(), readDivert());
+  if (!PP.built || !PP.balance) return;
+  var arcs = readShieldArcs(), div = readDivert(), mx = arcs.max > 0 ? arcs.max : 1;
+  if (PP.balance.fwd) { PP.balance.fwd.val = round(arcs.fwd); drawDial(PP.balance.fwd, clamp(arcs.fwd / mx, 0, 1), CFG.COL_SHIELDS, { value: round(arcs.fwd), label: 'FWD', sub: div === 'fwd' ? 'DIVERT' : '', subColor: CFG.COL_SHIELDS, vfont: 0.26 }); }
+  if (PP.balance.aft) { PP.balance.aft.val = round(arcs.aft); drawDial(PP.balance.aft, clamp(arcs.aft / mx, 0, 1), CFG.COL_ENGINES, { value: round(arcs.aft), label: 'AFT', sub: div === 'aft' ? 'DIVERT' : '', subColor: CFG.COL_ENGINES, vfont: 0.26 }); }
 }
-
+// the LASER / ENGINE capacitor dials (read-only - they drain/regen automatically)
 function renderCapacitors() {
   if (!PP.built) return;
   var lz = readCapLaser(), en = readCapEngine();
-  if (PP.capLaser) {
-    var lf = lz.max > 0 ? clamp(lz.cur / lz.max, 0, 1) : 0;
-    if (PP.capLaser.fillEl) PP.capLaser.fillEl.style.width = (lf * 100).toFixed(1) + '%';
-    if (PP.capLaser.pctEl) PP.capLaser.pctEl.textContent = 'LASER ' + round(lz.cur) + '/' + round(lz.max);
-  }
-  if (PP.capEngine) {
-    var ef = en.max > 0 ? clamp(en.cur / en.max, 0, 1) : 0;
-    if (PP.capEngine.fillEl) PP.capEngine.fillEl.style.width = (ef * 100).toFixed(1) + '%';
-    if (PP.capEngine.pctEl) PP.capEngine.pctEl.textContent = 'ENGINE ' + round(en.cur) + '/' + round(en.max);
-  }
+  if (PP.capLaser) { PP.capLaser.val = round(lz.cur); drawDial(PP.capLaser, lz.max > 0 ? clamp(lz.cur / lz.max, 0, 1) : 0, CFG.COL_LASER, { value: round(lz.cur), label: 'LASER', vfont: 0.26 }); }
+  if (PP.capEngine) { PP.capEngine.val = round(en.cur); drawDial(PP.capEngine, en.max > 0 ? clamp(en.cur / en.max, 0, 1) : 0, CFG.COL_ENGINE_CAP, { value: round(en.cur), label: 'ENGINE', vfont: 0.26 }); }
 }
 
 function renderAll() {
@@ -400,141 +407,54 @@ function wireDrag(sysKey, trackEl) {
   trackEl._ppEnd = endDrag;
 }
 
+// a square canvas dial at logical size L (backing store 2x for sharpness). `draggable` adds the ns-resize cursor.
+function makeDialCanvas(L, draggable) {
+  var d = doc(); if (!d || !d.createElement) return null;
+  var cv = d.createElement('canvas'); cv.width = L * 2; cv.height = L * 2;
+  if (cv.style) cv.style.cssText = 'width:' + L + 'px;height:' + L + 'px;display:block;' + (draggable ? 'cursor:ns-resize;touch-action:none;-webkit-user-select:none;user-select:none' : 'cursor:pointer');
+  return cv;
+}
+// a POWER dial (WEAPONS/ENGINES/SHIELDS): a radial allocator. Drag up/down over it to reroute power (levelFromPointer
+// maps the pointer Y within the dial's box to 0-100, same contract as the old vertical bar - so wireDrag is reused).
 function buildBar(sys) {
-  var col = el('div', 'display:flex;flex-direction:column;align-items:center;width:' + CFG.TRACK_W + 'px');
-
-  var label = el('div',
-    'font-size:8.5px;font-weight:800;letter-spacing:.08em;color:' + sys.col + ';margin-bottom:4px;text-align:center',
-    sys.label.slice(0, 3));
-
-  var track = el('div',
-    'position:relative;width:' + CFG.TRACK_W + 'px;height:' + CFG.BAR_H + 'px;background:' + CFG.COL_TRACK_BG + ';' +
-    'border:1px solid ' + CFG.COL_TRACK_BORDER + ';border-radius:5px;overflow:hidden;cursor:ns-resize;' +
-    'touch-action:none;-webkit-user-select:none;user-select:none');
-
-  // faint full-height tick underlay: the EMPTY segments still read as tick marks (Unity TechSlider track look)
-  var under = el('div',
-    'position:absolute;left:2px;right:2px;top:0;bottom:0;background:' + sys.col + ';opacity:0.14;pointer-events:none' +
-    tickMask('to top', CFG.TICK_H, CFG.TICK_GAP));
-
-  var fill = el('div',
-    'position:absolute;left:2px;right:2px;bottom:0;height:50%;background:' + sys.col + ';' +
-    'box-shadow:0 0 8px ' + sys.col + '88 inset;transition:background 0.15s' +
-    tickMask('to top', CFG.TICK_H, CFG.TICK_GAP));
-
-  track.appendChild(under);
-  track.appendChild(fill);
-
-  var pct = el('div', 'font:700 10px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-top:5px', '50%');
-  var mult = el('div', 'font-size:9px;color:' + CFG.COL_DIM + ';margin-top:1px', 'x1.00');
-
-  col.appendChild(label);
-  col.appendChild(track);
-  col.appendChild(pct);
-  col.appendChild(mult);
-
-  wireDrag(sys.key, track);
-
-  PP.bars[sys.key] = { fillEl: fill, trackEl: track, pctEl: pct, multEl: mult };
+  var col = el('div', 'display:flex;flex-direction:column;align-items:center');
+  var cv = makeDialCanvas(CFG.DIAL_L, true);
+  if (cv) col.appendChild(cv);
+  PP.bars[sys.key] = { cv: cv, oc: (doc() && doc().createElement) ? doc().createElement('canvas') : null, trackEl: cv, col: sys.col, label: sys.label.slice(0, 3), lastLevel: 50 };
+  if (cv) wireDrag(sys.key, cv);
   return col;
 }
 
-// horizontal fore/aft SHIELD ARC bar - shows REAL charge per arc (not a preference slider). The FWD gauge lives on
-// the left (matches fillFore's left anchor below), AFT on the right - clicking/dragging the left third diverts to
-// FWD, the right third to AFT, the middle third returns to BALANCED (both arcs regen normally).
-function zoneFromPointer(trackEl, clientX) {
-  if (!trackEl || typeof trackEl.getBoundingClientRect !== 'function') return undefined;
-  var rect = null;
-  try { rect = trackEl.getBoundingClientRect(); } catch (e) { return undefined; }
-  if (!rect || !rect.width) return undefined;
-  var frac = (clientX - rect.left) / rect.width;
-  return frac < CFG.DIVERT_ZONE ? 'fwd' : (frac > (1 - CFG.DIVERT_ZONE) ? 'aft' : null);
+// a read-only-ish dial slot (capacitor, or a shield arc). `onClick` (shield arcs) wires a divert toggle.
+function buildDialSlot(labelText, col, onClick) {
+  var wrap = el('div', 'display:flex;flex-direction:column;align-items:center');
+  var cv = makeDialCanvas(CFG.CAP_L, false);
+  if (cv) wrap.appendChild(cv);
+  var slot = { cv: cv, oc: (doc() && doc().createElement) ? doc().createElement('canvas') : null, col: col, label: labelText, val: 0 };
+  if (cv && onClick && cv.addEventListener) {
+    var handler = function (ev) { onClick(); if (ev && ev.preventDefault) try { ev.preventDefault(); } catch (e) {} };
+    cv.addEventListener('mousedown', handler); cv.addEventListener('touchstart', handler, { passive: false });
+    cv._ppClick = handler;   // exposed for the self-test
+  }
+  return { wrap: wrap, slot: slot };
 }
-function applyBalanceVisual(arcs, divert) {
-  var b = PP.balance; if (!b) return;
-  var aFrac = arcs.max > 0 ? clamp(arcs.aft / arcs.max, 0, 1) : 0, fFrac = arcs.max > 0 ? clamp(arcs.fwd / arcs.max, 0, 1) : 0;
-  if (b.fillAft) b.fillAft.style.width = (aFrac * 50).toFixed(1) + '%';   // aft occupies the LEFT half (up to 50% of the track), scaled by its own charge fraction
-  if (b.fillFore) b.fillFore.style.width = (fFrac * 50).toFixed(1) + '%';   // fwd occupies the RIGHT half
-  var divLabel = divert === 'fwd' ? ' - DIVERT FWD' : divert === 'aft' ? ' - DIVERT AFT' : '';
-  if (b.labelEl) b.labelEl.textContent = 'FWD ' + round(arcs.fwd) + '/' + round(arcs.max) + '  AFT ' + round(arcs.aft) + '/' + round(arcs.max) + divLabel;
-}
-function wireBalanceDrag(trackEl) {
-  if (!trackEl) return;
-  var d = doc();
-  function applyAt(clientX) {
-    var zone = zoneFromPointer(trackEl, clientX);
-    if (zone === undefined) return;
-    setDivert(zone); applyBalanceVisual(readShieldArcs(), zone);
-  }
-  function onMove(ev) {
-    if (!PP.dragBalance) return;
-    var x = (ev.touches && ev.touches[0]) ? ev.touches[0].clientX : ev.clientX;
-    applyAt(x);
-    if (ev.preventDefault) try { ev.preventDefault(); } catch (e) {}
-  }
-  function endDrag() {
-    if (!PP.dragBalance) return;
-    PP.dragBalance = false;
-    if (d && typeof d.removeEventListener === 'function') {
-      try {
-        d.removeEventListener('mousemove', onMove); d.removeEventListener('mouseup', endDrag);
-        d.removeEventListener('touchmove', onMove); d.removeEventListener('touchend', endDrag);
-      } catch (e) {}
-    }
-  }
-  function startDrag(ev) {
-    PP.dragBalance = true; playSound('ui');
-    var x = (ev.touches && ev.touches[0]) ? ev.touches[0].clientX : ev.clientX;
-    applyAt(x);
-    if (d && typeof d.addEventListener === 'function') {
-      try {
-        d.addEventListener('mousemove', onMove); d.addEventListener('mouseup', endDrag);
-        d.addEventListener('touchmove', onMove, { passive: false }); d.addEventListener('touchend', endDrag);
-      } catch (e) {}
-    }
-    if (ev.preventDefault) try { ev.preventDefault(); } catch (e) {}
-  }
-  if (trackEl && typeof trackEl.addEventListener === 'function') {
-    trackEl.addEventListener('mousedown', startDrag);
-    trackEl.addEventListener('touchstart', startDrag, { passive: false });
-  }
-  trackEl._ppStartDrag = startDrag; trackEl._ppMove = onMove; trackEl._ppEnd = endDrag;
-}
+// SR X-WING SHIELDS as two radial arc dials (FWD / AFT): each shows its arc's REAL charge; clicking a dial DIVERTS
+// regen to that arc (clicking the already-diverted one returns to BALANCED). Replaces the old horizontal split bar.
 function buildBalanceBar() {
-  var wrap = el('div', 'margin-top:9px;padding-top:8px;border-top:1px solid ' + CFG.COL_TRACK_BORDER);
-  var label = el('div', 'font:700 9px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-bottom:4px;text-align:center', 'FWD --/-- AFT --/--');
-  var track = el('div',
-    'position:relative;height:12px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';' +
-    'border-radius:5px;overflow:hidden;cursor:ew-resize;touch-action:none;-webkit-user-select:none;user-select:none');
-  var divider = el('div', 'position:absolute;top:0;bottom:0;left:50%;width:1px;background:' + CFG.COL_TRACK_BORDER);
-  var fillAft = el('div', 'position:absolute;top:0;bottom:0;right:0;width:0%;background:' + CFG.COL_ENGINES + '55' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
-  var fillFore = el('div', 'position:absolute;top:0;bottom:0;left:0;width:0%;background:' + CFG.COL_SHIELDS + ';box-shadow:0 0 6px ' + CFG.COL_SHIELDS + '88 inset' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
-  track.appendChild(fillAft); track.appendChild(fillFore); track.appendChild(divider);
-  wrap.appendChild(label); wrap.appendChild(track);
-  wireBalanceDrag(track);
-  PP.balance = { trackEl: track, fillFore: fillFore, fillAft: fillAft, labelEl: label };
+  var wrap = el('div', 'display:flex;justify-content:center;gap:10px;margin-top:8px');
+  var fwd = buildDialSlot('FWD', CFG.COL_SHIELDS, function () { playSound('ui'); setDivert(readDivert() === 'fwd' ? null : 'fwd'); renderBalance(); });
+  var aft = buildDialSlot('AFT', CFG.COL_ENGINES, function () { playSound('ui'); setDivert(readDivert() === 'aft' ? null : 'aft'); renderBalance(); });
+  wrap.appendChild(fwd.wrap); wrap.appendChild(aft.wrap);
+  PP.balance = { fwd: fwd.slot, aft: aft.slot };
   return wrap;
 }
-
-// SR X-WING CAPACITORS: a small horizontal readout gauge (non-interactive - these drain/regen automatically, there's
-// nothing to drag) for laser and engine energy, separate from the weapons/engines/shields ALLOCATION bars above.
-function buildCapGauge(label0, col) {
-  var wrap = el('div', 'margin-top:5px');
-  var track = el('div',
-    'position:relative;height:9px;background:' + CFG.COL_TRACK_BG + ';border:1px solid ' + CFG.COL_TRACK_BORDER + ';border-radius:4px;overflow:hidden');
-  var fill = el('div', 'position:absolute;top:0;bottom:0;left:0;width:100%;background:' + col + ';box-shadow:0 0 6px ' + col + '88 inset;transition:width 0.15s' + tickMask('to right', CFG.TICK_W, CFG.TICK_WGAP));
-  var pct = el('div', 'font:700 8.5px/1 ui-monospace,monospace;color:' + CFG.COL_TEXT + ';margin-top:2px;text-align:center', label0);
-  track.appendChild(fill);
-  wrap.appendChild(track); wrap.appendChild(pct);
-  return { wrap: wrap, fillEl: fill, pctEl: pct };
-}
+// SR X-WING CAPACITORS as two radial dials (LASER / ENGINE) - read-only (they drain/regen automatically).
 function buildCapacitorRow() {
-  var wrap = el('div', 'margin-top:9px;padding-top:8px;border-top:1px solid ' + CFG.COL_TRACK_BORDER);
-  var laser = buildCapGauge('LASER --/--', CFG.COL_LASER);
-  var engine = buildCapGauge('ENGINE --/--', CFG.COL_ENGINE_CAP);
+  var wrap = el('div', 'display:flex;justify-content:center;gap:10px;margin-top:8px');
+  var laser = buildDialSlot('LASER', CFG.COL_LASER, null);
+  var engine = buildDialSlot('ENGINE', CFG.COL_ENGINE_CAP, null);
   wrap.appendChild(laser.wrap); wrap.appendChild(engine.wrap);
-  PP.capLaser = { fillEl: laser.fillEl, pctEl: laser.pctEl };
-  PP.capEngine = { fillEl: engine.fillEl, pctEl: engine.pctEl };
+  PP.capLaser = laser.slot; PP.capEngine = engine.slot;
   return wrap;
 }
 
@@ -563,24 +483,23 @@ function build(parentEl) {
   head.appendChild(title); head.appendChild(closeBtn);
   root.appendChild(head);
 
-  // RADIAL HULL+SHIELD GAUGE (Starfighter2's techslidercircle tick ring, tinted by health) sitting beside the
-  // three allocation bars - one combined row keeps the docked panel compact (user 2026-07-10: radial health bar
-  // + power controls merged into the smaller reasoning column).
-  var mainRow = el('div', 'display:flex;align-items:flex-start;gap:12px');
-  var radialCol = el('div', 'display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto');
+  // ALL-RADIAL GAUGES (user 2026-07-10 "make all the gauges radial"): the big HULL dial on top (its inner arc is
+  // the shield), then a row of the three POWER allocator dials, then the shield-arc + capacitor dials. Every gauge
+  // is the same Unity techslidercircle tick ring, so the panel reads as one instrument cluster.
+  var radialCol = el('div', 'display:flex;flex-direction:column;align-items:center;gap:1px');
   var cv = null, d2 = doc();
   if (d2 && d2.createElement) {
     cv = d2.createElement('canvas');
     cv.width = CFG.RADIAL * 2; cv.height = CFG.RADIAL * 2;   // 2x backing store for sharpness
-    if (cv.style) cv.style.cssText = 'width:' + CFG.RADIAL + 'px;height:' + CFG.RADIAL + 'px';
+    if (cv.style) cv.style.cssText = 'width:' + CFG.RADIAL + 'px;height:' + CFG.RADIAL + 'px;display:block';
     radialCol.appendChild(cv);
   }
-  var hullEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM, 'HULL --/--');
-  var shieldEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM, 'SHIELD --/--');
+  var hullEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM + ';text-align:center', 'HULL --/--');
+  var shieldEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM + ';text-align:center', 'SHIELD --/--');
   radialCol.appendChild(hullEl); radialCol.appendChild(shieldEl);
   PP.hullEl = hullEl; PP.shieldEl = shieldEl;
   PP.radial = { cv: cv, img: null, imgOk: false, _oc: null };
-  // load the Unity tick-ring texture (best-effort; the procedural 36-tick ring below draws until/unless it arrives)
+  // load the Unity tick-ring texture (best-effort; the procedural 36-tick ring draws until/unless it arrives)
   try {
     var w2 = win();
     if (w2 && typeof w2.Image === 'function') {
@@ -590,16 +509,15 @@ function build(parentEl) {
       PP.radial.img = im;
     }
   } catch (e) {}
+  root.appendChild(radialCol);
 
-  // three bars, side by side
-  var row = el('div', 'display:flex;justify-content:space-between;gap:' + CFG.BAR_GAP + 'px;flex:1 1 auto');
+  // three POWER allocator dials, in a row
+  var row = el('div', 'display:flex;justify-content:center;gap:12px;margin-top:6px');
   for (var i = 0; i < SYSTEMS.length; i++) row.appendChild(buildBar(SYSTEMS[i]));
-  mainRow.appendChild(radialCol);
-  mainRow.appendChild(row);
-  root.appendChild(mainRow);
+  root.appendChild(row);
 
-  root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio"
-  root.appendChild(buildCapacitorRow());   // user 2026-07-08: "show the power capacitor levels for lasers shields and engine speed"
+  root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio" -> radial FWD/AFT dials
+  root.appendChild(buildCapacitorRow());   // user 2026-07-08: "show the power capacitor levels" -> radial LASER/ENGINE dials
 
   if (parent && parent.appendChild) parent.appendChild(root);
   PP.root = root; PP.built = true;
@@ -793,28 +711,19 @@ if (typeof require !== 'undefined' && require.main === module) {
   check('HOST.setPower reroute keeps pool total constant (~150)', Math.abs(total - 150) < 0.5);
   check('HOST.setPower actually moved shields to 80', Math.abs(fakeShip.power.shields - 80) < 0.5);
 
-  // 7b. SR X-WING SHIELDS - fore/aft ARC bar, now a 3-state divert (fwd/aft/balanced) over REAL charge, not a
-  // continuous preference blend (user 2026-07-08: "same as tie fighter xwing... configure shields both forward or
-  // both behind"). Stub track rect is left=0,right=30,width=30 (see stubEl above); DIVERT_ZONE=0.33 so clientX=30
-  // (frac=1.0) lands in the right third -> 'aft', clientX=0 (frac=0) lands in the left third -> 'fwd'.
-  check('balance bar built', !!(pp._PP.balance && pp._PP.balance.trackEl));
-  var balTrack = pp._PP.balance ? pp._PP.balance.trackEl : null;
-  if (balTrack && balTrack._ppStartDrag) {
-    safeCall('simulated balance drag: mousedown at clientX=30 (right third -> divert AFT)', function () {
-      balTrack._ppStartDrag({ clientX: 30 });
-    });
-    check('balance drag start called HOST.setShieldDivert (aft)', fakeShip.shieldDivert === 'aft');
-    safeCall('simulated balance drag: mousemove to clientX=0 (left third -> divert FWD), fired on document', function () {
-      global.document._fire('mousemove', { clientX: 0 });
-    });
-    check('balance drag move re-called HOST.setShieldDivert (fwd)', fakeShip.shieldDivert === 'fwd');
-    safeCall('simulated balance drag: mousemove to clientX=15 (middle third -> balanced)', function () {
-      global.document._fire('mousemove', { clientX: 15 });
-    });
-    check('balance drag move set BALANCED (null) in the middle zone', fakeShip.shieldDivert === null);
-    safeCall('simulated balance drag: mouseup ends it', function () { global.document._fire('mouseup', {}); });
+  // 7b. SR X-WING SHIELDS - now two RADIAL arc dials (FWD/AFT); clicking a dial diverts regen to that arc, clicking
+  // the already-diverted one returns to BALANCED (user 2026-07-10 "make all the gauges radial").
+  check('shield arc dials built', !!(pp._PP.balance && pp._PP.balance.fwd && pp._PP.balance.fwd.cv && pp._PP.balance.aft && pp._PP.balance.aft.cv));
+  var fwdCv = pp._PP.balance ? pp._PP.balance.fwd.cv : null, aftCv = pp._PP.balance ? pp._PP.balance.aft.cv : null;
+  if (fwdCv && fwdCv._ppClick && aftCv && aftCv._ppClick) {
+    safeCall('click FWD dial', function () { fwdCv._ppClick({}); });
+    check('click FWD dial diverts fwd', fakeShip.shieldDivert === 'fwd');
+    safeCall('click FWD dial again', function () { fwdCv._ppClick({}); });
+    check('click FWD again returns to BALANCED (null)', fakeShip.shieldDivert === null);
+    safeCall('click AFT dial', function () { aftCv._ppClick({}); });
+    check('click AFT dial diverts aft', fakeShip.shieldDivert === 'aft');
   } else {
-    check('drag handle wired onto balance track', false);
+    check('shield arc dial click wired', false);
   }
   safeCall('direct HOST.setShieldDivert(fakeShip, "fwd")', function () { global.window.HOST.setShieldDivert(fakeShip, 'fwd'); });
   check('HOST.setShieldDivert actually set it to fwd', fakeShip.shieldDivert === 'fwd');
@@ -823,13 +732,12 @@ if (typeof require !== 'undefined' && require.main === module) {
   var arcs = global.window.HOST.shieldArcsOf(fakeShip);
   check('HOST.shieldArcsOf reads real per-arc charge', arcs.fwd === 15 && arcs.aft === 8 && arcs.max === 20);
 
-  // 7c. SR X-WING CAPACITORS - laser/engine energy gauges (user 2026-07-08: "show the power capacitor levels for
-  // lasers shields and engine speed")
-  check('capacitor gauges built', !!(pp._PP.capLaser && pp._PP.capLaser.fillEl) && !!(pp._PP.capEngine && pp._PP.capEngine.fillEl));
+  // 7c. SR X-WING CAPACITORS - now two RADIAL dials (LASER/ENGINE); renderCapacitors stores the live value on .val
+  check('capacitor dials built', !!(pp._PP.capLaser && pp._PP.capLaser.cv) && !!(pp._PP.capEngine && pp._PP.capEngine.cv));
   fakeShip.capLaser = 40; fakeShip.capEngine = 90;
   safeCall('renderCapacitors via a fresh show()', function () { pp.hide(); pp.show(); });
-  check('laser gauge DOM text reflects the fake ship value end-to-end', pp._PP.capLaser.pctEl.textContent.indexOf('40') >= 0);
-  check('engine gauge DOM text reflects the fake ship value end-to-end', pp._PP.capEngine.pctEl.textContent.indexOf('90') >= 0);
+  check('laser dial value reflects the fake ship value end-to-end', pp._PP.capLaser.val === 40);
+  check('engine dial value reflects the fake ship value end-to-end', pp._PP.capEngine.val === 90);
 
   // 8. mounting into an explicit parent element works
   var altParent = stubEl();
