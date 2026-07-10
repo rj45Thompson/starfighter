@@ -1066,9 +1066,15 @@ function groundHtml(){
 /* ------------------------------------------------ TAB: NEWS (galaxy timeline: war front, economy, campaign) */
 function logHtml(){
   if(!S.log.length) return '<div class="pm-note">No news yet - the front, the markets, and the campaign all report here as they happen. The last '+CFG.LOG_MAX+' items land here, and it survives a reload.</div>';
-  var h='', i;
+  /* SR:AWA readability slice (2026-07-09): a relative age chip next to each stamp + a count header. NOTE the
+     audit save: entries are UNSHIFTED (newest at [0], see pushEvent) so the ascending loop was ALREADY
+     newest-first - a draft of this slice iterated backwards and would have INVERTED it. Read the write path
+     before "fixing" the read path. */
+  var h='<div class="pm-note" style="margin-bottom:6px">newest first - '+S.log.length+' item'+(S.log.length>1?'s':'')+' this session</div>', i;
+  var now=(typeof gameT==='function')?num(gameT(),0):0;
   for(i=0;i<S.log.length;i++){ var e=S.log[i];
-    h+='<div class="pm-log"><span class="pm-tm">'+tstr(e.t)+'</span>'+e.h+'</div>'; }
+    var age=Math.max(0,now-num(e.t,0)); var rel=age<60?(Math.round(age)+'s'):(Math.round(age/60)+'m');
+    h+='<div class="pm-log"><span class="pm-tm">'+tstr(e.t)+' <span style="opacity:.55">('+rel+' ago)</span></span>'+e.h+'</div>'; }
   return h; }
 
 /* ------------------------------------------------ TAB: DEPART */
