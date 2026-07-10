@@ -172,52 +172,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710q"></script>
-<script src="fflate.min.js?v=20260710q"></script>
-<script src="fbxloader.js?v=20260710q"></script>
+<script src="three.min.js?v=20260710r"></script>
+<script src="fflate.min.js?v=20260710r"></script>
+<script src="fbxloader.js?v=20260710r"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710q"></script>
-<script src="inhabitant.js?v=20260710q"></script>
-<script src="passenger.js?v=20260710q"></script>
-<script src="gamemod.js?v=20260710q"></script>
-<script src="chatter.js?v=20260710q"></script>
-<script src="speech_gen.js?v=20260710q"></script>
-<script src="speech_input.js?v=20260710q"></script>
-<script src="vision.js?v=20260710q"></script>
-<script src="deliberate.js?v=20260710q"></script>
-<script src="knowledge.js?v=20260710q"></script>
-<script src="acquire.js?v=20260710q"></script>
-<script src="sound.js?v=20260710q"></script>
-<script src="hullmodels.js?v=20260710q"></script>
-<script src="knowledge_hud.js?v=20260710q"></script>
-<script src="knowledge_screen.js?v=20260710q"></script>
-<script src="centroid_mind.js?v=20260710q"></script>
-<script src="kripke_mind.js?v=20260710q"></script>
-<script src="sober_gate.js?v=20260710q"></script>
-<script src="contradiction_ledger.js?v=20260710q"></script>
-<script src="kripke_planner.js?v=20260710q"></script>
-<script src="pillar_router.js?v=20260710q"></script>
-<script src="gravity_well.js?v=20260710q"></script>
-<script src="growth_loop.js?v=20260710q"></script>
-<script src="coop_proof.js?v=20260710q"></script>
-<script src="item_variance.js?v=20260710q"></script>
-<script src="tom_test.js?v=20260710q"></script>
-<script src="thoughts.js?v=20260710q"></script>
-<script src="tami_battle_ui.js?v=20260710q"></script>
-<script src="power_panel.js?v=20260710q"></script>
-<script src="panels.js?v=20260710q"></script>
-<script src="item_icons.js?v=20260710q"></script>
-<script src="engbay.js?v=20260710q"></script>
+<script src="speech_tier.js?v=20260710r"></script>
+<script src="inhabitant.js?v=20260710r"></script>
+<script src="passenger.js?v=20260710r"></script>
+<script src="gamemod.js?v=20260710r"></script>
+<script src="chatter.js?v=20260710r"></script>
+<script src="speech_gen.js?v=20260710r"></script>
+<script src="speech_input.js?v=20260710r"></script>
+<script src="vision.js?v=20260710r"></script>
+<script src="deliberate.js?v=20260710r"></script>
+<script src="knowledge.js?v=20260710r"></script>
+<script src="acquire.js?v=20260710r"></script>
+<script src="sound.js?v=20260710r"></script>
+<script src="hullmodels.js?v=20260710r"></script>
+<script src="knowledge_hud.js?v=20260710r"></script>
+<script src="knowledge_screen.js?v=20260710r"></script>
+<script src="centroid_mind.js?v=20260710r"></script>
+<script src="kripke_mind.js?v=20260710r"></script>
+<script src="sober_gate.js?v=20260710r"></script>
+<script src="contradiction_ledger.js?v=20260710r"></script>
+<script src="kripke_planner.js?v=20260710r"></script>
+<script src="pillar_router.js?v=20260710r"></script>
+<script src="gravity_well.js?v=20260710r"></script>
+<script src="growth_loop.js?v=20260710r"></script>
+<script src="coop_proof.js?v=20260710r"></script>
+<script src="item_variance.js?v=20260710r"></script>
+<script src="tom_test.js?v=20260710r"></script>
+<script src="thoughts.js?v=20260710r"></script>
+<script src="tami_battle_ui.js?v=20260710r"></script>
+<script src="power_panel.js?v=20260710r"></script>
+<script src="panels.js?v=20260710r"></script>
+<script src="item_icons.js?v=20260710r"></script>
+<script src="engbay.js?v=20260710r"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710q"></script>
-<script src="conquest.js?v=20260710q"></script>
-<script src="missions.js?v=20260710q"></script>
-<script src="planetmenu.js?v=20260710q"></script>
-<script src="textquests.js?v=20260710q"></script>
+<script src="starmap.js?v=20260710r"></script>
+<script src="conquest.js?v=20260710r"></script>
+<script src="missions.js?v=20260710r"></script>
+<script src="planetmenu.js?v=20260710r"></script>
+<script src="textquests.js?v=20260710r"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -1172,7 +1172,7 @@ function buy(s,p,gk,qty){ let price=priceOf(p,gk); if(s.role==='player') price*=
   if(qty<=0) return 0; s.credits-=Math.round(price*qty); p.stock[gk]-=qty; s.cargo[gk]=(s.cargo[gk]||0)+qty; if(s.role==='player'){ repAdd(p,CFG.REP_TRADE); if(window.KPLAN) KPLAN.observe('buy:'+gk); } return qty; }
 function sell(s,p,gk,qty){ qty=Math.min(qty,s.cargo[gk]||0); if(qty<=0) return 0; let price=priceOf(p,gk); if(s.role==='player') price*=repSellFactor(p); price*=(1+CFG.SKILL_TRADE_PRICE*skillLvl(s,'trade'));   // SR-M17: trade skill negotiates the price up
   const rev=Math.round(price*qty); s.credits+=rev; p.stock[gk]+=qty; s.cargo[gk]-=qty; if(s.cargo[gk]<=0) delete s.cargo[gk]; if(s.role==='player'){ repAdd(p,CFG.REP_TRADE); if(window.KPLAN) KPLAN.observe('sell:'+gk); } return rev; }
-function refuel(s,p){ const cap=s.fuelCap||CFG.FUEL_CAP, need=cap-s.fuel; if(need<1) return 0; const price=priceOf(p,'gas');
+function refuel(s,p){ const cap=fuelCapOf(s), need=cap-s.fuel; if(need<1) return 0; const price=priceOf(p,'gas');   // SR ITEM VARIANCE: fuel-tank instance powerMul scales the real cap here
   const q=Math.min(Math.ceil(need),Math.floor(s.credits/price),Math.floor(p.stock.gas-4)); if(q<=0) return 0; s.credits-=Math.round(price*q); p.stock.gas-=q; s.fuel=Math.min(cap,s.fuel+q); if(s.role==='player'&&window.KPLAN) KPLAN.observe('refuel'); return q; }
 // IRON LAW (2026-07-10) - P4's own stated law, now enforced in the LIVE game: a ship knows only the prices it
 // has OBSERVED by docking. The old bestArbitrage/planTrade read priceOf() across EVERY planet including ones the
@@ -1503,7 +1503,7 @@ function aimAt(s,dir){ const D=new T.Vector3().copy(dir).normalize(); const fwd=
   const yawErr=Math.atan2(local.x,-local.z), pitchErr=Math.atan2(local.y,Math.hypot(local.x,local.z));
   return { yaw:clamp(yawErr*CFG.KP_YAW,-1,1), pitch:clamp(pitchErr*CFG.KP_PITCH,-1,1), dot }; }
 function nearestRival(s,R){ let best=null,bd=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; const d=s.pos.distanceTo(o.pos); if(R&&d>R) continue; if(d<bd){bd=d;best=o;} } return best; }   // IRON LAW: pass R=senseRangeOf(s) at combat sites so a ship can only target what it SENSES (was: globally omniscient - the AI could chase an enemy anywhere in the galaxy); R omitted = legacy global read
-function senseRangeOf(s){ return (s&&s.senseR)||CFG.SENSE_R; }   // one honest sensor limit for EVERYONE - radar gear raises it, symmetric for AI + player
+function senseRangeOf(s){ return ((s&&s.senseR)||CFG.SENSE_R) * ((s&&s.radarInst&&s.radarInst.powerMul)||1); }   // one honest sensor limit for EVERYONE - radar gear raises it, symmetric for AI + player; SR ITEM VARIANCE: radar instance powerMul scales it (ship-agnostic)
 function weakestEnemyNear(s,R){ let best=null,bw=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; if(s.pos.distanceTo(o.pos)<R && o.hp<bw){ bw=o.hp; best=o; } } return best; }   // pick off the weak
 // inter-agent communication: a message that also CHANGES nearby allies' behavior (real coordination)
 // ===== A1: EMERGENT SIGNALING (Lewis referential game) - the squad LEARNS a symbol→meaning code ONLINE =====
@@ -1823,7 +1823,7 @@ function flyStep(s,dt){
     if(dd<effR){ const n=_v2.copy(s.pos).sub(base.pos); if(n.lengthSq()<1e-4) n.set(1,0,0); n.setLength(1);
       s.pos.copy(base.pos).addScaledVector(n,effR); const vn=s.vel.dot(n);
       if(vn<0){ s.vel.addScaledVector(n,-vn); const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }
-  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0)*seriesOf(s).droidMult)*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen; HULL SERIES: Repair boosts droid effectiveness
+  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0)*seriesOf(s).droidMult*((s.droidInst&&s.droidInst.powerMul)||1))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen; HULL SERIES: Repair boosts droid effectiveness; SR ITEM VARIANCE: droid instance powerMul scales its regen (ship-agnostic)
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
   capacitorTick(s,dt);                                                                              // SR X-WING CAPACITORS: laser energy regens off weapons power, engine capacitor regens off engines power (when not boosting)
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
@@ -2305,7 +2305,7 @@ function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.
     .map(x=>({name:x.name, dist:P.pos.distanceTo(x.pos), wpn:(x.lvl&&x.lvl.weapon)||1})).sort((a,b)=>a.dist-b.dist);
   const npNear=nearestPlanet(P.pos);
   const pw=shipPower(P);
-  return { hull:Math.round(P.hp), maxHull:Math.round(P.maxHp), fuel:Math.round(P.fuel), maxFuel:P.fuelCap,
+  return { hull:Math.round(P.hp), maxHull:Math.round(P.maxHp), fuel:Math.round(P.fuel), maxFuel:Math.round(fuelCapOf(P)),
     credits:P.credits, place:np?np.name:null, docked:!!P.docked, weaponLvl:(P.lvl&&P.lvl.weapon)||1,
     cargoCount:cargoTotal(P), holdCap:P.holdCap,
     near:ships.filter(x=>x.alive&&x!==P&&x.pos.distanceTo(P.pos)<=P.senseR).map(x=>x.name).slice(0,8),
@@ -2361,7 +2361,7 @@ function dockMenu(p, isBase){ const P=ships[0]; if(!P) return;
   const rep = isBase? '' : (p.rep>=CFG.REP_ALLIED?' · <span style="color:#7fdc8a">ALLIED - best prices + repair</span>':(p.rep<=CFG.REP_HOSTILE?' · <span style="color:#ff7a8a">HOSTILE</span>':' · neutral'));
   const repairCost=Math.round((P.maxHp-P.hp)*(isBase?0.4:0.5));
   term(`<b style="color:#8fd0ff">⚓ DOCKED - ${isBase?'⌂ Ranger Command':p.name}</b>${rep}`,'sys');
-  term(`&nbsp;&nbsp;hull <b>${Math.round(P.hp)}/${Math.round(P.maxHp)}</b> · fuel <b>${Math.round(P.fuel)}/${P.fuelCap}</b> · <span style="color:#ffcf52">${P.credits}c</span> · hold ${cargoTotal(P)}/${P.holdCap}`,'sys');
+  term(`&nbsp;&nbsp;hull <b>${Math.round(P.hp)}/${Math.round(P.maxHp)}</b> · fuel <b>${Math.round(P.fuel)}/${Math.round(fuelCapOf(P))}</b> · <span style="color:#ffcf52">${P.credits}c</span> · hold ${cargoTotal(P)}/${P.holdCap}`,'sys');
   const opt=(cmd,label,note)=>`&nbsp;&nbsp;<b style="color:#e8c37a">${cmd}</b> ${label}${note?` <span style="opacity:.5">${note}</span>`:''}`;
   const canRepair = isBase || p.rep>CFG.REP_HOSTILE;   // allied/neutral planets repair; conquered/hostile don't
   if(canRepair) term(opt('repair', ' - fix your hull', repairCost>0?`(${repairCost}c)`:'(already full)'),'sys');
@@ -2590,7 +2590,7 @@ function scanBlockPct(o){ return clamp(Math.round((shieldMaxFor(o)/CFG.SHIELD_BA
 // rough (a band, no numbers) is the naked-eye read of a LOW-TIER ship at point-blank; else you get nothing.
 function healthReadout(viewer,o){
   if(!viewer||!o) return {mode:'none'};
-  const sp=(scannerOf(viewer).power)||0, dist=viewer.pos.distanceTo(o.pos), tier=o.tier||0;
+  const sp=scannerPowerOf(viewer), dist=viewer.pos.distanceTo(o.pos), tier=o.tier||0;   // SR ITEM VARIANCE: scanner instance powerMul scales read strength
   const screen=tier*CFG.SCAN_SCREEN_PER_TIER, range=CFG.SCAN_HEALTH_R_BASE+sp*CFG.SCAN_HEALTH_R_PER_POWER;
   const hull=o.maxHp>0?clamp(Math.round(o.hp/o.maxHp*100),0,100):0;
   if(sp>0 && sp>=screen && dist<=range){
@@ -2623,7 +2623,7 @@ function shieldGenOf(s){ return SHIELD_GENS[s.shieldGenType||'none']||SHIELD_GEN
 function hullResFor(s,dmgType){ const base=(HULLS[s.hullClass]&&HULLS[s.hullClass].res&&HULLS[s.hullClass].res[dmgType])||1;
   const tech=Math.max(CFG.TECH_RES_FLOOR, 1-CFG.TECH_RES_PER_LVL*(((s.lvl&&s.lvl.hull)||1)-1));   // TECH LEVEL: your existing hull-upgrade level, live multiplier - Lv1 is a no-op (×1.00)
   return base*((manuOf(s).res&&manuOf(s).res[dmgType])||1)*tech; }   // STANDARD GEAR SLOTS + MANUFACTURER + TECH LEVEL: compose hull-class, manufacturer, and tech-level susceptibility
-function shieldGenPctFor(s){ return Math.min(0.9,(shieldGenOf(s).pct||0)*seriesOf(s).shieldGenMult); }   // HULL SERIES: Ironclad boosts the Shield Generator's effect
+function shieldGenPctFor(s){ return Math.min(0.9,(shieldGenOf(s).pct||0)*seriesOf(s).shieldGenMult*((s&&s.shieldGenInst&&s.shieldGenInst.powerMul)||1)); }   // HULL SERIES: Ironclad boosts the Shield Generator's effect; SR ITEM VARIANCE: shieldgen instance powerMul scales absorb %, capped at 0.9 (ship-agnostic)
 
 // CARGO HOOK (user: "tractors in loot, minerals, and salvage - better hooks have longer ranges and can pull
 // heavier items without dropping them") - extends the existing gem/pod magnet+pick radii (see pickRFor/magnetFor),
@@ -2646,7 +2646,11 @@ const CARGO_HOOKS={
 const CARGO_HOOK_KEYS=Object.keys(CARGO_HOOKS);
 function hookOf(s){ return CARGO_HOOKS[s.cargoHookType||'none']||CARGO_HOOKS.none; }
 function pickRFor(s){ return CFG.GEM_PICK_R+hookOf(s).range; }
-function magnetFor(s){ return CFG.GEM_MAGNET+hookOf(s).pull; }
+function magnetFor(s){ return CFG.GEM_MAGNET+hookOf(s).pull*((s&&s.cargoHookInst&&s.cargoHookInst.powerMul)||1); }   // SR ITEM VARIANCE: instance powerMul scales pull, ship-agnostic
+// SR ITEM VARIANCE effect helpers - each reads s.<fam>Inst.powerMul, SHIP-AGNOSTIC (no role guards; ironlaw owns AI-side symmetrisation).
+function gearInst(planet,fam,key,cost,wt){ return (window.ITEMVAR)?ITEMVAR.roll(planet+'|'+fam+'|'+key,cost,wt):null; }   // deterministic per planet+item = stable per-planet shop stock
+function fuelCapOf(s){ return ((s&&s.fuelCap)||CFG.FUEL_CAP) * ((s&&s.fuelTankInst&&s.fuelTankInst.powerMul)||1); }
+function scannerPowerOf(s){ return ((scannerOf(s).power)||0) * ((s&&s.scannerInst&&s.scannerInst.powerMul)||1); }
 
 // MICRO-MODULES (user: "Optimator reduce the size of a component by 25%... Integrator boost weapon damage across
 // the board... dropped by destroyed Dominators or earned via missions") - mechanically identical to ARTIFACTS
@@ -4015,35 +4019,41 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   // Hook... buy different types... that help your ship with special things like a targeting computer") - six more
   // single-slot fits, same pattern as `engine` above (list when bare, fit-by-prefix-match when given a key).
   if(c==='tank'){ if(!need(dockedP,'must be docked')) return; const key=FUEL_TANK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('FUEL TANKS (fit at dock):','sys'); FUEL_TANK_KEYS.forEach(kk=>{ const E=FUEL_TANKS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.fuelTankType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('FUEL TANKS (fit at dock - per-planet stock varies):','sys'); FUEL_TANK_KEYS.forEach(kk=>{ const E=FUEL_TANKS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'tank',kk,E.cost,20):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.fuelTankType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.fuelTankType||'standard')===key){ term(`Already fitted: ${FUEL_TANKS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=FUEL_TANKS[key].cost,`need ${FUEL_TANKS[key].cost}c`)) return; P.credits-=FUEL_TANKS[key].cost; fitFuelTank(P,key);
-    term(`Fitted ${FUEL_TANKS[key].n} (-${FUEL_TANKS[key].cost}c) - fuel cap now ${P.fuelCap}.`,'sys'); return; }
+    const iv=(FUEL_TANKS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'tank',key,FUEL_TANKS[key].cost,20):null; const price=iv?iv.price:(FUEL_TANKS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitFuelTank(P,key); P.fuelTankInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${FUEL_TANKS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - fuel cap now ${Math.round(fuelCapOf(P))}.`,'sys'); return; }
   if(c==='radar'){ if(!need(dockedP,'must be docked')) return; const key=RADAR_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('RADARS (fit at dock):','sys'); RADAR_KEYS.forEach(kk=>{ const E=RADARS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.radarType||'basic')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('RADARS (fit at dock - per-planet stock varies):','sys'); RADAR_KEYS.forEach(kk=>{ const E=RADARS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'radar',kk,E.cost,8):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.radarType||'basic')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.radarType||'basic')===key){ term(`Already fitted: ${RADARS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=RADARS[key].cost,`need ${RADARS[key].cost}c`)) return; P.credits-=RADARS[key].cost; fitRadar(P,key);
-    term(`Fitted ${RADARS[key].n} (-${RADARS[key].cost}c) - sensor range now ${Math.round(P.senseR)}.`,'sys'); return; }
+    const iv=(RADARS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'radar',key,RADARS[key].cost,8):null; const price=iv?iv.price:(RADARS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitRadar(P,key); P.radarInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${RADARS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - sensor range now ${Math.round(senseRangeOf(P))}.`,'sys'); return; }
   if(c==='droid'){ if(!need(dockedP,'must be docked')) return; const key=REPAIR_DROID_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('REPAIR DROIDS (fit at dock):','sys'); REPAIR_DROID_KEYS.forEach(kk=>{ const E=REPAIR_DROIDS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.droidType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('REPAIR DROIDS (fit at dock - per-planet stock varies):','sys'); REPAIR_DROID_KEYS.forEach(kk=>{ const E=REPAIR_DROIDS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'droid',kk,E.cost,10):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.droidType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.droidType||'none')===key){ term(`Already fitted: ${REPAIR_DROIDS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=REPAIR_DROIDS[key].cost,`need ${REPAIR_DROIDS[key].cost}c`)) return; P.credits-=REPAIR_DROIDS[key].cost; fitDroid(P,key);
-    term(`Fitted ${REPAIR_DROIDS[key].n} (-${REPAIR_DROIDS[key].cost}c) - regen now +${(P.regenBonus||0).toFixed(1)}/s.`,'sys'); return; }
+    const iv=(REPAIR_DROIDS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'droid',key,REPAIR_DROIDS[key].cost,10):null; const price=iv?iv.price:(REPAIR_DROIDS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitDroid(P,key); P.droidInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${REPAIR_DROIDS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - regen now +${((P.regenBonus||0)*((P.droidInst&&P.droidInst.powerMul)||1)).toFixed(1)}/s.`,'sys'); return; }
   if(c==='scanner'){ if(!need(dockedP,'must be docked')) return; const key=SCANNER_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('SCANNERS (fit at dock):','sys'); SCANNER_KEYS.forEach(kk=>{ const E=SCANNERS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.scannerType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('SCANNERS (fit at dock - per-planet stock varies):','sys'); SCANNER_KEYS.forEach(kk=>{ const E=SCANNERS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'scanner',kk,E.cost,6):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.scannerType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.scannerType||'none')===key){ term(`Already fitted: ${SCANNERS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=SCANNERS[key].cost,`need ${SCANNERS[key].cost}c`)) return; P.credits-=SCANNERS[key].cost; P.scannerType=key;
-    term(`Fitted ${SCANNERS[key].n} (-${SCANNERS[key].cost}c) - ${SCANNERS[key].desc}.`,'sys'); return; }
+    const iv=(SCANNERS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'scanner',key,SCANNERS[key].cost,6):null; const price=iv?iv.price:(SCANNERS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.scannerType=key; P.scannerInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${SCANNERS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - ${SCANNERS[key].desc} · scan pwr ${Math.round(scannerPowerOf(P))}.`,'sys'); return; }
   if(c==='shieldgen'){ if(!need(dockedP,'must be docked')) return; const key=SHIELD_GEN_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('SHIELD GENERATORS (fit at dock):','sys'); SHIELD_GEN_KEYS.forEach(kk=>{ const E=SHIELD_GENS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.shieldGenType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('SHIELD GENERATORS (fit at dock - per-planet stock varies):','sys'); SHIELD_GEN_KEYS.forEach(kk=>{ const E=SHIELD_GENS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'shieldgen',kk,E.cost,14):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.shieldGenType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.shieldGenType||'none')===key){ term(`Already fitted: ${SHIELD_GENS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=SHIELD_GENS[key].cost,`need ${SHIELD_GENS[key].cost}c`)) return; P.credits-=SHIELD_GENS[key].cost; P.shieldGenType=key;
-    term(`Fitted ${SHIELD_GENS[key].n} (-${SHIELD_GENS[key].cost}c) - ${SHIELD_GENS[key].desc}.`,'sys'); return; }
+    const iv=(SHIELD_GENS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'shieldgen',key,SHIELD_GENS[key].cost,14):null; const price=iv?iv.price:(SHIELD_GENS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.shieldGenType=key; P.shieldGenInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${SHIELD_GENS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - absorbs ${Math.round(shieldGenPctFor(P)*100)}% of each hit to hull.`,'sys'); return; }
   if(c==='hook'){ if(!need(dockedP,'must be docked')) return; const key=CARGO_HOOK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
-    if(!key){ term('CARGO HOOKS (fit at dock):','sys'); CARGO_HOOK_KEYS.forEach(kk=>{ const E=CARGO_HOOKS[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.cargoHookType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!key){ term('CARGO HOOKS (fit at dock - per-planet stock varies):','sys'); CARGO_HOOK_KEYS.forEach(kk=>{ const E=CARGO_HOOKS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'hook',kk,E.cost,12):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.cargoHookType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.cargoHookType||'none')===key){ term(`Already fitted: ${CARGO_HOOKS[key].n}.`,'sys'); return; }
-    if(!need(P.credits>=CARGO_HOOKS[key].cost,`need ${CARGO_HOOKS[key].cost}c`)) return; P.credits-=CARGO_HOOKS[key].cost; P.cargoHookType=key;
-    term(`Fitted ${CARGO_HOOKS[key].n} (-${CARGO_HOOKS[key].cost}c) - ${CARGO_HOOKS[key].desc}.`,'sys'); return; }
+    const iv=(CARGO_HOOKS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'hook',key,CARGO_HOOKS[key].cost,12):null; const price=iv?iv.price:(CARGO_HOOKS[key].cost||0);
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.cargoHookType=key; P.cargoHookInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
+    term(`Fitted ${CARGO_HOOKS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - pull radius now ${Math.round(magnetFor(P))}.`,'sys'); return; }
   if(c==='ammo'){ const cost=CFG.MISSILE_AMMO_COST; if(!a[1]||a[1]==='buy'){
       if(!need(dockedP,'must be docked to restock - ammo buy <n>')) return;
       const qty=Math.min(CFG.MISSILE_AMMO_MAX-(P.missileAmmo||0), parseInt(a[2])||5); if(!need(qty>0,'magazine already full')) return;
@@ -4052,7 +4062,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`Missile ammo: ${P.missileAmmo||0}/${CFG.MISSILE_AMMO_MAX} · ${cost}c/unit · try: ammo buy &lt;n&gt;`,'sys'); return; }
   if(c==='probe'){ const o=ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith((a[1]||'').toLowerCase())); if(!need(o,'no such ship - try: scan')) return;
     if(!need(P.pos.distanceTo(o.pos)<=P.senseR*1.6,`${o.name} is out of scanner range`)) return;
-    const needPct=scanBlockPct(o), have=scannerOf(P).power;
+    const needPct=scanBlockPct(o), have=Math.round(scannerPowerOf(P));
     if(have<needPct){ term(`◈ PROBE ${o.name} - scan resisted, their shields block it (need ${needPct} scan power, you have ${have}) - try: scanner`,'err'); return; }
     term(`◈ PROBE ${o.name} - hull ${Math.round((o.hp/o.maxHp)*100)}% · weapon ${WEAPONS[o.weaponType||'energy'].n} · hull class ${o.hullClass?HULLS[o.hullClass].n:'?'} · cargo ${cargoTotal(o)}/${o.holdCap||0}`,'sys'); return; }
   if(c==='micromods'||c==='mm'){ const inv=P.micromodules||[]; if(!inv.length){ term('No micro-modules recovered. Destroy Warlord-tier Hegemon ships (or the Stronghold) with a Cargo Hook fitted to recover them.','sys'); return; }
@@ -5005,6 +5015,7 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
 
       fuelTankType:P.fuelTankType||'standard', radarType:P.radarType||'basic', scannerType:P.scannerType||'none',
       shieldGenType:P.shieldGenType||'none', droidType:P.droidType||'none', cargoHookType:P.cargoHookType||'none',
+      fuelTankInst:P.fuelTankInst||null, radarInst:P.radarInst||null, scannerInst:P.scannerInst||null, shieldGenInst:P.shieldGenInst||null, droidInst:P.droidInst||null, cargoHookInst:P.cargoHookInst||null,   // SR ITEM VARIANCE: fitted gear instances
       missileAmmo:P.missileAmmo, dmgMult:P.dmgMult||0, micromodules:[...(P.micromodules||[])],   // STANDARD GEAR SLOTS
       manufacturer:P.manufacturer||'human', hullSeries:P.hullSeries||'standard', weaponSlots:[...(P.weaponSlots||[])],   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
       missionsCompleted:P.missionsCompleted||0, questsCompleted:P.questsCompleted||0, discoveries:P.discoveries||0,   // SR-M20: campaign-score components
@@ -5027,6 +5038,7 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     weaponInst:sp.weaponInst||null, engineInst:sp.engineInst||null,   // SR ITEM VARIANCE: restore fitted weapon/engine instances
     fuelTankType:sp.fuelTankType||'standard', radarType:sp.radarType||'basic', scannerType:sp.scannerType||'none',
     shieldGenType:sp.shieldGenType||'none', droidType:sp.droidType||'none', cargoHookType:sp.cargoHookType||'none',
+    fuelTankInst:sp.fuelTankInst||null, radarInst:sp.radarInst||null, scannerInst:sp.scannerInst||null, shieldGenInst:sp.shieldGenInst||null, droidInst:sp.droidInst||null, cargoHookInst:sp.cargoHookInst||null,   // SR ITEM VARIANCE: restore fitted gear instances
     missileAmmo:num2(sp.missileAmmo,CFG.MISSILE_AMMO_START), dmgMult:num2(sp.dmgMult,0), micromodules:sp.micromodules||[],   // STANDARD GEAR SLOTS
     manufacturer:sp.manufacturer||'human', hullSeries:sp.hullSeries||'standard', weaponSlots:sp.weaponSlots||null, slotFire:null,   // WEAPON HARDPOINTS / HULL SERIES / MANUFACTURER
     missionsCompleted:num2(sp.missionsCompleted,0), questsCompleted:num2(sp.questsCompleted,0), discoveries:num2(sp.discoveries,0),   // SR-M20
