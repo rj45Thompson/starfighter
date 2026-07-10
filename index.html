@@ -172,51 +172,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710o"></script>
-<script src="fflate.min.js?v=20260710o"></script>
-<script src="fbxloader.js?v=20260710o"></script>
+<script src="three.min.js?v=20260710p"></script>
+<script src="fflate.min.js?v=20260710p"></script>
+<script src="fbxloader.js?v=20260710p"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710o"></script>
-<script src="inhabitant.js?v=20260710o"></script>
-<script src="passenger.js?v=20260710o"></script>
-<script src="gamemod.js?v=20260710o"></script>
-<script src="chatter.js?v=20260710o"></script>
-<script src="speech_gen.js?v=20260710o"></script>
-<script src="speech_input.js?v=20260710o"></script>
-<script src="vision.js?v=20260710o"></script>
-<script src="deliberate.js?v=20260710o"></script>
-<script src="knowledge.js?v=20260710o"></script>
-<script src="acquire.js?v=20260710o"></script>
-<script src="sound.js?v=20260710o"></script>
-<script src="hullmodels.js?v=20260710o"></script>
-<script src="knowledge_hud.js?v=20260710o"></script>
-<script src="knowledge_screen.js?v=20260710o"></script>
-<script src="centroid_mind.js?v=20260710o"></script>
-<script src="kripke_mind.js?v=20260710o"></script>
-<script src="sober_gate.js?v=20260710o"></script>
-<script src="contradiction_ledger.js?v=20260710o"></script>
-<script src="kripke_planner.js?v=20260710o"></script>
-<script src="pillar_router.js?v=20260710o"></script>
-<script src="gravity_well.js?v=20260710o"></script>
-<script src="growth_loop.js?v=20260710o"></script>
-<script src="coop_proof.js?v=20260710o"></script>
-<script src="tom_test.js?v=20260710o"></script>
-<script src="thoughts.js?v=20260710o"></script>
-<script src="tami_battle_ui.js?v=20260710o"></script>
-<script src="power_panel.js?v=20260710o"></script>
-<script src="panels.js?v=20260710o"></script>
-<script src="item_icons.js?v=20260710o"></script>
-<script src="engbay.js?v=20260710o"></script>
+<script src="speech_tier.js?v=20260710p"></script>
+<script src="inhabitant.js?v=20260710p"></script>
+<script src="passenger.js?v=20260710p"></script>
+<script src="gamemod.js?v=20260710p"></script>
+<script src="chatter.js?v=20260710p"></script>
+<script src="speech_gen.js?v=20260710p"></script>
+<script src="speech_input.js?v=20260710p"></script>
+<script src="vision.js?v=20260710p"></script>
+<script src="deliberate.js?v=20260710p"></script>
+<script src="knowledge.js?v=20260710p"></script>
+<script src="acquire.js?v=20260710p"></script>
+<script src="sound.js?v=20260710p"></script>
+<script src="hullmodels.js?v=20260710p"></script>
+<script src="knowledge_hud.js?v=20260710p"></script>
+<script src="knowledge_screen.js?v=20260710p"></script>
+<script src="centroid_mind.js?v=20260710p"></script>
+<script src="kripke_mind.js?v=20260710p"></script>
+<script src="sober_gate.js?v=20260710p"></script>
+<script src="contradiction_ledger.js?v=20260710p"></script>
+<script src="kripke_planner.js?v=20260710p"></script>
+<script src="pillar_router.js?v=20260710p"></script>
+<script src="gravity_well.js?v=20260710p"></script>
+<script src="growth_loop.js?v=20260710p"></script>
+<script src="coop_proof.js?v=20260710p"></script>
+<script src="item_variance.js?v=20260710p"></script>
+<script src="tom_test.js?v=20260710p"></script>
+<script src="thoughts.js?v=20260710p"></script>
+<script src="tami_battle_ui.js?v=20260710p"></script>
+<script src="power_panel.js?v=20260710p"></script>
+<script src="panels.js?v=20260710p"></script>
+<script src="item_icons.js?v=20260710p"></script>
+<script src="engbay.js?v=20260710p"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710o"></script>
-<script src="conquest.js?v=20260710o"></script>
-<script src="missions.js?v=20260710o"></script>
-<script src="planetmenu.js?v=20260710o"></script>
-<script src="textquests.js?v=20260710o"></script>
+<script src="starmap.js?v=20260710p"></script>
+<script src="conquest.js?v=20260710p"></script>
+<script src="missions.js?v=20260710p"></script>
+<script src="planetmenu.js?v=20260710p"></script>
+<script src="textquests.js?v=20260710p"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -234,7 +235,7 @@ const T = THREE;
 // SF_LAST_ERROR_v1, so the next crash hands us an exact stack instead of a silent frozen canvas. Diagnostic
 // only - never swallows the error (the console still gets it), never alters game state.
 (function(){ function report(kind,msg,src,line,col,stack){
-    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710o'})); }catch(e){}
+    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710p'})); }catch(e){}
     try{ let el=document.getElementById('sfCrashBanner');
       if(!el){ el=document.createElement('div'); el.id='sfCrashBanner';
         el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#3a0a12;color:#ffb4bc;border:1px solid #ff5a6e;border-radius:8px;padding:8px 14px;font:12px monospace;max-width:80vw;white-space:pre-wrap;';
@@ -1727,7 +1728,7 @@ function think(s,dt){
       s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
       s.capLaser=Math.max(0,(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser)-CFG.LASER_CAP_PER_SHOT);
       if(W.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);   // IRON LAW: consume the magazine for EVERYONE (AI + player), symmetric
-      const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0)))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers
+      const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*(s.weaponInst&&s.weaponInst.powerMul||1))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers; SR VARIANCE: the player's rolled weapon-instance power
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
         shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };   // per-weapon visual signature; SR Treton slow-on-hit
       const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
@@ -3950,7 +3951,12 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
   if(c==='upgrade'||c==='up'){ if(!need(dockedP,'must be docked')) return; const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return; if(!need(canUpgradeLvl(P,k),`${k} is already at the max level (Lv${CFG.UP_LVL_CAP})`)) return; const cost=upCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.lvl[k]++; if(k==='hull'){P.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(P.lvl.hull-1));P.hp=P.maxHp;} term(`Upgraded ${k} to Lv${P.lvl[k]} (-${cost}c).`,'sys'); return; }
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
-    if(!wt){ term('WEAPONS (fit at dock):','sys'); WEAPON_ORDER.forEach(kk=>{ const W=WEAPONS[kk]; term(`  ${kk} - ${W.n} · dmg ${W.dmg} · ${W.homing?'homing ':''}${W.splash?'splash ':''}${W.slow?'slows ':''}range ${(W.range*100)|0}% · ${W.cost?W.cost+'c':'free'}${(P.weaponType||'energy')===kk?'  [fitted]':''}${W.desc?`<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="opacity:.6">${W.desc}</span>`:''}`,'sys'); }); return; }
+    // SR ITEM VARIANCE: a weapon is a TEMPLATE; THIS station's stock is a rolled INSTANCE (quality/condition/weight/
+    // power/price) stable per planet+key, so the price you see is the price you pay and the power you get.
+    const wInst=kk=>{ const W=WEAPONS[kk]; return (window.ITEMVAR&&dockedP)?ITEMVAR.roll(dockedP.name+'|w|'+kk, W.cost||60, Math.max(6,Math.round((W.dmg||10)*0.4))):null; };
+    if(!wt){ term('WEAPONS <span style="opacity:.6">(this station\'s stock - condition/weight/power/price vary per drop)</span>:','sys'); WEAPON_ORDER.forEach(kk=>{ const W=WEAPONS[kk]; const inst=wInst(kk);
+      const vLine=inst?` · <span style="color:${inst.col}">${inst.quality} ${inst.condition}% · wt${inst.weight} · pwr${Math.round(inst.powerMul*100)}%</span> · <b>${inst.price}c</b>`:` · ${W.cost?W.cost+'c':'free'}`;
+      term(`  ${kk} - ${W.n} · dmg ${W.dmg} · ${W.homing?'homing ':''}${W.splash?'splash ':''}${W.slow?'slows ':''}range ${(W.range*100)|0}%${vLine}${(P.weaponType||'energy')===kk?'  [fitted]':''}${W.desc?`<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="opacity:.6">${W.desc}</span>`:''}`,'sys'); }); return; }
     const key=WEAPON_ORDER.find(kk=>kk.startsWith(wt)); if(!need(key,'weapon energy|ballistic|missile')) return; const W=WEAPONS[key];
     // M5 rank-gate: map the weapon's position across the REAL rank tiers (SR-M21 grew WEAPON_ORDER to 11 - the raw
     // index would run past RANKS[5], so scale + clamp: starters early, the apex Vertix needs the top rank).
@@ -3958,8 +3964,11 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     // instead of dumping the whole top half at Legend (was floor(idx/2), which pinned 11 weapons to max rank).
     const req=Math.min(RANKS.length-1, Math.round(WEAPON_ORDER.indexOf(key)*(RANKS.length-1)/Math.max(1,WEAPON_ORDER.length-1))); if(!need(rankIdx(P.score||0)>=req, `${W.n} requires ${RANKS[req].n} rank (see: rank)`)) return;
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
-    if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
-    term(`Fitted ${W.n} (-${W.cost}c) - dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
+    const inst=wInst(key), price=inst?inst.price:W.cost;   // buy the SAME rolled instance the list showed
+    if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.weaponType=key;
+    P.weaponInst=inst?{powerMul:inst.powerMul,condition:inst.condition,weight:inst.weight,quality:inst.quality}:null;   // SR VARIANCE: the fitted instance's rolled power carries into combat
+    const eff=Math.round(W.dmg*(inst?inst.powerMul:1));
+    term(`Fitted ${inst?`<span style="color:${inst.col}">${inst.quality}</span> `:''}${W.n} (-${price}c) - dmg <b>${eff}</b>${inst&&eff!==W.dmg?` <span style="opacity:.6">(base ${W.dmg} @ ${inst.condition}% cond, wt ${inst.weight})</span>`:''}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
   if(c==='outfit'||c==='shop'){ term('EQUIPMENT (install at dock):','sys'); Object.keys(EQUIP).forEach(k=>term(`  ${k} - ${EQUIP[k].n} · ${EQUIP[k].desc} · ${equipCost(P,k)}c`,'sys'));
     term(`  fitted: hold ${P.holdCap} · fuel ${P.fuelCap} · sensor ${Math.round(P.senseR)} · weapon ${WEAPONS[P.weaponType||'energy'].n} · engine ${ENGINES[P.engineType||'standard'].n} · gizmos ${(P.gizmoSlots||[]).filter(Boolean).length}/${gizmoSlotsFor(P)} · regen +${(P.regenBonus||0).toFixed(1)}`,'sys');
     term(`  gear: tank ${FUEL_TANKS[P.fuelTankType||'standard'].n} · radar ${RADARS[P.radarType||'basic'].n} · scanner ${scannerOf(P).n} · shieldgen ${shieldGenOf(P).n} · droid ${REPAIR_DROIDS[P.droidType||'none'].n} · hook ${hookOf(P).n} · missiles ${P.missileAmmo||0}/${CFG.MISSILE_AMMO_MAX}`,'sys');   // STANDARD GEAR SLOTS
@@ -4979,6 +4988,7 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       rankShown:P.rankShown, engineType:P.engineType||'standard', gizmoSlots:[...(P.gizmoSlots||[])],
       skills:{...(P.skills||{})}, skillPts:P.skillPts||0,
       stim:(P.stim&&P.stim.until>T0)?{n:P.stim.n,buffs:{...P.stim.buffs},left:Math.round(P.stim.until-T0)}:null,   // SR STIMULATORS: save REMAINING seconds (T0 resets on reload) - re-anchored in applySaveState
+      weaponInst:P.weaponInst||null,   // SR ITEM VARIANCE: the fitted weapon-instance's rolled power/condition/weight
 
       fuelTankType:P.fuelTankType||'standard', radarType:P.radarType||'basic', scannerType:P.scannerType||'none',
       shieldGenType:P.shieldGenType||'none', droidType:P.droidType||'none', cargoHookType:P.cargoHookType||'none',
@@ -5001,6 +5011,7 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     engineType:sp.engineType||'standard', gizmoSlots:sp.gizmoSlots||new Array(CFG.GIZMO_SLOTS).fill(null),
     skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0),
     stim:(sp.stim&&sp.stim.left>0)?{n:sp.stim.n,buffs:sp.stim.buffs,until:T0+sp.stim.left}:null,   // SR STIMULATORS: re-anchor the timer to the fresh T0
+    weaponInst:sp.weaponInst||null,   // SR ITEM VARIANCE: restore the fitted weapon instance
     fuelTankType:sp.fuelTankType||'standard', radarType:sp.radarType||'basic', scannerType:sp.scannerType||'none',
     shieldGenType:sp.shieldGenType||'none', droidType:sp.droidType||'none', cargoHookType:sp.cargoHookType||'none',
     missileAmmo:num2(sp.missileAmmo,CFG.MISSILE_AMMO_START), dmgMult:num2(sp.dmgMult,0), micromodules:sp.micromodules||[],   // STANDARD GEAR SLOTS
