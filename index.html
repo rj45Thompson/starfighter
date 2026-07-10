@@ -172,52 +172,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710t"></script>
-<script src="fflate.min.js?v=20260710t"></script>
-<script src="fbxloader.js?v=20260710t"></script>
+<script src="three.min.js?v=20260710u"></script>
+<script src="fflate.min.js?v=20260710u"></script>
+<script src="fbxloader.js?v=20260710u"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710t"></script>
-<script src="inhabitant.js?v=20260710t"></script>
-<script src="passenger.js?v=20260710t"></script>
-<script src="gamemod.js?v=20260710t"></script>
-<script src="chatter.js?v=20260710t"></script>
-<script src="speech_gen.js?v=20260710t"></script>
-<script src="speech_input.js?v=20260710t"></script>
-<script src="vision.js?v=20260710t"></script>
-<script src="deliberate.js?v=20260710t"></script>
-<script src="knowledge.js?v=20260710t"></script>
-<script src="acquire.js?v=20260710t"></script>
-<script src="sound.js?v=20260710t"></script>
-<script src="hullmodels.js?v=20260710t"></script>
-<script src="knowledge_hud.js?v=20260710t"></script>
-<script src="knowledge_screen.js?v=20260710t"></script>
-<script src="centroid_mind.js?v=20260710t"></script>
-<script src="kripke_mind.js?v=20260710t"></script>
-<script src="sober_gate.js?v=20260710t"></script>
-<script src="contradiction_ledger.js?v=20260710t"></script>
-<script src="kripke_planner.js?v=20260710t"></script>
-<script src="pillar_router.js?v=20260710t"></script>
-<script src="gravity_well.js?v=20260710t"></script>
-<script src="growth_loop.js?v=20260710t"></script>
-<script src="coop_proof.js?v=20260710t"></script>
-<script src="item_variance.js?v=20260710t"></script>
-<script src="tom_test.js?v=20260710t"></script>
-<script src="thoughts.js?v=20260710t"></script>
-<script src="tami_battle_ui.js?v=20260710t"></script>
-<script src="power_panel.js?v=20260710t"></script>
-<script src="panels.js?v=20260710t"></script>
-<script src="item_icons.js?v=20260710t"></script>
-<script src="engbay.js?v=20260710t"></script>
+<script src="speech_tier.js?v=20260710u"></script>
+<script src="inhabitant.js?v=20260710u"></script>
+<script src="passenger.js?v=20260710u"></script>
+<script src="gamemod.js?v=20260710u"></script>
+<script src="chatter.js?v=20260710u"></script>
+<script src="speech_gen.js?v=20260710u"></script>
+<script src="speech_input.js?v=20260710u"></script>
+<script src="vision.js?v=20260710u"></script>
+<script src="deliberate.js?v=20260710u"></script>
+<script src="knowledge.js?v=20260710u"></script>
+<script src="acquire.js?v=20260710u"></script>
+<script src="sound.js?v=20260710u"></script>
+<script src="hullmodels.js?v=20260710u"></script>
+<script src="knowledge_hud.js?v=20260710u"></script>
+<script src="knowledge_screen.js?v=20260710u"></script>
+<script src="centroid_mind.js?v=20260710u"></script>
+<script src="kripke_mind.js?v=20260710u"></script>
+<script src="sober_gate.js?v=20260710u"></script>
+<script src="contradiction_ledger.js?v=20260710u"></script>
+<script src="kripke_planner.js?v=20260710u"></script>
+<script src="pillar_router.js?v=20260710u"></script>
+<script src="gravity_well.js?v=20260710u"></script>
+<script src="growth_loop.js?v=20260710u"></script>
+<script src="coop_proof.js?v=20260710u"></script>
+<script src="item_variance.js?v=20260710u"></script>
+<script src="tom_test.js?v=20260710u"></script>
+<script src="thoughts.js?v=20260710u"></script>
+<script src="tami_battle_ui.js?v=20260710u"></script>
+<script src="power_panel.js?v=20260710u"></script>
+<script src="panels.js?v=20260710u"></script>
+<script src="item_icons.js?v=20260710u"></script>
+<script src="engbay.js?v=20260710u"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710t"></script>
-<script src="conquest.js?v=20260710t"></script>
-<script src="missions.js?v=20260710t"></script>
-<script src="planetmenu.js?v=20260710t"></script>
-<script src="textquests.js?v=20260710t"></script>
+<script src="starmap.js?v=20260710u"></script>
+<script src="conquest.js?v=20260710u"></script>
+<script src="missions.js?v=20260710u"></script>
+<script src="planetmenu.js?v=20260710u"></script>
+<script src="textquests.js?v=20260710u"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -376,6 +376,7 @@ const CFG = {
   CONTRACT_MAX:4, CONTRACT_REP:2, CONTRACT_BOUNTY_EA:22, CONTRACT_DEF_REWARD:160, CONTRACT_REFILL_CD:20,   // M4: coalition job board
   ART_DROP_BASE:0.10, ART_DROP_PER_TIER:0.22,          // M6: artifact drop chance = base + tier*per (Drone 10% .. Warlord 54%)
   BASE_R:46, SCAN_CHANCE:0.5, SCAN_FINE:0.6, CONTRA_MARKUP:2.3,   // M8/M10: base dock radius; scan probability + fine; contraband fence markup at hostile worlds
+  REPAIR_RATE_BASE:0.4, REPAIR_RATE_ALLIED:0.5, REPAIR_RATE_MEDICAL:0.3,   // SR BASE TYPES: hull-repair c/hp - Ranger Command cheapest, a Medical Center undercuts a normal allied world
   MAX_ENCOUNTERS:4, ENCOUNTER_CD:13, ENCOUNTER_R:17, ENCOUNTER_LIFE:70, NEWS_CD:22,   // M11: roaming derelicts/caches/distress + galaxy news that shocks prices
   CAM_BACK:18, CAM_UP:7.5, CAM_AHEAD:20, CAM_LAG:3.0, CAM_UP_LERP:2.4,
   HITFX_DUR:0.45, HITFX_MAX_OPACITY:0.55, HITFX_DMG_REF:14, CAM_SHAKE_MAG:0.85,   // user 2026-07-07 "flash red in the direction you are hit and rock the camera"
@@ -853,6 +854,18 @@ const PTYPES=[
   {t:'Hi-Tech', col:0x5aa6c8, makes:{tech:1.0,med:0.7}, needs:{alloy:0.8,food:0.5,lux:0.25}},
   {t:'Luxury',  col:0xc85ab0, makes:{lux:1.0},          needs:{food:0.6,tech:0.5,med:0.4,gas:0.2}} ];
 const GARDEN={t:'Garden', col:0x4a90d0, makes:{food:0.9,med:0.6,lux:0.5}, needs:{tech:0.6,alloy:0.4,gas:0.3}};   // earth-like (terraformed) - rich world
+// SR BASE TYPES (SR planets carry a SPECIALTY on top of their economy TYPE - Medical Center / Military Base / Business
+// Center). Assigned DETERMINISTICALLY per planet by a stable name-hash (survives reloads - planets regenerate in a fixed
+// order, NO rng), weighted toward 'general' so specialists feel rare. THIS TICK wires the MEDICAL service live (cheaper
+// hull repair); military/business are LABELLED, their economy mechanics proposed to ironlaw's trader-economy lane.
+const BASE_TYPES=['general','medical','general','military','general','business','general','medical'];   // name-hash % length -> specialty (5/8 general)
+const BASE_SPECIALTY={
+  general: {n:'Trade Outpost',  icon:'',  blurb:'a general port - the usual market, shops and repair bots'},
+  medical: {n:'Medical Center', icon:'✚', blurb:'discounted hull repair - the surgeons patch your ship for less'},
+  military:{n:'Military Base',   icon:'✦', blurb:'a coalition garrison - weapons & missions specialist (services expanding)'},
+  business:{n:'Business Center', icon:'§', blurb:'a commerce hub - favourable trade & finance (services expanding)'} };
+function baseTypeOf(p){ return (p&&p.baseType)||'general'; }
+function _baseTypeHash(name){ let h=0; name=String(name); for(let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return h; }   // deterministic per-planet-name (stable across reloads)
 const PNAMES=['Halcyon','Cydon','Ferrus','Vantor','Ludo','Sireth','Kova','Draxis','Orwell','Pallas',
   'Meridian','Tarsus','Volan','Ecliptor','Nyx','Cerule','Ashfall','Brigand','Thorne','Solace',
   'Veldt','Cauldron','Ithaca','Rimward'];   // 24 unique - go/planetByName are name-keyed, dups would break them
@@ -869,7 +882,7 @@ function makePlanets(){ makeSystems();
   const u=rand(0,TAU), r=CFG.SYSTEM_R*rand(0.35,0.85), el=rand(-0.3,0.3), cs=Math.cos(el);
   const pos=sys.center.clone().add(new T.Vector3(Math.cos(u)*r*cs, Math.sin(el)*r*0.5, Math.sin(u)*r*cs)), radius=rand(17,25);
   const stock={}; GOODS.forEach(g=>stock[g.k]=CFG.EQ_STOCK);
-  const p={ name:PNAMES[i%PNAMES.length], type, pos, radius, baseRadius:radius, stock, system:sys, rep:0,
+  const p={ name:PNAMES[i%PNAMES.length], type, pos, radius, baseRadius:radius, baseType:BASE_TYPES[_baseTypeHash(PNAMES[i%PNAMES.length])%BASE_TYPES.length], stock, system:sys, rep:0,   // SR BASE TYPES: deterministic specialty per planet-name
     wealth:CFG.PLANET_WEALTH0, dev:1, eq:CFG.EQ_STOCK, underThreat:false, defCd:0, boomT:0,   // SR-M13: post-liberation trade boom timer, set by warTick on liberation, consumed by econTick
     hull:CFG.PLANET_HULL, maxHull:CFG.PLANET_HULL, hullT:0, terra:0, terraformable:(type.t==='Mining'||type.t==='Refinery') };
   const m=new T.Mesh(new T.SphereGeometry(radius,24,18), new T.MeshStandardMaterial({color:type.col,map:PLANET_TEX,emissive:new T.Color(type.col).multiplyScalar(0.22),emissiveMap:PLANET_TEX,roughness:0.85,metalness:0.1})); m.rotation.y=rand(0,TAU); m.position.copy(pos); scene.add(m); p.mesh=m; p.spin=rand(0.01,0.035);   // real Starfighter2 planet skin (user 2026-07-07), tinted per economy TYPE; slow spin sells the sphere as a real world
@@ -1036,6 +1049,7 @@ function completeDock(s,p,isBase){
   if(s.role==='player'&&window.TEXTQUESTS) questOffer=TEXTQUESTS.tryOffer(p);
   dockMenu(p,false);
   if(s.role==='player'){ if(window.KPLAN) KPLAN.observe('dock:'+p.name); if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
+  if(s.role==='player' && !p._base){ const bt=baseTypeOf(p); if(bt!=='general'){ const bs=BASE_SPECIALTY[bt]; term(`${bs.icon} <b>${bs.n}</b> - ${bs.blurb}.`,'sys'); } }   // SR BASE TYPES: announce a specialist port's identity on dock (general ports stay quiet)
   if(questOffer) term(`<b style="color:#c9a0ff">📜 ${questOffer.title}</b> - ${questOffer.text}<br>`+questOffer.choices.map(c=>`  <b>[${c.n}]</b> ${c.label}`).join('<br>')+`<br><span style="opacity:.65">type <b>choose &lt;n&gt;</b>, or open the QUESTS tab</span>`,'sys');
   return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15};
 }
@@ -3512,7 +3526,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   // GRAVITY WELL (AGI_SALVAGE port from agi_proto/chainer.py): give the knowledge store a 2D geometry where
   // every relation is a CONSERVED TRANSLATION, then let the agent repair drifted positions on its own when
   // the composition residual runs high. Repair-not-prune: only POSITIONS move, never facts.
-  if(c==='gravity'||c==='repair'){ if(!window.GWELL){ term('gravity_well.js not loaded','err'); return; }
+  if(c==='gravity'){ if(!window.GWELL){ term('gravity_well.js not loaded','err'); return; }   // SR BASE TYPES fix: dropped the 'repair' alias here - it SHADOWED hull repair (only reachable via 'refit'), so a docked player typing 'repair' hit the AGI graph-repair instead of fixing their ship. 'gravity' is this command's documented trigger; 'repair' now falls through to hull repair below (enabling the Medical Center discount via the intuitive keyword).
     const r=GWELL.report();
     if(r.verdict==='abstain'){ term(`◉ GRAVITY WELL - ${r.why}`,'sys'); return; }
     term(`◉ <b>GRAVITY WELL</b> - ${r.nodes} nodes · ${r.edges} constraint edges · ${r.relations} conserved relations${r.excludedTainted?` · <span style="color:#ffd27a">${r.excludedTainted} tainted edge${r.excludedTainted>1?'s':''} EXCLUDED (quarantined)</span>`:''}`,'sys');
@@ -3938,8 +3952,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`⌂ RANGER COMMAND - docked. Rank ${rankOf(P.score||0).n}. Services:`,'sys'); term('  <b>hull</b> &lt;scout|fighter|freighter|cruiser&gt; · <b>blackmarket</b> · <b>repair</b>','sys'); return; }
   if(c==='repair'||c==='refit'){ const alliedDock = dockedP && dockedP.rep>CFG.REP_HOSTILE && !dockedP.hegemon;   // repair bots on ALL allied/neutral worlds (user 2026-07-07), not just the base
     if(!need(atBase(P)||alliedDock, dockedP&&dockedP.hegemon?`${dockedP.name} is under Iron Synod control - no repair bots for you here. Liberate it or make for Ranger Command.`:'must be docked at an allied world or Ranger Command (go base)')) return;
-    const rate=atBase(P)?0.4:0.5; const cost=Math.round((P.maxHp-P.hp)*rate); if(P.hp>=P.maxHp){ term('Hull already full.','sys'); return; } if(!need(P.credits>=cost,`repair costs ${cost}c`)) return;
-    P.credits-=cost; P.hp=P.maxHp; term(`Repair bots seal the hull - full (-${cost}c).`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
+    const medical=baseTypeOf(dockedP)==='medical'; const rate=atBase(P)?CFG.REPAIR_RATE_BASE:(medical?CFG.REPAIR_RATE_MEDICAL:CFG.REPAIR_RATE_ALLIED); const cost=Math.round((P.maxHp-P.hp)*rate); if(P.hp>=P.maxHp){ term('Hull already full.','sys'); return; } if(!need(P.credits>=cost,`repair costs ${cost}c`)) return;   // SR BASE TYPES: a Medical Center undercuts a normal allied world
+    P.credits-=cost; P.hp=P.maxHp; term(`${medical?'✚ Medical Center surgeons seal the hull - discounted rate':'Repair bots seal the hull'} - full (-${cost}c).`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
   if(c==='signals'||c==='encounters'){ if(!encounters.length){ term('No active signals - derelicts/caches/distress calls appear over time. Fly to them to claim.','sys'); return; } term('ACTIVE SIGNALS (fly to them):','sys'); encounters.forEach(e=>term(`  ✦ ${e.kind} · ${Math.round(P.pos.distanceTo(e.pos))}u`,'sys')); return; }
   if(c==='hull'){ if(!need(atBase(P),'hull swaps are at Ranger Command (go base)')) return; const k=HULL_ORDER.find(x=>x.startsWith((a[1]||'').toLowerCase()));
     if(!k){ const hullLine=x=>{ const H=HULLS[x], M=HULL_MOUNTS[x]; return `  ${x} - <b>${H.n}</b> · hull ${H.hp} · hold ${H.hold} · speed ×${H.speed} · role ${H.role} · ${M.gizmoPoints.length} gizmo + ${M.weaponPoints.length} hardpoint mounts · E${H.res.energy} S${H.res.frag} M${H.res.missile}${H.pd?' · PD '+Math.round(H.pd*100)+'%':''} · ${H.desc} · ${H.cost?H.cost+'c':'free'}${P.hullClass===x?' [current]':''}`; };
