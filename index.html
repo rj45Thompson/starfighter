@@ -168,51 +168,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710k"></script>
-<script src="fflate.min.js?v=20260710k"></script>
-<script src="fbxloader.js?v=20260710k"></script>
+<script src="three.min.js?v=20260710l"></script>
+<script src="fflate.min.js?v=20260710l"></script>
+<script src="fbxloader.js?v=20260710l"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710k"></script>
-<script src="inhabitant.js?v=20260710k"></script>
-<script src="passenger.js?v=20260710k"></script>
-<script src="gamemod.js?v=20260710k"></script>
-<script src="chatter.js?v=20260710k"></script>
-<script src="speech_gen.js?v=20260710k"></script>
-<script src="speech_input.js?v=20260710k"></script>
-<script src="vision.js?v=20260710k"></script>
-<script src="deliberate.js?v=20260710k"></script>
-<script src="knowledge.js?v=20260710k"></script>
-<script src="acquire.js?v=20260710k"></script>
-<script src="sound.js?v=20260710k"></script>
-<script src="hullmodels.js?v=20260710k"></script>
-<script src="knowledge_hud.js?v=20260710k"></script>
-<script src="knowledge_screen.js?v=20260710k"></script>
-<script src="centroid_mind.js?v=20260710k"></script>
-<script src="kripke_mind.js?v=20260710k"></script>
-<script src="sober_gate.js?v=20260710k"></script>
-<script src="contradiction_ledger.js?v=20260710k"></script>
-<script src="kripke_planner.js?v=20260710k"></script>
-<script src="pillar_router.js?v=20260710k"></script>
-<script src="gravity_well.js?v=20260710k"></script>
-<script src="growth_loop.js?v=20260710k"></script>
-<script src="coop_proof.js?v=20260710k"></script>
-<script src="tom_test.js?v=20260710k"></script>
-<script src="thoughts.js?v=20260710k"></script>
-<script src="tami_battle_ui.js?v=20260710k"></script>
-<script src="power_panel.js?v=20260710k"></script>
-<script src="panels.js?v=20260710k"></script>
-<script src="item_icons.js?v=20260710k"></script>
-<script src="engbay.js?v=20260710k"></script>
+<script src="speech_tier.js?v=20260710l"></script>
+<script src="inhabitant.js?v=20260710l"></script>
+<script src="passenger.js?v=20260710l"></script>
+<script src="gamemod.js?v=20260710l"></script>
+<script src="chatter.js?v=20260710l"></script>
+<script src="speech_gen.js?v=20260710l"></script>
+<script src="speech_input.js?v=20260710l"></script>
+<script src="vision.js?v=20260710l"></script>
+<script src="deliberate.js?v=20260710l"></script>
+<script src="knowledge.js?v=20260710l"></script>
+<script src="acquire.js?v=20260710l"></script>
+<script src="sound.js?v=20260710l"></script>
+<script src="hullmodels.js?v=20260710l"></script>
+<script src="knowledge_hud.js?v=20260710l"></script>
+<script src="knowledge_screen.js?v=20260710l"></script>
+<script src="centroid_mind.js?v=20260710l"></script>
+<script src="kripke_mind.js?v=20260710l"></script>
+<script src="sober_gate.js?v=20260710l"></script>
+<script src="contradiction_ledger.js?v=20260710l"></script>
+<script src="kripke_planner.js?v=20260710l"></script>
+<script src="pillar_router.js?v=20260710l"></script>
+<script src="gravity_well.js?v=20260710l"></script>
+<script src="growth_loop.js?v=20260710l"></script>
+<script src="coop_proof.js?v=20260710l"></script>
+<script src="tom_test.js?v=20260710l"></script>
+<script src="thoughts.js?v=20260710l"></script>
+<script src="tami_battle_ui.js?v=20260710l"></script>
+<script src="power_panel.js?v=20260710l"></script>
+<script src="panels.js?v=20260710l"></script>
+<script src="item_icons.js?v=20260710l"></script>
+<script src="engbay.js?v=20260710l"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710k"></script>
-<script src="conquest.js?v=20260710k"></script>
-<script src="missions.js?v=20260710k"></script>
-<script src="planetmenu.js?v=20260710k"></script>
-<script src="textquests.js?v=20260710k"></script>
+<script src="starmap.js?v=20260710l"></script>
+<script src="conquest.js?v=20260710l"></script>
+<script src="missions.js?v=20260710l"></script>
+<script src="planetmenu.js?v=20260710l"></script>
+<script src="textquests.js?v=20260710l"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -230,7 +230,7 @@ const T = THREE;
 // SF_LAST_ERROR_v1, so the next crash hands us an exact stack instead of a silent frozen canvas. Diagnostic
 // only - never swallows the error (the console still gets it), never alters game state.
 (function(){ function report(kind,msg,src,line,col,stack){
-    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710k'})); }catch(e){}
+    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710l'})); }catch(e){}
     try{ let el=document.getElementById('sfCrashBanner');
       if(!el){ el=document.createElement('div'); el.id='sfCrashBanner';
         el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#3a0a12;color:#ffb4bc;border:1px solid #ff5a6e;border-radius:8px;padding:8px 14px;font:12px monospace;max-width:80vw;white-space:pre-wrap;';
@@ -242,7 +242,7 @@ const T = THREE;
 const CFG = {
   ARENA_R:2100, EDGE_STEER:0.9,           // the whole GALAXY bound; systems are clusters inside it (SR ramp: massive)
   N_SYSTEMS:9, SYSTEM_R:290, SUN_R:34,    // a galaxy of star systems, Rise-of-the-Dominators scale; all travel is real-space
-  THRUST:44, DRAG:0.7, VMAX:34, PITCH_RATE:1.7, YAW_RATE:1.5, BANK_MAX:0.7, BANK_LERP:3.5, SHIP_R:2.6, IFRAME:1.1,
+  THRUST:44, DRAG:0.7, VMAX:34, PITCH_RATE:1.7, YAW_RATE:1.5, BANK_MAX:0.7, BANK_LERP:3.5, SHIP_R:2.6, IFRAME:1.1, SLOW_DUR:2.2,   // SR Treton: a slow-on-hit lasts SLOW_DUR seconds
   KP_YAW:1.5, KP_PITCH:1.5, ALIGN_FIRE:0.9, THR_TURN_EASE:0.55, GEM_EASE_R:16,
   STANDOFF_R:12, BRAKE_R:26, CRUISE_THR:0.5,   // CH7 fix: throttle brakes/coasts to a target's standoff range (was hardcoded always-on -> "full throttle, never stop")
   BULLET_SPEED:118, BULLET_LIFE:1.1, BULLET_R:0.9, FIRE_CD:0.27, BULLET_DMG:12, MUZZLE_OFF:1.8,
@@ -798,7 +798,7 @@ function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=nu
   let dmg=(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG; const ow=shipById[owner];
   if(ow && ow.role==='trader') dmg*=CFG.TRADER_GUN_MULT;                                     // merchants mount light guns
   bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner, col,   // SR-M6: keep the weapon's OWN color on the bullet record so impact FX can match it instead of borrowing the target's tint
-    dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null, dmgType:spec.dmgType||'energy',
+    dmg, homing:spec.homing||0, splash:spec.splash||0, target:spec.target||null, dmgType:spec.dmgType||'energy', slow:spec.slow||0,
     trail:spec.trail||0, trailCd:spec.trailCd||0, trailT:0, bolt:spec.shape==='bolt' }); }
 // swept bullet collision: distance² from point p to the segment a→b (this frame's travel). A point-only test tunnels
 // through targets whenever bulletSpeed×dt exceeds the hit radius (e.g. autocannon 150u/s at <43fps) - the reported
@@ -1725,7 +1725,7 @@ function think(s,dt){
       if(W.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);   // IRON LAW: consume the magazine for EVERYONE (AI + player), symmetric
       const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0)))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
-        shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy' };   // per-weapon visual signature
+        shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };   // per-weapon visual signature; SR Treton slow-on-hit
       const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
       if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),fwd,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),fwd,s.id,spec); }
       else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec);
@@ -1791,14 +1791,14 @@ function flyStep(s,dt){
   const nitroMult=nitroActive?CFG.NITRO_BOOST_MULT:1;                                                // NITRO BURST: instant thrust/vmax layer - doesn't wait on the power-stat ramp above to feel like a boost
   if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
   s._nitroWasActive=nitroActive;
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*s.ctrl.thr*dt);   // M9: hull class speed multiplier; SR-M17: handling skill; ENGINEERING BAY: engine type speed multiplier; HULL SERIES/MANUFACTURER: further live multipliers
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1)*s.ctrl.thr*dt);   // M9: hull class speed; SR-M17: handling skill; ENGINEERING BAY: engine type; HULL SERIES/MANUFACTURER: live multipliers; SR TRETON: slow-on-hit
   // user 2026-07-08 ("when I hold shift I want to have burst mode"): the line above only fires while W is ALSO
   // held (multiplies s.ctrl.thr, which is 0 otherwise) - so Shift alone gave one kick then coasted to a stop under
   // drag, never reading as a sustained "burst". A real afterburner propels you on its own, no second key needed -
   // this term is independent of s.ctrl.thr, active for exactly as long as Shift is held.
   if(nitroActive) s.vel.addScaledVector(fwd,CFG.NITRO_AUTOTHRUST*engMult*dt);
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult; if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engineOf(s).speedMult*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1); if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -1899,6 +1899,7 @@ function step(dt){
         const rawDmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
         const dmg=rawDmg*hullResFor(s,b.dmgType);   // STANDARD GEAR SLOTS + MANUFACTURER: E/S/M hull+manufacturer susceptibility, applied before shields
         applyHullDamage(s, drainShield(s,dmg,b.pos)*(1-shieldGenPctFor(s)), b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // gems-as-hull buffer fires on GUNFIRE now (shared sink); I1 FIX: attacker IDENTITY only learnable if on sensors; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
+        if(b.slow>0){ s.slowT=T0+CFG.SLOW_DUR; s.slowMul=b.slow; }   // SR TRETON: a hit slows the target's engines for SLOW_DUR seconds
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
         if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
@@ -2746,9 +2747,25 @@ const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT
   imho9000:     {n:'IMHO-9000',      dmg:45, cd:0.62, speed:150, life:1.35, range:1.1,  col:0xffd24a, r:3.1, twin:false, homing:0, splash:13, cost:1900, shape:'tracer', tracerLen:2.8, trail:0xffe090, trailCd:0.05, flash:2.8, dmgType:'frag'},
   // -- MISSILE family (orb) --
   lirecron:     {n:'Lirecron',       dmg:38, cd:0.70, speed:88,  life:2.1,  range:1.1,  col:0xff7ac0, r:3.4, twin:true,  homing:2.1, splash:8,  cost:820,  shape:'orb', trail:0x8a8f99, trailCd:0.05, flash:2.0, dmgType:'missile'},
-  torpedo:      {n:'Torpedo Apparatus',dmg:74,cd:1.20, speed:96,  life:2.7,  range:1.55, col:0xff5030, r:4.0, twin:false, homing:1.6, splash:16, cost:1700, shape:'orb', trail:0x9a6a4a, trailCd:0.05, flash:2.6, dmgType:'missile'} };
+  torpedo:      {n:'Torpedo Apparatus',dmg:74,cd:1.20, speed:96,  life:2.7,  range:1.55, col:0xff5030, r:4.0, twin:false, homing:1.6, splash:16, cost:1700, shape:'orb', trail:0x9a6a4a, trailCd:0.05, flash:2.6, dmgType:'missile', desc:'longest-range missile, very high damage'},
+  // SR WEAPON GUIDE (user 2026-07-10, WaKKO151 roster): names + types + AOE/behaviour are FACTS about SR's own game;
+  // copied here. Stats scaled to our curve; each reuses a projectile FAMILY (bolt=energy, tracer=fragment, orb=missile)
+  // so the shared icon/look holds. Signature behaviours: AOE -> splash; Treton -> slow; Wave Phaser chain ~ splash.
+  // -- ENERGY (bolt) --
+  treton:       {n:'Treton',          dmg:9,  cd:0.20, speed:170, life:1.5,  range:1.30, col:0x9fffe0, r:2.0, twin:false, homing:0, splash:0,  cost:700,  shape:'bolt', boltLen:3.2, flash:1.2, dmgType:'energy', slow:0.80, desc:'fastest-firing, weakest damage - each hit SLOWS the enemy'},
+  atomicvision: {n:'Atomic Vision',   dmg:30, cd:0.95, speed:110, life:1.9,  range:1.40, col:0xffe24a, r:3.2, twin:false, homing:0, splash:15, cost:1400, shape:'bolt', boltLen:4.0, flash:2.6, dmgType:'energy', desc:'long-range AOE - a yellow sphere damages every enemy it touches (slow to fire)'},
+  caphisator:   {n:'Caphisator',      dmg:14, cd:0.30, speed:130, life:1.2,  range:0.90, col:0xff9ad0, r:2.3, twin:false, homing:0, splash:0,  cost:500,  shape:'bolt', boltLen:3.0, flash:1.4, dmgType:'energy', desc:'pirate energy beam - weak, but its ionization bleeds extra hull damage'},
+  electroniccutter:{n:'Electronic Cutter',dmg:16,cd:0.34,speed:128,life:1.1, range:0.80, col:0xff5a8a, r:2.4, twin:false, homing:0, splash:0,  cost:540,  shape:'bolt', boltLen:3.2, flash:1.5, dmgType:'energy', desc:'low damage, but wrecks the target\'s equipment on a hit'},
+  fluxlezka:    {n:'Flux',            dmg:13, cd:0.30, speed:135, life:1.7,  range:1.10, col:0x8fd0ff, r:2.1, twin:false, homing:0, splash:0,  cost:460,  shape:'bolt', boltLen:3.0, flash:1.2, dmgType:'energy', desc:'a long-range industry laser - cheap and weak'},
+  // -- FRAGMENT (tracer) --
+  fragmentcannon:{n:'Fragment Cannon',dmg:26, cd:0.42, speed:150, life:0.9,  range:0.60, col:0xffdc4a, r:2.6, twin:false, homing:0, splash:0,  cost:260,  shape:'tracer', tracerLen:2.4, trail:0xffe27a, trailCd:0.05, flash:2.0, dmgType:'frag', desc:'strong cheap starter - high damage, SHORT range (bring a fast ship)'},
+  esodapher:    {n:'Esodapher',       dmg:20, cd:0.44, speed:140, life:1.4,  range:1.00, col:0x9affc0, r:2.7, twin:false, homing:0, splash:0,  cost:620,  shape:'tracer', tracerLen:2.6, trail:0xb0ffd0, trailCd:0.05, flash:2.1, dmgType:'frag', shieldMul:2.2, desc:'shield-shredder - every hit chews through the enemy shield'},
+  flowblaster:  {n:'Flow Blaster',    dmg:40, cd:0.60, speed:145, life:1.6,  range:1.20, col:0xff7a4a, r:2.9, twin:true,  homing:0, splash:6,  cost:1100, shape:'tracer', tracerLen:2.7, trail:0xffa060, trailCd:0.05, flash:2.5, dmgType:'frag', desc:'twin side pellets, long range, med-high damage - but bulky'},
+  // -- MISSILE (orb) --
+  missiles:     {n:'Missiles',        dmg:30, cd:0.80, speed:84,  life:2.0,  range:1.00, col:0xff6a5a, r:3.4, twin:true,  homing:2.2, splash:9,  cost:300,  shape:'orb', trail:0x8a8f99, trailCd:0.05, flash:2.0, dmgType:'missile', desc:'the classic 3-missile launcher - the best early weapon (pricey to fire)'},
+  wavephaser:   {n:'Wave Phaser',     dmg:22, cd:0.42, speed:132, life:1.2,  range:0.70, col:0xffe066, r:2.5, twin:false, homing:0, splash:11, cost:640,  shape:'bolt', boltLen:3.4, flash:1.8, dmgType:'energy', desc:'a wave that jumps to nearby ships - hits up to three at once'} };
 // player-purchasable, in `weapon` shop order - the 3 starters first (cheap->dear), then the SR ladder; flame is Hegemon-only (see addPirate()).
-const WEAPON_ORDER=['energy','ballistic','missile','industrylaser','multiresonator','lirecron','disintegrator','imho9000','torpedo','turbogravir','vertix'];
+const WEAPON_ORDER=['energy','industrylaser','ballistic','fragmentcannon','missiles','missile','fluxlezka','caphisator','electroniccutter','esodapher','wavephaser','treton','lirecron','multiresonator','flowblaster','atomicvision','disintegrator','torpedo','imho9000','turbogravir','vertix'];   // SR roster, cost-sorted so the shop reads as a real progression; flame is Hegemon-only
 // M6: ARTIFACTS - rare tech scavenged from Hegemon wrecks (higher tiers drop more); equip for a unique passive.
 const ARTIFACTS={
   core:   {n:'Hegemon Core',  desc:'+18% fire rate',  apply:s=>s.artFire=(s.artFire||0)+0.18},
@@ -3900,11 +3917,13 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
   if(c==='upgrade'||c==='up'){ if(!need(dockedP,'must be docked')) return; const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return; if(!need(canUpgradeLvl(P,k),`${k} is already at the max level (Lv${CFG.UP_LVL_CAP})`)) return; const cost=upCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.lvl[k]++; if(k==='hull'){P.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(P.lvl.hull-1));P.hp=P.maxHp;} term(`Upgraded ${k} to Lv${P.lvl[k]} (-${cost}c).`,'sys'); return; }
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
-    if(!wt){ term('WEAPONS (fit at dock):','sys'); WEAPON_ORDER.forEach(kk=>{ const W=WEAPONS[kk]; term(`  ${kk} - ${W.n} · dmg ${W.dmg} · ${W.homing?'homing ':''}${W.splash?'splash ':''}range ${(W.range*100)|0}% · ${W.cost?W.cost+'c':'free'}${(P.weaponType||'energy')===kk?'  [fitted]':''}`,'sys'); }); return; }
+    if(!wt){ term('WEAPONS (fit at dock):','sys'); WEAPON_ORDER.forEach(kk=>{ const W=WEAPONS[kk]; term(`  ${kk} - ${W.n} · dmg ${W.dmg} · ${W.homing?'homing ':''}${W.splash?'splash ':''}${W.slow?'slows ':''}range ${(W.range*100)|0}% · ${W.cost?W.cost+'c':'free'}${(P.weaponType||'energy')===kk?'  [fitted]':''}${W.desc?`<br>&nbsp;&nbsp;&nbsp;&nbsp;<span style="opacity:.6">${W.desc}</span>`:''}`,'sys'); }); return; }
     const key=WEAPON_ORDER.find(kk=>kk.startsWith(wt)); if(!need(key,'weapon energy|ballistic|missile')) return; const W=WEAPONS[key];
     // M5 rank-gate: map the weapon's position across the REAL rank tiers (SR-M21 grew WEAPON_ORDER to 11 - the raw
     // index would run past RANKS[5], so scale + clamp: starters early, the apex Vertix needs the top rank).
-    const req=Math.min(RANKS.length-1, Math.floor(WEAPON_ORDER.indexOf(key)/2)); if(!need(rankIdx(P.score||0)>=req, `${W.n} requires ${RANKS[req].n} rank (see: rank)`)) return;
+    // rank-gate spread LINEARLY across the (now 21-long, cost-sorted) roster so the SR weapons unlock progressively
+    // instead of dumping the whole top half at Legend (was floor(idx/2), which pinned 11 weapons to max rank).
+    const req=Math.min(RANKS.length-1, Math.round(WEAPON_ORDER.indexOf(key)*(RANKS.length-1)/Math.max(1,WEAPON_ORDER.length-1))); if(!need(rankIdx(P.score||0)>=req, `${W.n} requires ${RANKS[req].n} rank (see: rank)`)) return;
     if((P.weaponType||'energy')===key){ term(`Already fitted: ${W.n}.`,'sys'); return; }
     if(!need(P.credits>=W.cost,`need ${W.cost}c`)) return; P.credits-=W.cost; P.weaponType=key;
     term(`Fitted ${W.n} (-${W.cost}c) - dmg ${W.dmg}${W.homing?' · homing':''}${W.splash?' · splash':''} · range ${(W.range*100)|0}%.`,'sys'); return; }
@@ -5196,7 +5215,7 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
     s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
     s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);   // SR X-WING CAPACITORS: hits 0 -> next fire attempt is blocked until it regens
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
-      shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash };
+      shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
     if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),fwd,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),fwd,s.id,spec); }
     else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),fwd,s.id,spec); }
