@@ -168,51 +168,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710e"></script>
-<script src="fflate.min.js?v=20260710e"></script>
-<script src="fbxloader.js?v=20260710e"></script>
+<script src="three.min.js?v=20260710f"></script>
+<script src="fflate.min.js?v=20260710f"></script>
+<script src="fbxloader.js?v=20260710f"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710e"></script>
-<script src="inhabitant.js?v=20260710e"></script>
-<script src="passenger.js?v=20260710e"></script>
-<script src="gamemod.js?v=20260710e"></script>
-<script src="chatter.js?v=20260710e"></script>
-<script src="speech_gen.js?v=20260710e"></script>
-<script src="speech_input.js?v=20260710e"></script>
-<script src="vision.js?v=20260710e"></script>
-<script src="deliberate.js?v=20260710e"></script>
-<script src="knowledge.js?v=20260710e"></script>
-<script src="acquire.js?v=20260710e"></script>
-<script src="sound.js?v=20260710e"></script>
-<script src="hullmodels.js?v=20260710e"></script>
-<script src="knowledge_hud.js?v=20260710e"></script>
-<script src="knowledge_screen.js?v=20260710e"></script>
-<script src="centroid_mind.js?v=20260710e"></script>
-<script src="kripke_mind.js?v=20260710e"></script>
-<script src="sober_gate.js?v=20260710e"></script>
-<script src="contradiction_ledger.js?v=20260710e"></script>
-<script src="kripke_planner.js?v=20260710e"></script>
-<script src="pillar_router.js?v=20260710e"></script>
-<script src="gravity_well.js?v=20260710e"></script>
-<script src="growth_loop.js?v=20260710e"></script>
-<script src="coop_proof.js?v=20260710e"></script>
-<script src="tom_test.js?v=20260710e"></script>
-<script src="thoughts.js?v=20260710e"></script>
-<script src="tami_battle_ui.js?v=20260710e"></script>
-<script src="power_panel.js?v=20260710e"></script>
-<script src="panels.js?v=20260710e"></script>
-<script src="item_icons.js?v=20260710e"></script>
-<script src="engbay.js?v=20260710e"></script>
+<script src="speech_tier.js?v=20260710f"></script>
+<script src="inhabitant.js?v=20260710f"></script>
+<script src="passenger.js?v=20260710f"></script>
+<script src="gamemod.js?v=20260710f"></script>
+<script src="chatter.js?v=20260710f"></script>
+<script src="speech_gen.js?v=20260710f"></script>
+<script src="speech_input.js?v=20260710f"></script>
+<script src="vision.js?v=20260710f"></script>
+<script src="deliberate.js?v=20260710f"></script>
+<script src="knowledge.js?v=20260710f"></script>
+<script src="acquire.js?v=20260710f"></script>
+<script src="sound.js?v=20260710f"></script>
+<script src="hullmodels.js?v=20260710f"></script>
+<script src="knowledge_hud.js?v=20260710f"></script>
+<script src="knowledge_screen.js?v=20260710f"></script>
+<script src="centroid_mind.js?v=20260710f"></script>
+<script src="kripke_mind.js?v=20260710f"></script>
+<script src="sober_gate.js?v=20260710f"></script>
+<script src="contradiction_ledger.js?v=20260710f"></script>
+<script src="kripke_planner.js?v=20260710f"></script>
+<script src="pillar_router.js?v=20260710f"></script>
+<script src="gravity_well.js?v=20260710f"></script>
+<script src="growth_loop.js?v=20260710f"></script>
+<script src="coop_proof.js?v=20260710f"></script>
+<script src="tom_test.js?v=20260710f"></script>
+<script src="thoughts.js?v=20260710f"></script>
+<script src="tami_battle_ui.js?v=20260710f"></script>
+<script src="power_panel.js?v=20260710f"></script>
+<script src="panels.js?v=20260710f"></script>
+<script src="item_icons.js?v=20260710f"></script>
+<script src="engbay.js?v=20260710f"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710e"></script>
-<script src="conquest.js?v=20260710e"></script>
-<script src="missions.js?v=20260710e"></script>
-<script src="planetmenu.js?v=20260710e"></script>
-<script src="textquests.js?v=20260710e"></script>
+<script src="starmap.js?v=20260710f"></script>
+<script src="conquest.js?v=20260710f"></script>
+<script src="missions.js?v=20260710f"></script>
+<script src="planetmenu.js?v=20260710f"></script>
+<script src="textquests.js?v=20260710f"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -230,7 +230,7 @@ const T = THREE;
 // SF_LAST_ERROR_v1, so the next crash hands us an exact stack instead of a silent frozen canvas. Diagnostic
 // only - never swallows the error (the console still gets it), never alters game state.
 (function(){ function report(kind,msg,src,line,col,stack){
-    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710e'})); }catch(e){}
+    try{ localStorage.setItem('SF_LAST_ERROR_v1', JSON.stringify({kind,msg:String(msg),src:String(src||''),line:line||0,col:col||0,stack:String(stack||'').slice(0,2000),at:new Date().toISOString(),build:'20260710f'})); }catch(e){}
     try{ let el=document.getElementById('sfCrashBanner');
       if(!el){ el=document.createElement('div'); el.id='sfCrashBanner';
         el.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#3a0a12;color:#ffb4bc;border:1px solid #ff5a6e;border-radius:8px;padding:8px 14px;font:12px monospace;max-width:80vw;white-space:pre-wrap;';
@@ -598,6 +598,14 @@ function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
   if(/\.(tif|tga|psd|bmp)$/.test(u)) return PIXEL_URI;                          // unmapped Unity refs → 1px, never 404
   if(!u||/(^|\/)(undefined|null)$/.test(u)) return PIXEL_URI;                   // a NAMELESS Unity texture ref serialized as 'undefined' (arrives here already path-prefixed, e.g. 'assets/undefined') → was a 404 every boot
   return url; }
+// CRASH FIX (2026-07-10, caught by the SF_LAST_ERROR_v1 trap: "Cannot read properties of undefined (reading
+// 'search')" in three.min.js): FBXLoader passes a NAMELESS texture ref to T.TextureLoader.load as literal
+// undefined. The 1px rescue above makes the fetch SUCCEED - and three r128's SUCCESS callback then runs
+// t.search(...) on the ORIGINAL undefined argument and throws (async, so the game kept running). Before the
+// rescue this path 404'd into onError, which never touches t.search - the rescue traded a harmless 404 for a
+// TypeError. Root fix: coerce nullish URLs to the 1px URI AT THE API BOUNDARY so three never sees undefined.
+(function(){ const _load=T.TextureLoader.prototype.load;
+  T.TextureLoader.prototype.load=function(url,onLoad,onProgress,onError){ return _load.call(this, url==null?PIXEL_URI:url, onLoad, onProgress, onError); }; })();
 // BUG FIX (user report "player ship appears black"): the old Unity FBX files never had their textures actually
 // EMBEDDED - Unity assigns materials via separate .mat files outside the mesh, so FBXLoader hands back a
 // MeshPhongMaterial whose `map` slot is a Texture object with NO `.image` ever resolved. A material that
