@@ -55,7 +55,7 @@ function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').repla
 function clip(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
 var KO = {
-  built: false, shown: false, wrapped: false,
+  built: false, shown: false, wrapped: false, layoutMode: 'spiral', gravityMeta: null,
   root: null, canvas: null, ctx: null, dpr: 1, cw: 800, ch: 600,
   statsEl: null, statusEl: null, feedEl: null, tipEl: null,
   novelSel: null, novelBody: null, novelHead: null,
@@ -99,7 +99,7 @@ function buildGraph() {
   return { nodes: nodes, edges: edges };
 }
 // golden-angle spiral: deterministic, no physics, spreads any N evenly (the small HUD's 3-ring radial clumps past ~40)
-function layout(graph, w, h) {
+function layoutSpiral(graph, w, h) {
   var ids = Object.keys(graph.nodes); var pos = {};
   var cx = w / 2, cy = h / 2, maxR = Math.min(w, h) * 0.46, N = ids.length || 1;
   var GA = 2.399963229728653;   // golden angle (rad)
@@ -112,6 +112,43 @@ function layout(graph, w, h) {
     pos[id] = { x: cx + Math.cos(ang) * rr, y: cy + Math.sin(ang) * rr };
   }
   return pos;
+}
+// GRAVITY LAYOUT (integration 2026-07-09): place each node at its gravity-well-solved 2D coordinate
+// (GWELL.positions() - the pose-graph least-squares that made every relation a CONSERVED TRANSLATION, proven
+// 71%/96% fact-recovery). Every edge then reads as a consistent DIRECTION instead of an arbitrary spiral chord.
+// The positions are INFERRED (derived from the facts, not truth); nodes GWELL never placed (not in a
+// constrained relation) fall back to the spiral so nothing vanishes. fitToCanvas is a PURE, testable helper.
+function fitToCanvas(rawPos, ids, w, h) {
+  var xs = [], ys = [], id, i;
+  for (i = 0; i < ids.length; i++) { var rp = rawPos[ids[i]]; if (rp) { xs.push(rp[0]); ys.push(rp[1]); } }
+  if (!xs.length) return null;
+  var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+  var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+  var spanX = (maxX - minX) || 1, spanY = (maxY - minY) || 1;
+  var pad = Math.min(w, h) * 0.08, iw = w - 2 * pad, ih = h - 2 * pad;
+  var sc = Math.min(iw / spanX, ih / spanY);                 // uniform scale preserves the solved GEOMETRY (angles/directions)
+  var offX = pad + (iw - spanX * sc) / 2, offY = pad + (ih - spanY * sc) / 2;
+  var out = {};
+  for (i = 0; i < ids.length; i++) { var r2 = rawPos[ids[i]]; if (r2) out[ids[i]] = { x: offX + (r2[0] - minX) * sc, y: offY + (r2[1] - minY) * sc }; }
+  return out;
+}
+function layoutGravity(graph, w, h) {
+  var W = win(); if (!W || !W.GWELL) return null;
+  var rep, positions;
+  try { rep = W.GWELL.report(); positions = W.GWELL.positions(); } catch (e) { return null; }
+  if (!positions || rep.verdict === 'abstain') return null;
+  KO.gravityMeta = rep;                                       // stashed for the header readout (residual, nodes, recovery)
+  var ids = Object.keys(graph.nodes);
+  var fitted = fitToCanvas(positions, ids, w, h);
+  if (!fitted) return null;
+  // any node GWELL did not place (relations too sparse to constrain it) keeps a spiral slot so it stays visible
+  var spiral = null;
+  for (var i = 0; i < ids.length; i++) if (!fitted[ids[i]]) { if (!spiral) spiral = layoutSpiral(graph, w, h); fitted[ids[i]] = spiral[ids[i]]; }
+  return fitted;
+}
+function layout(graph, w, h) {
+  if (KO.layoutMode === 'gravity') { var g = layoutGravity(graph, w, h); if (g) return g; }   // falls through to spiral if GWELL absent/abstains
+  return layoutSpiral(graph, w, h);
 }
 function edgeKey(e) { return e.a + '|' + e.r + '|' + e.b; }
 
@@ -367,10 +404,12 @@ function renderStats() {
   var st = storeStats();
   var grew = (KO._lastTotal != null && (st.shared + st.private_total) > KO._lastTotal);
   KO._lastTotal = st.shared + st.private_total;
+  var gm = (KO.layoutMode === 'gravity' && KO.gravityMeta) ? KO.gravityMeta : null;
   KO.statsEl.innerHTML = 'SHARED <b style="color:' + CFG.COL_SHARED + '">' + st.shared + '</b>' +
     ' · PRIVATE <b style="color:' + CFG.COL_PRIV + '">' + st.private_total + '</b>' +
     ' <span style="color:' + CFG.COL_DIM + '">across ' + st.agents + ' mind' + (st.agents === 1 ? '' : 's') + '</span>' +
-    (grew ? ' <span style="color:' + CFG.COL_OK + '">▲ growing</span>' : '');
+    (grew ? ' <span style="color:' + CFG.COL_OK + '">▲ growing</span>' : '') +
+    (gm ? ' <span style="color:' + CFG.COL_HL + '">◉ gravity: residual ' + gm.residualAfter + ', ' + gm.relations + ' relation-directions</span>' : '');
 }
 
 // ---- build the fullscreen DOM ---------------------------------------------------------------------------------
@@ -388,9 +427,21 @@ function build() {
   var stats = el('div', 'font-size:11px'); KO.statsEl = stats;
   var spacer = el('div', 'flex:1');
   var hint = el('div', 'font-size:10px;color:' + CFG.COL_DIM, 'cyan=shared · violet=private · click a node to ask about it · ESC closes');
+  // LAYOUT TOGGLE (integration 2026-07-09): spiral (deterministic spread) vs GRAVITY (the gravity-well's
+  // solved coordinates, where relations read as consistent directions). INFERRED geometry, labeled in the tip.
+  var layBtn = el('button', 'cursor:pointer;background:#122234;border:1px solid ' + CFG.COL_BORDER + ';color:#cfe6f5;border-radius:6px;padding:4px 12px;font:700 11px ui-monospace,monospace', '◇ LAYOUT: SPIRAL');
+  layBtn.title = 'toggle node placement: SPIRAL (even spread) or GRAVITY (each node at its gravity-well-solved coordinate - relations become consistent directions; positions are INFERRED from the facts, not truth)';
+  layBtn.onclick = function () {
+    KO.layoutMode = (KO.layoutMode === 'gravity') ? 'spiral' : 'gravity';
+    var g = (KO.layoutMode === 'gravity') && win() && win().GWELL;
+    layBtn.innerHTML = (KO.layoutMode === 'gravity') ? '◉ LAYOUT: GRAVITY' : '◇ LAYOUT: SPIRAL';
+    if (KO.layoutMode === 'gravity' && (!win() || !win().GWELL)) feedLog('note', 'gravity layout needs gravity_well.js - staying on spiral');
+    else feedLog('note', 'layout → ' + KO.layoutMode + (KO.layoutMode === 'gravity' ? ' (INFERRED positions from the gravity well - connected nodes cluster, relations point the same way)' : ''));
+    draw(); renderStats();   // draw() populates KO.gravityMeta; refresh the header readout immediately, not on the next poll
+  };
   var closeBtn = el('button', 'cursor:pointer;background:#122234;border:1px solid ' + CFG.COL_BORDER + ';color:#cfe6f5;border-radius:6px;padding:4px 12px;font:700 11px ui-monospace,monospace', '✕ CLOSE');
   closeBtn.onclick = function () { close(); };
-  head.appendChild(title); head.appendChild(stats); head.appendChild(spacer); head.appendChild(hint); head.appendChild(closeBtn);
+  head.appendChild(title); head.appendChild(stats); head.appendChild(spacer); head.appendChild(hint); head.appendChild(layBtn); head.appendChild(closeBtn);
   root.appendChild(head);
 
   // main split
@@ -519,7 +570,7 @@ function close() {
 function toggle() { if (KO.shown) close(); else open(); return KO.shown; }
 function visible() { return !!KO.shown; }
 
-var API = { open: open, close: close, toggle: toggle, visible: visible, ask: ask, mount: build, CFG: CFG, _KO: KO, _buildGraph: buildGraph, _ground: groundEntities };
+var API = { open: open, close: close, toggle: toggle, visible: visible, ask: ask, mount: build, CFG: CFG, _KO: KO, _buildGraph: buildGraph, _ground: groundEntities, _fitToCanvas: fitToCanvas, _layout: layout };
 if (typeof window !== 'undefined') window.KOBS = API;
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 
@@ -576,6 +627,23 @@ if (typeof require !== 'undefined' && require.main === module) {
   check('wrapped commit still returned the original result + recorded the edge', COMMITS.length === 1 && COMMITS[0].s === 'X');
   K.close();
   check('close() hides', K.visible() === false);
+  // GRAVITY LAYOUT: fitToCanvas is pure - maps solved coords into the canvas box, preserving GEOMETRY
+  var raw = { A: [0, 0], B: [10, 0], C: [0, 10], D: [10, 10] };   // a unit square in solve-space
+  var fit = K._fitToCanvas(raw, ['A', 'B', 'C', 'D'], 800, 600);
+  check('[gravity 1] fitToCanvas places every node inside the canvas box',
+    fit && ['A', 'B', 'C', 'D'].every(function (id) { return fit[id].x >= 0 && fit[id].x <= 800 && fit[id].y >= 0 && fit[id].y <= 600; }));
+  check('[gravity 2] uniform scale preserves geometry (a square stays a square: |AB| == |CD|, |AC| == |BD|)',
+    fit && Math.abs(Math.hypot(fit.B.x - fit.A.x, fit.B.y - fit.A.y) - Math.hypot(fit.D.x - fit.C.x, fit.D.y - fit.C.y)) < 0.01 &&
+    Math.abs(Math.hypot(fit.C.x - fit.A.x, fit.C.y - fit.A.y) - Math.hypot(fit.D.x - fit.B.x, fit.D.y - fit.B.y)) < 0.01);
+  check('[gravity 3] a relation direction is CONSISTENT: A->B and C->D point the same way',
+    fit && Math.abs((fit.B.x - fit.A.x) - (fit.D.x - fit.C.x)) < 0.01 && Math.abs((fit.B.y - fit.A.y) - (fit.D.y - fit.C.y)) < 0.01);
+  check('[gravity 4] fitToCanvas returns null on empty input (honest, no crash)', K._fitToCanvas({}, [], 800, 600) === null);
+  // layout() falls back to spiral when GWELL is absent even in gravity mode (no fabricated coords)
+  K._KO.layoutMode = 'gravity';
+  var lp = K._layout(g, 800, 600);
+  check('[gravity 5] gravity mode with no GWELL falls back to spiral - every node still placed',
+    lp && Object.keys(g.nodes).every(function (id) { return lp[id] && isFinite(lp[id].x) && isFinite(lp[id].y); }));
+  K._KO.layoutMode = 'spiral';
   console.log('---'); console.log('TOTAL: ' + (pass + fail) + '  PASS: ' + pass + '  FAIL: ' + fail);
   console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));
   if (fail > 0) process.exit(1);

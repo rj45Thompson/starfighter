@@ -431,7 +431,22 @@ function scienceHtml(){
   else{ html+='<div style="margin-bottom:5px">You carry <b style="color:'+COL.AMBER+'">'+unid.length+'</b> unidentified artifact'+(unid.length>1?'s':'')+' - function unknown until analyzed (they refuse to equip).</div>'
     +'<button class="pm-b" data-act="cmd" data-cmd="analyze"'+(cores<ac?' disabled':'')+'>ANALYZE ONE - '+ac+' cores</button> '
     +'<button class="pm-b" data-act="cmd" data-cmd="analyze all"'+(cores<ac?' disabled':'')+'>ANALYZE ALL</button>'; }
-  html+='</div><div class="pm-panel"><h4>MINERAL PROBES - '+pc+' cores each</h4>'
+  html+='</div>';
+  /* SR:AWA slice (2026-07-09): INSTALLING an identified artifact was terminal-only (`artifacts <name>`) - you
+     could analyze with a button but then had to TYPE to actually use it. This closes the loop: identified
+     artifacts render with their icon + effect + an INSTALL button delegating to the real `artifacts` command. */
+  var inv=(P&&P.artifacts)||[], eqp=(P&&P.artEquipped)||[], ARTS=h&&h.ARTIFACTS, wI=(typeof window!=='undefined')?window:null;
+  if(ARTS && (inv.length || eqp.length)){
+    html+='<div class="pm-panel"><h4>ARTIFACTS - IDENTIFIED</h4>';
+    if(inv.length){ html+='<div style="margin-bottom:5px;color:'+COL.DIM+'">ready to install (permanent once fitted):</div>';
+      for(var ai=0;ai<inv.length;ai++){ var k=inv[ai], A=ARTS[k]; if(!A) continue;
+        var ic=(wI&&wI.ICONS)?(function(){ try{ return wI.ICONS.img('artifact',k,A,ARTS,{size:22,style:'margin-right:7px'}); }catch(e){ return ''; } })():'';
+        html+='<div class="pm-row">'+ic+'<div class="pm-grow"><b>'+esc(A.n)+'</b> <span class="pm-sub">'+esc(A.desc||'')+'</span></div>'
+          +'<button class="pm-b pm-go" data-act="cmd" data-cmd="artifacts '+esc(k)+'" style="min-width:70px">INSTALL</button></div>'; } }
+    if(eqp.length){ html+='<div style="margin-top:6px;color:'+COL.DIM+'">installed: '+eqp.map(function(k){ return ARTS[k]?esc(ARTS[k].n):esc(k); }).join(', ')+'</div>'; }
+    html+='</div>';
+  }
+  html+='<div class="pm-panel"><h4>MINERAL PROBES - '+pc+' cores each</h4>'
     +'<div style="margin-bottom:5px">Aboard: <b>'+owned+'</b>. Deploy at any WORLD (deployprobe while docked there); it mines ore on the REAL clock - even while the game is closed - and you collect on return.</div>'
     +'<button class="pm-b" data-act="cmd" data-cmd="buyprobe"'+(cores<pc?' disabled':'')+'>BUY PROBE - '+pc+' cores</button>'
     +'<div style="margin-top:6px"><button class="pm-b" data-act="cmd" data-cmd="probes">PROBE NETWORK STATUS → terminal</button></div>'
