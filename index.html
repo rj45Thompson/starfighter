@@ -166,44 +166,45 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709l"></script>
-<script src="fflate.min.js?v=20260709l"></script>
-<script src="fbxloader.js?v=20260709l"></script>
+<script src="three.min.js?v=20260709m"></script>
+<script src="fflate.min.js?v=20260709m"></script>
+<script src="fbxloader.js?v=20260709m"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709l"></script>
-<script src="inhabitant.js?v=20260709l"></script>
-<script src="passenger.js?v=20260709l"></script>
-<script src="gamemod.js?v=20260709l"></script>
-<script src="chatter.js?v=20260709l"></script>
-<script src="speech_gen.js?v=20260709l"></script>
-<script src="speech_input.js?v=20260709l"></script>
-<script src="vision.js?v=20260709l"></script>
-<script src="deliberate.js?v=20260709l"></script>
-<script src="knowledge.js?v=20260709l"></script>
-<script src="acquire.js?v=20260709l"></script>
-<script src="sound.js?v=20260709l"></script>
-<script src="hullmodels.js?v=20260709l"></script>
-<script src="knowledge_hud.js?v=20260709l"></script>
-<script src="knowledge_screen.js?v=20260709l"></script>
-<script src="centroid_mind.js?v=20260709l"></script>
-<script src="kripke_mind.js?v=20260709l"></script>
-<script src="sober_gate.js?v=20260709l"></script>
-<script src="contradiction_ledger.js?v=20260709l"></script>
-<script src="thoughts.js?v=20260709l"></script>
-<script src="tami_battle_ui.js?v=20260709l"></script>
-<script src="power_panel.js?v=20260709l"></script>
-<script src="panels.js?v=20260709l"></script>
-<script src="engbay.js?v=20260709l"></script>
+<script src="speech_tier.js?v=20260709m"></script>
+<script src="inhabitant.js?v=20260709m"></script>
+<script src="passenger.js?v=20260709m"></script>
+<script src="gamemod.js?v=20260709m"></script>
+<script src="chatter.js?v=20260709m"></script>
+<script src="speech_gen.js?v=20260709m"></script>
+<script src="speech_input.js?v=20260709m"></script>
+<script src="vision.js?v=20260709m"></script>
+<script src="deliberate.js?v=20260709m"></script>
+<script src="knowledge.js?v=20260709m"></script>
+<script src="acquire.js?v=20260709m"></script>
+<script src="sound.js?v=20260709m"></script>
+<script src="hullmodels.js?v=20260709m"></script>
+<script src="knowledge_hud.js?v=20260709m"></script>
+<script src="knowledge_screen.js?v=20260709m"></script>
+<script src="centroid_mind.js?v=20260709m"></script>
+<script src="kripke_mind.js?v=20260709m"></script>
+<script src="sober_gate.js?v=20260709m"></script>
+<script src="contradiction_ledger.js?v=20260709m"></script>
+<script src="kripke_planner.js?v=20260709m"></script>
+<script src="thoughts.js?v=20260709m"></script>
+<script src="tami_battle_ui.js?v=20260709m"></script>
+<script src="power_panel.js?v=20260709m"></script>
+<script src="panels.js?v=20260709m"></script>
+<script src="engbay.js?v=20260709m"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709l"></script>
-<script src="conquest.js?v=20260709l"></script>
-<script src="missions.js?v=20260709l"></script>
-<script src="planetmenu.js?v=20260709l"></script>
-<script src="textquests.js?v=20260709l"></script>
+<script src="starmap.js?v=20260709m"></script>
+<script src="conquest.js?v=20260709m"></script>
+<script src="missions.js?v=20260709m"></script>
+<script src="planetmenu.js?v=20260709m"></script>
+<script src="textquests.js?v=20260709m"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -864,7 +865,7 @@ function completeDock(s,p,isBase){
   // engbay/loadout, hardpoint mount/unmount, gizmo mount/unmount, tank/radar/scanner/shieldgen/droid/hook/series -
   // gates on `dockedP=P.docked`, which stayed null forever while docked at Ranger Command specifically (planets
   // never had this bug - their branch already set it). Silent no-op, not a crash, so it read as "didn't work."
-  if(isBase){ s.docked=p; s.obj=null; s.vel.set(0,0,0); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
+  if(isBase){ s.docked=p; s.obj=null; s.vel.set(0,0,0); if(s.role==='player'&&window.KPLAN) KPLAN.observe('dock:'+p.name); dockMenu(p,true); return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15}; }   // kill residual velocity so a fast approach can't coast back OUT of the (now-tighter) atBase() radius while the loadout screen is open
   if(p.rep<=CFG.REP_HOSTILE && !p.isPirateStation){ s.obj=null; s.docked=null; term(`${p.name} is HOSTILE - docking refused, defenders inbound.`,'err'); return {mode:'FLEE',aimDir:_v.copy(s.pos).sub(p.pos).clone(),ease:1}; }   // a pirate station's whole business model is welcoming ships everyone else refuses - see makePirateStation()
   s.docked=p; s.obj=null; contractDeliver(p);
   if(s.role==='player') recordObservedPrices(p);   // SR-M7: the moment of docking is a real observation, whether or not the market panel happens to be open
@@ -876,7 +877,7 @@ function completeDock(s,p,isBase){
   let questOffer=null;
   if(s.role==='player'&&window.TEXTQUESTS) questOffer=TEXTQUESTS.tryOffer(p);
   dockMenu(p,false);
-  if(s.role==='player'){ if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
+  if(s.role==='player'){ if(window.KPLAN) KPLAN.observe('dock:'+p.name); if(window.PANELS) PANELS.open('market'); else { marketOn=true; const mk=document.getElementById('market'); if(mk){ mk.style.display='block'; updateMarket(); } } if(window.PASSENGER){ PASSENGER.onEvent('docked'); if(window.GAMEMOD) GAMEMOD.emit('docked'); } if(window.CHATTER) CHATTER.onEvent('docked',{place:p.name}); }   // auto-open the market on docking (discoverable on phone)
   if(questOffer) term(`<b style="color:#c9a0ff">📜 ${questOffer.title}</b> - ${questOffer.text}<br>`+questOffer.choices.map(c=>`  <b>[${c.n}]</b> ${c.label}`).join('<br>')+`<br><span style="opacity:.65">type <b>choose &lt;n&gt;</b>, or open the QUESTS tab</span>`,'sys');
   return {mode:'HOLD',aimDir:FWD.clone().applyQuaternion(s.quat),ease:0.15};
 }
@@ -1010,11 +1011,11 @@ function cargoTotal(s){ let n=0; for(const k in s.cargo) n+=s.cargo[k]; return n
 // buy/sell MOVE stock -> MOVE price (the organic pressure; no cheating)
 function buy(s,p,gk,qty){ let price=priceOf(p,gk); if(s.role==='player') price*=repBuyFactor(p); price*=(1-CFG.SKILL_TRADE_PRICE*skillLvl(s,'trade')); const reserve=s.role==='player'?0:CFG.CREDIT_RESERVE;   // SR-M17: trade skill haggles the price down
   qty=Math.min(qty,Math.floor(Math.max(0,s.credits-reserve)/price),(s.holdCap||CFG.HOLD_CAP)-cargoTotal(s),Math.floor(p.stock[gk]-4));
-  if(qty<=0) return 0; s.credits-=Math.round(price*qty); p.stock[gk]-=qty; s.cargo[gk]=(s.cargo[gk]||0)+qty; if(s.role==='player') repAdd(p,CFG.REP_TRADE); return qty; }
+  if(qty<=0) return 0; s.credits-=Math.round(price*qty); p.stock[gk]-=qty; s.cargo[gk]=(s.cargo[gk]||0)+qty; if(s.role==='player'){ repAdd(p,CFG.REP_TRADE); if(window.KPLAN) KPLAN.observe('buy:'+gk); } return qty; }
 function sell(s,p,gk,qty){ qty=Math.min(qty,s.cargo[gk]||0); if(qty<=0) return 0; let price=priceOf(p,gk); if(s.role==='player') price*=repSellFactor(p); price*=(1+CFG.SKILL_TRADE_PRICE*skillLvl(s,'trade'));   // SR-M17: trade skill negotiates the price up
-  const rev=Math.round(price*qty); s.credits+=rev; p.stock[gk]+=qty; s.cargo[gk]-=qty; if(s.cargo[gk]<=0) delete s.cargo[gk]; if(s.role==='player') repAdd(p,CFG.REP_TRADE); return rev; }
+  const rev=Math.round(price*qty); s.credits+=rev; p.stock[gk]+=qty; s.cargo[gk]-=qty; if(s.cargo[gk]<=0) delete s.cargo[gk]; if(s.role==='player'){ repAdd(p,CFG.REP_TRADE); if(window.KPLAN) KPLAN.observe('sell:'+gk); } return rev; }
 function refuel(s,p){ const cap=s.fuelCap||CFG.FUEL_CAP, need=cap-s.fuel; if(need<1) return 0; const price=priceOf(p,'gas');
-  const q=Math.min(Math.ceil(need),Math.floor(s.credits/price),Math.floor(p.stock.gas-4)); if(q<=0) return 0; s.credits-=Math.round(price*q); p.stock.gas-=q; s.fuel=Math.min(cap,s.fuel+q); return q; }
+  const q=Math.min(Math.ceil(need),Math.floor(s.credits/price),Math.floor(p.stock.gas-4)); if(q<=0) return 0; s.credits-=Math.round(price*q); p.stock.gas-=q; s.fuel=Math.min(cap,s.fuel+q); if(s.role==='player'&&window.KPLAN) KPLAN.observe('refuel'); return q; }
 function bestArbitrage(s){ const opts=[]; for(const g of GOODS){ if(g.k==='gas') continue;
   for(const bp of planets){ const bpr=priceOf(bp,g.k); for(const sp of planets){ if(sp===bp) continue; const pr=priceOf(sp,g.k)-bpr;
     if(pr>CFG.PROFIT_MIN) opts.push({good:g.k,buy:bp,sell:sp,profit:pr}); } } }
@@ -1801,6 +1802,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
   if(window.MISSIONS&&MISSIONS.onKill) try{ MISSIONS.onKill(victim,killer); }catch(e){}     // bounty missions watch every kill
+  if(killer===ships[0]&&killer!==victim&&window.KPLAN) KPLAN.observe('kill');               // MODAL PLANNER: a player kill is a real completed action
   killShip(victim);
   if(killer&&killer.alive){ killer.score+=CFG.KILL_BOUNTY+(wasPirate?(victim.tier||0):0); checkRankUp(killer); if(killer.inhabitant) INH.onKill(victim);   // M5: kills advance rank · I2: destroyed_foe episode
     if(wasPirate){ const bty=victim.bounty||CFG.PIRATE_LOOT; killer.credits+=bty; sgSay(killer,'kill',{target:victim.name,bounty:bty},`Splashed ${victim.name} - +${bty}c bounty!`);
@@ -2035,6 +2037,8 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'kripke', desc:'the Kripke diamond: kripke, modal, box, diamond, necessary, possible, possible worlds, who knows what, epistemic logic - one world per mind; box = every mind knows it (shared), diamond = some mind\'s secret (names who), nowhere = no world holds it', usage:'kripke · kripke <s> <r> <o>'},
   {name:'sober', desc:'the sober answerability gate: sober, refuse, hallucination check, can you answer this, answerable - 3 checks before any answer (grounding floor, identifier existence, content coverage); refuses with the exact reason rather than inventing', usage:'sober <question>'},
   {name:'contradictions', desc:'the contradiction quarantine ledger: contradictions, quarantine, conflicts, incompatible facts, truth conflicts - functional relations allow one value per subject per world; conflicts quarantine and every mind abstains on tainted keys', usage:'contradictions'},
+  {name:'plan', desc:'the modal planner (Jobe Kripke port): plan, planner, how do i get, which action guarantees, necessity, necessarily - which observed action NECESSARILY makes a goal prop true; 2+ observations = proven, 1 = tentative, else observed route or honest abstain; learned from YOUR play only', usage:'plan <prop>'},
+  {name:'ensures', desc:'per-action guarantees from the current state: ensures, action effects, what does docking guarantee, necessity per action - the []_a intersection over every observed outcome of each action taken from here', usage:'ensures'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2943,6 +2947,28 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`⚠ <b>CONTRADICTION LEDGER</b> - ${ks.length} quarantined key${ks.length===1?'':'s'} <span style=\"opacity:.55\">(functional relations: ${CONTRA.FUNCTIONAL_RELS.join(', ')} - one value per subject per world; every mind abstains on tainted keys)</span>`,'sys');
     ks.slice(0,12).forEach(k=>term(`&nbsp;&nbsp;[${k.world==='@'?'shared':k.world}] ${k.reason||k.subject+' '+k.predicate}`,'sys'));
     if(!ks.length) term('&nbsp;&nbsp;<span style=\"opacity:.6\">the store is conflict-free - no two facts assign different values to the same functional key in the same world</span>','sys'); return; }
+  // MODAL PLANNER (AGI_SALVAGE port from Jobe kripke_memory.py): worlds = fingerprinted game states, one
+  // accessibility relation per ACTION, every transition LEARNED from real completed play - nothing pre-seeded.
+  // plan <prop> = "which action NECESSARILY causes <prop>" ([]_a over observed successors), iron-rule gated.
+  if(c==='plan'){ if(!window.KPLAN){ term('kripke_planner.js not loaded','err'); return; }
+    const st=KPLAN.stats();
+    if(!a[1]){ const props=KPLAN.knownProps(16);
+      term(`◇ <b>MODAL PLANNER</b> - ${st.worlds} world${st.worlds===1?'':'s'} · ${st.edges} observed transition${st.edges===1?'':'s'} · ${st.labels} action${st.labels===1?'':'s'} <span style="opacity:.55">(every edge learned from your own play - dock, trade, jump, fight; nothing pre-seeded)</span>`,'sys');
+      term(`usage: <b>plan &lt;prop&gt;</b> - which action NECESSARILY makes it true from here. ${KPLAN.CFG.MIN_SUPPORT_PROVEN}+ agreeing observations = PROVEN · 1 = tentative · else an observed route or an honest abstain. Current state: <b>${KPLAN.lastWorld()||'(unarmed)'}</b>`,'sys');
+      term('&nbsp;&nbsp;props seen so far: '+(props.length?props.map(p=>`<b>${p}</b>`).join(' · '):'<span style="opacity:.6">(none yet - fly, dock, trade and the planner learns)</span>'),'sys'); return; }
+    const r=KPLAN.plan(a.slice(1).join(' '));
+    if(r.verdict==='refuse_contradicted'){ term(`⚠ REFUSED - ${r.reason}`,'err'); return; }
+    if(r.verdict==='already'){ term(`◇ <b>${r.prop}</b> already holds in this state (${r.world}).`,'sys'); return; }
+    if(r.verdict==='proven'){ term(`[] <b style="color:#7fd0b0">PROVEN</b> - from <b>${r.world}</b>: ${r.actions.map(x=>`<b>${x.label}</b> (${x.support}x observed, every outcome agrees)`).join(' · ')} NECESSARILY yields <b>${r.prop}</b>.${r.tentative&&r.tentative.length?' <span style="opacity:.6">also tentative: '+r.tentative.map(x=>x.label).join(', ')+'</span>':''}`,'sys'); return; }
+    if(r.verdict==='tentative'){ term(`◇ <b style="color:#ffd27a">TENTATIVE</b> - ${r.actions.map(x=>`<b>${x.label}</b> (${x.support}x)`).join(' · ')} led to <b>${r.prop}</b> every time, but ${r.why}.`,'sys'); return; }
+    if(r.verdict==='route'){ term(`◇ <b style="color:#ffd27a">POSSIBLE VIA ROUTE</b> - ${r.why}: <b>${r.path.join(' → ')}</b>`,'sys'); return; }
+    term(`◇ <b style="color:#7d93ad">ABSTAIN</b> - ${r.why}`,'sys'); return; }
+  if(c==='ensures'){ if(!window.KPLAN){ term('kripke_planner.js not loaded','err'); return; }
+    const e=KPLAN.ensuresHere();
+    if(!e.world||!e.actions.length){ term(`◇ no observed actions from this exact state yet (<b>${e.world||'unarmed'}</b>) - act, and the planner learns what your actions guarantee.`,'sys'); return; }
+    term(`◇ from <b>${e.world}</b> - what each observed action GUARANTEES <span style="opacity:.55">([]_a - true in EVERY observed outcome; support = times taken from here)</span>:`,'sys');
+    e.actions.forEach(x=>term(`&nbsp;&nbsp;<b>${x.label}</b> (${x.support}x → ${x.nDest} outcome${x.nDest===1?'':'s'}): ${x.guaranteed.length?x.guaranteed.join(', '):'<span style="opacity:.6">(outcomes share no common guarantee)</span>'}`,'sys'));
+    return; }
   if(c==='starmap'||c==='galaxy2'||c==='sm'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } else term('starmap.js not loaded','err'); return; }
   if(c==='missions'||c==='board'){ if(window.MISSIONS&&MISSIONS.board){ term('<b style="color:#8fd0ff">★ RANGER COMMAND - MISSION BOARD</b> <span style="opacity:.55">(rank-gated · <b>accept m&lt;n&gt;</b> e.g. accept m1 · one active at a time)</span>','sys'); term(MISSIONS.board(),''); } else term('missions.js not loaded','err'); return; }
   if(c==='accept'&&window.MISSIONS&&MISSIONS.accept&&/^m\d+$/i.test(a[1]||'')){ const r=MISSIONS.accept(parseInt(String(a[1]).slice(1),10)); term(r&&r.msg?r.msg:'(no such mission)', r&&r.ok?'sys':'err'); return; }   // accept m1..m4 = mission board · plain numbers stay CONTRACTS
@@ -3336,6 +3362,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     P.fuel-=cost; P.obj=null; P.docked=null;
     P.pos.copy(sy.center).add(new T.Vector3(rand(-1,1),rand(-0.2,0.2),rand(-1,1)).setLength(rand(40,CFG.SYSTEM_R*0.4))); P.vel.set(0,0,0);
     notify(`⚡ HYPERJUMP - arrived in ${sy.name} system (-${cost} fuel, ${Math.round(P.fuel)}/${P.fuelCap} remaining).`,'flag');
+    if(window.KPLAN) KPLAN.observe('jump:'+sy.name);
     if(window.SOUND) SOUND.play('warp'); return; }
   if(c==='hold'||c==='stop'){ P.obj=null; term('Holding position.','sys'); return; }
   if(c==='flee'){ P.obj={type:'flee'}; term('Evasive - breaking off.','sys'); return; }

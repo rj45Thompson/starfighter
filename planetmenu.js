@@ -433,11 +433,40 @@ function scienceHtml(){
     +'</div>';
   return html; }
 
-/* ------------------------------------------------ TAB: MARKET */
+/* ------------------------------------------------ TAB: MARKET (+ black market / fence, SR:AWA clicks-only rule) */
+/* SR:AWA parity slice (2026-07-09): the base's MARKET tab was a DEAD NOTE telling the player to type terminal
+   commands - this file's own rule (see terraformHtml) says "every dock-only action... achievable by clicks
+   alone". Rendered from HOST.CONTRABAND live (no second catalog), every button delegates data-cmd to the REAL
+   `blackmarket`/`fence` commands, which re-verify location/credits/holdings themselves - the UI only decides
+   VISIBILITY (base + pirate station sell; hostile-rep worlds fence), never outcome. */
+function contrabandHtml(){
+  var h=H(), P=player(); if(!h || !h.CONTRABAND || !h.CONTRA_KEYS || !P) return '';
+  var atBM = S.isBase || !!(S.planet && S.planet.isPirateStation);
+  var canFence = !!(S.planet && !S.isBase && num(S.planet.rep,0) <= num(h.CFG && h.CFG.REP_HOSTILE, -6));
+  if(!atBM && !canFence) return '';
+  var mk = num(h.CFG && h.CFG.CONTRA_MARKUP, 1.6);
+  var rows='', i, holding=0;
+  for(i=0;i<h.CONTRA_KEYS.length;i++){ var k=h.CONTRA_KEYS[i], c=h.CONTRABAND[k]; if(!c) continue;
+    var have=num(P.contraband && P.contraband[k],0); holding+=have;
+    var tr='';
+    if(atBM){ tr += '<button class="pm-b" data-act="cmd" data-cmd="blackmarket '+k+' 1"'+(num(P.credits,0)>=c.base?'':' disabled')+'>+1</button> '
+                  + '<button class="pm-b" data-act="cmd" data-cmd="blackmarket '+k+' 5"'+(num(P.credits,0)>=c.base*5?'':' disabled')+'>+5</button> '; }
+    if(canFence){ tr += '<button class="pm-b pm-go" data-act="cmd" data-cmd="fence '+k+' 1"'+(have>0?'':' disabled')+'>-1</button> '
+                     + '<button class="pm-b pm-go" data-act="cmd" data-cmd="fence '+k+' 999"'+(have>0?'':' disabled')+'>-all</button>'; }
+    rows += '<tr><td><b>'+esc(c.n||k)+'</b></td>'
+      + '<td style="color:'+COL.AMBER+'">'+Math.round(c.base)+'c</td>'
+      + '<td style="color:'+COL.GOOD+'">'+Math.round(c.base*mk)+'c</td>'
+      + '<td style="color:'+(have>0?COL.TEXT:COL.DIM)+'">'+have+'</td>'
+      + '<td>'+tr+'</td></tr>'; }
+  var note = atBM
+    ? 'Buy here, fence at <span style="color:'+COL.BAD+'">HOSTILE</span> worlds at ×'+mk+' - but coalition docks may SCAN you on arrival.'
+    : 'This world is lawless enough to fence - contraband moves at ×'+mk+' over base.';
+  return '<div class="pm-panel"><h4 style="color:'+COL.VIOLET+'">☠ BLACK MARKET'+(canFence&&!atBM?' - FENCE':'')+'</h4>'
+    + '<div style="margin-bottom:6px;color:'+COL.DIM+'">'+note+(holding?' Carrying <b style="color:'+COL.AMBER+'">'+holding+'</b> unit'+(holding>1?'s':'')+'.':'')+'</div>'
+    + '<table class="pm-t"><tr><th>WARE</th><th>BUY</th><th>FENCE AT</th><th>HELD</th><th>TRADE</th></tr>'+rows+'</table></div>'; }
 function marketHtml(){
   var p=S.planet, P=player(), G=goods();
-  if(S.isBase) return '<div class="pm-note">No commodity exchange at Ranger Command - the base deals in hulls and contraband.'
-    + '<br>Terminal: <b style="color:'+COL.AMBER+'">hull &lt;class&gt;</b> - <b style="color:'+COL.AMBER+'">blackmarket</b> - <b style="color:'+COL.AMBER+'">fence</b></div>';
+  if(S.isBase) return '<div class="pm-note">No commodity exchange at Ranger Command - the base deals in hulls (SHOP tab) and the wares below.</div>'+contrabandHtml();
   if(!p || !p.stock || !G.length) return '<div class="pm-note">(market data offline)</div>';
   var hostile = num(p.rep,0) <= num(H()&&H().CFG&&H().CFG.REP_HOSTILE,-6);
   var head = '<div style="margin-bottom:8px;color:'+COL.DIM+'">Prices are organic - they move with stock. '
@@ -474,7 +503,7 @@ function marketHtml(){
   var foot = '<div class="pm-note" style="margin-top:8px">hold '+htot+'/'+Math.round(hcap)
     + ' - credits <span style="color:'+COL.AMBER+'">'+Math.round(num(P&&P.credits,0))+'c</span>'
     + ' - reputation moves prices: allied worlds sell cheap and buy dear.</div>';
-  return head+table+foot+terraformHtml(p); }
+  return head+table+foot+terraformHtml(p)+contrabandHtml(); }
 
 /* SR-M4 gap fix (REQUIREMENTS_SR.md, "every dock-only action... achievable by clicks alone"): terraform was
    terminal-only, its own hint text on this tab said so explicitly. Same data-cmd->HOST.runCmd path as everything
