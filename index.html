@@ -166,46 +166,47 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709o"></script>
-<script src="fflate.min.js?v=20260709o"></script>
-<script src="fbxloader.js?v=20260709o"></script>
+<script src="three.min.js?v=20260709p"></script>
+<script src="fflate.min.js?v=20260709p"></script>
+<script src="fbxloader.js?v=20260709p"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709o"></script>
-<script src="inhabitant.js?v=20260709o"></script>
-<script src="passenger.js?v=20260709o"></script>
-<script src="gamemod.js?v=20260709o"></script>
-<script src="chatter.js?v=20260709o"></script>
-<script src="speech_gen.js?v=20260709o"></script>
-<script src="speech_input.js?v=20260709o"></script>
-<script src="vision.js?v=20260709o"></script>
-<script src="deliberate.js?v=20260709o"></script>
-<script src="knowledge.js?v=20260709o"></script>
-<script src="acquire.js?v=20260709o"></script>
-<script src="sound.js?v=20260709o"></script>
-<script src="hullmodels.js?v=20260709o"></script>
-<script src="knowledge_hud.js?v=20260709o"></script>
-<script src="knowledge_screen.js?v=20260709o"></script>
-<script src="centroid_mind.js?v=20260709o"></script>
-<script src="kripke_mind.js?v=20260709o"></script>
-<script src="sober_gate.js?v=20260709o"></script>
-<script src="contradiction_ledger.js?v=20260709o"></script>
-<script src="kripke_planner.js?v=20260709o"></script>
-<script src="thoughts.js?v=20260709o"></script>
-<script src="tami_battle_ui.js?v=20260709o"></script>
-<script src="power_panel.js?v=20260709o"></script>
-<script src="panels.js?v=20260709o"></script>
-<script src="item_icons.js?v=20260709o"></script>
-<script src="engbay.js?v=20260709o"></script>
+<script src="speech_tier.js?v=20260709p"></script>
+<script src="inhabitant.js?v=20260709p"></script>
+<script src="passenger.js?v=20260709p"></script>
+<script src="gamemod.js?v=20260709p"></script>
+<script src="chatter.js?v=20260709p"></script>
+<script src="speech_gen.js?v=20260709p"></script>
+<script src="speech_input.js?v=20260709p"></script>
+<script src="vision.js?v=20260709p"></script>
+<script src="deliberate.js?v=20260709p"></script>
+<script src="knowledge.js?v=20260709p"></script>
+<script src="acquire.js?v=20260709p"></script>
+<script src="sound.js?v=20260709p"></script>
+<script src="hullmodels.js?v=20260709p"></script>
+<script src="knowledge_hud.js?v=20260709p"></script>
+<script src="knowledge_screen.js?v=20260709p"></script>
+<script src="centroid_mind.js?v=20260709p"></script>
+<script src="kripke_mind.js?v=20260709p"></script>
+<script src="sober_gate.js?v=20260709p"></script>
+<script src="contradiction_ledger.js?v=20260709p"></script>
+<script src="kripke_planner.js?v=20260709p"></script>
+<script src="pillar_router.js?v=20260709p"></script>
+<script src="thoughts.js?v=20260709p"></script>
+<script src="tami_battle_ui.js?v=20260709p"></script>
+<script src="power_panel.js?v=20260709p"></script>
+<script src="panels.js?v=20260709p"></script>
+<script src="item_icons.js?v=20260709p"></script>
+<script src="engbay.js?v=20260709p"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709o"></script>
-<script src="conquest.js?v=20260709o"></script>
-<script src="missions.js?v=20260709o"></script>
-<script src="planetmenu.js?v=20260709o"></script>
-<script src="textquests.js?v=20260709o"></script>
+<script src="starmap.js?v=20260709p"></script>
+<script src="conquest.js?v=20260709p"></script>
+<script src="missions.js?v=20260709p"></script>
+<script src="planetmenu.js?v=20260709p"></script>
+<script src="textquests.js?v=20260709p"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2041,6 +2042,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'plan', desc:'the modal planner (Jobe Kripke port): plan, planner, how do i get, which action guarantees, necessity, necessarily - which observed action NECESSARILY makes a goal prop true; 2+ observations = proven, 1 = tentative, else observed route or honest abstain; learned from YOUR play only', usage:'plan <prop>'},
   {name:'ensures', desc:'per-action guarantees from the current state: ensures, action effects, what does docking guarantee, necessity per action - the []_a intersection over every observed outcome of each action taken from here', usage:'ensures'},
   {name:'depart', desc:'undock and return to space: depart, undock, leave dock, leave planet, launch from orbit - clears the berth and hands back the helm (the planet screen DEPART button runs this)', usage:'depart'},
+  {name:'solve', desc:'the pillar router (TDRE port): solve, reason about, answer a question, is X a Y, what is the task of, what do they have in common, does X reach Y - routes by question STRUCTURE to 4 verifier-first solvers over the knowledge store; defining-operator ties abstain, answers quote their facts', usage:'solve <question>'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2970,6 +2972,22 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!e.world||!e.actions.length){ term(`◇ no observed actions from this exact state yet (<b>${e.world||'unarmed'}</b>) - act, and the planner learns what your actions guarantee.`,'sys'); return; }
     term(`◇ from <b>${e.world}</b> - what each observed action GUARANTEES <span style="opacity:.55">([]_a - true in EVERY observed outcome; support = times taken from here)</span>:`,'sys');
     e.actions.forEach(x=>term(`&nbsp;&nbsp;<b>${x.label}</b> (${x.support}x → ${x.nDest} outcome${x.nDest===1?'':'s'}): ${x.guaranteed.length?x.guaranteed.join(', '):'<span style="opacity:.6">(outcomes share no common guarantee)</span>'}`,'sys'));
+    return; }
+  // PILLAR ROUTER (AGI_SALVAGE port from TDRE pillar_router.py + rootbench_solver.py): route a question by
+  // its STRUCTURE to the pillar that carries it, propose-then-verify over the ranked candidates, abstain on
+  // defining-operator ties. Every answer quotes the store facts that entail it - 0-fabrication.
+  if(c==='solve'){ if(!window.PROUTER){ term('pillar_router.js not loaded','err'); return; }
+    const qq=a.slice(1).join(' ');
+    if(!qq){ term(`◈ <b>PILLAR ROUTER</b> - routes a question by STRUCTURE to one of 4 solvers (inheritance · constraint · composition · centric), each answering ONLY what the knowledge store entails. Ties between defining operators ABSTAIN - never a coin-flip.`,'sys');
+      term(`usage: <b>solve &lt;question&gt;</b> - e.g. <b>solve is GNAW a beast?</b> · <b>solve what is the task of awb_5?</b> · <b>solve what do X and Y have in common?</b> · <b>solve does X reach Y?</b>`,'sys'); return; }
+    const r=PROUTER.solve(qq);
+    const ord=(r.routing&&r.routing.order||[]).slice(0,4).map(p=>p===(r.solver||'')?`<b>${p}</b>`:p).join(' → ');
+    term(`◈ routed: ${ord||'(none)'} <span style="opacity:.5">(confidence ${r.routing?r.routing.confidence:0})</span>`,'sys');
+    if(r.verdict==='refuse_contradicted'){ term(`⚠ REFUSED - ${r.why}`,'err'); return; }
+    if(r.verdict==='router_abstain'){ term(`◈ <b style="color:#ffd27a">ROUTER ABSTAIN</b> - ${r.why}`,'sys'); return; }
+    if(r.verdict==='abstain'){ term(`◈ <b style="color:#7d93ad">ABSTAIN</b> - ${r.why}`,'sys'); return; }
+    term(`◈ <b style="color:#7fd0b0">${String(r.answer)}</b> <span style="opacity:.55">[${r.label} · solver: ${r.solver}]</span>`,'sys');
+    (r.facts||[]).forEach(f=>term(`&nbsp;&nbsp;<span style="opacity:.7">${f}</span>`,'sys'));
     return; }
   if(c==='starmap'||c==='galaxy2'||c==='sm'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } else term('starmap.js not loaded','err'); return; }
   if(c==='missions'||c==='board'){ if(window.MISSIONS&&MISSIONS.board){ term('<b style="color:#8fd0ff">★ RANGER COMMAND - MISSION BOARD</b> <span style="opacity:.55">(rank-gated · <b>accept m&lt;n&gt;</b> e.g. accept m1 · one active at a time)</span>','sys'); term(MISSIONS.board(),''); } else term('missions.js not loaded','err'); return; }
@@ -4484,6 +4502,7 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 window.HOST={
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
+  get contracts(){ return contracts; },   // SR:AWA 2026-07-09: the MISSIONS tab renders coalition contracts as clickable rows (they were terminal-only - the tab's own fallback note admitted it)
   CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS, POWER_SYS, CONTRABAND, CONTRA_KEYS,
   HULL_ORDER_ORIGINAL, shopHullKeys:()=>HULL_ORDER_ORIGINAL.concat(shopHullPool()),   // PROCEDURAL HULL ROSTER: the CURATED (7 standard + rotating 8 generated) list any hull-shop UI should render, not the raw 57-long HULL_ORDER
   EQUIP, ENGINES, ENGINE_KEYS, GIZMOS, GIZMO_KEYS, GIZMO_SELL_FRAC, hasGizmo, gizmoSlotsFor,   // ENGINEERING BAY - exposed live like HULLS/WEAPONS/ARTIFACTS so the UI never hardcodes a second copy that can drift

@@ -997,7 +997,23 @@ function missionsHtml(){
       var j; h+='<div class="pm-note">Accept by board order (top = 1):</div><div>';
       for(j=0;j<CFG.MISSION_BTN_N;j++) h+='<button class="pm-b pm-go" style="margin-right:6px" data-act="accept" data-i="'+(j+1)+'">ACCEPT '+(j+1)+'</button>';   // BUGFIX: MISSIONS.accept(idx) is 1-based (does idx-1 internally) - button j=0 ("ACCEPT 1") must send data-i=1, not 0, or it always misses by one slot
       h+='</div>'; } }
-  else h += '<div class="pm-note">Coalition contracts still post on the terminal: <b style="color:'+COL.AMBER+'">contracts</b> - <b style="color:'+COL.AMBER+'">accept &lt;id&gt;</b>.</div>';
+  /* SR:AWA parity slice (2026-07-09): COALITION CONTRACTS were terminal-only - this tab's own fallback note
+     used to say "still post on the terminal". Rendered live from HOST.contracts (no second copy), every
+     button delegates to the REAL `accept <id>` / `abandon <id>` commands. */
+  var cts=(h0=>{ var hh=H(); return (hh&&hh.contracts)||[]; })();
+  if(cts.length){
+    h+='<div class="pm-panel" style="margin-top:10px"><h4>COALITION CONTRACTS <span style="color:'+COL.DIM+';font-weight:400">(open jobs - defense, delivery, bounties)</span></h4>';
+    for(var ci=0;ci<cts.length;ci++){ var ct=cts[ci]||{};
+      var prog=(ct.type==='bounty'&&ct.need)?(' <span class="pm-tag mk">'+num(ct.got,0)+'/'+ct.need+'</span>'):'';
+      h+='<div class="pm-row"><div class="pm-grow"><b>['+esc(ct.id)+']</b> '+esc(ct.desc||'?')
+        +(ct.accepted?(' <span style="color:'+COL.GOOD+'">ACCEPTED</span>'+prog):'')
+        +' <span class="pm-sub">@ '+esc(ct.issuer&&ct.issuer.name||'?')+'</span></div>'
+        +'<div style="color:'+COL.AMBER+';min-width:80px;text-align:right">'+num(ct.reward,0)+'c <span style="color:'+COL.GOOD+'">+'+num(ct.rep,0)+'rep</span></div>'
+        +(ct.accepted
+          ? '<button class="pm-b" data-act="cmd" data-cmd="abandon '+esc(ct.id)+'" style="min-width:76px">ABANDON</button>'
+          : '<button class="pm-b pm-go" data-act="cmd" data-cmd="accept '+esc(ct.id)+'" style="min-width:76px">ACCEPT</button>')
+        +'</div>'; }
+    h+='</div>'; }
   return h; }
 
 /* ------------------------------------------------ TAB: QUESTS (SR-M9, REQUIREMENTS_SR.md - Space Rangers 2's
