@@ -166,50 +166,51 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709y"></script>
-<script src="fflate.min.js?v=20260709y"></script>
-<script src="fbxloader.js?v=20260709y"></script>
+<script src="three.min.js?v=20260709z"></script>
+<script src="fflate.min.js?v=20260709z"></script>
+<script src="fbxloader.js?v=20260709z"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709y"></script>
-<script src="inhabitant.js?v=20260709y"></script>
-<script src="passenger.js?v=20260709y"></script>
-<script src="gamemod.js?v=20260709y"></script>
-<script src="chatter.js?v=20260709y"></script>
-<script src="speech_gen.js?v=20260709y"></script>
-<script src="speech_input.js?v=20260709y"></script>
-<script src="vision.js?v=20260709y"></script>
-<script src="deliberate.js?v=20260709y"></script>
-<script src="knowledge.js?v=20260709y"></script>
-<script src="acquire.js?v=20260709y"></script>
-<script src="sound.js?v=20260709y"></script>
-<script src="hullmodels.js?v=20260709y"></script>
-<script src="knowledge_hud.js?v=20260709y"></script>
-<script src="knowledge_screen.js?v=20260709y"></script>
-<script src="centroid_mind.js?v=20260709y"></script>
-<script src="kripke_mind.js?v=20260709y"></script>
-<script src="sober_gate.js?v=20260709y"></script>
-<script src="contradiction_ledger.js?v=20260709y"></script>
-<script src="kripke_planner.js?v=20260709y"></script>
-<script src="pillar_router.js?v=20260709y"></script>
-<script src="gravity_well.js?v=20260709y"></script>
-<script src="growth_loop.js?v=20260709y"></script>
-<script src="tom_test.js?v=20260709y"></script>
-<script src="thoughts.js?v=20260709y"></script>
-<script src="tami_battle_ui.js?v=20260709y"></script>
-<script src="power_panel.js?v=20260709y"></script>
-<script src="panels.js?v=20260709y"></script>
-<script src="item_icons.js?v=20260709y"></script>
-<script src="engbay.js?v=20260709y"></script>
+<script src="speech_tier.js?v=20260709z"></script>
+<script src="inhabitant.js?v=20260709z"></script>
+<script src="passenger.js?v=20260709z"></script>
+<script src="gamemod.js?v=20260709z"></script>
+<script src="chatter.js?v=20260709z"></script>
+<script src="speech_gen.js?v=20260709z"></script>
+<script src="speech_input.js?v=20260709z"></script>
+<script src="vision.js?v=20260709z"></script>
+<script src="deliberate.js?v=20260709z"></script>
+<script src="knowledge.js?v=20260709z"></script>
+<script src="acquire.js?v=20260709z"></script>
+<script src="sound.js?v=20260709z"></script>
+<script src="hullmodels.js?v=20260709z"></script>
+<script src="knowledge_hud.js?v=20260709z"></script>
+<script src="knowledge_screen.js?v=20260709z"></script>
+<script src="centroid_mind.js?v=20260709z"></script>
+<script src="kripke_mind.js?v=20260709z"></script>
+<script src="sober_gate.js?v=20260709z"></script>
+<script src="contradiction_ledger.js?v=20260709z"></script>
+<script src="kripke_planner.js?v=20260709z"></script>
+<script src="pillar_router.js?v=20260709z"></script>
+<script src="gravity_well.js?v=20260709z"></script>
+<script src="growth_loop.js?v=20260709z"></script>
+<script src="coop_proof.js?v=20260709z"></script>
+<script src="tom_test.js?v=20260709z"></script>
+<script src="thoughts.js?v=20260709z"></script>
+<script src="tami_battle_ui.js?v=20260709z"></script>
+<script src="power_panel.js?v=20260709z"></script>
+<script src="panels.js?v=20260709z"></script>
+<script src="item_icons.js?v=20260709z"></script>
+<script src="engbay.js?v=20260709z"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709y"></script>
-<script src="conquest.js?v=20260709y"></script>
-<script src="missions.js?v=20260709y"></script>
-<script src="planetmenu.js?v=20260709y"></script>
-<script src="textquests.js?v=20260709y"></script>
+<script src="starmap.js?v=20260709z"></script>
+<script src="conquest.js?v=20260709z"></script>
+<script src="missions.js?v=20260709z"></script>
+<script src="planetmenu.js?v=20260709z"></script>
+<script src="textquests.js?v=20260709z"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2077,6 +2078,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'gravity', desc:'the gravity-well repair (chainer port): gravity, repair, heal the graph, fix geometry, relation vectors - gives the store a 2D geometry where relations are conserved translations, autonomously repairs drifted positions (repair-not-prune), reports fact-recovery accuracy on REAL edges', usage:'gravity'},
   {name:'grow', desc:'the M8 growth loop (combine-iso port): grow, learn from sensors, observe ships, growth engine, holding pen - observes ships on YOUR sensors through the noisy channel, quarantines everything, promotes only rule-gated consensus (a lone misread can never commit), graduates true-majority rules like freighter=>trader', usage:'grow · growth (last run)'},
   {name:'presume', desc:'pre-classify an unscanned ship from its hull using the growth loop\'s LEARNED rules: presume, guess role, what is that ship, classify before scanning - labeled PRESUMED + defeasible (a scan can refute it); `presume` alone scores the mind\'s accuracy vs a base-rate baseline', usage:'presume [ship]'},
+  {name:'coop', desc:'the M9 cooperative proof (combine-iso port): coop, prove a chain, jointly prove, corroborate, do the sources agree - N provenance-distinct sources jointly prove a chain over the galaxy\'s knowledge, committing a hop ONLY when >=2 of them independently hold it (with <=1 lying source, zero fabrication by construction); else joint ABSTAIN/UNRESOLVED, never a guess. `coop demo` runs the 9-world structural battery live', usage:'coop <start> <goal> [rel] · coop demo'},
   {name:'tom', desc:'the theory-of-mind falsifiable test: tom, predict other minds, read intentions, what will that ship do - watches sensed ships, predicts each mind\'s next action from OBSERVABLE state only, scores vs reality, and claims a ToM signal ONLY if it beats both the majority and persistence baselines (honest failure otherwise)', usage:'tom [seconds] · tom report'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
@@ -3186,6 +3188,29 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`&nbsp;&nbsp;committed on <b>${m.presumed}</b>/${m.n} ships (abstained on ${m.abstained} with no matching rule) · <b style="color:${m.betterThanBase?'#7fd0b0':'#ffd27a'}">${Math.round(m.acc*100)}% correct</b> vs ${Math.round(m.baseAcc*100)}% for always-guess-"${m.majorityRole}"`,'sys');
     term(`&nbsp;&nbsp;<b style="color:${m.betterThanBase?'#7fd0b0':'#ffd27a'}">${m.betterThanBase?'BEATS the base rate - the learned rules carry real signal':'does NOT beat the base rate on this fleet (reported honestly)'}</b> <span style="opacity:.55">· every guess is PRESUMED + defeasible; a scan is the truth</span>`,'sys');
     return; }
+  // COOP-PROOF (INTEGRATION 2026-07-10, ENDGAME M9 port from combine-iso-agi-fleet/agi_proto/m9_protocol.py):
+  // N provenance-distinct reasoners jointly PROVE a chain none can prove alone, or JOINTLY ABSTAIN, committing
+  // ZERO fabrications. A hop commits ONLY when >=2 provenance-distinct sources (two witnessing pilots, or a
+  // witnessed fact ALSO in the shared library) independently hold it - the iron rule's >=2-edge-disjoint gate
+  // made into a running proof over live galaxy facts. With <=1 lying source, committed-fabrication is 0 by
+  // construction (every committed hop has an honest attester). Defeasible + labeled; never a guess.
+  if(c==='coop'||c==='prove'){ if(!window.COOP){ term('coop_proof.js not loaded','err'); return; }
+    if(a[1]==='demo'||a[1]==='test'){ const bat=COOP.runBattery();   // the M9 structural battery, run LIVE in-game
+      term(`🤝 <b>COOP-PROOF - M9 structural battery</b> <span style="opacity:.6">(N provenance-distinct reasoners jointly prove or jointly abstain; a hop commits only with >=2 distinct attesters)</span>`,'sys');
+      bat.rows.forEach(row=>{ term(`&nbsp;&nbsp;${row.ok?'<span style="color:#8fe38f">OK</span>':'<span style="color:#ff8a8a">XX</span>'} <b>${row.world}</b> - ${row.status} <span style="opacity:.55">(exp ${row.expect}; depth ${row.depth} vs max-solo ${row.maxSolo}; ${row.fabAttempts} lie(s) in transit; DUF ${row.duf===Infinity?'inf':row.duf})</span>`,'sys'); });
+      term(`&nbsp;&nbsp;<b style="color:${bat.ironLawTotal===0?'#8fe38f':'#ff8a8a'}">IRON LAW: ${bat.ironLawTotal} committed fabrication(s) across all 9 worlds</b> (must be 0) · ${bat.allOk?'<b style="color:#8fe38f">all gates green</b>':'<b style="color:#ff8a8a">a gate FAILED</b>'}`,'sys'); return; }
+    if(!a[1]||!a[2]){ const rels=COOP.relationsInStore(), cs=COOP.corroborationStats();
+      term(`🤝 <b>COOP-PROOF</b> - jointly prove a chain over the galaxy's knowledge, committing a hop only when >=2 provenance-distinct sources hold it (else ABSTAIN, never a guess). Usage: <b>coop &lt;start&gt; &lt;goal&gt; [relation]</b> · or <b>coop demo</b> for the structural battery.`,'sys');
+      term(`&nbsp;&nbsp;<b>${cs.sources}</b> provenance-distinct source(s) · corroboration coverage <b style="color:${cs.corroboratedEdges>0?'#8fe38f':'#ffd27a'}">${cs.corroboratedEdges}/${cs.totalEdges}</b> edges held by >=2 sources (${Math.round(cs.coverage*100)}%)${cs.corroboratedEdges===0?' - all knowledge is single-source, so nothing is cooperatively provable yet (the honest state, not a bug)':''}`,'sys');
+      term(`&nbsp;&nbsp;top relations: ${rels.slice(0,5).map(r=>r.rel+'('+r.n+')').join(', ')||'none'}`,'sys');
+      return; }
+    const start=a[1], goal=a[2], rel=a[3]||((COOP.relationsInStore()[0]||{}).rel)||'isa';
+    const r=COOP.prove(start, goal, rel);
+    if(r.status==='PROVED'){
+      term(`🤝 <b style="color:#8fe38f">PROVED</b> ${start} --${rel}*--> ${goal} <span style="opacity:.6">(${r.chain.length} hops across ${r.n_agents} sources; no single source proves it alone: ${r.coop_necessary?'confirmed':'-'})</span>`,'sys');
+      r.chain.forEach(h=>term(`&nbsp;&nbsp;${h[0]} --${h[1]}--> ${h[2]} <span style="opacity:.55">attested by ${h[3].join(' + ')}</span>`,'sys')); return; }
+    if(r.status==='UNRESOLVED'){ term(`🤝 <b style="color:#ffd27a">UNRESOLVED</b> ${start} -> ${goal}: <span style="opacity:.8">${r.why||(r.conflicts&&r.conflicts.length?'sources disagree on a single-valued relation - no agreement, not a guess':'a continuation was offered but only single-source - below the >=2 agreement bar')}</span>`,'sys'); return; }
+    term(`🤝 <b style="color:#9fb4c8">ABSTAIN</b> ${start} -> ${goal}: <span style="opacity:.8">${r.why||'no >=2-corroborated continuation across the gap - joint abstain, zero fabrication'}</span>`,'sys'); return; }
   // GRAVITY WELL (AGI_SALVAGE port from agi_proto/chainer.py): give the knowledge store a 2D geometry where
   // every relation is a CONSERVED TRANSLATION, then let the agent repair drifted positions on its own when
   // the composition residual runs high. Repair-not-prune: only POSITIONS move, never facts.
@@ -3461,7 +3486,23 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term('<b style="color:#8fd0ff">◈ SCAN</b> <span style="opacity:.55"> - the Passenger reads what your sensors touch; badges painted over live contacts for 8s</span>','sys');
     term('&nbsp;&nbsp;planets: '+ps,'sys'); term('&nbsp;&nbsp;contacts:<br>&nbsp;&nbsp;'+sh,'sys'); return; }
   if(c==='map'||c==='nav'){ planets.forEach((p,i)=>term(`  [${i}] ${p.name} · ${p.type.t} Lv${p.dev} · ${p.system?p.system.name+' sys · ':''}${Math.round(P.pos.distanceTo(p.pos))}u · ${Math.round(p.wealth)}c${p.underThreat?' ⚠':''}${p.terraformable?(' · terra '+Math.round((p.terra||0)*100)+'%'):''}`,'sys')); return; }
-  if(c==='galaxy'||c==='systems'||c==='g'){ systems.forEach(sy=>{ term(`<b>${sy.name}</b> system · ${Math.round(P.pos.distanceTo(sy.center))}u away`,'sys'); sy.planets.forEach(p=>{ if(planets.indexOf(p)>=0) term(`   ${p.name} · ${p.type.t} Lv${p.dev}${p.rep?(' · rep '+(p.rep>0?'+':'')+Math.round(p.rep)):''}`,'sys'); }); }); return; }
+  if(c==='galaxy'||c==='systems'||c==='g'){
+    // SR:AWA slice (2026-07-10): make the JUMP-LANE NETWORK visible - SR's galaxy view IS a star-lane map (which
+    // systems connect + the jump cost), not just a list. neighborsOf() is the SAME graph the starmap draws (SR-M16);
+    // the per-lane cost reuses the exact `jump` fuel formula so the readout can never disagree with the actual jump.
+    let curSys=null,curBd=Infinity; for(const s of systems){ const sd=P.pos.distanceTo(s.center); if(sd<curBd){curBd=sd;curSys=s;} }
+    const lanesHere=(curSys&&window.STARMAP&&STARMAP.neighborsOf)?STARMAP.neighborsOf(curSys.name):[];
+    systems.forEach(sy=>{ const d=P.pos.distanceTo(sy.center), here=(sy===curSys), adj=lanesHere.includes(sy.name);
+      let tag;
+      if(here) tag=' <span style="color:#8fe38f">◉ you are here</span>';
+      else if(adj){ const cost=Math.ceil((CFG.JUMP_FUEL_BASE+d/CFG.JUMP_DIST_PER_FUEL)*engineOf(P).fuelMult*seriesOf(P).fuelMult);
+        tag=` · <span style="color:${P.fuel>=cost?'#7fd0ff':'#ff8a8a'}">⚡ jump lane (${cost} fuel${P.fuel>=cost?'':' - short'})</span>`; }
+      else tag=' <span style="opacity:.5">· no direct lane (jump via an adjacent system)</span>';
+      const neigh=(window.STARMAP&&STARMAP.neighborsOf)?STARMAP.neighborsOf(sy.name):[];
+      term(`<b>${sy.name}</b> system · ${Math.round(d)}u${tag}`,'sys');
+      if(neigh.length) term(`   <span style="opacity:.7">lanes:</span> ${neigh.join(', ')}`,'sys');
+      sy.planets.forEach(p=>{ if(planets.indexOf(p)>=0) term(`   ${p.name} · ${p.type.t} Lv${p.dev}${p.rep?(' · rep '+(p.rep>0?'+':'')+Math.round(p.rep)):''}`,'sys'); }); });
+    return; }
   if(c==='war'||c==='front'){ const nHeg=ships.filter(s=>s.alive&&s.team==='pirate').length, T=HEG_TIERS[hegTier()];
     term(`<b>THE HEGEMON</b> - escalation ${Math.floor(escalation)} · spawning up to <b>${T.n}</b>-class · ${nHeg} hostile now / cap ${enemyCap()}`,'err');
     systems.forEach(sy=>term(`   ${sy.name}: ${sy.lawless?'<span style="color:#ff8a4a">⚠ LAWLESS</span> - no one\'s beat, pirates roam free':sy.contested?('<span style="color:#ff6a6a">CONTESTED</span> ('+(sy.enemies||0)+' hostiles)'):'<span style="color:#7fdc8a">free</span>'}`,'sys'));
