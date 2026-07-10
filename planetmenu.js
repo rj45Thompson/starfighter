@@ -508,7 +508,25 @@ function marketHtml(){
   var foot = '<div class="pm-note" style="margin-top:8px">hold '+htot+'/'+Math.round(hcap)
     + ' - credits <span style="color:'+COL.AMBER+'">'+Math.round(num(P&&P.credits,0))+'c</span>'
     + ' - reputation moves prices: allied worlds sell cheap and buy dear.</div>';
-  return head+table+foot+terraformHtml(p)+contrabandHtml(); }
+  return head+table+foot+terraformHtml(p)+contrabandHtml()+probeHtml(p); }
+
+/* SR:AWA parity slice (2026-07-09): mineral probes were TERMINAL-ONLY at deploy time - the Athenaeum's own
+   SCIENCE tab sells them, but the `deployprobe`/`collectprobe` commands only work at OTHER worlds, where no
+   button existed. Rendered from live state (P.probesOwned + HOST.probeAt), buttons delegate to the REAL
+   commands - visibility here, truth in the command gates. */
+function probeHtml(p){
+  var h=H(), P=player();
+  if(!h || !P || !p || p.isScience || p.isPirateStation) return '';
+  var aboard=num(P.probesOwned,0);
+  var working=(typeof h.probeAt==='function') ? h.probeAt(p.name).working : false;
+  if(!aboard && !working) return '';
+  var html='<div class="pm-panel"><h4 style="color:'+COL.VIOLET+'">🛰 MINERAL PROBE</h4>';
+  if(working) html+='<div style="margin-bottom:5px;color:'+COL.DIM+'">A probe is mining '+esc(p.name)+' on the real clock - even while you\'re logged off.</div>'
+    +'<button class="pm-b pm-go" data-act="cmd" data-cmd="collectprobe">COLLECT ORE</button> '
+    +'<button class="pm-b" data-act="cmd" data-cmd="probes">NETWORK STATUS → terminal</button>';
+  else html+='<div style="margin-bottom:5px;color:'+COL.DIM+'">Aboard: <b>'+aboard+'</b>. Deploy one here and it mines while you fly.</div>'
+    +'<button class="pm-b pm-go" data-act="cmd" data-cmd="deployprobe">DEPLOY PROBE HERE</button>';
+  return html+'</div>'; }
 
 /* SR-M4 gap fix (REQUIREMENTS_SR.md, "every dock-only action... achievable by clicks alone"): terraform was
    terminal-only, its own hint text on this tab said so explicitly. Same data-cmd->HOST.runCmd path as everything

@@ -166,48 +166,49 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709q"></script>
-<script src="fflate.min.js?v=20260709q"></script>
-<script src="fbxloader.js?v=20260709q"></script>
+<script src="three.min.js?v=20260709r"></script>
+<script src="fflate.min.js?v=20260709r"></script>
+<script src="fbxloader.js?v=20260709r"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709q"></script>
-<script src="inhabitant.js?v=20260709q"></script>
-<script src="passenger.js?v=20260709q"></script>
-<script src="gamemod.js?v=20260709q"></script>
-<script src="chatter.js?v=20260709q"></script>
-<script src="speech_gen.js?v=20260709q"></script>
-<script src="speech_input.js?v=20260709q"></script>
-<script src="vision.js?v=20260709q"></script>
-<script src="deliberate.js?v=20260709q"></script>
-<script src="knowledge.js?v=20260709q"></script>
-<script src="acquire.js?v=20260709q"></script>
-<script src="sound.js?v=20260709q"></script>
-<script src="hullmodels.js?v=20260709q"></script>
-<script src="knowledge_hud.js?v=20260709q"></script>
-<script src="knowledge_screen.js?v=20260709q"></script>
-<script src="centroid_mind.js?v=20260709q"></script>
-<script src="kripke_mind.js?v=20260709q"></script>
-<script src="sober_gate.js?v=20260709q"></script>
-<script src="contradiction_ledger.js?v=20260709q"></script>
-<script src="kripke_planner.js?v=20260709q"></script>
-<script src="pillar_router.js?v=20260709q"></script>
-<script src="gravity_well.js?v=20260709q"></script>
-<script src="thoughts.js?v=20260709q"></script>
-<script src="tami_battle_ui.js?v=20260709q"></script>
-<script src="power_panel.js?v=20260709q"></script>
-<script src="panels.js?v=20260709q"></script>
-<script src="item_icons.js?v=20260709q"></script>
-<script src="engbay.js?v=20260709q"></script>
+<script src="speech_tier.js?v=20260709r"></script>
+<script src="inhabitant.js?v=20260709r"></script>
+<script src="passenger.js?v=20260709r"></script>
+<script src="gamemod.js?v=20260709r"></script>
+<script src="chatter.js?v=20260709r"></script>
+<script src="speech_gen.js?v=20260709r"></script>
+<script src="speech_input.js?v=20260709r"></script>
+<script src="vision.js?v=20260709r"></script>
+<script src="deliberate.js?v=20260709r"></script>
+<script src="knowledge.js?v=20260709r"></script>
+<script src="acquire.js?v=20260709r"></script>
+<script src="sound.js?v=20260709r"></script>
+<script src="hullmodels.js?v=20260709r"></script>
+<script src="knowledge_hud.js?v=20260709r"></script>
+<script src="knowledge_screen.js?v=20260709r"></script>
+<script src="centroid_mind.js?v=20260709r"></script>
+<script src="kripke_mind.js?v=20260709r"></script>
+<script src="sober_gate.js?v=20260709r"></script>
+<script src="contradiction_ledger.js?v=20260709r"></script>
+<script src="kripke_planner.js?v=20260709r"></script>
+<script src="pillar_router.js?v=20260709r"></script>
+<script src="gravity_well.js?v=20260709r"></script>
+<script src="growth_loop.js?v=20260709r"></script>
+<script src="thoughts.js?v=20260709r"></script>
+<script src="tami_battle_ui.js?v=20260709r"></script>
+<script src="power_panel.js?v=20260709r"></script>
+<script src="panels.js?v=20260709r"></script>
+<script src="item_icons.js?v=20260709r"></script>
+<script src="engbay.js?v=20260709r"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709q"></script>
-<script src="conquest.js?v=20260709q"></script>
-<script src="missions.js?v=20260709q"></script>
-<script src="planetmenu.js?v=20260709q"></script>
-<script src="textquests.js?v=20260709q"></script>
+<script src="starmap.js?v=20260709r"></script>
+<script src="conquest.js?v=20260709r"></script>
+<script src="missions.js?v=20260709r"></script>
+<script src="planetmenu.js?v=20260709r"></script>
+<script src="textquests.js?v=20260709r"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2045,6 +2046,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'depart', desc:'undock and return to space: depart, undock, leave dock, leave planet, launch from orbit - clears the berth and hands back the helm (the planet screen DEPART button runs this)', usage:'depart'},
   {name:'solve', desc:'the pillar router (TDRE port): solve, reason about, answer a question, is X a Y, what is the task of, what do they have in common, does X reach Y - routes by question STRUCTURE to 4 verifier-first solvers over the knowledge store; defining-operator ties abstain, answers quote their facts', usage:'solve <question>'},
   {name:'gravity', desc:'the gravity-well repair (chainer port): gravity, repair, heal the graph, fix geometry, relation vectors - gives the store a 2D geometry where relations are conserved translations, autonomously repairs drifted positions (repair-not-prune), reports fact-recovery accuracy on REAL edges', usage:'gravity'},
+  {name:'grow', desc:'the M8 growth loop (combine-iso port): grow, learn from sensors, observe ships, growth engine, holding pen - observes ships on YOUR sensors through the noisy channel, quarantines everything, promotes only rule-gated consensus (a lone misread can never commit), graduates true-majority rules like freighter=>trader', usage:'grow · growth (last run)'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
 function passengerTelemetry(){ const P=ships[0]; if(!P) return null; const np=P.docked||nearestPlanet(P.pos);
@@ -2991,6 +2993,21 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`◈ <b style="color:#7fd0b0">${String(r.answer)}</b> <span style="opacity:.55">[${r.label} · solver: ${r.solver}]</span>`,'sys');
     (r.facts||[]).forEach(f=>term(`&nbsp;&nbsp;<span style="opacity:.7">${f}</span>`,'sys'));
     return; }
+  // M8 GROWTH LOOP (AGI_SALVAGE port from combine-iso m8_growth.py): curiosity -> pen -> promote -> rule ->
+  // demote, verifier-gated. Members = ships on YOUR sensors; the oracle is the distance-noisy sensor channel;
+  // a single misread can never commit. Promoted facts land in the store's private 'growth' layer, LEARNED.
+  if(c==='grow'){ if(!window.GROWTH){ term('growth_loop.js not loaded','err'); return; }
+    const r=GROWTH.grow();
+    if(r.verdict==='abstain'){ term(`🌱 GROWTH - ${r.why}`,'sys'); return; }
+    term(`🌱 <b>GROWTH LOOP</b> - observed <b>${r.members}</b> ships on sensors (${r.oracleAsks} noisy reads)${r.tainted?` · <span style="color:#ffd27a">${r.tainted} member(s) excluded (quarantined class)</span>`:''}`,'sys');
+    term(`&nbsp;&nbsp;pen: ${r.coverage.found} observations parked · <b style="color:#7fd0b0">${r.coverage.promoted}</b> promoted (rule-gated) · ${r.coverage.quarantined} stay quarantined - a lone misread can never commit`,'sys');
+    term(`&nbsp;&nbsp;rules graduated (true-majority): ${r.rules.length?r.rules.map(x=>'<b>'+x+'</b>').join(' · '):'<span style="opacity:.6">none - not enough consistent consensus yet</span>'}`,'sys');
+    term(`&nbsp;&nbsp;${r.verified} verified edges grown · ${r.committedToStore} committed to your private knowledge layer <span style="opacity:.55">(LEARNED, provenance carried; quarantined observations never leave the pen)</span>`,'sys');
+    return; }
+  if(c==='growth'){ if(!window.GROWTH){ term('growth_loop.js not loaded','err'); return; }
+    const r=GROWTH.report();
+    if(r.verdict==='abstain'){ term(`🌱 GROWTH - ${r.why}`,'sys'); return; }
+    term(`🌱 last grow: ${r.members} ships · rules: ${r.rules.join(' · ')||'(none)'} · ${r.verified} verified · ${r.committedToStore} in store`,'sys'); return; }
   // GRAVITY WELL (AGI_SALVAGE port from agi_proto/chainer.py): give the knowledge store a 2D geometry where
   // every relation is a CONSERVED TRANSLATION, then let the agent repair drifted positions on its own when
   // the composition residual runs high. Repair-not-prune: only POSITIONS move, never facts.
@@ -4520,6 +4537,7 @@ window.HOST={
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
   get contracts(){ return contracts; },   // SR:AWA 2026-07-09: the MISSIONS tab renders coalition contracts as clickable rows (they were terminal-only - the tab's own fallback note admitted it)
+  probeAt:(name)=>{ const pr=mineProbes.find(p=>p.planet===name); return pr?{working:true}:{working:false}; },   // SR:AWA 2026-07-09: the planet screen's probe section (deployprobe/collectprobe were terminal-only)
   CFG, RANKS, GOODS, HULLS, HULL_ORDER, WEAPONS, WEAPON_ORDER, ARTIFACTS, ARTIFACT_KEYS, POWER_SYS, CONTRABAND, CONTRA_KEYS,
   HULL_ORDER_ORIGINAL, shopHullKeys:()=>HULL_ORDER_ORIGINAL.concat(shopHullPool()),   // PROCEDURAL HULL ROSTER: the CURATED (7 standard + rotating 8 generated) list any hull-shop UI should render, not the raw 57-long HULL_ORDER
   EQUIP, ENGINES, ENGINE_KEYS, GIZMOS, GIZMO_KEYS, GIZMO_SELL_FRAC, hasGizmo, gizmoSlotsFor,   // ENGINEERING BAY - exposed live like HULLS/WEAPONS/ARTIFACTS so the UI never hardcodes a second copy that can drift
