@@ -263,6 +263,30 @@ function onGridPick(kind, key) {
 // hint instead of any buy UI - deliberately no price list or mutate path here, since that would let a player shop
 // from anywhere; the existing dock-gated commands (hardpoint/gizmo mount, hull, upgrade, ...) remain the only way
 // to actually transact, same as always. "Still need to travel" is preserved by construction, not by a new check.
+// PILOT SKILLS (SR:AWA slice 2026-07-09): the SR-M17 skill career was TERMINAL-ONLY (`skill <k>`), yet this
+// panel calls itself the character screen. Rendered live from the ship + HOST.CFG (no second copy); the TRAIN
+// button delegates to the real `skill <k>` command - visibility here, truth in the command's own gates.
+function skillsHtml(h, s) {
+  var keys = h.CFG && h.CFG.SKILL_KEYS, max = (h.CFG && h.CFG.SKILL_MAX) || 5;
+  if (!keys || !keys.length) return '';
+  var pts = (s && s.skillPts) || 0;
+  var html = '<div style="margin-top:12px;border-top:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-top:8px">' +
+    '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:6px">PILOT SKILLS - unspent points: ' +
+    '<b style="color:' + (pts > 0 ? '#ffd27a' : CFG.COL_TEXT) + '">' + pts + '</b>' +
+    (pts > 0 ? '' : ' <span style="opacity:.6">(earn one per rank-up)</span>') + '</div>';
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i], lv = (s && s.skills && s.skills[k]) || 0;
+    var pips = '';
+    for (var p2 = 0; p2 < max; p2++) pips += '<span style="display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:2px;background:' + (p2 < lv ? '#46d6ff' : '#1c2a3c') + ';border:1px solid ' + (p2 < lv ? '#9fe6ff' : CFG.COL_EMPTY_STROKE) + '"></span>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+      '<span style="min-width:86px;font-size:10px;color:' + CFG.COL_TEXT + ';letter-spacing:.05em">' + esc(k.toUpperCase()) + '</span>' + pips +
+      '<span style="font-size:10px;color:' + CFG.COL_DIM + '">Lv' + lv + '/' + max + '</span>' +
+      (pts > 0 && lv < max ? '<button data-skill="' + esc(k) + '" style="margin-left:auto;font:700 9px/1 ui-monospace,monospace;color:#04140c;background:linear-gradient(#8fe6b0,#4fd68a);border:1px solid #bff5d6;border-radius:4px;padding:3px 8px;cursor:pointer">+ TRAIN</button>' : '') +
+      '</div>';
+  }
+  return html + '</div>';
+}
+
 function nearestStationHtml(h, s) {
   var ns = (typeof h.nearestStation === 'function') ? h.nearestStation(s.pos) : null;
   if (!ns) return '<div style="color:' + CFG.COL_DIM + '">no station data yet.</div>';
@@ -308,6 +332,7 @@ function render() {
   } else {
     right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>NEAREST STATION</b></div>' + nearestStationHtml(h, s);
   }
+  right += skillsHtml(h, s);
   right += '</div>';
 
   EB.body.innerHTML = top + left + right;
@@ -345,6 +370,8 @@ function wireClicks() {
     if (gridPickEl) { onGridPick(EB.gridPick, gridPickEl.getAttribute('data-gridpick')); return; }
     var gridEl = ev.target.closest && ev.target.closest('[data-grid]');
     if (gridEl) { onGridClick(gridEl.getAttribute('data-grid')); return; }
+    var skillEl = ev.target.closest && ev.target.closest('[data-skill]');
+    if (skillEl) { var h2 = HOST(); if (h2) h2.runCmd('skill ' + skillEl.getAttribute('data-skill')); render(); return; }
     // (2026-07-09: the embedded-shop data-act delegation is GONE with the shop itself - the Bay is loadout-only;
     // buying happens in the docked menu's SHOP tab.)
   });
