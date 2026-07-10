@@ -57,9 +57,9 @@ var CFG = {
   // the RADIAL tick ring (techslidercircle.png pulled from Starfighter2/Assets/Textures) tinted by health.
   TICK_H: 7, TICK_GAP: 3,     // vertical-bar tick segment height / gap (px)
   TICK_W: 6, TICK_WGAP: 3,    // horizontal-gauge tick width / gap (px)
-  RADIAL: 92,                 // radial HULL gauge CSS size (px); canvas is 2x for sharpness
-  DIAL_L: 58,                 // radial POWER dial size (WEAPONS/ENGINES/SHIELDS) - user 2026-07-10 "make all the gauges radial"
-  CAP_L: 46,                  // radial capacitor + shield-arc dial size (LASER/ENGINE/FWD/AFT)
+  RADIAL: 70,                 // radial HULL gauge CSS size (px); canvas is 2x for sharpness (was 92: user 2026-07-10 the dials overflowed the dock off-screen bottom - shrunk to fit the ~245px dock)
+  DIAL_L: 52,                 // radial POWER dial size (WEAPONS/ENGINES/SHIELDS) - user 2026-07-10 "make all the gauges radial"
+  CAP_L: 40,                  // radial capacitor + shield-arc dial size (LASER/ENGINE/FWD/AFT), all four in ONE row now
   RADIAL_IMG: 'assets/techslidercircle.png',
   COL_RADIAL_DIM: '#2a4258',  // unfilled remainder of the tick ring
   COL_RADIAL_SHIELD: '#7fd0ff',
@@ -438,22 +438,17 @@ function buildDialSlot(labelText, col, onClick) {
   }
   return { wrap: wrap, slot: slot };
 }
-// SR X-WING SHIELDS as two radial arc dials (FWD / AFT): each shows its arc's REAL charge; clicking a dial DIVERTS
-// regen to that arc (clicking the already-diverted one returns to BALANCED). Replaces the old horizontal split bar.
-function buildBalanceBar() {
-  var wrap = el('div', 'display:flex;justify-content:center;gap:10px;margin-top:8px');
+// ONE instrument row of four small radial dials so the whole panel fits the fixed-height dock without clipping off
+// the screen (user 2026-07-10): SR X-WING shield arcs FWD / AFT (click a dial to DIVERT regen to it; click the
+// diverted one for BALANCED) + the LASER / ENGINE capacitor gauges (read-only, drain/regen automatically).
+function buildInstrumentRow() {
+  var wrap = el('div', 'display:flex;justify-content:center;gap:7px;margin-top:5px;flex-wrap:wrap');
   var fwd = buildDialSlot('FWD', CFG.COL_SHIELDS, function () { playSound('ui'); setDivert(readDivert() === 'fwd' ? null : 'fwd'); renderBalance(); });
   var aft = buildDialSlot('AFT', CFG.COL_ENGINES, function () { playSound('ui'); setDivert(readDivert() === 'aft' ? null : 'aft'); renderBalance(); });
-  wrap.appendChild(fwd.wrap); wrap.appendChild(aft.wrap);
-  PP.balance = { fwd: fwd.slot, aft: aft.slot };
-  return wrap;
-}
-// SR X-WING CAPACITORS as two radial dials (LASER / ENGINE) - read-only (they drain/regen automatically).
-function buildCapacitorRow() {
-  var wrap = el('div', 'display:flex;justify-content:center;gap:10px;margin-top:8px');
   var laser = buildDialSlot('LASER', CFG.COL_LASER, null);
   var engine = buildDialSlot('ENGINE', CFG.COL_ENGINE_CAP, null);
-  wrap.appendChild(laser.wrap); wrap.appendChild(engine.wrap);
+  wrap.appendChild(fwd.wrap); wrap.appendChild(aft.wrap); wrap.appendChild(laser.wrap); wrap.appendChild(engine.wrap);
+  PP.balance = { fwd: fwd.slot, aft: aft.slot };
   PP.capLaser = laser.slot; PP.capEngine = engine.slot;
   return wrap;
 }
@@ -472,7 +467,7 @@ function build(parentEl) {
   root.id = 'powerpanel';
 
   // header
-  var head = el('div', 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px');
+  var head = el('div', 'display:flex;align-items:center;justify-content:space-between;margin-bottom:3px');
   var title = el('div',
     'font-weight:800;letter-spacing:.04em;font-size:10.5px;color:' + CFG.COL_HEADER,
     'POWER');
@@ -494,9 +489,11 @@ function build(parentEl) {
     if (cv.style) cv.style.cssText = 'width:' + CFG.RADIAL + 'px;height:' + CFG.RADIAL + 'px;display:block';
     radialCol.appendChild(cv);
   }
-  var hullEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM + ';text-align:center', 'HULL --/--');
-  var shieldEl = el('div', 'font-size:9px;color:' + CFG.COL_DIM + ';text-align:center', 'SHIELD --/--');
-  radialCol.appendChild(hullEl); radialCol.appendChild(shieldEl);
+  var hullEl = el('span', 'font-size:8.5px;color:' + CFG.COL_DIM, 'HULL --/--');
+  var shieldEl = el('span', 'font-size:8.5px;color:' + CFG.COL_DIM, 'SHIELD --/--');
+  var statLine = el('div', 'display:flex;gap:9px;justify-content:center;line-height:1.1');   // one compact line so the panel fits the dock
+  statLine.appendChild(hullEl); statLine.appendChild(shieldEl);
+  radialCol.appendChild(statLine);
   PP.hullEl = hullEl; PP.shieldEl = shieldEl;
   PP.radial = { cv: cv, img: null, imgOk: false, _oc: null };
   // load the Unity tick-ring texture (best-effort; the procedural 36-tick ring draws until/unless it arrives)
@@ -512,12 +509,11 @@ function build(parentEl) {
   root.appendChild(radialCol);
 
   // three POWER allocator dials, in a row
-  var row = el('div', 'display:flex;justify-content:center;gap:12px;margin-top:6px');
+  var row = el('div', 'display:flex;justify-content:center;gap:10px;margin-top:3px');
   for (var i = 0; i < SYSTEMS.length; i++) row.appendChild(buildBar(SYSTEMS[i]));
   root.appendChild(row);
 
-  root.appendChild(buildBalanceBar());   // user 2026-07-08: "tie fighter... shields (forward/behind) ratio" -> radial FWD/AFT dials
-  root.appendChild(buildCapacitorRow());   // user 2026-07-08: "show the power capacitor levels" -> radial LASER/ENGINE dials
+  root.appendChild(buildInstrumentRow());   // FWD/AFT shield arcs + LASER/ENGINE capacitors, one compact row so the dock never clips
 
   if (parent && parent.appendChild) parent.appendChild(root);
   PP.root = root; PP.built = true;
@@ -558,7 +554,7 @@ function mount(parentEl, opts) {
   if (PP.docked && r && r.style) {
     r.style.cssText += ';position:relative;inset:auto;right:auto;bottom:auto;width:auto;height:100%;' +
       'box-sizing:border-box;display:block;border-radius:0;border:0;border-top:1px solid ' + CFG.COL_BORDER + ';' +
-      'box-shadow:none;overflow:hidden';
+      'box-shadow:none;overflow-y:auto;overflow-x:hidden;padding:5px 8px 6px';   // compact padding + scroll-not-clip: if a short window shrinks the dock below the dial stack, it scrolls inside the dock instead of falling off-screen
     PP.shown = true;
   }
   ensureTimer();
