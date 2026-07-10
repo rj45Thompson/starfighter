@@ -299,6 +299,9 @@ function ask(text) {
       // ◇ some mind's secret (hover the terminal `kripke` command for exactly who) - the port of the missed pillar
       var modal = '';
       if (win() && win().KRIPKE) { try { var kv = win().KRIPKE.verdict(e.a, e.r, e.b); modal = ' <b title="' + esc(kv.reading) + '" style="color:' + (kv.modality === 'box' ? CFG.COL_SHARED : CFG.COL_HL) + '">' + kv.glyph + '</b>'; } catch (er) {} }
+      // CONTRADICTION LEDGER (TDRE port): a walked edge sitting on a quarantined functional key gets a ⚠ with the
+      // conflict named - the observer SEES the poison every consumer is abstaining over
+      if (win() && win().CONTRA) { try { if (win().CONTRA.isQuarantined(e.a, e.r)) modal += ' <b title="' + esc(win().CONTRA.reason(e.a, e.r)) + '" style="color:' + CFG.COL_WARN + '">⚠</b>'; } catch (er2) {} }
       steps.push({ edge: e, note: esc(e.a) + ' <span style="color:' + CFG.COL_DIM + '">' + esc(e.r) + '</span> ' + esc(e.b) +
         ' <span style="color:' + (e.tier === 'shared' ? CFG.COL_SHARED : CFG.COL_PRIV) + '">[' + e.tier + ']</span>' + modal });
     }

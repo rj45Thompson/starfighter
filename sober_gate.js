@@ -100,6 +100,19 @@ function check(query, opts) {
   contentWords(factText.join(' ').replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2')).forEach(function (w2) { stems[prefix(w2)] = 1; });
   var uncovered = qWords.filter(function (w3) { return !stems[prefix(w3)]; });
   if (uncovered.length <= CFG.MAX_UNCOVERED) {
+    // CONTRADICTION CONSULT (TDRE ledger law: "a conclusion whose evidence touches a quarantined key must be
+    // answered unknown") - a query that would commit still refuses if any grounded subject sits on a quarantined
+    // functional key in the shared world. The gate names the conflict instead of answering over poisoned ground.
+    var C = win() && win().CONTRA;
+    if (C) {
+      for (var gi2 = 0; gi2 < grounded.length; gi2++) {
+        for (var fr = 0; fr < C.FUNCTIONAL_RELS.length; fr++) {
+          if (C.isQuarantined(grounded[gi2], C.FUNCTIONAL_RELS[fr])) {
+            return { decision: 'refuse_contradicted', reason: 'evidence is quarantined: ' + C.reason(grounded[gi2], C.FUNCTIONAL_RELS[fr]), grounded: grounded, missing: [] };
+          }
+        }
+      }
+    }
     return { decision: 'commit', reason: 'store covers the query' + (uncovered.length ? ' (missing: ' + uncovered.join(', ') + ')' : ''), grounded: grounded, missing: uncovered };
   }
   // (the original falls back to an NLI entailment model here - there is no NLI in a browser game, so the honest

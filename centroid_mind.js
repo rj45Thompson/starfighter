@@ -109,6 +109,10 @@ function splitMembers(members, frac) {
 
 // ---- the gate: geometry proposes, the symbolic check verifies (or the mind abstains) ---------------------------
 function proposeAndGate(entity, P) {
+  // CONTRADICTION CONSULT (TDRE ledger law: every pillar abstains on tainted keys) - if this entity's label
+  // relation is quarantined in the shared world, no claim is possible regardless of what the geometry says.
+  var C = win() && win().CONTRA;
+  if (C && P.catRel && C.isQuarantined(entity, P.catRel)) return { verdict: 'abstain', why: 'quarantined: ' + C.reason(entity, P.catRel) };
   var eSet = P.sym[entity];
   if (!eSet || !eSet.size) return { verdict: 'abstain', why: 'no facts known about ' + entity };
   var scores = [];
@@ -147,7 +151,7 @@ function prep(catRel, opts) {
   }
   var centroids = {};
   for (var c in trainSets) centroids[c] = centroidOf(trainSets[c]);
-  return { edges: edges, sym: sym, lm: lm, objsOf: objsOf, train: train, test: test, trainSets: trainSets, centroids: centroids };
+  return { edges: edges, sym: sym, lm: lm, objsOf: objsOf, train: train, test: test, trainSets: trainSets, centroids: centroids, catRel: catRel };
 }
 
 // ---- held-out evaluation: the honest number (labels shown only to this grader) ---------------------------------
@@ -177,6 +181,11 @@ function evalHoldout(catRel, opts) {
 
 // ---- single-entity classification (same machinery, full graph as train) ----------------------------------------
 function classify(entity, catRel, opts) {
+  // quarantine consult BEFORE the known-label shortcut (live-caught: a contradicted entity holds BOTH conflicting
+  // labels, so labelOf happily returns one of them as 'known' - exactly the answer-by-local-check-order the
+  // ledger law forbids)
+  var C = win() && win().CONTRA;
+  if (C && C.isQuarantined(entity, catRel)) return { verdict: 'abstain', why: 'quarantined: ' + C.reason(entity, catRel) };
   var P = prep(catRel, Object.assign({ trainFrac: 1 }, opts || {}));
   if (P.lm.labelOf[entity]) return { verdict: 'known', cat: P.lm.labelOf[entity], why: 'already labeled in the store' };
   return proposeAndGate(entity, P);
