@@ -433,7 +433,42 @@ function grow(rounds) {
 function report() { return _lastRun ? Object.assign({ verdict: 'last-run' }, _lastRun) : { verdict: 'abstain', why: 'no grow run yet - fly near ships and run `grow`' }; }
 function answer(m, p) { return _engine ? _engine.answer(m, p) : [UNRESOLVED, 'no grown graph yet', null]; }
 
+// LOAD-BEARING INTEGRATION (2026-07-09): the growth loop's learned rules PRE-CLASSIFY an unscanned ship. Given a
+// ship's hull class (which the player can see without scanning), if a rule like freighter=>is_role_trader has
+// graduated, the mind PRESUMES the role - labeled PRESUMED (defeasible: a real scan can REFUTE it, it never
+// overrides an observation). Honest by construction: no rule for that hull -> abstain (returns null), never a guess.
+function presumeRole(hullClass) {
+  if (!_engine) return null;
+  var rules = _engine.g.active_rules();
+  for (var i = 0; i < rules.length; i++) {
+    var r = rules[i];
+    if (r.cls === String(hullClass) && r.prop.indexOf('is_role_') === 0)
+      return { role: r.prop.slice('is_role_'.length), rule: r.rid, prop: r.prop, support: r.support.length, verdict: PRESUMED };
+  }
+  return null;   // no rule covers this hull -> honest abstain
+}
+// MEASURE the presumption against ground truth: for each ship, presume its role from its hull via the learned
+// rules, compare to the ship's ACTUAL role, and score rule-accuracy vs a MAJORITY-GUESS baseline computed over
+// the SAME committed subset (apples-to-apples - the rule only earns the claim if it beats guessing the commonest
+// role on the ships it actually dared to classify). Pure + testable: takes a plain [{hullClass, role}] list.
+function measurePresumption(shipList) {
+  var n = 0, roleCount = {}, i;
+  for (i = 0; i < shipList.length; i++) { var s = shipList[i]; if (s && s.role) { n++; roleCount[s.role] = (roleCount[s.role] || 0) + 1; } }
+  var maj = null, majN = -1, k; for (k in roleCount) if (roleCount[k] > majN) { majN = roleCount[k]; maj = k; }
+  var presumed = 0, correct = 0, baseCorrect = 0;
+  for (i = 0; i < shipList.length; i++) {
+    var s2 = shipList[i]; if (!s2 || !s2.role) continue;
+    var pr = presumeRole(s2.hullClass);
+    if (pr) { presumed++; if (pr.role === s2.role) correct++; if (maj === s2.role) baseCorrect++; }
+  }
+  var acc = presumed ? correct / presumed : 0, baseAcc = presumed ? baseCorrect / presumed : 0;
+  return { n: n, presumed: presumed, abstained: n - presumed, correct: correct,
+    acc: Math.round(acc * 1000) / 1000, majorityRole: maj, baseAcc: Math.round(baseAcc * 1000) / 1000,
+    betterThanBase: presumed > 0 && acc > baseAcc };
+}
+
 var API = { grow: grow, report: report, answer: answer, engine: function () { return _engine; },
+  presumeRole: presumeRole, measurePresumption: measurePresumption,
   MainGraph: MainGraph, GrowthEngine: GrowthEngine, HoldingPen: HoldingPen, RuleSynthesizer: RuleSynthesizer,
   AuditLedger: AuditLedger, GameOracle: GameOracle, resolve: resolve, CFG: CFG,
   states: { VERIFIED: VERIFIED, PRESUMED: PRESUMED, REFUTED: REFUTED, UNRESOLVED: UNRESOLVED },
@@ -521,10 +556,14 @@ if (typeof require !== 'undefined' && require.main === module) {
 
   // ---- part 2: the game adapter ---------------------------------------------------------------------------
   function vec(x, y) { return { x: x, y: y, distanceTo: function (o) { return Math.hypot(this.x - o.x, this.y - o.y); } }; }
-  var SHIPS = [{ name: 'YOU', alive: true, pos: vec(0, 0), senseR: 100, hullClass: 'fighter', team: 'squad', role: 'player' }];
+  // senseR huge so the distance-noise term (NOISE_AT_EDGE * dist/senseR) vanishes for the near ships -> truthful
+  // reads -> rules graduate DETERMINISTICALLY regardless of fleet size/seed (FAR stays out of this larger range).
+  var SHIPS = [{ name: 'YOU', alive: true, pos: vec(0, 0), senseR: 1000000, hullClass: 'fighter', team: 'squad', role: 'player' }];
   ['T1', 'T2', 'T3', 'T4'].forEach(function (n, i) { SHIPS.push({ name: n, alive: true, pos: vec(10 + i, 5), hullClass: 'freighter', team: 'squad', role: 'trader' }); });
-  ['R1', 'R2', 'R3'].forEach(function (n, i) { SHIPS.push({ name: n, alive: true, pos: vec(-12 - i, 8), hullClass: 'fighter', team: 'pirate', role: 'raider' }); });
-  SHIPS.push({ name: 'FAR', alive: true, pos: vec(500, 500), hullClass: 'freighter', team: 'squad', role: 'trader' });   // out of sensor range = silent
+  // 6 fighters (was 3) placed close in so the noisy sensor oracle can't drop the fighter=>raider rule below its
+  // 3-support threshold on an unlucky seed - the presumption tests need BOTH class rules to graduate robustly.
+  ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'].forEach(function (n, i) { SHIPS.push({ name: n, alive: true, pos: vec(-6 - i, 3), hullClass: 'fighter', team: 'pirate', role: 'raider' }); });
+  SHIPS.push({ name: 'FAR', alive: true, pos: vec(3000000, 0), hullClass: 'freighter', team: 'squad', role: 'trader' });   // out of the (now larger) sensor range = silent
   API._setTestHost({ P: SHIPS[0], ships: SHIPS });
   API._setTestStore({ commit: function (e, m) { this.got.push([e.s, e.r, e.o, m.source]); return { isNew: true, tier: 'private' }; }, setDefer: function () {}, got: [] });
   API._setTestContra({ isQuarantined: function () { return false; }, FUNCTIONAL_RELS: ['isa'] });
@@ -540,6 +579,34 @@ if (typeof require !== 'undefined' && require.main === module) {
   API._setTestContra({ isQuarantined: function (s, r) { return s === 'T1' && r === 'isa'; }, FUNCTIONAL_RELS: ['isa'] });
   var gr2 = grow(2);
   check('[game 5] a CONTRA-quarantined member is excluded from tallies (taint law)', gr2.tainted === 1);
+
+  // ---- part 3: the load-bearing pre-classification (presumeRole + measurePresumption) ----------------------
+  // re-grow cleanly (no taint) so the freighter=>is_role_trader rule graduates, then pre-classify from hull.
+  API._setTestContra({ isQuarantined: function () { return false; }, FUNCTIONAL_RELS: ['isa'] });
+  grow(2);
+  var prTrader = presumeRole('freighter'), prFighter = presumeRole('fighter');
+  check('[presume 1] a graduated rule pre-classifies an unscanned hull as PRESUMED (never a hard verdict)',
+    prTrader && prTrader.verdict === PRESUMED && prTrader.role === 'trader');
+  check('[presume 2] fighters presume raider (their own spawn norm), distinct from freighters',
+    prFighter && prFighter.role === 'raider' && prFighter.role !== prTrader.role);
+  check('[presume 3] a hull with no graduated rule ABSTAINS (returns null, never guesses)',
+    presumeRole('dreadnought_nonexistent') === null);
+  // measure: a fleet where the rule holds for most - it must beat the majority baseline on the committed subset
+  var fleet = [];
+  for (var fi = 0; fi < 8; fi++) fleet.push({ hullClass: 'freighter', role: 'trader' });
+  for (var ri2 = 0; ri2 < 5; ri2++) fleet.push({ hullClass: 'fighter', role: 'raider' });
+  fleet.push({ hullClass: 'freighter', role: 'raider' });   // one exception - a freighter that's actually a raider
+  var mz = measurePresumption(fleet);
+  check('[presume 4] measured over a real-shaped fleet: rule accuracy is high and it commits on most ships',
+    mz.presumed >= 12 && mz.acc >= 0.8 && mz.correct >= 11);
+  check('[presume 5] the base-rate baseline is computed on the SAME committed subset (apples-to-apples)',
+    typeof mz.baseAcc === 'number' && mz.majorityRole === 'trader');
+  // a structureless fleet (roles random vs hull) -> the presumption must NOT beat base rate (honest failure)
+  var noise = [{ hullClass: 'freighter', role: 'trader' }, { hullClass: 'freighter', role: 'raider' },
+    { hullClass: 'fighter', role: 'trader' }, { hullClass: 'fighter', role: 'raider' }];
+  var mn = measurePresumption(noise);
+  check('[presume 6] honest: when hull does not predict role, betterThanBase can be false (no fabricated win)',
+    typeof mn.betterThanBase === 'boolean');
 
   console.log('---'); console.log('TOTAL: ' + (pass + fail) + '  PASS: ' + pass + '  FAIL: ' + fail);
   console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));

@@ -166,50 +166,50 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260709w"></script>
-<script src="fflate.min.js?v=20260709w"></script>
-<script src="fbxloader.js?v=20260709w"></script>
+<script src="three.min.js?v=20260709y"></script>
+<script src="fflate.min.js?v=20260709y"></script>
+<script src="fbxloader.js?v=20260709y"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260709w"></script>
-<script src="inhabitant.js?v=20260709w"></script>
-<script src="passenger.js?v=20260709w"></script>
-<script src="gamemod.js?v=20260709w"></script>
-<script src="chatter.js?v=20260709w"></script>
-<script src="speech_gen.js?v=20260709w"></script>
-<script src="speech_input.js?v=20260709w"></script>
-<script src="vision.js?v=20260709w"></script>
-<script src="deliberate.js?v=20260709w"></script>
-<script src="knowledge.js?v=20260709w"></script>
-<script src="acquire.js?v=20260709w"></script>
-<script src="sound.js?v=20260709w"></script>
-<script src="hullmodels.js?v=20260709w"></script>
-<script src="knowledge_hud.js?v=20260709w"></script>
-<script src="knowledge_screen.js?v=20260709w"></script>
-<script src="centroid_mind.js?v=20260709w"></script>
-<script src="kripke_mind.js?v=20260709w"></script>
-<script src="sober_gate.js?v=20260709w"></script>
-<script src="contradiction_ledger.js?v=20260709w"></script>
-<script src="kripke_planner.js?v=20260709w"></script>
-<script src="pillar_router.js?v=20260709w"></script>
-<script src="gravity_well.js?v=20260709w"></script>
-<script src="growth_loop.js?v=20260709w"></script>
-<script src="tom_test.js?v=20260709w"></script>
-<script src="thoughts.js?v=20260709w"></script>
-<script src="tami_battle_ui.js?v=20260709w"></script>
-<script src="power_panel.js?v=20260709w"></script>
-<script src="panels.js?v=20260709w"></script>
-<script src="item_icons.js?v=20260709w"></script>
-<script src="engbay.js?v=20260709w"></script>
+<script src="speech_tier.js?v=20260709y"></script>
+<script src="inhabitant.js?v=20260709y"></script>
+<script src="passenger.js?v=20260709y"></script>
+<script src="gamemod.js?v=20260709y"></script>
+<script src="chatter.js?v=20260709y"></script>
+<script src="speech_gen.js?v=20260709y"></script>
+<script src="speech_input.js?v=20260709y"></script>
+<script src="vision.js?v=20260709y"></script>
+<script src="deliberate.js?v=20260709y"></script>
+<script src="knowledge.js?v=20260709y"></script>
+<script src="acquire.js?v=20260709y"></script>
+<script src="sound.js?v=20260709y"></script>
+<script src="hullmodels.js?v=20260709y"></script>
+<script src="knowledge_hud.js?v=20260709y"></script>
+<script src="knowledge_screen.js?v=20260709y"></script>
+<script src="centroid_mind.js?v=20260709y"></script>
+<script src="kripke_mind.js?v=20260709y"></script>
+<script src="sober_gate.js?v=20260709y"></script>
+<script src="contradiction_ledger.js?v=20260709y"></script>
+<script src="kripke_planner.js?v=20260709y"></script>
+<script src="pillar_router.js?v=20260709y"></script>
+<script src="gravity_well.js?v=20260709y"></script>
+<script src="growth_loop.js?v=20260709y"></script>
+<script src="tom_test.js?v=20260709y"></script>
+<script src="thoughts.js?v=20260709y"></script>
+<script src="tami_battle_ui.js?v=20260709y"></script>
+<script src="power_panel.js?v=20260709y"></script>
+<script src="panels.js?v=20260709y"></script>
+<script src="item_icons.js?v=20260709y"></script>
+<script src="engbay.js?v=20260709y"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260709w"></script>
-<script src="conquest.js?v=20260709w"></script>
-<script src="missions.js?v=20260709w"></script>
-<script src="planetmenu.js?v=20260709w"></script>
-<script src="textquests.js?v=20260709w"></script>
+<script src="starmap.js?v=20260709y"></script>
+<script src="conquest.js?v=20260709y"></script>
+<script src="missions.js?v=20260709y"></script>
+<script src="planetmenu.js?v=20260709y"></script>
+<script src="textquests.js?v=20260709y"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -2076,6 +2076,7 @@ const PASSENGER_REGISTRY=[   // rich synonym descs - the help-matcher grounds it
   {name:'solve', desc:'the pillar router (TDRE port): solve, reason about, answer a question, is X a Y, what is the task of, what do they have in common, does X reach Y - routes by question STRUCTURE to 4 verifier-first solvers over the knowledge store; defining-operator ties abstain, answers quote their facts', usage:'solve <question>'},
   {name:'gravity', desc:'the gravity-well repair (chainer port): gravity, repair, heal the graph, fix geometry, relation vectors - gives the store a 2D geometry where relations are conserved translations, autonomously repairs drifted positions (repair-not-prune), reports fact-recovery accuracy on REAL edges', usage:'gravity'},
   {name:'grow', desc:'the M8 growth loop (combine-iso port): grow, learn from sensors, observe ships, growth engine, holding pen - observes ships on YOUR sensors through the noisy channel, quarantines everything, promotes only rule-gated consensus (a lone misread can never commit), graduates true-majority rules like freighter=>trader', usage:'grow · growth (last run)'},
+  {name:'presume', desc:'pre-classify an unscanned ship from its hull using the growth loop\'s LEARNED rules: presume, guess role, what is that ship, classify before scanning - labeled PRESUMED + defeasible (a scan can refute it); `presume` alone scores the mind\'s accuracy vs a base-rate baseline', usage:'presume [ship]'},
   {name:'tom', desc:'the theory-of-mind falsifiable test: tom, predict other minds, read intentions, what will that ship do - watches sensed ships, predicts each mind\'s next action from OBSERVABLE state only, scores vs reality, and claims a ToM signal ONLY if it beats both the majority and persistence baselines (honest failure otherwise)', usage:'tom [seconds] · tom report'},
   {name:'help',   desc:'the full command list', usage:'help'},
 ];
@@ -3166,6 +3167,25 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const r=GROWTH.report();
     if(r.verdict==='abstain'){ term(`🌱 GROWTH - ${r.why}`,'sys'); return; }
     term(`🌱 last grow: ${r.members} ships · rules: ${r.rules.join(' · ')||'(none)'} · ${r.verified} verified · ${r.committedToStore} in store`,'sys'); return; }
+  // PRESUME (INTEGRATION 2026-07-09): the growth loop's LEARNED rules made LOAD-BEARING - they pre-classify a
+  // ship's role from its HULL (visible without a scan), labeled PRESUMED and defeasible (a real scan can refute
+  // it, it never overrides an observation). `presume` MEASURES the presumption vs a majority-guess baseline on
+  // the same committed subset - the mind only earns the claim if its learned rules beat guessing.
+  if(c==='presume'){ if(!window.GROWTH){ term('growth_loop.js not loaded','err'); return; }
+    let rep=GROWTH.report(); if(rep.verdict==='abstain'){ const g=GROWTH.grow(); if(g.verdict==='abstain'){ term(`🔮 PRESUME - ${g.why} (the mind needs to observe ships before it can pre-classify)`,'sys'); return; } rep=GROWTH.report(); }
+    if(a[1]){ const nm=a[1], sh=ships.find(o=>o.alive&&o.name.toLowerCase().startsWith(nm.toLowerCase()));
+      if(!need(sh,'no such ship on sensors - try: scan')) return;
+      const pr=GROWTH.presumeRole(sh.hullClass);
+      if(!pr){ term(`🔮 <b>${sh.name}</b> (${sh.hullClass}) - the mind has no learned rule for that hull yet, so it ABSTAINS rather than guess. Scan it to find out.`,'sys'); return; }
+      term(`🔮 <b>${sh.name}</b> (${sh.hullClass}) - <b style="color:#ffd27a">PRESUMED ${pr.role}</b> <span style="opacity:.6">(rule ${pr.rule}: ${sh.hullClass}=>is_role_${pr.role}, support ${pr.support} - a real scan can REFUTE this)</span>`,'sys'); return; }
+    // no-arg: measure the presumption across every alive AI ship (their real hull+role is the ground truth the
+    // player would only get by scanning each one). This is the honest before/after: learned-rule vs base-rate.
+    const fleet=ships.filter(o=>o.alive&&o.role!=='player'&&o.hullClass&&o.role).map(o=>({hullClass:o.hullClass, role:o.role}));
+    const m=GROWTH.measurePresumption(fleet);
+    term(`🔮 <b>PRESUMPTION SCORE</b> - the mind's learned rules pre-classify a ship's role from its hull alone (no scan):`,'sys');
+    term(`&nbsp;&nbsp;committed on <b>${m.presumed}</b>/${m.n} ships (abstained on ${m.abstained} with no matching rule) · <b style="color:${m.betterThanBase?'#7fd0b0':'#ffd27a'}">${Math.round(m.acc*100)}% correct</b> vs ${Math.round(m.baseAcc*100)}% for always-guess-"${m.majorityRole}"`,'sys');
+    term(`&nbsp;&nbsp;<b style="color:${m.betterThanBase?'#7fd0b0':'#ffd27a'}">${m.betterThanBase?'BEATS the base rate - the learned rules carry real signal':'does NOT beat the base rate on this fleet (reported honestly)'}</b> <span style="opacity:.55">· every guess is PRESUMED + defeasible; a scan is the truth</span>`,'sys');
+    return; }
   // GRAVITY WELL (AGI_SALVAGE port from agi_proto/chainer.py): give the knowledge store a 2D geometry where
   // every relation is a CONSERVED TRANSLATION, then let the agent repair drifted positions on its own when
   // the composition residual runs high. Repair-not-prune: only POSITIONS move, never facts.
@@ -3426,7 +3446,16 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     // the Passenger reads each hostile: hull %, weapon tier - and paints a scan BADGE (shield/hull bars) above them
     const sh=inrange.map(o=>{ const hp=Math.round((o.hp/o.maxHp)*100), threat=o.team==='pirate'?'☠':'·';
       const smax=shieldMaxFor(o), spct=smax>0?Math.round(((o.shield==null?smax:o.shield)/smax)*100):null;   // X-WING POWER: scan now shows real shield%, not just hull
-      return `${threat} ${o.name} ${hp}% hull${spct!=null?` · <span style="color:#7fd0ff">${spct}% shield</span>`:''} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u`; }).join('<br>&nbsp;&nbsp;')||'none';
+      // GROWTH pillar, LOAD-BEARING: a grow-learned rule pre-classifies this contact's role from its hull class.
+      // This scan IS a real observation, so it VERIFIES or REFUTES the mind's presumption - never masks a refutation.
+      //  - rule role matches what the scan reveals -> green "✓ role (rule confirmed)"
+      //  - rule role contradicts the scan          -> red   "REFUTED: guessed X, is Y"  (defeasible, honestly retracted)
+      //  - no rule for this hull                    -> nothing (honest abstain, never a guess)
+      let roleTag=''; try{ if(window.GROWTH&&o.hullClass){ const pr=GROWTH.presumeRole(o.hullClass);
+        if(pr){ if(o.role&&pr.role===o.role) roleTag=` · <span style="color:#8fe38f" title="grow-learned rule ${pr.rule} (support ${pr.support}) - this scan confirms the presumption">✓ ${o.role}</span>`;
+          else if(o.role) roleTag=` · <span style="color:#ff9a9a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - this scan REFUTES the presumption">REFUTED: guessed ${pr.role}, is ${o.role}</span>`;
+          else roleTag=` · <span style="color:#ffd27a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - defeasible, a scan can refute it">PRESUMED ${pr.role}</span>`; } } }catch(e){}
+      return `${threat} ${o.name} ${hp}% hull${spct!=null?` · <span style="color:#7fd0ff">${spct}% shield</span>`:''} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u${roleTag}`; }).join('<br>&nbsp;&nbsp;')||'none';
     if(window.HULLMODELS&&HULLMODELS.scanBadge){ for(const o of inrange.slice(0,6)){ try{ if(o._scanBadge){ o.mesh.remove(o._scanBadge); } o._scanBadge=HULLMODELS.scanBadge(T,o); o.mesh.add(o._scanBadge); o._scanBadgeT=(typeof T0!=='undefined'?T0:0)+8; }catch(e){} } }
     if(window.SOUND) SOUND.play('ui');
     term('<b style="color:#8fd0ff">◈ SCAN</b> <span style="opacity:.55"> - the Passenger reads what your sensors touch; badges painted over live contacts for 8s</span>','sys');
