@@ -34,6 +34,7 @@ const CFG = {
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
   RESIZE_GRIP:26,              // resize-handle footprint (bumped 16->18->26 across "still I can't resize" reports 2026-07-08/09/10 - now a bold, unmistakable corner handle, not a faint 18px hint)
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
+  RESIZE_EDGE:9,               // thickness of the edge-resize strips (user 2026-07-10 'thicker border + resize cursor on hover, all windows') - bumped to 16 on touch in positionGrip()
   DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
   EDGE_OFFSET:14,              // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
   EDGE_HL_THICK:10,            // drag-feedback strip thickness along the candidate edge (6->10 2026-07-09: "docking is still weak" - the old strip was easy to miss entirely)
@@ -96,6 +97,11 @@ if(!document.getElementById('pnl-style')){
       ' border:1px solid '+COL.cyan+'88; box-shadow:0 0 8px '+COL.cyan+'55;'+   // a lit corner so the eye lands on it
       ' background-image:repeating-linear-gradient(135deg,'+COL.cyan+'cc 0,'+COL.cyan+'cc 2px,transparent 2px,transparent 5px); background-position:bottom right; background-size:16px 16px; background-repeat:no-repeat; border-radius:6px; }'+
     '.pnl-grip:hover{ background-color:'+COL.cyan+'55; box-shadow:0 0 12px '+COL.cyan+'99; }'+
+    // EDGE-RESIZE STRIPS (user 2026-07-10 'make the border thicker + show the resize cursor on hover, ALL windows'):
+    // a thin grabbable strip along each of the panel's two FREE edges (the ones facing open space), plus the lit
+    // corner above. Subtle always-on tint so the border reads as grabbable; brighter on hover; cursor per-instance.
+    '.pnl-edge{ position:fixed; z-index:'+(CFG.Z+1)+'; pointer-events:auto; background-color:'+COL.cyan+'22; transition:background-color .12s,box-shadow .12s; }'+
+    '.pnl-edge:hover{ background-color:'+COL.cyan+'66; box-shadow:0 0 10px '+COL.cyan+'77; }'+
     // ANDROID/TOUCH: the desktop sizes above (20x18 buttons, 16x16 grip) are well under a comfortable touch
     // target (~40px+) - fine for a mouse pointer, fiddly for a fingertip. `pointer:coarse` is the standard signal
     // for "primary input is imprecise" and degrades gracefully on hybrid devices (a touchscreen laptop with a
@@ -183,7 +189,7 @@ function applyVisual(rec){
   const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   rec.ctl.style.display = rec.open ? 'flex' : 'none';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.right=''; rec.ctl.style.width=c.width; }
-  if(rec.grip){ rec.grip.style.display=rec.open?'block':'none'; if(rec.open) positionGrip(rec); }
+  if(rec.grip){ const _d=rec.open?'block':'none'; rec.grip.style.display=_d; if(rec.gripE) rec.gripE.style.display=_d; if(rec.gripS) rec.gripS.style.display=_d; if(rec.open) positionGrip(rec); }
 }
 // WHICH CORNER IS FREE? (2026-07-09 "still I can't resize"): the old grip lived at bottom-right and always grew
 // with +dx/+dy - for a panel ANCHORED at the screen's right or bottom edge that direction is pinned against the
@@ -199,15 +205,21 @@ function anchorOf(rec){
     : (window.innerHeight - r.bottom) < r.top;
   return { right, bottom };
 }
-function positionGrip(rec){   // the FREE corner of the panel's own current rect (only meaningful while open)
+function positionGrip(rec){   // corner grip + the two FREE-edge resize strips (only meaningful while open)
   const r=rec.el.getBoundingClientRect();
-  // read the grip's OWN rendered size rather than assume CFG.RESIZE_GRIP - the touch media query above enlarges
-  // it, and anchoring off the wrong (smaller) constant would leave it hanging partway off the panel's corner.
   const gw=rec.grip.offsetWidth||CFG.RESIZE_GRIP, gh=rec.grip.offsetHeight||CFG.RESIZE_GRIP;
-  const a=anchorOf(rec);
+  const a=rec._resizeAnch || anchorOf(rec);   // FROZEN anchor during an active resize so a handle can't flip corners mid-drag (the old 'reversed/odd' feel)
+  const T=(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)?16:CFG.RESIZE_EDGE;   // fatter strips on touch
+  // CORNER (both free edges meet) - keeps the diagonal cursor + hatched look
   rec.grip.style.top =(a.bottom ? r.top : r.bottom-gh)+'px';
   rec.grip.style.left=(a.right ? r.left : r.right-gw)+'px';
   rec.grip.style.cursor = (a.right !== a.bottom) ? 'nesw-resize' : 'nwse-resize';
+  // VERTICAL free edge (resizes WIDTH): left edge if right-anchored, else right edge; leaves the corner clear
+  if(rec.gripE){ rec.gripE.style.left=(a.right ? r.left : r.right-T)+'px'; rec.gripE.style.width=T+'px';
+    rec.gripE.style.top=(a.bottom ? r.top+gh : r.top)+'px'; rec.gripE.style.height=Math.max(0,r.height-gh)+'px'; }
+  // HORIZONTAL free edge (resizes HEIGHT): top edge if bottom-anchored, else bottom edge; leaves the corner clear
+  if(rec.gripS){ rec.gripS.style.top=(a.bottom ? r.top : r.bottom-T)+'px'; rec.gripS.style.height=T+'px';
+    rec.gripS.style.left=(a.right ? r.left+gw : r.left)+'px'; rec.gripS.style.width=Math.max(0,r.width-gw)+'px'; }
 }
 
 // BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
@@ -409,32 +421,40 @@ function register(id, el, opts){
 
   let grip=null;
   if(rec.resizable){
-    grip=document.createElement('div'); grip.className='pnl-grip'; grip.title='drag to resize'; body.appendChild(grip);
+    // THREE resize handles per panel (user 2026-07-10 'thicker border + resize cursor on hover, ALL windows'):
+    // the lit CORNER grip (both axes) + a thin strip on each of the two FREE edges (the edges facing open space,
+    // computed from anchorOf). Every panel that registers as resizable gets all three via this same path.
+    grip=document.createElement('div'); grip.className='pnl-grip'; grip.title='drag corner to resize'; body.appendChild(grip);
     rec.grip=grip;
-    // DIRECTION-AWARE RESIZE (2026-07-09 "still I can't resize"): deltas grow AWAY from the anchored sides -
-    // a right-docked panel grows leftward, a bottom-docked one grows upward. The old unconditional +dx/+dy
-    // meant panels docked at the right or bottom screen edge could only ever SHRINK (their growth direction was
-    // pinned against the screen) - the exact "can't resize" being reported.
-    let dragging=false, startX=0, startY=0, startW=0, startH=0, anch={right:false,bottom:false};
-    const onMove=(ev)=>{ if(!dragging) return;
-      const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
-      const dw=anch.right ? (startX-x) : (x-startX), dh=anch.bottom ? (startY-y) : (y-startY);
-      const w=Math.max(CFG.RESIZE_MIN_W, startW+dw), h=Math.max(CFG.RESIZE_MIN_H, startH+dh);
-      applyStoredSize(el, w, h); positionGrip(rec);
-      const c=ctlPosition(rec); ctl.style.top=c.top; ctl.style.left=c.left; ctl.style.width=c.width;   // the title bar tracks the live rect
-      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
-    const endDrag=()=>{ if(!dragging) return; dragging=false;
-      const r=el.getBoundingClientRect(); store[id]=store[id]||{}; store[id].w=Math.round(r.width); store[id].h=Math.round(r.height); save();
-      applyVisual(rec);
-      document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
-      document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag); };
-    const startDrag=(ev)=>{ dragging=true; const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
-      anch=anchorOf(rec);
-      startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
-      document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
-      document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag);
-      if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
-    grip.addEventListener('mousedown',startDrag); grip.addEventListener('touchstart',startDrag,{passive:false});
+    const gripE=document.createElement('div'); gripE.className='pnl-edge'; gripE.style.cursor='ew-resize'; gripE.title='drag to resize width'; body.appendChild(gripE); rec.gripE=gripE;
+    const gripS=document.createElement('div'); gripS.className='pnl-edge'; gripS.style.cursor='ns-resize'; gripS.title='drag to resize height'; body.appendChild(gripS); rec.gripS=gripS;
+    // DIRECTION-AWARE + PER-AXIS: deltas grow AWAY from the anchored side (a right-docked panel grows leftward, a
+    // bottom-docked one upward). axis 'x'=width only, 'y'=height only, 'xy'=corner. The anchor is FROZEN at
+    // drag-start (rec._resizeAnch) so a handle can't jump corners mid-drag - that anchor-recompute-every-frame was
+    // the 'reversed/odd' feel the user reported.
+    const makeResize=(handle,axis)=>{
+      let dragging=false, startX=0, startY=0, startW=0, startH=0, anch={right:false,bottom:false};
+      const onMove=(ev)=>{ if(!dragging) return;
+        const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+        const dw=(axis==='y')?0:(anch.right ? (startX-x) : (x-startX)), dh=(axis==='x')?0:(anch.bottom ? (startY-y) : (y-startY));
+        const w=Math.max(CFG.RESIZE_MIN_W, startW+dw), h=Math.max(CFG.RESIZE_MIN_H, startH+dh);
+        applyStoredSize(el, w, h); positionGrip(rec);
+        const c=ctlPosition(rec); ctl.style.top=c.top; ctl.style.left=c.left; ctl.style.width=c.width;   // the title bar tracks the live rect
+        if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+      const endDrag=()=>{ if(!dragging) return; dragging=false; rec._resizeAnch=null;
+        const r=el.getBoundingClientRect(); store[id]=store[id]||{}; store[id].w=Math.round(r.width); store[id].h=Math.round(r.height); save();
+        applyVisual(rec);
+        document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
+        document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag); };
+      const startDrag=(ev)=>{ dragging=true; const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
+        anch=anchorOf(rec); rec._resizeAnch=anch;   // freeze for the whole drag
+        startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
+        document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
+        document.addEventListener('touchmove',onMove,{passive:false}); document.addEventListener('touchend',endDrag);
+        if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
+      handle.addEventListener('mousedown',startDrag); handle.addEventListener('touchstart',startDrag,{passive:false});
+    };
+    makeResize(grip,'xy'); makeResize(gripE,'x'); makeResize(gripS,'y');
   }
 
   pinBtn.onclick=(e)=>{ e.stopPropagation(); setPinned(rec, !rec.pinned); };
@@ -450,7 +470,7 @@ function register(id, el, opts){
   el.addEventListener('mouseenter',stayAwake); el.addEventListener('mouseleave',mayDoze);
   tab.addEventListener('mouseenter',stayAwake); tab.addEventListener('mouseleave',mayDoze);
   ctl.addEventListener('mouseenter',stayAwake); ctl.addEventListener('mouseleave',mayDoze);   // the controls float outside `el` now - count hovering them too
-  if(grip){ grip.addEventListener('mouseenter',stayAwake); grip.addEventListener('mouseleave',mayDoze); }
+  [grip,rec.gripE,rec.gripS].forEach(h=>{ if(h){ h.addEventListener('mouseenter',stayAwake); h.addEventListener('mouseleave',mayDoze); } });
 
   PANELS_[id]=rec; (EDGE_MEMBERS[rec.edge]=EDGE_MEMBERS[rec.edge]||[]).push(rec);
   applyVisual(rec); reflowEdge(rec.edge);
