@@ -42,8 +42,9 @@
     METAL: 0.62,
     ROUGH: 0.5,
     EMISSIVE_MUL: 0.14,
-    // procedural hull texture (planar-mapped brushed panels)
-    TEX_SIZE: 128,
+    // procedural hull texture (planar-mapped plated panels) - user 2026-07-10 "add textures to the ships": bumped
+    // 128->256 + a far richer plated/weathered generator below so hulls read as real textured armor, not flat metal
+    TEX_SIZE: 256,
     // engine-glow sprite base scale (game multiplies this every frame)
     ENG_SCALE: 1.7,
     // cockpit accent
@@ -119,30 +120,58 @@
     if (!cv) return null;
     var g = cv.getContext('2d');
     if (!g) return null;
-    // base plate
-    g.fillStyle = '#8b929c'; g.fillRect(0, 0, S, S);
-    // horizontal brushed streaks
-    for (var i = 0; i < 260; i++) {
-      var y = Math.random() * S;
-      var shade = 118 + ((Math.random() * 60) | 0);
-      g.strokeStyle = 'rgba(' + shade + ',' + shade + ',' + (shade + 6) + ',0.28)';
-      g.beginPath(); g.moveTo(0, y); g.lineTo(S, y + (Math.random() * 2 - 1)); g.stroke();
+    // deterministic PRNG so the texture is stable + tileable (no Math.random seams across the wrap edge)
+    var seed = 0x9e3779b1;
+    function rnd() { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return ((seed >>> 8) & 0xffffff) / 0xffffff; }
+    // base plate - neutral grey so the per-ship material.color tint reads clean on top
+    g.fillStyle = '#8f96a0'; g.fillRect(0, 0, S, S);
+    // a 4x4 grid of ARMOR PANELS with beveled edges (lit top-left, shadowed bottom-right) + slight per-panel shade
+    // variation -> reads as assembled plating. The grid divides S evenly so the texture tiles seamlessly.
+    var N = 4, cell = S / N, bev = Math.max(2, cell * 0.06);
+    for (var py = 0; py < N; py++) for (var px = 0; px < N; px++) {
+      var x = px * cell, y = py * cell, sh = 138 + ((rnd() * 34) | 0);          // panel base shade
+      g.fillStyle = 'rgb(' + sh + ',' + (sh + 4) + ',' + (sh + 10) + ')';
+      g.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+      // bevel: bright top+left edge, dark bottom+right edge -> a raised-plate illusion
+      g.fillStyle = 'rgba(255,255,255,0.10)'; g.fillRect(x + 1, y + 1, cell - 2, bev); g.fillRect(x + 1, y + 1, bev, cell - 2);
+      g.fillStyle = 'rgba(0,0,0,0.22)'; g.fillRect(x + 1, y + cell - 1 - bev, cell - 2, bev); g.fillRect(x + cell - 1 - bev, y + 1, bev, cell - 2);
     }
-    // faint panel grid so flat facets read as armor plating
-    g.strokeStyle = 'rgba(30,34,40,0.5)'; g.lineWidth = 1;
-    var step = S / 4;
-    for (var k = 1; k < 4; k++) {
-      g.beginPath(); g.moveTo(k * step, 0); g.lineTo(k * step, S); g.stroke();
-      g.beginPath(); g.moveTo(0, k * step); g.lineTo(S, k * step); g.stroke();
+    // deep panel SEAMS between plates
+    g.strokeStyle = 'rgba(22,26,32,0.6)'; g.lineWidth = Math.max(1, S / 160);
+    for (var k = 0; k <= N; k++) {
+      g.beginPath(); g.moveTo(k * cell, 0); g.lineTo(k * cell, S); g.stroke();
+      g.beginPath(); g.moveTo(0, k * cell); g.lineTo(S, k * cell); g.stroke();
     }
-    // a few rivets
-    g.fillStyle = 'rgba(40,44,52,0.6)';
-    for (var r = 0; r < 40; r++) {
-      g.beginPath(); g.arc(Math.random() * S, Math.random() * S, 1.1, 0, Math.PI * 2); g.fill();
+    // fine horizontal BRUSHED grain across everything
+    for (var i = 0; i < S * 2.2; i++) {
+      var gy = rnd() * S, gsh = 120 + ((rnd() * 70) | 0);
+      g.strokeStyle = 'rgba(' + gsh + ',' + gsh + ',' + (gsh + 6) + ',0.12)';
+      g.beginPath(); g.moveTo(0, gy); g.lineTo(S, gy + (rnd() * 2 - 1)); g.stroke();
+    }
+    // WEATHERING: diagonal scratches + a few grime streaks that read as wear
+    for (var w = 0; w < 30; w++) {
+      var sx = rnd() * S, sy = rnd() * S, len = 6 + rnd() * 26, ang = (rnd() - 0.5) * 1.2;
+      g.strokeStyle = 'rgba(30,32,38,' + (0.10 + rnd() * 0.18).toFixed(2) + ')'; g.lineWidth = rnd() < 0.3 ? 1.6 : 0.8;
+      g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + Math.cos(ang) * len, sy + Math.sin(ang) * len); g.stroke();
+    }
+    // RIVETS along panel seams (a double row per seam) - the classic hull-plate detail
+    g.fillStyle = 'rgba(36,40,48,0.7)';
+    for (var s2 = 1; s2 < N; s2++) for (var t = 0; t < N * 4; t++) {
+      var rr = t / (N * 4) * S + rnd() * 2;
+      g.beginPath(); g.arc(s2 * cell, rr, 1.2, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.arc(rr, s2 * cell, 1.2, 0, Math.PI * 2); g.fill();
+    }
+    // a couple of darker VENT rectangles as greebles
+    g.fillStyle = 'rgba(24,27,33,0.55)';
+    for (var v = 0; v < 3; v++) {
+      var vx = (rnd() * (N - 1) + 0.2) * cell, vy = (rnd() * (N - 1) + 0.2) * cell, vw = cell * 0.32, vh = cell * 0.14;
+      g.fillRect(vx, vy, vw, vh);
+      g.strokeStyle = 'rgba(120,128,138,0.4)'; g.lineWidth = 1;
+      for (var vl = 1; vl < 4; vl++) { g.beginPath(); g.moveTo(vx, vy + vh * vl / 4); g.lineTo(vx + vw, vy + vh * vl / 4); g.stroke(); }
     }
     var tex = new T.CanvasTexture(cv);
     if (T.RepeatWrapping) { tex.wrapS = tex.wrapT = T.RepeatWrapping; }
-    tex.anisotropy = 2;
+    tex.anisotropy = 4;
     T.__hullMetalTex = tex;
     return tex;
   }
