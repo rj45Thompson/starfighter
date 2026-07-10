@@ -51,7 +51,17 @@ function HOST() { var w = win(); return w && w.HOST; }
 function el(tag, style, html) { var d = doc(); var e = d.createElement(tag); if (style) e.style.cssText = style; if (html != null) e.innerHTML = html; return e; }
 function esc(s) { return String(s == null ? '' : s).replace(/</g, '&lt;'); }
 
-var EB = { root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null, gridPick: null };
+var EB = { root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null, gridPick: null,
+  dragging: null };   // "kind|key" while an item icon is mid-drag - the poll must NOT re-render then (a re-render destroys the dragged element and cancels the drag)
+
+// PROCEDURAL ITEM ICONS (user 2026-07-09 "icons, somewhat unique for each item... slot them in like diablo"):
+// item_icons.js generates a deterministic per-item face from the item's own real data. Soft dependency - every
+// call falls back to the old category glyph when ICONS isn't loaded, so this file still works standalone.
+function iconImg(kind, key, item, table, size, drag) {
+  var w = win();
+  if (!w || !w.ICONS || !item) return null;
+  try { return w.ICONS.img(kind, key, item, table, { size: size, drag: !!drag }); } catch (e) { return null; }
+}
 
 function shipOr(h) { return (h && h.P) || null; }
 
@@ -142,9 +152,10 @@ function pickerHtml(h, kind, idx) {
   var keys = kind === 'weapon' ? h.WEAPON_ORDER : h.GIZMO_KEYS;
   var cat = kind === 'weapon' ? h.WEAPONS : h.GIZMOS;
   var rows = keys.map(function (k) {
-    return '<div data-pick="' + esc(k) + '" style="padding:4px 8px;cursor:pointer;border-radius:4px" ' +
-      'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' +
-      '<b style="color:' + CFG.COL_TEXT + '">' + esc(cat[k].n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + cat[k].cost + 'c - ' + esc(cat[k].desc || '') + '</span></div>';
+    var face = iconImg(kind, k, cat[k], cat, 24, true) || '';
+    return '<div data-pick="' + esc(k) + '" draggable="true" data-drag="' + esc(kind) + '|' + esc(k) + '" style="padding:4px 8px;cursor:grab;border-radius:4px;display:flex;align-items:center;gap:6px" ' +
+      'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' + face +
+      '<span><b style="color:' + CFG.COL_TEXT + '">' + esc(cat[k].n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + cat[k].cost + 'c - ' + esc(cat[k].desc || '') + '</span></span></div>';
   }).join('');
   return '<div style="margin-top:8px;border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:6px;padding:6px;background:#0c1623">' +
     '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">mount in ' + kind + ' slot ' + (idx + 1) + ' - click one:</div>' + rows + '</div>';
@@ -160,7 +171,10 @@ function pickerHtml(h, kind, idx) {
 // this grid can never drift out of sync with the HANGAR tab's own list of the same categories.
 var GRID_GLYPH = { primaryweapon:'⚔', tank:'⛽', radar:'📡', scanner:'🔍', shieldgen:'🛡', droid:'🔧', hook:'🪝', series:'⚙', manufacturer:'🏭', micromodule:'✦' };
 function gridSlotDefs(h) {
-  var defs = [ { kind:'primaryweapon', label:'PRIMARY WEAPON', table:h.WEAPONS, keys:h.WEAPON_ORDER, field:'weaponType', defKey:'energy', cmd:'weapon', lockField:null } ];
+  var defs = [ { kind:'primaryweapon', label:'PRIMARY WEAPON', table:h.WEAPONS, keys:h.WEAPON_ORDER, field:'weaponType', defKey:'energy', cmd:'weapon', lockField:null },
+    // ENGINE (2026-07-09, added with the icon pass): it was fittable in the HANGAR tab (`engine <key>`) but missing
+    // from this Diablo grid - the character screen should show the whole character.
+    { kind:'engine', label:'ENGINE', table:h.ENGINES, keys:h.ENGINE_KEYS, field:'engineType', defKey:'standard', cmd:'engine', lockField:null } ];
   (h && Array.isArray(win() && win().PLANETMENU && win().PLANETMENU.GEAR_SLOTS) ? win().PLANETMENU.GEAR_SLOTS : []).forEach(function (g) {
     defs.push({ kind:g[0], label:g[1], table:h[g[2]], keys:h[g[3]], field:g[4], defKey:g[5], cmd:g[6], lockField:g[7] || null });
   });
@@ -172,14 +186,22 @@ function gridSlotDefs(h) {
 function gridBoxHtml(h, s, def) {
   var locked = !!(def.lockField && s[def.lockField]);
   var readOnly = !def.cmd;   // manufacturer/micromodules have no fit command - display only
-  var it = def.table && def.table[(s && s[def.field]) || def.defKey];
+  var curKey = (s && s[def.field]) || def.defKey;
+  var it = def.table && def.table[curKey];
   var filled = it && ((s[def.field] || def.defKey) !== def.defKey);
+  // DIABLO ICONS: a slot holding a REAL item (even factory default gear like the Pulse Laser) shows that item's
+  // own procedural icon; only a genuinely empty slot ('none') keeps the faint category glyph.
+  var isEmpty = curKey === 'none' || !it;
+  var face = !isEmpty && iconImg(def.kind, curKey, it, def.table, 34, false);
   var glyph = GRID_GLYPH[def.kind] || '◇';
   var boxCol = readOnly ? CFG.COL_REF : (locked ? '#ff9a9a' : (filled ? CFG.COL_GIZMO : CFG.COL_EMPTY_STROKE));
-  var attrs = (readOnly ? '' : ' data-grid="' + def.kind + '"') + ' style="' + (readOnly ? '' : 'cursor:pointer;') +
+  var attrs = (readOnly ? '' : ' data-grid="' + def.kind + '"') +
+    (readOnly || locked ? '' : ' data-drop="' + def.kind + '"') +
+    ' style="' + (readOnly ? '' : 'cursor:pointer;') +
     'border:1px solid ' + boxCol + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px"';
   return '<div' + attrs + '>' +
-    '<div style="font-size:20px">' + glyph + (locked ? ' 🔒' : '') + '</div>' +
+    '<div style="font-size:20px;min-height:36px;display:flex;align-items:center;justify-content:center;gap:2px">' +
+      (face || '<span style="opacity:.45">' + glyph + '</span>') + (locked ? ' <span style="font-size:13px">🔒</span>' : '') + '</div>' +
     '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">' + esc(def.label) + '</div>' +
     '<div style="font-size:10px;color:' + (filled ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(it ? it.n : 'empty') + '</div>' +
     '</div>';
@@ -187,9 +209,12 @@ function gridBoxHtml(h, s, def) {
 function micromoduleGridHtml(h, s) {
   var mods = s.micromodules || [];
   var glyph = GRID_GLYPH.micromodule;
+  // DIABLO GEMS: each socketed micromodule renders as its own faceted-gem icon (the closest thing this game has
+  // to D2 gems - permanent once socketed, hence the lock).
+  var faces = mods.map(function (k) { return iconImg('micromodule', k, (h.MICROMODULES && h.MICROMODULES[k]) || { n: k }, h.MICROMODULES, 26, false) || ''; }).join('');
   var label = mods.length ? mods.map(function (k) { return (h.MICROMODULES && h.MICROMODULES[k] && h.MICROMODULES[k].n) || k; }).join(', ') : 'none yet';
   return '<div style="border:1px solid ' + CFG.COL_REF + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px">' +
-    '<div style="font-size:20px">' + glyph + (mods.length ? ' 🔒' : '') + '</div>' +
+    '<div style="font-size:20px;min-height:36px;display:flex;align-items:center;justify-content:center;gap:2px">' + (faces || '<span style="opacity:.45">' + glyph + '</span>') + (mods.length ? ' <span style="font-size:13px">🔒</span>' : '') + '</div>' +
     '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">MICROMODULES</div>' +
     '<div style="font-size:10px;color:' + (mods.length ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(label) + '</div></div>';
 }
@@ -204,12 +229,13 @@ function slotGridHtml(h, s) {
     if (def && def.keys) {
       var rows = def.keys.map(function (k) {
         var it2 = def.table[k]; if (!it2) return '';
-        return '<div data-gridpick="' + esc(k) + '" style="padding:4px 8px;cursor:pointer;border-radius:4px" ' +
-          'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' +
-          '<b style="color:' + CFG.COL_TEXT + '">' + esc(it2.n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + (it2.cost ? it2.cost + 'c' : 'free') + ' - ' + esc(it2.desc || '') + '</span></div>';
+        var face = iconImg(def.kind, k, it2, def.table, 24, true) || '';
+        return '<div data-gridpick="' + esc(k) + '" draggable="true" data-drag="' + esc(def.kind) + '|' + esc(k) + '" style="padding:4px 8px;cursor:grab;border-radius:4px;display:flex;align-items:center;gap:6px" ' +
+          'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' + face +
+          '<span><b style="color:' + CFG.COL_TEXT + '">' + esc(it2.n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + (it2.cost ? it2.cost + 'c' : 'free') + ' - ' + esc(it2.desc || '') + '</span></span></div>';
       }).join('');
       html += '<div style="border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:6px;padding:6px;background:#0c1623;margin-bottom:6px">' +
-        '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">fit ' + esc(def.label) + ' - click one:</div>' + rows + '</div>';
+        '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">fit ' + esc(def.label) + ' - click one, or DRAG it onto the slot:</div>' + rows + '</div>';
     }
   }
   return html;
@@ -322,6 +348,59 @@ function wireClicks() {
     // (2026-07-09: the embedded-shop data-act delegation is GONE with the shop itself - the Bay is loadout-only;
     // buying happens in the docked menu's SHOP tab.)
   });
+  wireDrag();
+}
+
+// DIABLO DRAG-AND-DROP (user 2026-07-09 "I want to slot them in like diablo"): drag an item's icon from a picker
+// list onto its slot. The drop routes through the SAME real fit commands as clicking (weapon/tank/.../hardpoint
+// mount) - drag is a gesture, never a second mutate path. Wrong-slot drops are simply not accepted (no dragover
+// preventDefault -> the browser shows no-drop), exactly Diablo's "item won't go in that socket".
+function dropAccepts(targetKind, dragKind) {
+  if (targetKind === dragKind) return true;
+  var wk = { weapon: 1, primaryweapon: 1 };   // both draw on the WEAPONS table - a gun fits any gun socket
+  return !!(wk[targetKind] && wk[dragKind]);
+}
+function clearDropHl() { if (EB._hl) { try { EB._hl.style.outline = ''; } catch (e) {} EB._hl = null; } }
+function dropTargetOf(ev, dragKind) {
+  var t = ev.target;
+  var box = t.closest && t.closest('[data-drop]');
+  if (box && dropAccepts(box.getAttribute('data-drop'), dragKind)) return { el: box, type: 'grid', kind: box.getAttribute('data-drop') };
+  var mnt = t.closest && t.closest('[data-mount]');
+  if (mnt && dropAccepts(mnt.getAttribute('data-mount') === 'weapon' ? 'weapon' : 'gizmo', dragKind))
+    return { el: mnt, type: 'mount', kind: mnt.getAttribute('data-mount') };
+  return null;
+}
+function wireDrag() {
+  EB.body.addEventListener('dragstart', function (ev) {
+    var d = ev.target.closest && ev.target.closest('[data-drag]');
+    if (!d) return;
+    EB.dragging = d.getAttribute('data-drag');
+    try { ev.dataTransfer.setData('text/plain', EB.dragging); ev.dataTransfer.effectAllowed = 'move'; } catch (e) {}
+  });
+  EB.body.addEventListener('dragover', function (ev) {
+    if (!EB.dragging) return;
+    var tgt = dropTargetOf(ev, EB.dragging.split('|')[0]);
+    clearDropHl();
+    if (tgt) { ev.preventDefault(); if (tgt.el && tgt.el.style) { tgt.el.style.outline = '2px solid #46d6ff'; EB._hl = tgt.el; } }
+  });
+  EB.body.addEventListener('drop', function (ev) {
+    if (!EB.dragging) return;
+    var parts = (EB.dragging || '').split('|'), dragKind = parts[0], key = parts[1];
+    var tgt = dropTargetOf(ev, dragKind);
+    clearDropHl(); EB.dragging = null;
+    if (!tgt || !key) return;
+    ev.preventDefault();
+    var h = HOST(); if (!h) return;
+    if (tgt.type === 'grid') {
+      var def = gridSlotDefs(h).filter(function (d) { return d.kind === tgt.kind; })[0];
+      if (def && def.cmd) h.runCmd(def.cmd + ' ' + key);
+    } else {
+      h.runCmd((tgt.kind === 'weapon' ? 'hardpoint' : 'gizmo') + ' mount ' + key);
+    }
+    EB.gridPick = null; EB.pickIdx = null; EB.pickType = null;
+    render();
+  });
+  EB.body.addEventListener('dragend', function () { clearDropHl(); EB.dragging = null; });
 }
 
 function build() {
@@ -352,7 +431,7 @@ function show() {
   build();
   if (EB.root) EB.root.style.display = 'flex';
   EB.shown = true; render();
-  clearInterval(EB.pollT); EB.pollT = setInterval(function () { if (EB.shown) render(); }, CFG.POLL_MS);
+  clearInterval(EB.pollT); EB.pollT = setInterval(function () { if (EB.shown && !EB.dragging) render(); }, CFG.POLL_MS);
 }
 function hide() {
   if (EB.root) EB.root.style.display = 'none';
@@ -360,7 +439,7 @@ function hide() {
 }
 function toggle() { if (EB.shown) hide(); else show(); return EB.shown; }
 function visible() { return EB.shown; }
-function setShown(v) { EB.shown = !!v; if (EB.shown) { render(); clearInterval(EB.pollT); EB.pollT = setInterval(function () { if (EB.shown) render(); }, CFG.POLL_MS); } else { clearInterval(EB.pollT); EB.pollT = null; } }
+function setShown(v) { EB.shown = !!v; if (EB.shown) { render(); clearInterval(EB.pollT); EB.pollT = setInterval(function () { if (EB.shown && !EB.dragging) render(); }, CFG.POLL_MS); } else { clearInterval(EB.pollT); EB.pollT = null; } }
 
 var API = { mount: build, show: show, hide: hide, toggle: toggle, visible: visible, setShown: setShown, CFG: CFG, _EB: EB };
 if (typeof window !== 'undefined') window.ENGBAY = API;

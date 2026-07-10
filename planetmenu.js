@@ -528,6 +528,21 @@ function upCostEst(P,k){ var h=H(), c=h&&h.CFG;
    docked buying surface: ONE flat scroll, thin group headers, every purchasable a single row
    [name - stat - price - BUY]. No expanding, no nesting. LAYOUT editing (mounts/slots/specializations) is the
    Engineering Bay's job and is deliberately NOT here - and hull purchases are deliberately NOT in the Bay. */
+/* PROCEDURAL ITEM ICONS (user 2026-07-09 "icons, somewhat unique for each item"): the icon is derived from the
+   row's OWN buy command ("tank extended" -> kind tank, key extended -> FUEL_TANKS.extended), so every shop row
+   gets its item's face with zero caller changes and no second catalog. Soft dependency on item_icons.js. */
+var ICON_TABLE_OF = { weapon:'WEAPONS', hardpoint:'WEAPONS', tank:'FUEL_TANKS', radar:'RADARS', scanner:'SCANNERS',
+  shieldgen:'SHIELD_GENS', droid:'REPAIR_DROIDS', hook:'CARGO_HOOKS', series:'HULL_SERIES', gizmo:'GIZMOS',
+  hull:'HULLS', engine:'ENGINES', blackmarket:'CONTRABAND' };
+function shopIcon(cmd){
+  var w=(typeof window!=='undefined')?window:null, h=H();
+  if(!w || !w.ICONS || !h || !cmd) return '';
+  var p=String(cmd).split(/\s+/), kind=p[0], key=p[1];
+  if((kind==='hardpoint'||kind==='gizmo') && key==='mount') key=p[2];
+  var tp=ICON_TABLE_OF[kind]; if(!tp) return '';
+  var table=h[tp], item=table&&table[key]; if(!item) return '';
+  try{ return w.ICONS.img(kind, key, item, table, { size:22, style:'margin-right:7px' }); }catch(e){ return ''; }
+}
 function shopRow(name, stat, cost, cmd, tag){
   var P=player(); var afford = cost==null || num(P&&P.credits,0)>=cost;
   /* SR:AWA parity slice (2026-07-09): every row carries a hover tooltip with the full item card - name, stats,
@@ -536,7 +551,7 @@ function shopRow(name, stat, cost, cmd, tag){
   var tip = name + (stat? (' | ' + String(stat).replace(/<[^>]*>/g,'')) : '')
     + ' | ' + (cost? (cost + 'c' + (afford? '' : ' (you hold ' + Math.round(num(P&&P.credits,0)) + 'c - short ' + Math.round(cost-num(P&&P.credits,0)) + 'c)')) : 'free')
     + (tag==='fitted' ? ' | currently fitted' : (cmd? (' | buys via: ' + cmd) : ''));
-  return '<div class="pm-row" title="'+esc(tip)+'"><div class="pm-grow"><b>'+esc(name)+'</b>'
+  return '<div class="pm-row" title="'+esc(tip)+'">'+shopIcon(cmd)+'<div class="pm-grow"><b>'+esc(name)+'</b>'
     + (stat?(' <span class="pm-sub">'+stat+'</span>'):'') + '</div>'
     + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+';min-width:56px;text-align:right">'+(cost?fmtC(cost):'free')+'</div>'
     + (tag==='fitted' ? '<span class="pm-tag mk" style="min-width:52px;text-align:center">FITTED</span>'
