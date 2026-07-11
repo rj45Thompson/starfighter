@@ -172,52 +172,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710u"></script>
-<script src="fflate.min.js?v=20260710u"></script>
-<script src="fbxloader.js?v=20260710u"></script>
+<script src="three.min.js?v=20260710v"></script>
+<script src="fflate.min.js?v=20260710v"></script>
+<script src="fbxloader.js?v=20260710v"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710u"></script>
-<script src="inhabitant.js?v=20260710u"></script>
-<script src="passenger.js?v=20260710u"></script>
-<script src="gamemod.js?v=20260710u"></script>
-<script src="chatter.js?v=20260710u"></script>
-<script src="speech_gen.js?v=20260710u"></script>
-<script src="speech_input.js?v=20260710u"></script>
-<script src="vision.js?v=20260710u"></script>
-<script src="deliberate.js?v=20260710u"></script>
-<script src="knowledge.js?v=20260710u"></script>
-<script src="acquire.js?v=20260710u"></script>
-<script src="sound.js?v=20260710u"></script>
-<script src="hullmodels.js?v=20260710u"></script>
-<script src="knowledge_hud.js?v=20260710u"></script>
-<script src="knowledge_screen.js?v=20260710u"></script>
-<script src="centroid_mind.js?v=20260710u"></script>
-<script src="kripke_mind.js?v=20260710u"></script>
-<script src="sober_gate.js?v=20260710u"></script>
-<script src="contradiction_ledger.js?v=20260710u"></script>
-<script src="kripke_planner.js?v=20260710u"></script>
-<script src="pillar_router.js?v=20260710u"></script>
-<script src="gravity_well.js?v=20260710u"></script>
-<script src="growth_loop.js?v=20260710u"></script>
-<script src="coop_proof.js?v=20260710u"></script>
-<script src="item_variance.js?v=20260710u"></script>
-<script src="tom_test.js?v=20260710u"></script>
-<script src="thoughts.js?v=20260710u"></script>
-<script src="tami_battle_ui.js?v=20260710u"></script>
-<script src="power_panel.js?v=20260710u"></script>
-<script src="panels.js?v=20260710u"></script>
-<script src="item_icons.js?v=20260710u"></script>
-<script src="engbay.js?v=20260710u"></script>
+<script src="speech_tier.js?v=20260710v"></script>
+<script src="inhabitant.js?v=20260710v"></script>
+<script src="passenger.js?v=20260710v"></script>
+<script src="gamemod.js?v=20260710v"></script>
+<script src="chatter.js?v=20260710v"></script>
+<script src="speech_gen.js?v=20260710v"></script>
+<script src="speech_input.js?v=20260710v"></script>
+<script src="vision.js?v=20260710v"></script>
+<script src="deliberate.js?v=20260710v"></script>
+<script src="knowledge.js?v=20260710v"></script>
+<script src="acquire.js?v=20260710v"></script>
+<script src="sound.js?v=20260710v"></script>
+<script src="hullmodels.js?v=20260710v"></script>
+<script src="knowledge_hud.js?v=20260710v"></script>
+<script src="knowledge_screen.js?v=20260710v"></script>
+<script src="centroid_mind.js?v=20260710v"></script>
+<script src="kripke_mind.js?v=20260710v"></script>
+<script src="sober_gate.js?v=20260710v"></script>
+<script src="contradiction_ledger.js?v=20260710v"></script>
+<script src="kripke_planner.js?v=20260710v"></script>
+<script src="pillar_router.js?v=20260710v"></script>
+<script src="gravity_well.js?v=20260710v"></script>
+<script src="growth_loop.js?v=20260710v"></script>
+<script src="coop_proof.js?v=20260710v"></script>
+<script src="item_variance.js?v=20260710v"></script>
+<script src="tom_test.js?v=20260710v"></script>
+<script src="thoughts.js?v=20260710v"></script>
+<script src="tami_battle_ui.js?v=20260710v"></script>
+<script src="power_panel.js?v=20260710v"></script>
+<script src="panels.js?v=20260710v"></script>
+<script src="item_icons.js?v=20260710v"></script>
+<script src="engbay.js?v=20260710v"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710u"></script>
-<script src="conquest.js?v=20260710u"></script>
-<script src="missions.js?v=20260710u"></script>
-<script src="planetmenu.js?v=20260710u"></script>
-<script src="textquests.js?v=20260710u"></script>
+<script src="starmap.js?v=20260710v"></script>
+<script src="conquest.js?v=20260710v"></script>
+<script src="missions.js?v=20260710v"></script>
+<script src="planetmenu.js?v=20260710v"></script>
+<script src="textquests.js?v=20260710v"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -386,6 +386,7 @@ const CFG = {
   TOP_VIEW_SHARE:0.56,                             // of the right column ABOVE the power dock, the system map's share (rest = the smaller REASONING view)
   POWER_DOCK_H:252,                                // px reserved at the right column's bottom for the always-on power dock (radial hull ring + tick bars)
   KILLER_MARK_S:12,                                // how long the pilot who killed you stays ringed on the radar (Starblast-style)
+  SYNOD_HON_BLOODED:14, SYNOD_HON_DREAD:40, SYNOD_HON_NIGHTMARE:90,   // PIRATE RANK TITLES: raider kill-score thresholds for the honorific prefix (Blooded/Dread/Nightmare) on top of its combat-tier title
   HITVFX_R:320,                                    // only draw shield/hull impact VFX for ships within this range of you (perf)
   // STARBLAST GEMS-AS-HULL (user 2026-07-10 "when a ship loses hull another hit will drop his gems... his gems being
   // like a small extra hull, each bullet dropping a percentage"): a WOUNDED ship carrying wealth spills gems as a
@@ -2062,8 +2063,9 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   // so you know exactly who to hunt when you respawn.
   if(victim===ships[0]&&killer&&killer!==victim){
     killerMark={s:killer,until:T0+CFG.KILLER_MARK_S};
-    showKillerBanner(`☠ ${killer.name.toUpperCase()} killed you`);
-    term(`☠ <b style="color:#ff5a6e">${killer.name}</b> killed you - ringed red on the radar for ${CFG.KILLER_MARK_S}s`,'err');
+    const kt=killer.team==='pirate'?synodRankOf(killer)+' ':'';   // PIRATE RANK TITLES: name the raider's rank in the callout
+    showKillerBanner(`☠ ${(kt+killer.name).toUpperCase()} killed you`);
+    term(`☠ <b style="color:#ff5a6e">${kt}${killer.name}</b> killed you - ringed red on the radar for ${CFG.KILLER_MARK_S}s`,'err');
     if(window.CHATTER&&typeof CHATTER.voiceWorm==='function') try{ CHATTER.voiceWorm(killer.name+' killed you. I marked him on the radar.'); }catch(e){} }   // the Passenger says it aloud (only when voices are on)
   if(window.MISSIONS&&MISSIONS.onKill) try{ MISSIONS.onKill(victim,killer); }catch(e){}     // bounty missions watch every kill
   if(killer===ships[0]&&killer!==victim&&window.KPLAN) KPLAN.observe('kill');               // MODAL PLANNER: a player kill is a real completed action
@@ -2141,6 +2143,15 @@ function renderLog(){ const el=document.getElementById('logbody'); if(!el) retur
   el.innerHTML=LOGS[activeTab].slice(-70).join(''); const t=document.getElementById('ticker'); if(t) t.scrollTop=t.scrollHeight; }
 // ---- CHRONICLE: the crushed story as a readable menu + each pilot's interaction NOTES (story memory + live combat grudges) ----
 function facLabel(s){ return s.team==='pirate'?'Iron Synod':'Coalition'; }
+// PIRATE RANK TITLES (Iron Synod raider hierarchy - game-flavour names for the existing HEG_TIERS, NOT copied SR facts).
+// A raider's title = its combat-TIER base + an HONORIFIC prefix earned by its OWN kill-score, so a veteran low-tier
+// raider still reads as dangerous. Deterministic per-ship, ship-agnostic (any pirate-team ship), purely COSMETIC -
+// surfaced in the killer callout + scan/probe. No combat or economy effect.
+const SYNOD_RANK_TITLES=['Synod Drone','Synod Cruiser-Captain','Synod Warlord'];   // by HEG_TIERS index (0..2)
+function synodRankOf(s){ if(!s||s.team!=='pirate') return '';
+  const ti=Math.min(SYNOD_RANK_TITLES.length-1, Math.max(0, s.tier||0)), base=SYNOD_RANK_TITLES[ti];
+  const sc=s.score||0; let hon=''; if(sc>=CFG.SYNOD_HON_NIGHTMARE) hon='Nightmare'; else if(sc>=CFG.SYNOD_HON_DREAD) hon='Dread'; else if(sc>=CFG.SYNOD_HON_BLOODED) hon='Blooded';
+  return hon?hon+' '+base:base; }
 function noteLog(s, text, val){ if(!s) return; s.log=s.log||[]; s.log.push({t:text, val}); if(s.log.length>40) s.log.shift(); }   // per-pilot interaction ledger
 function noteHarm(v, atk){ if(!atk||atk===v||!v||!v.alive) return; v.rel=v.rel||{}; v.hitBy=v.hitBy||{};
   const first=!v.hitBy[atk.name]; v.hitBy[atk.name]=(v.hitBy[atk.name]||0)+1; v.rel[atk.name]=(v.rel[atk.name]||0)-0.03;      // accumulated grudge (cheap per-hit)
@@ -4109,7 +4120,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!need(P.pos.distanceTo(o.pos)<=P.senseR*1.6,`${o.name} is out of scanner range`)) return;
     const needPct=scanBlockPct(o), have=Math.round(scannerPowerOf(P));
     if(have<needPct){ term(`◈ PROBE ${o.name} - scan resisted, their shields block it (need ${needPct} scan power, you have ${have}) - try: scanner`,'err'); return; }
-    term(`◈ PROBE ${o.name} - hull ${Math.round((o.hp/o.maxHp)*100)}% · weapon ${WEAPONS[o.weaponType||'energy'].n} · hull class ${o.hullClass?HULLS[o.hullClass].n:'?'} · cargo ${cargoTotal(o)}/${o.holdCap||0}`,'sys'); return; }
+    term(`◈ PROBE ${o.name}${o.team==='pirate'?' <span style="color:#ff9a9a">['+synodRankOf(o)+']</span>':''} - hull ${Math.round((o.hp/o.maxHp)*100)}% · weapon ${WEAPONS[o.weaponType||'energy'].n} · hull class ${o.hullClass?HULLS[o.hullClass].n:'?'} · cargo ${cargoTotal(o)}/${o.holdCap||0}`,'sys'); return; }
   if(c==='micromods'||c==='mm'){ const inv=P.micromodules||[]; if(!inv.length){ term('No micro-modules recovered. Destroy Warlord-tier Hegemon ships (or the Stronghold) with a Cargo Hook fitted to recover them.','sys'); return; }
     term('MICRO-MODULES (permanently applied on pickup):','sys'); inv.forEach(k=>term(`  ${MICROMODULES[k].n} - ${MICROMODULES[k].desc}`,'sys')); return; }
   // HULL SERIES (user, SR "Acrynic" notes): single-slot fit, same pattern as `engine`/`tank` above.
