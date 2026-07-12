@@ -153,7 +153,7 @@ function pickerHtml(h, kind, idx) {
   var cat = kind === 'weapon' ? h.WEAPONS : h.GIZMOS;
   var rows = keys.map(function (k) {
     var face = iconImg(kind, k, cat[k], cat, 24, true) || '';
-    return '<div data-pick="' + esc(k) + '" draggable="true" data-drag="' + esc(kind) + '|' + esc(k) + '" style="padding:4px 8px;cursor:grab;border-radius:4px;display:flex;align-items:center;gap:6px" ' +
+    return '<div data-pick="' + esc(k) + '" draggable="true" data-drag="' + esc(kind) + '|' + esc(k) + '" style="padding:4px 8px;cursor:grab;border-radius:4px;display:flex;align-items:center;gap:6px"' + tipAttr(kind, k, cat[k], null, 'variance rolls when you buy') + ' ' +
       'onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' + face +
       '<span><b style="color:' + CFG.COL_TEXT + '">' + esc(cat[k].n) + '</b> <span style="color:' + CFG.COL_DIM + '">' + cat[k].cost + 'c - ' + esc(cat[k].desc || '') + '</span></span></div>';
   }).join('');
@@ -199,7 +199,8 @@ function gridBoxHtml(h, s, def) {
     (readOnly || locked ? '' : ' data-drop="' + def.kind + '"') +
     ' style="' + (readOnly ? '' : 'cursor:pointer;') +
     'border:1px solid ' + boxCol + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px"';
-  return '<div' + attrs + '>' +
+  var tip = it ? tipAttr(def.kind, curKey, it, instForKind(s, def.kind), locked ? 'PERMANENT for this hull' : (readOnly ? 'read-only' : null)) : '';
+  return '<div' + attrs + tip + '>' +
     '<div style="font-size:20px;min-height:36px;display:flex;align-items:center;justify-content:center;gap:2px">' +
       (face || '<span style="opacity:.45">' + glyph + '</span>') + (locked ? ' <span style="font-size:13px">🔒</span>' : '') + '</div>' +
     '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">' + esc(def.label) + '</div>' +
@@ -295,6 +296,53 @@ function nearestStationHtml(h, s) {
     'The shop only shows real, live stock while you\'re actually there - this is a distance hint, not a catalog.</div>';
 }
 
+// ---- SR-STYLE HOVER TOOLTIPS (user 2026-07-12 "copy the SR ship screen exactly"): in Space Rangers every item in
+// the ship/equipment screen shows a rich hover tooltip. Each slot box + picker row carries a data-tip (a JSON array
+// of lines, attribute-escaped) that a single floating panel renders on hover. It shows the item name, the [spec]
+// base rating, and the ROLLED INSTANCE stats where we actually track them (weaponInst/engineInst via
+// item_variance.js) - instance data is labeled [instance] vs the [spec] base, keeping the GIVEN-vs-rolled
+// distinction visible (iron rule), which is exactly SR's tier/quality/condition/weight/price readout.
+function attrEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function instForKind(s, kind) { if (!s) return null; if (kind === 'primaryweapon' || kind === 'weapon') return s.weaponInst || null; if (kind === 'engine') return s.engineInst || null; return null; }
+function instLine(inst) {
+  if (!inst) return null;
+  var w = win();
+  if (w && w.ITEMVAR && typeof w.ITEMVAR.describe === 'function') { try { var d = w.ITEMVAR.describe(inst); if (d) return '[instance] ' + d; } catch (e) {} }
+  var parts = [];
+  if (inst.quality != null) parts.push(String(inst.quality));
+  if (inst.condition != null) parts.push('cond ' + Math.round(inst.condition) + '%');
+  if (inst.weight != null) parts.push('wt ' + inst.weight);
+  if (inst.powerMul != null) parts.push('power x' + Number(inst.powerMul).toFixed(2));
+  return parts.length ? '[instance] ' + parts.join(' · ') : null;
+}
+function tipAttr(kind, key, it, inst, extra) {
+  if (!it) return '';
+  var lines = [it.n + (kind ? ' · ' + String(kind).toUpperCase().replace('PRIMARYWEAPON', 'PRIMARY WEAPON') : '')];
+  var base = [];
+  if (it.dmg != null) base.push('dmg ' + it.dmg);
+  if (it.rof != null) base.push('rof ' + it.rof);
+  if (it.cost != null) base.push(it.cost ? it.cost + 'c' : 'free');
+  if (base.length) lines.push('[spec] ' + base.join(' · '));
+  if (it.desc) lines.push(it.desc);
+  var il = instLine(inst);
+  if (il) lines.push(il); else lines.push('[spec] base rating - variance rolls on drop/purchase');
+  if (extra) lines.push(extra);
+  return ' data-tip="' + attrEsc(JSON.stringify(lines)) + '"';
+}
+
+// CARGO HOLD (SR ship screen, user 2026-07-12): in SR the ship screen has a hold grid for loose items you carry but
+// haven't fitted - drag between hold and slots, buy into the hold, sell from it. That carry-inventory MODEL (a real
+// s.hold array + buy-to-hold / unfit-to-hold / sell-from-hold runCmd verbs, persisted in save/load) is slice 2: it
+// needs new mutation verbs in the main file, which this module deliberately never adds (one mutate path = HOST.runCmd).
+// Until then this renders the SR hold STRUCTURE honestly - an empty cell grid + a one-line note - never faked contents.
+function holdHtml(h, s) {
+  var cells = '';
+  for (var i = 0; i < 8; i++) cells += '<div style="width:42px;height:42px;border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:6px;background:#0c1623"></div>';
+  return '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:6px">CARGO HOLD</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">' + cells + '</div>' +
+    '<div style="font-size:9px;color:' + CFG.COL_DIM + '">empty - carrying loose gear (buy-to-hold, unfit-to-hold, sell) is the next update</div>';
+}
+
 function render() {
   if (!EB.body) return;
   var h = HOST();
@@ -302,40 +350,46 @@ function render() {
   var s = shipOr(h);
   if (!s) { EB.body.innerHTML = '<div style="padding:10px;color:' + CFG.COL_DIM + '">no ship.</div>'; return; }
 
-  var top = '<div style="width:100%;order:-1">' +
-    '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:6px">LOADOUT - click a box to fit, 🔒 = permanent for this hull</div>' +
-    slotGridHtml(h, s) + '</div>';
-
   var schema = mountSchema(h, s);
   var hull = h.HULLS[s.hullClass || 'fighter'];
-  var left = '<div style="width:' + CFG.PANEL_W + 'px;max-width:100%;flex:0 0 auto">' +
-    '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:4px"><b>' + esc(hull ? hull.n : s.hullClass) + '</b> - ' +
-    schema.weaponPoints.length + ' weapon mount' + (schema.weaponPoints.length === 1 ? '' : 's') + ', ' + schema.gizmoPoints.length + ' gizmo mount' + (schema.gizmoPoints.length === 1 ? '' : 's') + '</div>' +
+  var creditsN = (s.credits != null ? s.credits : (s.cr != null ? s.cr : 0));
+
+  // SR SHIP-SCREEN HEADER: ship identity + credits across the top (order:-1 keeps it first in the wrap flow).
+  var header = '<div style="width:100%;order:-1;display:flex;align-items:center;justify-content:space-between;gap:10px;' +
+    'border-bottom:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-bottom:6px;margin-bottom:2px">' +
+    '<div style="font-size:12px;color:' + CFG.COL_TEXT + '"><b>' + esc(hull ? hull.n : s.hullClass) + '</b> ' +
+    '<span style="color:' + CFG.COL_DIM + '">- ' + schema.weaponPoints.length + ' hardpoint' + (schema.weaponPoints.length === 1 ? '' : 's') +
+    ' · ' + schema.gizmoPoints.length + ' gizmo slot' + (schema.gizmoPoints.length === 1 ? '' : 's') + '</span></div>' +
+    '<div style="font-size:12px;color:#ffd27a">◈ ' + Math.round(creditsN).toLocaleString() + ' cr</div></div>';
+
+  // ZONE 1 - THE SHIP: top-down schematic (hardpoints/gizmo mounts as clickable points + shield arcs).
+  var shipZone = '<div style="width:' + CFG.PANEL_W + 'px;max-width:100%;flex:0 0 auto">' +
+    '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:4px">SHIP</div>' +
     schematicSvg(h, s, schema) + shieldReadoutHtml(h, s);
   if (!s.docked) {
-    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dock at a planet or base to edit your loadout.</div>';
+    shipZone += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dock at a planet or base to edit your loadout.</div>';
     EB.pickIdx = null;
   } else {
-    left += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary weapon / engine, not editable here) - red = weapon hardpoint, blue = gizmo, cyan bubble = shield charge (fwd/aft). Click empty to mount, filled to unmount.</div>';
-    if (EB.pickIdx != null && EB.pickType) left += pickerHtml(h, EB.pickType, EB.pickIdx);
+    shipZone += '<div style="font-size:10px;color:' + CFG.COL_DIM + ';margin-top:4px">dashed = reference (primary / engine) · red = hardpoint · blue = gizmo · cyan bubble = shield (fwd/aft). Click empty to mount, filled to unmount.</div>';
+    if (EB.pickIdx != null && EB.pickType) shipZone += pickerHtml(h, EB.pickType, EB.pickIdx);
   }
-  left += '</div>';
+  shipZone += '</div>';
 
-  // SHOP REMOVED (user 2026-07-09 "I don't want to see hull purchases in engineering bay - that is just for
-  // editing the component slots and layout like diablo character control"): the Bay is LOADOUT-ONLY now - the
-  // schematic + paperdoll grid above. BUYING lives in the docked planet menu's SHOP tab (flat SR:AWA store).
-  var right = '<div style="flex:1 1 300px;min-width:260px;max-width:480px;border-left:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-left:14px">';
-  if (s.docked) {
-    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>THIS IS YOUR CHARACTER SCREEN</b></div>' +
-      '<div style="font-size:11px;color:' + CFG.COL_DIM + '">Fit, swap, and arrange what you already own here.<br><br>' +
-      '🛒 To BUY new hulls, weapons, or gear: close this (ESC) and open the docked menu\'s <b style="color:' + CFG.COL_TEXT + '">SHOP</b> tab - one flat list, one BUY button each.</div>';
-  } else {
-    right += '<div style="font-size:12px;color:' + CFG.COL_TEXT + ';margin-bottom:6px"><b>NEAREST STATION</b></div>' + nearestStationHtml(h, s);
-  }
-  right += skillsHtml(h, s);
-  right += '</div>';
+  // ZONE 2 - EQUIPMENT SLOTS: the SR/Diablo slot boxes. Hover any box for the SR item tooltip (spec + instance).
+  var equipZone = '<div style="flex:1 1 340px;min-width:280px">' +
+    '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-bottom:6px">EQUIPMENT - click a slot to fit · 🔒 permanent · hover for stats</div>' +
+    slotGridHtml(h, s) + '</div>';
 
-  EB.body.innerHTML = top + left + right;
+  // ZONE 3 - CARGO HOLD + pilot info: SR keeps the hold on the ship screen; skills/station info sit below it.
+  var holdZone = '<div style="flex:1 1 270px;min-width:230px;max-width:460px;border-left:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-left:14px">' +
+    holdHtml(h, s);
+  if (s.docked) holdZone += '<div style="font-size:9px;color:' + CFG.COL_DIM + ';margin:4px 0 8px">🛒 buy hulls / weapons / gear in the docked menu\'s SHOP tab</div>';
+  holdZone += skillsHtml(h, s);
+  if (!s.docked) holdZone += '<div style="margin-top:10px;border-top:1px solid ' + CFG.COL_EMPTY_STROKE + ';padding-top:8px">' +
+    '<div style="font-size:11px;color:' + CFG.COL_TEXT + ';margin-bottom:4px"><b>NEAREST STATION</b></div>' + nearestStationHtml(h, s) + '</div>';
+  holdZone += '</div>';
+
+  EB.body.innerHTML = header + shipZone + equipZone + holdZone;
 }
 
 function onMountClick(kind, idx) {
@@ -376,6 +430,31 @@ function wireClicks() {
     // buying happens in the docked menu's SHOP tab.)
   });
   wireDrag();
+  wireTips();
+}
+
+// SR HOVER TOOLTIP wiring: one delegated mousemove reads the nearest [data-tip] (a JSON line-array) and paints the
+// single floating EB.tip panel near the cursor - no per-element listeners (survives the poll re-render, which
+// rebuilds EB.body.innerHTML every CFG.POLL_MS). Positions flip to the cursor's left/top edge near the viewport rim.
+function wireTips() {
+  EB.body.addEventListener('mousemove', function (ev) {
+    if (!EB.tip) return;
+    var t = ev.target.closest && ev.target.closest('[data-tip]');
+    var raw = t && t.getAttribute('data-tip');
+    if (!raw) { EB.tip.style.display = 'none'; return; }
+    var lines; try { lines = JSON.parse(raw); } catch (e) { EB.tip.style.display = 'none'; return; }
+    if (!lines || !lines.length) { EB.tip.style.display = 'none'; return; }
+    var html = '<div style="font-weight:700;color:' + CFG.COL_TEXT + ';margin-bottom:2px">' + esc(lines[0]) + '</div>';
+    for (var i = 1; i < lines.length; i++) html += '<div style="color:#8fb0cc;font-size:10px;line-height:1.4">' + esc(lines[i]) + '</div>';
+    EB.tip.innerHTML = html;
+    EB.tip.style.display = 'block';
+    var w = win(), vw = (w && w.innerWidth) || 1280, vh = (w && w.innerHeight) || 800;
+    var x = ev.clientX + 16, y = ev.clientY + 14;
+    if (x > vw - 260) x = Math.max(6, ev.clientX - 250);
+    if (y > vh - 130) y = Math.max(6, ev.clientY - 120);
+    EB.tip.style.left = x + 'px'; EB.tip.style.top = y + 'px';
+  });
+  EB.body.addEventListener('mouseleave', function () { if (EB.tip) EB.tip.style.display = 'none'; });
 }
 
 // DIABLO DRAG-AND-DROP (user 2026-07-09 "I want to slot them in like diablo"): drag an item's icon from a picker
@@ -444,11 +523,14 @@ function build() {
   closeBtn.addEventListener('click', function () { hide(); });
   head.appendChild(title); head.appendChild(closeBtn);
   var body = el('div', 'flex:1 1 auto;overflow-y:auto;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap');
-  frame.appendChild(head); frame.appendChild(body);
+  var tip = el('div', 'position:fixed;display:none;pointer-events:none;z-index:' + (CFG.Z + 2) + ';max-width:250px;' +
+    'background:#0a1626f5;border:1px solid ' + CFG.COL_HULL_STROKE + ';border-radius:6px;padding:7px 9px;' +
+    'font:11px ui-monospace,monospace;box-shadow:0 6px 24px rgba(0,0,0,0.6)');
+  frame.appendChild(head); frame.appendChild(body); frame.appendChild(tip);
   backdrop.appendChild(frame);
   backdrop.addEventListener('click', function (ev) { if (ev.target === backdrop) hide(); });   // click the dim backdrop (outside the frame) to close, same convention as most fullscreen modals
   (d.body || d.documentElement).appendChild(backdrop);
-  EB.root = backdrop; EB.body = body; EB.mounted = true;
+  EB.root = backdrop; EB.body = body; EB.tip = tip; EB.mounted = true;
   wireClicks();
 }
 
@@ -553,6 +635,11 @@ if (typeof require !== 'undefined' && require.main === module) {
   show();
   check('shown after show()', EB.shown === true);
   check('docked ship renders the schematic, not the dock-gate message', EB.body._html.indexOf('dock at a planet') === -1);
+  // ---- SR ship-screen restructure (user 2026-07-12 "copy the SR ship screen exactly") ---------------------------
+  check('SR header shows a credits readout', EB.body._html.indexOf(' cr</div>') >= 0);
+  check('SR equipment slots carry a hover tooltip (data-tip)', EB.body._html.indexOf('data-tip=') >= 0);
+  check('tooltip encodes the item name + [spec] base line', EB.body._html.indexOf('Pulse Laser') >= 0 && EB.body._html.indexOf('[spec]') >= 0);
+  check('SR cargo hold section renders on the ship screen', EB.body._html.indexOf('CARGO HOLD') >= 0);
   // ---- shield arcs (task #83): fwd 15/20=75%, aft 8/20=40%, both driven by the REAL HOST.shieldArcsOf pool -------
   check('shield arc bright dasharray reflects fwd charge (15/20=75%)', EB.body._html.indexOf('stroke-dasharray="75 100"') >= 0);
   check('shield arc bright dasharray reflects aft charge (8/20=40%)', EB.body._html.indexOf('stroke-dasharray="40 100"') >= 0);
