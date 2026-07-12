@@ -172,52 +172,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260710y"></script>
-<script src="fflate.min.js?v=20260710y"></script>
-<script src="fbxloader.js?v=20260710y"></script>
+<script src="three.min.js?v=20260710z"></script>
+<script src="fflate.min.js?v=20260710z"></script>
+<script src="fbxloader.js?v=20260710z"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260710y"></script>
-<script src="inhabitant.js?v=20260710y"></script>
-<script src="passenger.js?v=20260710y"></script>
-<script src="gamemod.js?v=20260710y"></script>
-<script src="chatter.js?v=20260710y"></script>
-<script src="speech_gen.js?v=20260710y"></script>
-<script src="speech_input.js?v=20260710y"></script>
-<script src="vision.js?v=20260710y"></script>
-<script src="deliberate.js?v=20260710y"></script>
-<script src="knowledge.js?v=20260710y"></script>
-<script src="acquire.js?v=20260710y"></script>
-<script src="sound.js?v=20260710y"></script>
-<script src="hullmodels.js?v=20260710y"></script>
-<script src="knowledge_hud.js?v=20260710y"></script>
-<script src="knowledge_screen.js?v=20260710y"></script>
-<script src="centroid_mind.js?v=20260710y"></script>
-<script src="kripke_mind.js?v=20260710y"></script>
-<script src="sober_gate.js?v=20260710y"></script>
-<script src="contradiction_ledger.js?v=20260710y"></script>
-<script src="kripke_planner.js?v=20260710y"></script>
-<script src="pillar_router.js?v=20260710y"></script>
-<script src="gravity_well.js?v=20260710y"></script>
-<script src="growth_loop.js?v=20260710y"></script>
-<script src="coop_proof.js?v=20260710y"></script>
-<script src="item_variance.js?v=20260710y"></script>
-<script src="tom_test.js?v=20260710y"></script>
-<script src="thoughts.js?v=20260710y"></script>
-<script src="tami_battle_ui.js?v=20260710y"></script>
-<script src="power_panel.js?v=20260710y"></script>
-<script src="panels.js?v=20260710y"></script>
-<script src="item_icons.js?v=20260710y"></script>
-<script src="engbay.js?v=20260710y"></script>
+<script src="speech_tier.js?v=20260710z"></script>
+<script src="inhabitant.js?v=20260710z"></script>
+<script src="passenger.js?v=20260710z"></script>
+<script src="gamemod.js?v=20260710z"></script>
+<script src="chatter.js?v=20260710z"></script>
+<script src="speech_gen.js?v=20260710z"></script>
+<script src="speech_input.js?v=20260710z"></script>
+<script src="vision.js?v=20260710z"></script>
+<script src="deliberate.js?v=20260710z"></script>
+<script src="knowledge.js?v=20260710z"></script>
+<script src="acquire.js?v=20260710z"></script>
+<script src="sound.js?v=20260710z"></script>
+<script src="hullmodels.js?v=20260710z"></script>
+<script src="knowledge_hud.js?v=20260710z"></script>
+<script src="knowledge_screen.js?v=20260710z"></script>
+<script src="centroid_mind.js?v=20260710z"></script>
+<script src="kripke_mind.js?v=20260710z"></script>
+<script src="sober_gate.js?v=20260710z"></script>
+<script src="contradiction_ledger.js?v=20260710z"></script>
+<script src="kripke_planner.js?v=20260710z"></script>
+<script src="pillar_router.js?v=20260710z"></script>
+<script src="gravity_well.js?v=20260710z"></script>
+<script src="growth_loop.js?v=20260710z"></script>
+<script src="coop_proof.js?v=20260710z"></script>
+<script src="item_variance.js?v=20260710z"></script>
+<script src="tom_test.js?v=20260710z"></script>
+<script src="thoughts.js?v=20260710z"></script>
+<script src="tami_battle_ui.js?v=20260710z"></script>
+<script src="power_panel.js?v=20260710z"></script>
+<script src="panels.js?v=20260710z"></script>
+<script src="item_icons.js?v=20260710z"></script>
+<script src="engbay.js?v=20260710z"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260710y"></script>
-<script src="conquest.js?v=20260710y"></script>
-<script src="missions.js?v=20260710y"></script>
-<script src="planetmenu.js?v=20260710y"></script>
-<script src="textquests.js?v=20260710y"></script>
+<script src="starmap.js?v=20260710z"></script>
+<script src="conquest.js?v=20260710z"></script>
+<script src="missions.js?v=20260710z"></script>
+<script src="planetmenu.js?v=20260710z"></script>
+<script src="textquests.js?v=20260710z"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -405,6 +405,7 @@ const CFG = {
   SCAN_ROUGH_R:55,                                  // "really close" range for a naked-eye rough estimate (no scanner)
   HP_BAR_MAX:10,                                    // cap of live floating health bars drawn at once (perf)
   TOP_ZOOM:1.08,                                   // top-down ortho margin past the arena
+  MAIN_TOP_HH:160,                                 // TOP-DOWN PRIMARY view half-height in world units (Starblast close-follow zoom); user 2026-07-12
   // PERIPHERAL LENS (user 2026-07-10 "when turning at max speed the ship almost faces the other way but you only
   // see ahead - can the screen edges see more range? like fisheye only on the first/last 15%"): render the chase
   // view at a WIDER fov into an offscreen buffer, then a warp shader keeps the center rectilinear and smoothly
@@ -468,6 +469,10 @@ const chaseCam=new T.PerspectiveCamera(60,1,0.5,6000); chaseCam.position.set(0,C
 chaseCam.layers.enable(2);                                   // chase view also shows SPEECH (layer 2)
 const topCam=new T.OrthographicCamera(-1,1,1,-1,1,5000); topCam.position.set(0,CFG.ARENA_R*2.6,0);
 topCam.up.set(0,0,-1); topCam.lookAt(0,0,0); topCam.layers.enable(1);   // top view also shows BLIPS (layer 1)
+// TOP-DOWN PRIMARY VIEW (user 2026-07-12 "make the game top down, Starblast controls"): a SECOND ortho camera that
+// close-follows the player for the big MAIN view - topCam above stays the wide arena minimap in the corner.
+const mainTopCam=new T.OrthographicCamera(-1,1,1,-1,0.1,5000); mainTopCam.position.set(0,CFG.ARENA_R,0);
+mainTopCam.up.set(0,0,-1); mainTopCam.lookAt(0,0,0); mainTopCam.layers.enable(1);
 const CHASE_FOV_BASE=60;   // chaseCam's rectilinear fov; the peripheral lens renders WIDER than this then warps back
 
 // ---------------------------------------------------------------- PERIPHERAL LENS (wide-fov render -> edge-warp)
@@ -4914,6 +4919,15 @@ if(window.PANELS){
   PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9, resizable:true, defaultOpen:false,   // closed by default (task #66) - an already-busy screen shouldn't gain a 4th open-by-default left-edge panel; one click on its tab opens it
     onOpenChange:(open)=>{ missionlogOn=open; if(open) updateMissionLog(); } });
+  // TOP-DOWN PRIMARY (user 2026-07-12 "keep the 3d view but make it just a panel you can resize and move like the
+  // others"): the 3D chase view now lives in a movable/resizable window. Transparent body - the shared WebGL canvas
+  // renders the perspective chase camera into this element's on-screen rect (VIEW.chase, refreshed every frame).
+  // Registered with the SAME PANELS chrome as every other window, so it drags + resizes identically. pointer-events
+  // NONE on the box so aim/fire clicks pass straight through to the top-down world beneath it.
+  (function(){ if(!document.getElementById('chaseWin')){ const w=document.createElement('div'); w.id='chaseWin';
+      w.style.cssText='position:fixed;left:14px;bottom:92px;width:360px;height:228px;z-index:6;border:1px solid #2a4055;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,.5);pointer-events:none';
+      document.body.appendChild(w); }
+    PANELS.register('chaseWin', document.getElementById('chaseWin'), { title:'3D VIEW', edge:'left', rgb:[10,18,28], defaultOpacity:1, resizable:true }); })();
 }
 // SR-M7 (REQUIREMENTS_SR.md) "honest-economy rule": the overview grid used to call priceOf() live for EVERY
 // planet regardless of whether you'd ever been there - an omniscient read (the exact thing the P4 economy
@@ -4993,13 +5007,26 @@ function economyIsOrganic(){ if(planets.length<1) return true; const p=planets[0
 // =================================================================================================
 //  VIEWPORTS + MAIN LOOP (one renderer, three scissored WebGL views)
 // =================================================================================================
-const VIEW={ main:{x:0,y:0,w:1,h:1}, top:{x:0,y:0,w:1,h:1}, brain:{x:0,y:0,w:1,h:1} };
+const VIEW={ main:{x:0,y:0,w:1,h:1}, top:{x:0,y:0,w:1,h:1}, brain:{x:0,y:0,w:1,h:1}, chase:{x:0,y:0,w:0,h:0} };
 let topZoom=1, topCenter=null;   // topCenter null = follow focused ship; else free-look
 function sizeTopCam(){ updateTopCam(); }
 function updateTopCam(){ const c=topCenter||(ships[focus]&&ships[focus].pos)||new T.Vector3();
   const aspect=(VIEW.top.w/VIEW.top.h)||1, hh=CFG.SYSTEM_R*1.35*topZoom, hw=hh*aspect;
   topCam.left=-hw; topCam.right=hw; topCam.top=hh; topCam.bottom=-hh; topCam.updateProjectionMatrix();
   topCam.position.set(c.x, CFG.ARENA_R, c.z); topCam.up.set(0,0,-1); topCam.lookAt(c.x,0,c.z); }
+// TOP-DOWN PRIMARY: TOPDOWN_MAIN swaps the big MAIN view to a close top-down follow of the player; the 3D chase view
+// then lives inside the movable/resizable #chaseWin window (VIEW.chase, driven by that element's on-screen rect).
+let TOPDOWN_MAIN=true, mainTopZoom=1;
+function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3();
+  const aspect=(VIEW.main.w/Math.max(1,VIEW.main.h))||1, hh=CFG.MAIN_TOP_HH*mainTopZoom, hw=hh*aspect;
+  mainTopCam.left=-hw; mainTopCam.right=hw; mainTopCam.top=hh; mainTopCam.bottom=-hh; mainTopCam.updateProjectionMatrix();
+  mainTopCam.position.set(c.x, CFG.ARENA_R, c.z); mainTopCam.up.set(0,0,-1); mainTopCam.lookAt(c.x,0,c.z); }
+function updateChaseView(){ const el=document.getElementById('chaseWin');
+  if(!TOPDOWN_MAIN || !el || el.style.display==='none'){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
+  const r=el.getBoundingClientRect(), H=innerH();
+  if(r.width<8||r.height<8){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
+  VIEW.chase.x=Math.round(r.left); VIEW.chase.y=Math.round(H-(r.top+r.height)); VIEW.chase.w=Math.round(r.width); VIEW.chase.h=Math.round(r.height);
+  chaseCam.aspect=VIEW.chase.w/Math.max(1,VIEW.chase.h); chaseCam.updateProjectionMatrix(); }
 let brainZoom=1, brainCenter={x:300,y:235};
 function sizeBrainCam(vw,vh){ vw=vw||VIEW.brain.w||1; vh=vh||VIEW.brain.h||1; const va=vw/vh, ca=600/470; let hw,hh;
   if(va>ca){ hh=235*brainZoom; hw=hh*va; } else { hw=300*brainZoom; hh=hw/va; }
@@ -5039,7 +5066,8 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
     if(mb&&vb) vb.style.left=(mb.offsetLeft+mb.offsetWidth+6)+'px'; } }
 function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
 function renderAll(){ renderer.setScissorTest(true);
-  if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
+  if(TOPDOWN_MAIN){ renderView(VIEW.main,scene,mainTopCam); renderView(VIEW.chase,scene,chaseCam); }   // TOP-DOWN primary; 3D chase drawn into the floating #chaseWin rect (renderView skips it when w<=0)
+  else if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
   renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam); renderer.setScissorTest(false); }
 
 // =================================================================================================
@@ -5957,7 +5985,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
