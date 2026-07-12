@@ -309,6 +309,44 @@ function statusFallback(){
   if(p.underThreat) bits.push('<span style="color:'+COL.BAD+'">UNDER THREAT</span>');
   return bits.join(' - ') || 'A quiet world.'; }
 
+/* SR PLANET INFO PANEL (user 2026-07-12 "copy each SR menu exactly"): SR's planet screen always shows an info
+   window - political system / economic system / population / attitude-to-you. Built ONLY from real planet fields we
+   actually store (type.makes/needs, dev, infra, wealth, owner, rep, terra, underThreat), each labeled - nothing
+   invented (iron rule). "Economy" derives from what the world makes/needs; "government" from its allegiance;
+   "standing" from your reputation with it (SR's attitude line, exact). */
+function intelRow(label, val, col){
+  return '<div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid #16233a">'
+    + '<span style="color:'+COL.DIM+';letter-spacing:.06em">'+label+'</span>'
+    + '<span style="color:'+(col||COL.TEXT)+';text-align:right">'+val+'</span></div>'; }
+function economyLabel(p){
+  var mk=keysOf(p&&p.type&&p.type.makes), nd=keysOf(p&&p.type&&p.type.needs);
+  if(mk.length && nd.length) return 'exports '+mk.slice(0,2).join('/')+' · imports '+nd.slice(0,1).join('');
+  if(mk.length) return 'exports '+mk.slice(0,2).join('/');
+  if(nd.length) return 'imports '+nd.slice(0,2).join('/');
+  return 'subsistence'; }
+function standingLabel(rp){
+  return (rp>0?'+':'')+Math.round(rp)+' '+(rp>15?'allied':rp>0?'friendly':rp<-15?'hostile':rp<0?'wary':'neutral'); }
+function planetIntelHtml(){
+  var p=S.planet;
+  if(S.isBase){
+    var bc=(CFG.OWNER.base&&CFG.OWNER.base.c)||COL.GOOD;
+    return '<div class="pm-panel"><h4>STATION INTEL</h4>'
+      + intelRow('CLASS','orbital HQ')
+      + intelRow('ALLEGIANCE','coalition', bc)
+      + intelRow('SERVICES','repair · hangar · market')
+      + '</div>'; }
+  if(!p) return '';
+  var own=ownerOf(p), ob=CFG.OWNER[own]||CFG.OWNER.coalition, rp=num(p.rep,0);
+  var rows = intelRow('ECONOMY', esc(economyLabel(p)))
+    + intelRow('DEVELOPMENT', 'Lv'+Math.round(num(p.dev,1))+' · infra '+infraPct(p)+'%')
+    + (typeof p.wealth==='number' ? intelRow('TREASURY', Math.round(p.wealth)+'c') : '')
+    + intelRow('GOVERNMENT', esc(ob.n), ob.c)
+    + intelRow('STANDING', standingLabel(rp), rp>0?COL.GOOD:(rp<0?COL.BAD:COL.DIM))
+    + intelRow('DEFENSE', pipsHtml(defenseOf(p)))
+    + ((typeof p.terra==='number'&&p.terra>0) ? intelRow('TERRAFORM', Math.round(p.terra*100)+'%') : '')
+    + (p.underThreat ? intelRow('ALERT','UNDER THREAT', COL.BAD) : '');
+  return '<div class="pm-panel"><h4>PLANET INTEL</h4>'+rows+'</div>'; }
+
 function renderSide(){
   if(!S.el.side) return;
   var p=S.planet;
@@ -317,12 +355,13 @@ function renderSide(){
       portraitHtml()
     + '<div style="text-align:center;color:'+COL.DIM+';font-size:11px;letter-spacing:.14em;margin:-4px 0 12px 0">'
     +   esc(S.isBase?((p&&p.name)||'RANGER COMMAND'):((p&&p.name)||'?')).toUpperCase() + '</div>'
+    + planetIntelHtml()
     + '<div class="pm-panel"><h4>STATUS</h4><div>'+status+'</div></div>'
-    + '<div class="pm-panel"><h4>HOW IT WORKS</h4>'
-    +   '<div style="margin-bottom:6px"><span style="color:'+COL.VIOLET+'">CAPTURE:</span> red banner = Synod-held. '
-    +   'LAND there, win the turn-based ground battle, and the world flips to your side - then ADD DEFENSE so it holds.</div>'
+    + '<div class="pm-panel"><h4>DOCK GUIDE</h4>'
+    +   '<div style="margin-bottom:6px"><span style="color:'+COL.VIOLET+'">CONTEST:</span> a red world is Synod-held - '
+    +   'LAND there to fight for it, and if you take it, ADD DEFENSE so it holds.</div>'
     +   '<div><span style="color:'+COL.GOOD+'">TRADE:</span> buy what a world MAKES (high stock = cheap), '
-    +   'haul it to a world that NEEDS it (low stock = dear), sell green prices - refit in the HANGAR.</div>'
+    +   'haul it to a world that NEEDS it (low stock = dear), sell green prices - refit in the SHOP.</div>'
     + '</div>'; }
 
 /* ------------------------------------------------ RENDER: TABS */
