@@ -177,52 +177,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713h"></script>
-<script src="fflate.min.js?v=20260713h"></script>
-<script src="fbxloader.js?v=20260713h"></script>
+<script src="three.min.js?v=20260713i"></script>
+<script src="fflate.min.js?v=20260713i"></script>
+<script src="fbxloader.js?v=20260713i"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713h"></script>
-<script src="inhabitant.js?v=20260713h"></script>
-<script src="passenger.js?v=20260713h"></script>
-<script src="gamemod.js?v=20260713h"></script>
-<script src="chatter.js?v=20260713h"></script>
-<script src="speech_gen.js?v=20260713h"></script>
-<script src="speech_input.js?v=20260713h"></script>
-<script src="vision.js?v=20260713h"></script>
-<script src="deliberate.js?v=20260713h"></script>
-<script src="knowledge.js?v=20260713h"></script>
-<script src="acquire.js?v=20260713h"></script>
-<script src="sound.js?v=20260713h"></script>
-<script src="hullmodels.js?v=20260713h"></script>
-<script src="knowledge_hud.js?v=20260713h"></script>
-<script src="knowledge_screen.js?v=20260713h"></script>
-<script src="centroid_mind.js?v=20260713h"></script>
-<script src="kripke_mind.js?v=20260713h"></script>
-<script src="sober_gate.js?v=20260713h"></script>
-<script src="contradiction_ledger.js?v=20260713h"></script>
-<script src="kripke_planner.js?v=20260713h"></script>
-<script src="pillar_router.js?v=20260713h"></script>
-<script src="gravity_well.js?v=20260713h"></script>
-<script src="growth_loop.js?v=20260713h"></script>
-<script src="coop_proof.js?v=20260713h"></script>
-<script src="item_variance.js?v=20260713h"></script>
-<script src="tom_test.js?v=20260713h"></script>
-<script src="thoughts.js?v=20260713h"></script>
-<script src="tami_battle_ui.js?v=20260713h"></script>
-<script src="power_panel.js?v=20260713h"></script>
-<script src="panels.js?v=20260713h"></script>
-<script src="item_icons.js?v=20260713h"></script>
-<script src="engbay.js?v=20260713h"></script>
+<script src="speech_tier.js?v=20260713i"></script>
+<script src="inhabitant.js?v=20260713i"></script>
+<script src="passenger.js?v=20260713i"></script>
+<script src="gamemod.js?v=20260713i"></script>
+<script src="chatter.js?v=20260713i"></script>
+<script src="speech_gen.js?v=20260713i"></script>
+<script src="speech_input.js?v=20260713i"></script>
+<script src="vision.js?v=20260713i"></script>
+<script src="deliberate.js?v=20260713i"></script>
+<script src="knowledge.js?v=20260713i"></script>
+<script src="acquire.js?v=20260713i"></script>
+<script src="sound.js?v=20260713i"></script>
+<script src="hullmodels.js?v=20260713i"></script>
+<script src="knowledge_hud.js?v=20260713i"></script>
+<script src="knowledge_screen.js?v=20260713i"></script>
+<script src="centroid_mind.js?v=20260713i"></script>
+<script src="kripke_mind.js?v=20260713i"></script>
+<script src="sober_gate.js?v=20260713i"></script>
+<script src="contradiction_ledger.js?v=20260713i"></script>
+<script src="kripke_planner.js?v=20260713i"></script>
+<script src="pillar_router.js?v=20260713i"></script>
+<script src="gravity_well.js?v=20260713i"></script>
+<script src="growth_loop.js?v=20260713i"></script>
+<script src="coop_proof.js?v=20260713i"></script>
+<script src="item_variance.js?v=20260713i"></script>
+<script src="tom_test.js?v=20260713i"></script>
+<script src="thoughts.js?v=20260713i"></script>
+<script src="tami_battle_ui.js?v=20260713i"></script>
+<script src="power_panel.js?v=20260713i"></script>
+<script src="panels.js?v=20260713i"></script>
+<script src="item_icons.js?v=20260713i"></script>
+<script src="engbay.js?v=20260713i"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713h"></script>
-<script src="conquest.js?v=20260713h"></script>
-<script src="missions.js?v=20260713h"></script>
-<script src="planetmenu.js?v=20260713h"></script>
-<script src="textquests.js?v=20260713h"></script>
+<script src="starmap.js?v=20260713i"></script>
+<script src="conquest.js?v=20260713i"></script>
+<script src="missions.js?v=20260713i"></script>
+<script src="planetmenu.js?v=20260713i"></script>
+<script src="textquests.js?v=20260713i"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -5014,8 +5014,8 @@ if(window.PANELS){
     function fitRear(){ if(w._userSized) return; var vw=innerWidth||1280, vh=innerHeight||800, rW=Math.round(vw*0.5), rH=Math.round(vh*0.6);
       w.style.left=(vw-rW-12)+'px'; w.style.top='60px'; w.style.bottom='auto'; w.style.width=rW+'px'; w.style.height=rH+'px'; }
     fitRear(); window.addEventListener('resize',fitRear);   // opens at ~HALF THE SCREEN; re-fits on viewport resize until the user drags or sizes it (which sets w._userSized)
-    port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); ret.style.display='block'; ret.style.left=(e.clientX-r.left)+'px'; ret.style.top=(e.clientY-r.top)+'px'; });
-    port.addEventListener('mouseleave',function(){ ret.style.display='none'; });
+    port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); ret.style.display='block'; ret.style.left=(e.clientX-r.left)+'px'; ret.style.top=(e.clientY-r.top)+'px'; rearMouse={x:e.clientX,y:e.clientY}; });
+    port.addEventListener('mouseleave',function(){ ret.style.display='none'; rearMouse=null; });
     port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation(); if(typeof fireRearGun==='function') fireRearGun(e.clientX,e.clientY); });
     var drag=null;
     bar.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
@@ -5132,7 +5132,8 @@ function updateChaseView(){ const el=document.getElementById('chaseWin');
 // REAR GUNNER (user 2026-07-13 "another 3d view from the back of the ship, shooting with the mouse"): rearCam looks
 // AFT from the cockpit; #rearWin scissor-renders VIEW.rear (its gunport body). fireRearGun() unprojects the CLICK
 // through rearCam and launches a bolt from the ship along that ray - a pure MOUSE turret (no auto-aim on this one).
-let rearGunCd=0;
+let rearGunCd=0, rearMouse=null;   // rearMouse = last cursor pos over the gunport (drives where the barrel points)
+const rearAimDir=new T.Vector3(0,0,-1), rearMuzzle=new T.Vector3();   // the barrel's live aim direction + muzzle-tip world pos - the laser leaves from HERE, down the barrel
 function updateRearCam(){ const s=ships[0]; if(!s) return;
   const fwd=FWD.clone().applyQuaternion(s.quat), up=UPL.clone().applyQuaternion(s.quat);
   rearCam.aspect=(VIEW.rear.w/Math.max(1,VIEW.rear.h))||1;
@@ -5141,9 +5142,15 @@ function updateRearCam(){ const s=ships[0]; if(!s) return;
   rearCam.lookAt(s.pos.x-fwd.x*CFG.REAR_CAM_LOOK-up.x*CFG.REAR_CAM_LOOKDOWN,
                  s.pos.y-fwd.y*CFG.REAR_CAM_LOOK-up.y*CFG.REAR_CAM_LOOKDOWN,
                  s.pos.z-fwd.z*CFG.REAR_CAM_LOOK-up.z*CFG.REAR_CAM_LOOKDOWN);   // look AFT + slightly down over the dorsal hull, so the whole TOP of the ship sits in frame
-  { const aft=fwd.clone().multiplyScalar(-1);   // REAR BARREL: breach just below/behind the rear cam, muzzle pointing AFT down -fwd toward the pursuers
-    rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aft);
-    rearBarrel.position.copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD).addScaledVector(aft,CFG.REAR_BARREL_LEN*0.5); }
+  { let aim=null; const bel=document.getElementById('rearPort'), br=(rearMouse&&bel)?bel.getBoundingClientRect():null;   // REAR BARREL now AIMS where the mouse points in the gunport (user 2026-07-13 "look down the barrel like you're shooting the gun")
+    if(br&&br.width>0){ const nx=((rearMouse.x-br.left)/br.width)*2-1, ny=-(((rearMouse.y-br.top)/br.height)*2-1);
+      aim=new T.Vector3(nx,ny,0.5).unproject(rearCam).sub(s.pos).normalize(); }
+    if(!aim) aim=fwd.clone().multiplyScalar(-1);   // cursor off the gunport -> barrel rests pointing straight aft
+    rearAimDir.copy(aim);
+    const breach=new T.Vector3().copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD);   // breach sits just below+ahead of the rear cam
+    rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aim);   // point the barrel down the aim line
+    rearBarrel.position.copy(breach).addScaledVector(aim,CFG.REAR_BARREL_LEN*0.5);   // barrel body centered breach->muzzle
+    rearMuzzle.copy(breach).addScaledVector(aim,CFG.REAR_BARREL_LEN); }   // muzzle tip = where the laser is born
   rearCam.updateProjectionMatrix(); }
 function updateRearView(){ const el=document.getElementById('rearWin');
   if(!el || el.style.display==='none'){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
@@ -5155,10 +5162,12 @@ function fireRearGun(mx,my){ const s=ships[0]; if(!s||!s.alive||s.docked) return
   if(rearGunCd>0) return; if(s.capLaser!=null && s.capLaser<=0) return;   // shares the laser capacitor gate with the main gun
   const el=document.getElementById('rearPort'); if(!el) return; const r=el.getBoundingClientRect();
   const ndcX=((mx-r.left)/Math.max(1,r.width))*2-1, ndcY=-(((my-r.top)/Math.max(1,r.height))*2-1);
-  const dir=new T.Vector3(ndcX,ndcY,0.5).unproject(rearCam).sub(s.pos).normalize();
+  const dir=new T.Vector3(ndcX,ndcY,0.5).unproject(rearCam).sub(s.pos).normalize();   // where the gunport cursor points = the barrel's line
+  const up=UPL.clone().applyQuaternion(s.quat), fwd=FWD.clone().applyQuaternion(s.quat);
+  const muzzle=new T.Vector3().copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD).addScaledVector(dir,CFG.REAR_BARREL_LEN);   // the barrel TIP - same math as the barrel placement, so the laser leaves exactly from the muzzle, down the barrel
   const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy, base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1));
   const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null, shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
-  spawnBullet(new T.Vector3().copy(s.pos).addScaledVector(dir,2.4), dir, s.id, spec);
+  spawnBullet(muzzle, dir, s.id, spec);
   if(s.capLaser!=null) s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);
   rearGunCd=CFG.REAR_GUN_CD; if(window.SOUND) SOUND.play('shoot'); }
 let brainZoom=1, brainCenter={x:300,y:235};
