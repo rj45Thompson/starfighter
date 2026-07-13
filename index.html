@@ -177,52 +177,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713m"></script>
-<script src="fflate.min.js?v=20260713m"></script>
-<script src="fbxloader.js?v=20260713m"></script>
+<script src="three.min.js?v=20260713n"></script>
+<script src="fflate.min.js?v=20260713n"></script>
+<script src="fbxloader.js?v=20260713n"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713m"></script>
-<script src="inhabitant.js?v=20260713m"></script>
-<script src="passenger.js?v=20260713m"></script>
-<script src="gamemod.js?v=20260713m"></script>
-<script src="chatter.js?v=20260713m"></script>
-<script src="speech_gen.js?v=20260713m"></script>
-<script src="speech_input.js?v=20260713m"></script>
-<script src="vision.js?v=20260713m"></script>
-<script src="deliberate.js?v=20260713m"></script>
-<script src="knowledge.js?v=20260713m"></script>
-<script src="acquire.js?v=20260713m"></script>
-<script src="sound.js?v=20260713m"></script>
-<script src="hullmodels.js?v=20260713m"></script>
-<script src="knowledge_hud.js?v=20260713m"></script>
-<script src="knowledge_screen.js?v=20260713m"></script>
-<script src="centroid_mind.js?v=20260713m"></script>
-<script src="kripke_mind.js?v=20260713m"></script>
-<script src="sober_gate.js?v=20260713m"></script>
-<script src="contradiction_ledger.js?v=20260713m"></script>
-<script src="kripke_planner.js?v=20260713m"></script>
-<script src="pillar_router.js?v=20260713m"></script>
-<script src="gravity_well.js?v=20260713m"></script>
-<script src="growth_loop.js?v=20260713m"></script>
-<script src="coop_proof.js?v=20260713m"></script>
-<script src="item_variance.js?v=20260713m"></script>
-<script src="tom_test.js?v=20260713m"></script>
-<script src="thoughts.js?v=20260713m"></script>
-<script src="tami_battle_ui.js?v=20260713m"></script>
-<script src="power_panel.js?v=20260713m"></script>
-<script src="panels.js?v=20260713m"></script>
-<script src="item_icons.js?v=20260713m"></script>
-<script src="engbay.js?v=20260713m"></script>
+<script src="speech_tier.js?v=20260713n"></script>
+<script src="inhabitant.js?v=20260713n"></script>
+<script src="passenger.js?v=20260713n"></script>
+<script src="gamemod.js?v=20260713n"></script>
+<script src="chatter.js?v=20260713n"></script>
+<script src="speech_gen.js?v=20260713n"></script>
+<script src="speech_input.js?v=20260713n"></script>
+<script src="vision.js?v=20260713n"></script>
+<script src="deliberate.js?v=20260713n"></script>
+<script src="knowledge.js?v=20260713n"></script>
+<script src="acquire.js?v=20260713n"></script>
+<script src="sound.js?v=20260713n"></script>
+<script src="hullmodels.js?v=20260713n"></script>
+<script src="knowledge_hud.js?v=20260713n"></script>
+<script src="knowledge_screen.js?v=20260713n"></script>
+<script src="centroid_mind.js?v=20260713n"></script>
+<script src="kripke_mind.js?v=20260713n"></script>
+<script src="sober_gate.js?v=20260713n"></script>
+<script src="contradiction_ledger.js?v=20260713n"></script>
+<script src="kripke_planner.js?v=20260713n"></script>
+<script src="pillar_router.js?v=20260713n"></script>
+<script src="gravity_well.js?v=20260713n"></script>
+<script src="growth_loop.js?v=20260713n"></script>
+<script src="coop_proof.js?v=20260713n"></script>
+<script src="item_variance.js?v=20260713n"></script>
+<script src="tom_test.js?v=20260713n"></script>
+<script src="thoughts.js?v=20260713n"></script>
+<script src="tami_battle_ui.js?v=20260713n"></script>
+<script src="power_panel.js?v=20260713n"></script>
+<script src="panels.js?v=20260713n"></script>
+<script src="item_icons.js?v=20260713n"></script>
+<script src="engbay.js?v=20260713n"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713m"></script>
-<script src="conquest.js?v=20260713m"></script>
-<script src="missions.js?v=20260713m"></script>
-<script src="planetmenu.js?v=20260713m"></script>
-<script src="textquests.js?v=20260713m"></script>
+<script src="starmap.js?v=20260713n"></script>
+<script src="conquest.js?v=20260713n"></script>
+<script src="missions.js?v=20260713n"></script>
+<script src="planetmenu.js?v=20260713n"></script>
+<script src="textquests.js?v=20260713n"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -347,6 +347,7 @@ const CFG = {
   RAY_SEARCH_MUL:1.3, RAY_FIRE_MUL:1.6, RAY_FLEE_MUL:1.5, HPADV_MAX:3, SIT_SENSE_MUL:0.85, SIT_GEM_MIN:2,
   UPGRADE_HULL_DEATHS:2, WAR_CONTEST_FRAC:0.5, NAV_MIN_SAMPLES:6, TOM_FACE_W:3, CMD_MINE_MUL:1.6,
   UP_HULLCLASS_MINLVL:3, UP_HULLCLASS_CHANCE:0.08,   // AI hull-CLASS swap (user 2026-07-07 "AI don't upgrade their hulls"): only rolled once hull level is already maxed-feeling; rare per-tick chance so capital-ship progression stays a rare late-game outcome
+  AI_BUDGET_FRAC:0.7, AI_TANK_AGGR:0.55,   // AI GEAR DIVERSITY (user 2026-07-13 "AI don't buy different weapons/ships, I want diversity not cheats"): commit at most this frac of credits to one purchase; aggression >= AI_TANK_AGGR -> bold pilot wants heavy/armored hulls, below -> fast/light hulls
   // ---- M1: the HEGEMON rises (escalating machine invader + galactic war) ----
   ESC_RATE:0.6, ESC_PER_TIER:40, INVADE_THRESHOLD:3, LIBERATE_GRACE:6, CONTESTED_PROD:0.4,   // DIFFICULTY PASS 4 (user 2026-07-08 "the game should be harder"): ESC_RATE was 0.5 - the front pushes ~20% faster now
   LANE_SPREAD_THRESHOLD_MULT:0.5,   // SR-M16 "war spreads along them": a system touching an ALREADY-contested lane-neighbor needs only this fraction of the normal enemy count to also flip contested - the front creeps through connected lanes instead of every system's invasion status being decided in total isolation
@@ -776,7 +777,8 @@ function makeShip(i){
     missileAmmo:CFG.MISSILE_AMMO_START, dmgMult:0, micromodules:[],
     mode:'MINE', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(hue) };
   novelShipHook(s);   // N3 (GIVEN-from-canon): roster temperament -> aggr bias; traders faction -> trader role bias
-  applyHull(s, s.role==='trader'?'freighter':RAIDER_HULL_VARIETY[i%RAIDER_HULL_VARIETY.length]);   // user 2026-07-08 "each race is supposed to have a different ship type by default": makeShip never set a hullClass at all, so every coalition ship defaulted to plain Fighter regardless of role; traders now spawn as the big-holdCap Freighter this file's own comment already called for, raiders spawn a mix so the fleet reads as varied on day one, not just after upgrades
+  pilotPrefs(s);      // per-pilot weapon FAMILY + hull ARCHETYPE (seeded from id/role/aggr) - runs AFTER novelShipHook so it reads the temperament-biased s.aggr; drives the real credit purchases below so the fleet DIVERGES honestly
+  applyHull(s, s.role==='trader'?'freighter':aiStarterHull(s));   // spawn small (cheapest hull of this pilot's dream line = single-weapon); hull variety now EMERGES from purchases toward the pilot's preference, not a round-robin handout
   if(s.role==='trader'){ s.maxHp=Math.round(s.maxHp*CFG.TRADER_HP_MULT); s.hp=s.maxHp; }     // merchant hulls: cargo-first, thin armor
   s.quat.setFromEuler(new T.Euler(rand(-0.5,0.5),rand(0,TAU),0)); scene.add(s.mesh); ships.push(s); shipById[s.id]=s;
   novelSeedDispos();   // N3: canon relationship pairs seed where both endpoints are now alive (fills unset slots only)
@@ -1549,19 +1551,17 @@ function chooseUpgrade(s){ if(s.deaths>=CFG.UPGRADE_HULL_DEATHS && s.lvl.hull<=M
 function tryHullClassUpgrade(s){
   if(s.lvl.hull<CFG.UP_HULLCLASS_MINLVL) return false;
   if(rand(0,1)>=CFG.UP_HULLCLASS_CHANCE) return false;
-  // PROCEDURAL HULL ROSTER: "next" used to mean literal array-adjacency in HULL_ORDER - broke the instant 50
-  // generated hulls got appended after the 7 original ones (capital, index 6, would "upgrade" into union_skiff,
-  // index 7 - the WEAKEST generated hull, a real downgrade). Progression is now cost-sorted, not position-sorted:
-  // the cheapest hull STRICTLY pricier than the current one, searched across the whole roster - correct regardless
-  // of how many hulls exist or what order they were appended in, and lets a long-lived AI ship rarely progress
-  // into one of the new generated hulls too (a real difficulty/variety bonus, not just a player-shop addition).
+  // HULL DIVERSITY (user 2026-07-13 "AI don't buy different ships ... make it more real"): buy TOWARD this pilot's
+  // preferred archetype (AI_HULL_DREAMS: speed/balanced/tank/trader), not a universal cheapest-next ladder. Pick the
+  // priciest hull in the pilot's dream line it can afford that's an upgrade over its current hull - light pilots cap at
+  // Interceptor, tanks climb to the Capital Ship, so the fleet ends up genuinely varied. Reuses applyHull(s,key), the
+  // same swap the player's `hull` command uses (no duplicated hull-swap logic).
+  const dreams=AI_HULL_DREAMS[s.hullPrefKey]; if(!dreams) return false;   // no preference (e.g. Hegemon faction) -> no class churn
   const curCost=HULLS[s.hullClass||'fighter'].cost||0;
-  let next=null, nextCost=Infinity;
-  for(const key of HULL_ORDER){ const c=HULLS[key].cost||0; if(c>curCost && c<nextCost){ next=key; nextCost=c; } }
-  if(!next) return false;                          // already at the single most expensive hull in the roster
-  const cost=HULLS[next].cost;
-  if(s.credits<cost) return false;
-  s.credits-=cost; applyHull(s,next); return next; }
+  let target=null, tc=curCost;
+  for(let i=0;i<dreams.length;i++){ const H=HULLS[dreams[i]]; if(!H) continue; const c=H.cost||0; if(c>curCost && c>tc && c<=s.credits){ target=dreams[i]; tc=c; } }   // priciest affordable upgrade in the dream line
+  if(!target) return false;                         // dream ship already reached (or not yet affordable) - spend elsewhere
+  s.credits-=HULLS[target].cost; applyHull(s,target); return target; }
 function pickTarget(s,list){ if(s.lock && list.indexOf(s.lock)>=0 && s.pos.distanceTo(s.lock.pos)<CFG.SENSE_R) return s.lock;
   let best=null,bd=1e9; for(const o of list){ const d=s.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} } s.lock=best; return best; }
 function aimAt(s,dir){ const D=new T.Vector3().copy(dir).normalize(); const fwd=FWD.clone().applyQuaternion(s.quat); const dot=fwd.dot(D);
@@ -1736,6 +1736,7 @@ function think(s,dt){
   if(s.missileAmmo!=null && s.missileAmmo<CFG.MISSILE_AMMO_MAX){ s._ammoAcc=(s._ammoAcc||0)+CFG.MISSILE_AMMO_REGEN*dt;
     if(s._ammoAcc>=1){ const add=Math.floor(s._ammoAcc); s.missileAmmo=Math.min(CFG.MISSILE_AMMO_MAX,s.missileAmmo+add); s._ammoAcc-=add; } }
   if(s.role!=='player' && s.weaponInst==null && window.ITEMVAR) rollAIGear(s);   // IRON LAW: AI ships roll their own weapon/engine instances (symmetric with the player's shop rolls)
+  if(s.role!=='player' && s.team==='squad' && (!s.weaponFam || !s.hullPrefKey)) pilotPrefs(s);   // backfill per-pilot gear PREFERENCE for any coalition ship that missed makeShip (respawn/defender/convert paths) OR half-set it, so the WHOLE coalition fleet diversifies (enemy faction has no team==='squad', keeps its designed loadout)
   const seen=[];
   for(const a of asteroids){ const d=s.pos.distanceTo(a.pos); if(d<CFG.SENSE_R) seen.push({kind:'rock',o:a,d,val:a.level}); }
   for(const g of gems){ const d=s.pos.distanceTo(g.pos); if(d<CFG.SENSE_R) seen.push({kind:'gem',o:g,d,val:g.credits}); }
@@ -1853,11 +1854,16 @@ function think(s,dt){
   }
   let bought=null;
   if(mode==='UPGRADE'){ const k=chooseUpgrade(s),c=upCost(s,k); if(canUpgradeLvl(s,k) && s.credits>=c){ s.credits-=c; s.lvl[k]+=1; bought=k;
-    if(k==='hull'){ s.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(s.lvl.hull-1)); s.hp=s.maxHp; }
-    if(k==='weapon'){ const nt=WEAPON_ORDER[Math.min(WEAPON_ORDER.length-1, Math.floor((s.lvl.weapon-1)/2))]; if(nt!==(s.weaponType||'energy')){ s.weaponType=nt; if((WEAPONS[nt].dmgType)==='missile') s.missileAmmo=CFG.MISSILE_AMMO_MAX; rollAIGear(s); say(s,`Refit → ${WEAPONS[nt].n}.`); } }   // M3: arms race; IRON LAW: a weapon REFIT tops up the magazine (the AI's resupply analog of the player buying ammo at dock)
+    if(k==='hull'){ s.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(s.lvl.hull-1)); s.hp=s.maxHp; }   // numeric dmg/speed/hp scaling stays a credit-gated purchase
     burst(s.pos,0x86ff9d,12,12,3.2); }
-    const gotHull=tryHullClassUpgrade(s);                                       // rare: swap to the NEXT HULL_ORDER class (scout…capital), same applyHull() the player's `hull` command uses
-    if(gotHull){ say(s,`${(s.credits)|0}c left → HULL REFIT: ${HULLS[gotHull].n}`); burst(s.pos,0x86ff9d,20,16,4.2); } }
+    // WEAPON DIVERSITY (user 2026-07-13 "AI don't buy different weapons ... it's all cheats"): buy the best gun this
+    // pilot can afford in ITS OWN family (energy/ballistic/missile) from the real catalog - replaces the old lockstep
+    // "WEAPON_ORDER by level" that made every ship of the same age identical. IRON LAW: a missile fit tops up the mag.
+    const wbuy=aiPickWeapon(s);
+    if(wbuy){ s.credits-=WEAPONS[wbuy].cost; s.weaponType=wbuy; if(WEAPONS[wbuy].dmgType==='missile') s.missileAmmo=CFG.MISSILE_AMMO_MAX; rollAIGear(s); bought=bought||'weapon';
+      say(s,`Fitted ${WEAPONS[wbuy].n} · ${(s.credits)|0}c left.`); burst(s.pos,0x9fd8ff,14,12,3.4); }
+    const gotHull=tryHullClassUpgrade(s);                                       // buys TOWARD this pilot's preferred hull archetype (not a universal ladder), same applyHull() the player's `hull` command uses
+    if(gotHull){ say(s,`${(s.credits)|0}c left → HULL REFIT: ${HULLS[gotHull].n}`); burst(s.pos,0x86ff9d,20,16,4.2); bought=bought||'hull'; } }
   s.brain={ mode, target, dot:aim.dot, ctrl:s.ctrl, threat:!!threat, bought };
   s.utter-=dt;
   if(bought){ sgSay(s,'upgrade',{what:bought==='weapon'?'LASERS':bought==='engine'?'THRUSTERS':'HULL',lvl:s.lvl[bought],credits:(s.credits)|0},`${(s.credits)|0}c left → upgrade Lv${s.lvl[bought]}`); s.utter=CFG.UTTER_CD; }
@@ -2883,7 +2889,7 @@ function manuOf(s){ return MANUFACTURERS[s.manufacturer||'human']||MANUFACTURERS
 // dmgType: E/S/M susceptibility key (see HULLS.res) - energy=Pulse Laser/Incinerator, frag=Autocannon (SR
 // "Fragmentation Weapons"), missile=Seeker Missile (also gated by player-only ammo + hull point-defense, see CFG.MISSILE_AMMO_*/HULLS.pd).
 const WEAPONS={   // each weapon has a UNIQUE look when fired (user): laser BOLT vs cannon TRACER+sparks vs missile ORB+smoke trail
-  energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:true,  homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6, dmgType:'energy'},
+  energy:   {n:'Pulse Laser',    dmg:18, cd:0.27, speed:118, life:1.10, range:0.70, col:0x66ccff, r:2.2, twin:false, homing:0,   splash:0,  cost:0,   shape:'bolt',   boltLen:3.4, flash:1.6, dmgType:'energy'},   // starter = ONE bolt (user 2026-07-13 "most ships one laser at start"); twin stays a SPECIAL-weapon trait (ballistic/missiles/flowblaster/lirecron below)
   ballistic:{n:'Autocannon',     dmg:31, cd:0.50, speed:150, life:1.35, range:0.95, col:0xffc24a, r:2.7, twin:true,  homing:0,   splash:0,  cost:220, shape:'tracer', tracerLen:2.4, trail:0xffd27a, trailCd:0.045, flash:2.6, dmgType:'frag'},
   missile:  {n:'Seeker Missile', dmg:48, cd:0.90, speed:80,  life:2.30, range:1.15, col:0xff5a6e, r:3.6, twin:false, homing:2.4, splash:11, cost:360, shape:'orb',    trail:0x8a8f99, trailCd:0.05,  flash:2.2, dmgType:'missile'},
   // FLAMETHROWER (user 2026-07-07: "the enemies of starfighter originally had flame thrower, can you copy that").
@@ -3026,7 +3032,36 @@ const HULL_MOUNTS={
     gizmoPoints:[{x:-0.70,y:0.30,facingDeg:-90},{x:-0.35,y:0.60,facingDeg:0},{x:0,y:0.70,facingDeg:180},{x:0.35,y:0.60,facingDeg:0},{x:0.70,y:0.30,facingDeg:90},{x:0,y:0.45,facingDeg:0}] } };
 function hullMounts(s){ return HULL_MOUNTS[s.hullClass]||HULL_MOUNTS.fighter; }
 function gizmoSlotsFor(s){ return Math.max(0, hullMounts(s).gizmoPoints.length + seriesOf(s).gizmoDelta); }   // HULL SERIES: Fast trades a gizmo slot for speed
-const RAIDER_HULL_VARIETY=['scout','fighter','interceptor','cruiser'];   // default spawn variety for coalition raiders - dreadnought/capital stay upgrade-earned (tryHullClassUpgrade), not handed out for free
+const RAIDER_HULL_VARIETY=['scout','fighter','interceptor','cruiser'];   // (legacy) round-robin spawn variety - SUPERSEDED by per-pilot preference below; kept only so nothing dangles
+// ==== AI GEAR DIVERSITY (user 2026-07-13 "the ai don't seem to buy different weapons and ships ... I want diversity ...
+// it's all cheats.. make it more real") ====
+// The AI economy was already credit-gated (mode==='UPGRADE' spends real earned credits), but every pilot walked the SAME
+// lockstep ladder (weaponType by level, cheapest-next hull) - so the whole fleet was identical at a given age. Now each
+// pilot has a stable PREFERENCE (a weapon FAMILY + a hull ARCHETYPE, seeded from its own id/role/temperament) and buys
+// TOWARD that preference from the SAME catalog the player uses. Heterogeneous pilots + earned credits -> real emergent
+// diversity, no handouts. Weapon families are cost-ascending so "buy the priciest I can afford" walks each pilot up its
+// own line; hull dream-lines end at different ceilings (light pilots cap at Interceptor, tanks reach the Capital Ship).
+const AI_WEAPON_FAMILIES={
+  energy:   ['wavephaser','atomicvision','disintegrator','turbogravir','vertix'],                  // chain / AOE / heavy beams (640..3400c)
+  ballistic:['ballistic','fragmentcannon','esodapher','multiresonator','flowblaster','imho9000'],  // frag guns, some twin (220..1900c)
+  missile:  ['missiles','missile','lirecron','torpedo'] };                                         // homing launchers (300..1700c)
+const AI_HULL_DREAMS={
+  speed:    ['scout','interceptor'],                     // fast & nimble - caps at Interceptor
+  balanced: ['fighter','interceptor','cruiser'],         // all-rounder
+  tank:     ['fighter','cruiser','dreadnought','capital'],   // armor pilots climb to the flagship hulls
+  trader:   ['freighter'] };                             // merchants keep the big hold
+function pilotPrefs(s){ if(!s||s.role==='player') return;
+  const h=(((s.id||0)*2654435761)>>>0);                  // stable per-pilot hash (deterministic, survives death/respawn)
+  if(s.role==='trader'){ s.weaponFam='ballistic'; s.hullPrefKey='trader'; return; }   // light frag guns + freighter
+  s.weaponFam=['energy','ballistic','missile'][h%3];
+  s.hullPrefKey=((s.aggr||0.5)>=CFG.AI_TANK_AGGR ? ['tank','balanced'] : ['speed','balanced'])[(h>>>4)%2]; }   // >>> UNSIGNED shift: h can exceed 2^31, and a signed >> would go negative -> (neg)%2===-1 -> array[-1]===undefined (the half-set-pref bug)
+function aiStarterHull(s){ const d=AI_HULL_DREAMS[s.hullPrefKey]||['fighter'];   // spawn in the CHEAPEST hull of the pilot's dream line (small, single-weapon) - variety EMERGES from later purchases, not a handout
+  let best=d[0],bc=HULLS[d[0]]?(HULLS[d[0]].cost||0):1e9; for(const k of d){ const c=HULLS[k]?(HULLS[k].cost||0):1e9; if(c<bc){ best=k; bc=c; } } return best; }
+function aiWeaponCost(s){ return (WEAPONS[s.weaponType||'energy']||WEAPONS.energy).cost||0; }
+function aiPickWeapon(s){ const fam=AI_WEAPON_FAMILIES[s.weaponFam]; if(!fam) return null;   // priciest weapon in THIS pilot's family it can afford that beats its current gun (a real purchase; null = save up)
+  const budget=(s.credits||0)*CFG.AI_BUDGET_FRAC, cur=aiWeaponCost(s); let best=null,bc=cur;
+  for(let i=0;i<fam.length;i++){ const W=WEAPONS[fam[i]]; if(!W) continue; const c=W.cost||0; if(c>bc && c<=budget){ best=fam[i]; bc=c; } }
+  return best; }
 
 // =================================================================================================
 // PROCEDURAL HULL ROSTER (user 2026-07-08: "maybe 50 ship types all with different generated stats...
