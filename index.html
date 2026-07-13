@@ -105,7 +105,10 @@
   .vlabel{ position:fixed; z-index:6; pointer-events:none; font:800 10px/1 ui-monospace,monospace; letter-spacing:.14em; color:#5f7fa6; }
   .vlabel span{ font-weight:600; letter-spacing:.02em; color:#3f5group; color:#3f5d72; }
   #vdiv,#hdiv,#hdiv2{ position:fixed; z-index:6; background:#1b2a3c; }
-  #powerdock{ position:fixed; z-index:6; background:rgba(7,14,23,0.85); overflow:hidden; pointer-events:auto; }
+  #powerdock{ position:fixed; z-index:6; background:rgba(9,15,26,0.30); border:1px solid rgba(70,214,255,0.18); border-radius:10px; overflow:hidden; pointer-events:auto; }
+  /* ALL PANELS TRANSPARENT (user 2026-07-13 "have all panels transparent") - the fullscreen top-down shows through every HUD panel */
+  #market,#marketBody,#ticker,#rosterWrap,#roster,#missionlog,#khud{ background:rgba(9,15,26,0.34) !important; }
+  #chat{ background:rgba(9,15,26,0.45) !important; }
   #boot{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50;
     background:var(--ink); font:600 14px/1 ui-monospace,monospace; color:#86a0bd; transition:opacity .5s; }
   /* ---- Android / touch ---- */
@@ -172,52 +175,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713c"></script>
-<script src="fflate.min.js?v=20260713c"></script>
-<script src="fbxloader.js?v=20260713c"></script>
+<script src="three.min.js?v=20260713d"></script>
+<script src="fflate.min.js?v=20260713d"></script>
+<script src="fbxloader.js?v=20260713d"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713c"></script>
-<script src="inhabitant.js?v=20260713c"></script>
-<script src="passenger.js?v=20260713c"></script>
-<script src="gamemod.js?v=20260713c"></script>
-<script src="chatter.js?v=20260713c"></script>
-<script src="speech_gen.js?v=20260713c"></script>
-<script src="speech_input.js?v=20260713c"></script>
-<script src="vision.js?v=20260713c"></script>
-<script src="deliberate.js?v=20260713c"></script>
-<script src="knowledge.js?v=20260713c"></script>
-<script src="acquire.js?v=20260713c"></script>
-<script src="sound.js?v=20260713c"></script>
-<script src="hullmodels.js?v=20260713c"></script>
-<script src="knowledge_hud.js?v=20260713c"></script>
-<script src="knowledge_screen.js?v=20260713c"></script>
-<script src="centroid_mind.js?v=20260713c"></script>
-<script src="kripke_mind.js?v=20260713c"></script>
-<script src="sober_gate.js?v=20260713c"></script>
-<script src="contradiction_ledger.js?v=20260713c"></script>
-<script src="kripke_planner.js?v=20260713c"></script>
-<script src="pillar_router.js?v=20260713c"></script>
-<script src="gravity_well.js?v=20260713c"></script>
-<script src="growth_loop.js?v=20260713c"></script>
-<script src="coop_proof.js?v=20260713c"></script>
-<script src="item_variance.js?v=20260713c"></script>
-<script src="tom_test.js?v=20260713c"></script>
-<script src="thoughts.js?v=20260713c"></script>
-<script src="tami_battle_ui.js?v=20260713c"></script>
-<script src="power_panel.js?v=20260713c"></script>
-<script src="panels.js?v=20260713c"></script>
-<script src="item_icons.js?v=20260713c"></script>
-<script src="engbay.js?v=20260713c"></script>
+<script src="speech_tier.js?v=20260713d"></script>
+<script src="inhabitant.js?v=20260713d"></script>
+<script src="passenger.js?v=20260713d"></script>
+<script src="gamemod.js?v=20260713d"></script>
+<script src="chatter.js?v=20260713d"></script>
+<script src="speech_gen.js?v=20260713d"></script>
+<script src="speech_input.js?v=20260713d"></script>
+<script src="vision.js?v=20260713d"></script>
+<script src="deliberate.js?v=20260713d"></script>
+<script src="knowledge.js?v=20260713d"></script>
+<script src="acquire.js?v=20260713d"></script>
+<script src="sound.js?v=20260713d"></script>
+<script src="hullmodels.js?v=20260713d"></script>
+<script src="knowledge_hud.js?v=20260713d"></script>
+<script src="knowledge_screen.js?v=20260713d"></script>
+<script src="centroid_mind.js?v=20260713d"></script>
+<script src="kripke_mind.js?v=20260713d"></script>
+<script src="sober_gate.js?v=20260713d"></script>
+<script src="contradiction_ledger.js?v=20260713d"></script>
+<script src="kripke_planner.js?v=20260713d"></script>
+<script src="pillar_router.js?v=20260713d"></script>
+<script src="gravity_well.js?v=20260713d"></script>
+<script src="growth_loop.js?v=20260713d"></script>
+<script src="coop_proof.js?v=20260713d"></script>
+<script src="item_variance.js?v=20260713d"></script>
+<script src="tom_test.js?v=20260713d"></script>
+<script src="thoughts.js?v=20260713d"></script>
+<script src="tami_battle_ui.js?v=20260713d"></script>
+<script src="power_panel.js?v=20260713d"></script>
+<script src="panels.js?v=20260713d"></script>
+<script src="item_icons.js?v=20260713d"></script>
+<script src="engbay.js?v=20260713d"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713c"></script>
-<script src="conquest.js?v=20260713c"></script>
-<script src="missions.js?v=20260713c"></script>
-<script src="planetmenu.js?v=20260713c"></script>
-<script src="textquests.js?v=20260713c"></script>
+<script src="starmap.js?v=20260713d"></script>
+<script src="conquest.js?v=20260713d"></script>
+<script src="missions.js?v=20260713d"></script>
+<script src="planetmenu.js?v=20260713d"></script>
+<script src="textquests.js?v=20260713d"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -384,7 +387,7 @@ const CFG = {
   NOTIFY_DEDUPE_S:2.5, TOAST_MAX:4, TOAST_LIFE_S:3.2,   // message-triage: collapse identical bursts; cap the corner toast stack
   RIGHT_FRAC:0.30, RIGHT_MIN:300, RIGHT_MAX:430,   // right column width - narrowed (user 2026-07-10: "two panels reduce the view from landscape") so the main view is wide
   TOP_VIEW_SHARE:0.56,                             // of the right column ABOVE the power dock, the system map's share (rest = the smaller REASONING view)
-  POWER_DOCK_H:252,                                // px reserved at the right column's bottom for the always-on power dock (radial hull ring + tick bars)
+  POWER_DOCK_H:330,                                // px for the always-on power dock (radial hull ring + tick bars) - taller to fit the BIGGER dials (user 2026-07-13)
   KILLER_MARK_S:12,                                // how long the pilot who killed you stays ringed on the radar (Starblast-style)
   SYNOD_HON_BLOODED:14, SYNOD_HON_DREAD:40, SYNOD_HON_NIGHTMARE:90,   // PIRATE RANK TITLES: raider kill-score thresholds for the honorific prefix (Blooded/Dread/Nightmare) on top of its combat-tier title
   HITVFX_R:320,                                    // only draw shield/hull impact VFX for ships within this range of you (perf)
@@ -4937,9 +4940,7 @@ if(window.PANELS){
     bar.innerHTML='<span>◎ 3D VIEW</span><span style="opacity:.55;font-weight:400">drag · resize ↘</span>';
     var grip=document.createElement('div');
     grip.style.cssText='position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;pointer-events:auto;background:repeating-linear-gradient(135deg,#46d6ffcc 0,#46d6ffcc 2px,transparent 2px,transparent 5px);border-radius:0 0 6px 0';
-    var cvs=document.createElement('canvas'); cvs.width=300; cvs.height=190;   // display surface (matches CHASE_RT_W/H in paintChaseWindow); opaque so it shows the 3D over ANY panel behind the window
-    cvs.style.cssText='position:absolute;left:0;top:20px;width:100%;height:calc(100% - 20px);border-radius:0 0 7px 7px;background:#05080e;pointer-events:none;display:block';
-    w.appendChild(cvs); w.appendChild(bar); w.appendChild(grip); document.body.appendChild(w);
+    w.appendChild(bar); w.appendChild(grip); document.body.appendChild(w);   // transparent body: the shared canvas scissor-renders the chase into VIEW.chase behind it (cheap, no readback)
     var drag=null;
     bar.addEventListener('mousedown',function(e){ drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
     grip.addEventListener('mousedown',function(e){ drag={mode:'size',x:e.clientX,y:e.clientY,ww:w.offsetWidth,hh:w.offsetHeight}; e.preventDefault(); e.stopPropagation(); });
@@ -5041,26 +5042,17 @@ function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3(); co
   mainTopCam.aspect=(VIEW.main.w/Math.max(1,VIEW.main.h))||1;
   mainTopCam.position.set(c.x, c.y+CFG.TOPCAM_UP*z, c.z+CFG.TOPCAM_BACK*z);   // high above + slight +Z back = top-down WITH depth
   mainTopCam.up.set(0,0,-1); mainTopCam.lookAt(c.x, c.y, c.z); mainTopCam.updateProjectionMatrix(); }
-// TOP-DOWN 3D WINDOW paint (user "the 3d view is not working"): the earlier transparent-scissor draw was occluded by
-// whatever HUD panel sat behind the window (roster/ticker) - a dealbreaker for a window you drag around. Now the chase
-// renders to an OFFSCREEN target and is blitted into the window's OWN 2D canvas: opaque, on top of the DOM, visible
-// ANYWHERE. Throttled to CHASE_FPS with a small target so the per-frame GPU readback stays cheap.
-let chaseRT=null, chaseBuf=null, chaseCtx=null, chaseImg=null, chasePaintAcc=0;
-const CHASE_RT_W=300, CHASE_RT_H=190, CHASE_FPS=15;
-function paintChaseWindow(dt){
-  const el=document.getElementById('chaseWin'); if(!TOPDOWN_MAIN || !el) return;
-  const cvs=el.querySelector('canvas'); if(!cvs) return;
-  chasePaintAcc+=dt; if(chasePaintAcc < 1/CHASE_FPS) return; chasePaintAcc=0;
-  if(!chaseRT){ chaseRT=new T.WebGLRenderTarget(CHASE_RT_W,CHASE_RT_H); chaseBuf=new Uint8Array(4*CHASE_RT_W*CHASE_RT_H);
-    chaseCtx=cvs.getContext('2d'); chaseImg=chaseCtx.createImageData(CHASE_RT_W,CHASE_RT_H); }
-  chaseCam.aspect=CHASE_RT_W/CHASE_RT_H; chaseCam.updateProjectionMatrix();
-  renderer.setScissorTest(false); renderer.setRenderTarget(chaseRT);
-  renderer.setViewport(0,0,CHASE_RT_W,CHASE_RT_H); renderer.render(scene,chaseCam);
-  renderer.readRenderTargetPixels(chaseRT,0,0,CHASE_RT_W,CHASE_RT_H,chaseBuf);
-  renderer.setRenderTarget(null);
-  const d=chaseImg.data, W=CHASE_RT_W, Hh=CHASE_RT_H, row=W*4;   // flip GL bottom-origin -> canvas top-origin
-  for(let y=0;y<Hh;y++){ const sy=(Hh-1-y)*row, dy=y*row; for(let x=0;x<row;x++) d[dy+x]=chaseBuf[sy+x]; }
-  chaseCtx.putImageData(chaseImg,0,0); }
+// TOP-DOWN 3D WINDOW (user 2026-07-13 "have all panels transparent"): with every HUD panel now transparent, nothing
+// opaque occludes the shared canvas, so the CHEAP scissor path works again - the chase scissor-renders into VIEW.chase
+// (the #chaseWin body rect) directly on the main canvas, NO per-frame GPU readback. That readback was the framerate
+// killer (a full-pipeline stall every frame, brutal on the Claude browser's software GL); this removes it entirely.
+function updateChaseView(){ const el=document.getElementById('chaseWin');
+  if(!TOPDOWN_MAIN || !el || el.style.display==='none'){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
+  const r=el.getBoundingClientRect(), H=innerH(), TITLE=20;   // chase fills the BODY, below the 20px drag bar
+  if(r.width<8||r.height<8+TITLE){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
+  VIEW.chase.x=Math.round(r.left); VIEW.chase.w=Math.round(r.width);
+  VIEW.chase.h=Math.round(r.height-TITLE); VIEW.chase.y=Math.round(H-(r.top+r.height));
+  chaseCam.aspect=VIEW.chase.w/Math.max(1,VIEW.chase.h); chaseCam.updateProjectionMatrix(); }
 let brainZoom=1, brainCenter={x:300,y:235};
 function sizeBrainCam(vw,vh){ vw=vw||VIEW.brain.w||1; vh=vh||VIEW.brain.h||1; const va=vw/vh, ca=600/470; let hw,hh;
   if(va>ca){ hh=235*brainZoom; hw=hh*va; } else { hw=300*brainZoom; hh=hw/va; }
@@ -5074,15 +5066,19 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   const rw=Math.round(clamp(W*CFG.RIGHT_FRAC,CFG.RIGHT_MIN,CFG.RIGHT_MAX)), mw=W-rw;
   const ph=Math.min(CFG.POWER_DOCK_H, Math.round(H*0.34));
   const th=Math.round((H-ph)*CFG.TOP_VIEW_SHARE), bh=H-ph-th;
-  VIEW.main={x:0,y:0,w:mw,h:H}; VIEW.top={x:mw,y:H-th,w:rw,h:th}; VIEW.brain={x:mw,y:ph,w:rw,h:bh};   // GL y is bottom-origin
-  chaseCam.aspect=mw/H; chaseCam.updateProjectionMatrix(); sizeTopCam(rw,th); sizeBrainCam(rw,bh);
+  // TOP-DOWN fills the whole screen (user 2026-07-13 "2d view top down underneath all"). Minimap + reasoning become
+  // small WebGL insets in the top-right corner (WebGL views can't be DOM-transparent, so they stay compact), and the
+  // POWER DOCK + every other HUD panel float transparent on top of the top-down.
+  const insW=Math.round(clamp(W*0.22,190,300)), insH=Math.round(insW*0.66);
+  VIEW.main={x:0,y:0,w:W,h:H};
+  VIEW.top ={x:W-insW-10, y:H-insH-10,    w:insW, h:insH};   // GL bottom-origin: y=H-insH-10 => top-right corner
+  VIEW.brain={x:W-insW-10, y:H-insH*2-20, w:insW, h:insH};   // just below the minimap
+  chaseCam.aspect=W/H; chaseCam.updateProjectionMatrix(); sizeTopCam(insW,insH); sizeBrainCam(insW,insH);
   const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain'), vd=document.getElementById('vdiv'), hd=document.getElementById('hdiv'), hd2=document.getElementById('hdiv2'), pd=document.getElementById('powerdock');
   lt.style.display='block'; lb.style.display='block';
-  lt.style.left=(mw+12)+'px'; lt.style.top='10px'; lb.style.left=(mw+12)+'px'; lb.style.top=(th+10)+'px';
-  vd.style.display='block'; vd.style.left=mw+'px'; vd.style.top='0'; vd.style.width='1px'; vd.style.height=H+'px';
-  hd.style.display='block'; hd.style.left=mw+'px'; hd.style.top=th+'px'; hd.style.width=rw+'px'; hd.style.height='1px';
-  if(hd2){ hd2.style.display='block'; hd2.style.left=mw+'px'; hd2.style.top=(th+bh)+'px'; hd2.style.width=rw+'px'; hd2.style.height='1px'; }
-  if(pd){ pd.style.display='block'; pd.style.left=mw+'px'; pd.style.top=(th+bh)+'px'; pd.style.width=rw+'px'; pd.style.height=ph+'px'; }
+  lt.style.left=(W-insW-6)+'px'; lt.style.top='6px'; lb.style.left=(W-insW-6)+'px'; lb.style.top=(insH+16)+'px';
+  if(vd) vd.style.display='none'; if(hd) hd.style.display='none'; if(hd2) hd2.style.display='none';   // no column dividers in fullscreen
+  if(pd){ pd.style.display='block'; pd.style.left=(W-rw-8)+'px'; pd.style.top=(H-ph-8)+'px'; pd.style.width=rw+'px'; pd.style.height=ph+'px'; }
   document.getElementById('chat').style.width=Math.max(240,mw-28-40)+'px';   // -40 reserves room for #micBtn beside it
   if(!(window.PANELS&&PANELS.isManual&&PANELS.isManual('market'))) document.getElementById('market').style.left=(mw*0.5)+'px';   // LIVE-CAUGHT 2026-07-09 ("docking is still weak"): this legacy re-center ran on EVERY viewport pass and silently stomped a manually-docked market - once the player drags it anywhere, PANELS owns its position
   if(soloView){ const full={x:0,y:0,w:W,h:H}, z={x:0,y:0,w:0,h:0};   // MOBILE: render only the active view, full-screen
@@ -5100,9 +5096,11 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
     if(mb&&vb) vb.style.left=(mb.offsetLeft+mb.offsetWidth+6)+'px'; } }
 function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r.x,r.y,r.w,r.h); renderer.setScissor(r.x,r.y,r.w,r.h); renderer.render(sc,cam); }
 function renderAll(){ renderer.setScissorTest(true);
-  if(TOPDOWN_MAIN){ renderView(VIEW.main,scene,mainTopCam); }   // TOP-DOWN primary; the 3D chase is painted into the #chaseWin's OWN canvas by paintChaseWindow() - immune to HUD occlusion
+  if(TOPDOWN_MAIN){ renderView(VIEW.main,scene,mainTopCam); }   // TOP-DOWN primary fills the screen
   else if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
-  renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam); renderer.setScissorTest(false); }
+  renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam);
+  if(TOPDOWN_MAIN) renderView(VIEW.chase,scene,chaseCam);   // 3D chase window LAST = always on top (over the minimap/brain insets too); shows through the transparent #chaseWin body
+  renderer.setScissorTest(false); }
 
 // =================================================================================================
 //  SAVE / LOAD (SR-M1, REQUIREMENTS_SR.md - "a living galaxy you leave and return to"): credits, rank,
@@ -6019,9 +6017,9 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
-  renderAll(); paintChaseWindow(dt); updateRoster();
+  renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
   mlogAcc+=dt; if(mlogAcc>0.5){ mlogAcc=0; updateMissionLog(); }   // task #66 - matches mktAcc's own throttle pattern; board/progress text can change between polls while the panel is open
   requestAnimationFrame(frame);

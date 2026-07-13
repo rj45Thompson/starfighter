@@ -57,9 +57,9 @@ var CFG = {
   // the RADIAL tick ring (techslidercircle.png pulled from Starfighter2/Assets/Textures) tinted by health.
   TICK_H: 7, TICK_GAP: 3,     // vertical-bar tick segment height / gap (px)
   TICK_W: 6, TICK_WGAP: 3,    // horizontal-gauge tick width / gap (px)
-  RADIAL: 70,                 // radial HULL gauge CSS size (px); canvas is 2x for sharpness (was 92: user 2026-07-10 the dials overflowed the dock off-screen bottom - shrunk to fit the ~245px dock)
-  DIAL_L: 52,                 // radial POWER dial size (WEAPONS/ENGINES/SHIELDS) - user 2026-07-10 "make all the gauges radial"
-  CAP_L: 40,                  // radial capacitor + shield-arc dial size (LASER/ENGINE/FWD/AFT), all four in ONE row now
+  RADIAL: 104,                // radial HULL gauge CSS size (px); canvas is 2x for sharpness (user 2026-07-13 "make the weapons hull and shields dials bigger" - dock is now a bottom-right floater with room)
+  DIAL_L: 82,                 // radial POWER dial size (WEAPONS/ENGINES/SHIELDS) - bigger per user 2026-07-13
+  CAP_L: 58,                  // radial capacitor + shield-arc dial size (LASER/ENGINE/FWD/AFT), all four in ONE row now - bigger per user 2026-07-13
   RADIAL_IMG: 'assets/techslidercircle.png',
   COL_RADIAL_DIM: '#2a4258',  // unfilled remainder of the tick ring
   COL_RADIAL_SHIELD: '#7fd0ff',
