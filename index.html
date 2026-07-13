@@ -157,6 +157,8 @@
 <div class="vlabel" id="lblBrain">SHIP CONTROLS <span>· scroll zoom · drag pan</span></div>
 <div id="vdiv"></div><div id="hdiv"></div><div id="hdiv2"></div>
 <div id="powerdock"></div><!-- always-on power dock: radial hull ring + TechSlider tick bars (power_panel.js docked mode) -->
+<!-- LOCK-ON RETICLE (user 2026-07-13): original amber/red bracket-box, absolutely positioned, pointer-events:none. updateLockReticle() projects the player's auto-aim target through chaseCam and drops this box on it; centered via translate(-50%,-50%). -->
+<div id="lockRet" style="position:fixed;left:0;top:0;width:76px;height:76px;pointer-events:none;display:none;z-index:8;transform:translate(-50%,-50%);will-change:left,top"><svg viewBox="0 0 100 100" width="100%" height="100%" style="overflow:visible;filter:drop-shadow(0 0 4px rgba(255,70,30,.85))"><g fill="none" stroke="#ffb020" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M40 24 H24 V40"/><path d="M60 24 H76 V40"/><path d="M40 76 H24 V60"/><path d="M60 76 H76 V60"/></g><circle cx="50" cy="50" r="2.6" fill="#ff4a2a"/></svg></div>
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="type anything - commands run ('help')  ·  ask ORION what are you doing  ·  orders in plain English  ·  everything else reaches the thing living behind your ears">
 <button id="micBtn" type="button" title="talk instead of type - click for one line, or `talk on` for a hands-free conversation">🎤</button>
 <button id="voiceBtn" type="button" title="hear the Passenger and pilots speak ALOUD (off by default - click to toggle, or type `voices on`)">🔇</button>
@@ -175,52 +177,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713g"></script>
-<script src="fflate.min.js?v=20260713g"></script>
-<script src="fbxloader.js?v=20260713g"></script>
+<script src="three.min.js?v=20260713h"></script>
+<script src="fflate.min.js?v=20260713h"></script>
+<script src="fbxloader.js?v=20260713h"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713g"></script>
-<script src="inhabitant.js?v=20260713g"></script>
-<script src="passenger.js?v=20260713g"></script>
-<script src="gamemod.js?v=20260713g"></script>
-<script src="chatter.js?v=20260713g"></script>
-<script src="speech_gen.js?v=20260713g"></script>
-<script src="speech_input.js?v=20260713g"></script>
-<script src="vision.js?v=20260713g"></script>
-<script src="deliberate.js?v=20260713g"></script>
-<script src="knowledge.js?v=20260713g"></script>
-<script src="acquire.js?v=20260713g"></script>
-<script src="sound.js?v=20260713g"></script>
-<script src="hullmodels.js?v=20260713g"></script>
-<script src="knowledge_hud.js?v=20260713g"></script>
-<script src="knowledge_screen.js?v=20260713g"></script>
-<script src="centroid_mind.js?v=20260713g"></script>
-<script src="kripke_mind.js?v=20260713g"></script>
-<script src="sober_gate.js?v=20260713g"></script>
-<script src="contradiction_ledger.js?v=20260713g"></script>
-<script src="kripke_planner.js?v=20260713g"></script>
-<script src="pillar_router.js?v=20260713g"></script>
-<script src="gravity_well.js?v=20260713g"></script>
-<script src="growth_loop.js?v=20260713g"></script>
-<script src="coop_proof.js?v=20260713g"></script>
-<script src="item_variance.js?v=20260713g"></script>
-<script src="tom_test.js?v=20260713g"></script>
-<script src="thoughts.js?v=20260713g"></script>
-<script src="tami_battle_ui.js?v=20260713g"></script>
-<script src="power_panel.js?v=20260713g"></script>
-<script src="panels.js?v=20260713g"></script>
-<script src="item_icons.js?v=20260713g"></script>
-<script src="engbay.js?v=20260713g"></script>
+<script src="speech_tier.js?v=20260713h"></script>
+<script src="inhabitant.js?v=20260713h"></script>
+<script src="passenger.js?v=20260713h"></script>
+<script src="gamemod.js?v=20260713h"></script>
+<script src="chatter.js?v=20260713h"></script>
+<script src="speech_gen.js?v=20260713h"></script>
+<script src="speech_input.js?v=20260713h"></script>
+<script src="vision.js?v=20260713h"></script>
+<script src="deliberate.js?v=20260713h"></script>
+<script src="knowledge.js?v=20260713h"></script>
+<script src="acquire.js?v=20260713h"></script>
+<script src="sound.js?v=20260713h"></script>
+<script src="hullmodels.js?v=20260713h"></script>
+<script src="knowledge_hud.js?v=20260713h"></script>
+<script src="knowledge_screen.js?v=20260713h"></script>
+<script src="centroid_mind.js?v=20260713h"></script>
+<script src="kripke_mind.js?v=20260713h"></script>
+<script src="sober_gate.js?v=20260713h"></script>
+<script src="contradiction_ledger.js?v=20260713h"></script>
+<script src="kripke_planner.js?v=20260713h"></script>
+<script src="pillar_router.js?v=20260713h"></script>
+<script src="gravity_well.js?v=20260713h"></script>
+<script src="growth_loop.js?v=20260713h"></script>
+<script src="coop_proof.js?v=20260713h"></script>
+<script src="item_variance.js?v=20260713h"></script>
+<script src="tom_test.js?v=20260713h"></script>
+<script src="thoughts.js?v=20260713h"></script>
+<script src="tami_battle_ui.js?v=20260713h"></script>
+<script src="power_panel.js?v=20260713h"></script>
+<script src="panels.js?v=20260713h"></script>
+<script src="item_icons.js?v=20260713h"></script>
+<script src="engbay.js?v=20260713h"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713g"></script>
-<script src="conquest.js?v=20260713g"></script>
-<script src="missions.js?v=20260713g"></script>
-<script src="planetmenu.js?v=20260713g"></script>
-<script src="textquests.js?v=20260713g"></script>
+<script src="starmap.js?v=20260713h"></script>
+<script src="conquest.js?v=20260713h"></script>
+<script src="missions.js?v=20260713h"></script>
+<script src="planetmenu.js?v=20260713h"></script>
+<script src="textquests.js?v=20260713h"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -257,6 +259,7 @@ const CFG = {
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
   REAR_CAM_FOV:72, REAR_CAM_UP:11, REAR_CAM_FWD:11, REAR_CAM_LOOK:55, REAR_CAM_LOOKDOWN:4,   // rear-gunner cam: high + ahead of the nose, looking back over the dorsal hull so nearly the whole TOP of the ship is in frame (user 2026-07-13)
+  REAR_BARREL_LEN:14, REAR_BARREL_RAD:0.5, REAR_BARREL_UP:8, REAR_BARREL_FWD:9, REAR_BARREL_LAYER:3,   // aft tank-turret barrel shown ONLY in the rear-gunner view; UP/FWD = breach (near-end) offset from the ship, kept just below+behind rearCam (UP<REAR_CAM_UP, FWD<REAR_CAM_FWD); layer 3 (1=blips,2=speech already taken) is enabled only on rearCam
 
   AST_KEEP:76, AST_MAX:110, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // scaled with the 9-system galaxy
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:5, AST_SPLIT_KICK:12, AST_DMG:20,
@@ -486,6 +489,18 @@ const mainTopCam=new T.PerspectiveCamera(CFG.TOPCAM_FOV, 1, 0.5, 6000);
 // REAR GUNNER camera (user 2026-07-13 "another 3d view from the back of the ship"): looks AFT from the cockpit so a
 // mouse gunner can shoot pursuers. Positioned + aimed each frame by updateRearCam().
 const rearCam=new T.PerspectiveCamera(CFG.REAR_CAM_FOV, 1, 0.5, 6000);
+// REAR TURRET BARREL (user 2026-07-13): a long tank-turret barrel shown ONLY in the rear-gunner view. It lives on a
+// dedicated THREE layer (REAR_BARREL_LAYER) that only rearCam renders, so it never clutters the main / chase / minimap
+// / brain views. Created once here; positioned + aimed aft each frame in updateRearCam().
+rearCam.layers.enable(CFG.REAR_BARREL_LAYER);
+const BARREL_UP_AXIS=new T.Vector3(0,1,0);   // CylinderGeometry runs along local +Y; each frame we rotate this onto the aft axis
+const rearBarrel=(function(){ const g=new T.Group();
+  const barrel=new T.Mesh(new T.CylinderGeometry(CFG.REAR_BARREL_RAD,CFG.REAR_BARREL_RAD,CFG.REAR_BARREL_LEN,20),
+    new T.MeshStandardMaterial({color:0x2b3038,metalness:0.95,roughness:0.38,emissive:0x05070a}));
+  const muzzle=new T.Mesh(new T.TorusGeometry(CFG.REAR_BARREL_RAD*1.55,CFG.REAR_BARREL_RAD*0.34,10,20),
+    new T.MeshStandardMaterial({color:0x565f6b,metalness:1.0,roughness:0.3}));
+  muzzle.rotation.x=Math.PI/2; muzzle.position.y=CFG.REAR_BARREL_LEN*0.5;   // ring at the aft muzzle end (local +Y maps to aft)
+  g.add(barrel); g.add(muzzle); g.traverse(o=>o.layers.set(CFG.REAR_BARREL_LAYER)); scene.add(g); return g; })();
 const CHASE_FOV_BASE=60;   // chaseCam's rectilinear fov; the peripheral lens renders WIDER than this then warps back
 
 // ---------------------------------------------------------------- PERIPHERAL LENS (wide-fov render -> edge-warp)
@@ -1431,8 +1446,12 @@ function wingmanTick(dt){ const P=ships[0]; if(!P) return;
 // SR-M19 CORES: invader salvage - a distinct pickup off Hegemon wrecks, spent at the science station.
 function spawnCoreDrop(pos,n){ const col=new T.Color(0x7fffd4);
   const m=new T.Mesh(new T.OctahedronGeometry(1.5,0), new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.8,metalness:0.6,roughness:0.3}));
-  m.position.copy(pos); scene.add(m);
-  gems.push({ pos:m.position, vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(2), mesh:m, credits:0, cores:n, born:T0 }); }
+  // CRASH FIX (user 2026-07-13 "crash when I kill that guy"): core drops were the ONE gem type built WITHOUT a halo
+  // child, so the gems update loop's `g.mesh.children[0].material.opacity` read undefined and threw on the frame a
+  // Hegemon-wreck core dropped. Give it the same halo child as every other drop (+ clone pos, add age/phase so it
+  // ages + shimmers consistently). A defensive guard in the loop backs this up.
+  m.position.copy(pos); const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.85})); halo.scale.set(8,8,1); m.add(halo); scene.add(m);
+  gems.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(2), mesh:m, credits:0, cores:n, age:0, phase:rand(0,TAU), born:T0 }); }
 // SR-M19 PROBES: deployed at a docked planet, accrue ore on the WALL clock (Date.now) so "pays out across
 // reloads" is literally true - lazy accrual on read, capped so a week away isn't infinite money.
 let mineProbes=[];   // [{planet, ms, stash}] - persisted via gatherSaveState/applySaveState
@@ -1991,6 +2010,7 @@ function step(dt){
     hurt(s,CFG.AST_DMG,a.pos); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); break; } } }
   shipCollisions();   // pairwise ship-body contact: separate + bounce + hull scrape on hard rams
   for(let i=gems.length-1;i>=0;i--){ const g=gems[i]; g.age+=dt; let taken=false;
+    if(!g.mesh||!g.mesh.material){ if(g.mesh) scene.remove(g.mesh); gems.splice(i,1); continue; }   // DEFENSIVE (crash fix 2026-07-13): a gem with no renderable mesh/material can't be shown or picked up - drop it rather than crash the frame loop
     for(const s of ships){ if(!s.alive||s.warping) continue; const d=s.pos.distanceTo(g.pos);
       if(d<magnetFor(s) && (!g.artifact || s.role==='player') && (!g.micromodule || s.role==='player')) g.vel.addScaledVector(_v.copy(s.pos).sub(g.pos).setLength(1),(magnetFor(s)-d)*0.9*dt*8);   // STANDARD GEAR SLOTS: Cargo Hook extends the pull radius
       if(d<pickRFor(s)){                                                                          // STANDARD GEAR SLOTS: Cargo Hook extends the grab radius
@@ -2008,7 +2028,8 @@ function step(dt){
     if(taken) continue;
     g.vel.multiplyScalar(Math.exp(-1.2*dt)); g.pos.addScaledVector(g.vel,dt); if(g.pos.length()>CFG.ARENA_R-1.5) g.pos.setLength(CFG.ARENA_R-1.5);
     g.mesh.position.copy(g.pos); g.mesh.rotation.y+=dt*1.6; g.mesh.rotation.x+=dt*0.8; g.mesh.material.emissiveIntensity=0.6+0.5*Math.sin(g.age*5);
-    const fade=(!g.perm&&g.age>CFG.GEM_LIFE-3)?Math.max(0,(CFG.GEM_LIFE-g.age)/3):1; g.mesh.children[0].material.opacity=0.8*fade;   // a death STASH (perm) never fades
+    const fade=(!g.perm&&g.age>CFG.GEM_LIFE-3)?Math.max(0,(CFG.GEM_LIFE-g.age)/3):1;
+    if(g.mesh&&g.mesh.children[0]&&g.mesh.children[0].material) g.mesh.children[0].material.opacity=0.8*fade;   // a death STASH (perm) never fades; GUARD (CRASH FIX 2026-07-13): a childless/meshless gem can never crash the frame loop
     if(!g.perm && g.age>CFG.GEM_LIFE){ scene.remove(g.mesh); gems.splice(i,1); } }   // perm stash persists until a ship collects it
   updateCargoPods(dt);
   for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.life-=dt; p.pos.addScaledVector(p.vel,dt); p.vel.multiplyScalar(Math.exp(-3*dt)); p.mesh.position.copy(p.pos);
@@ -2158,6 +2179,20 @@ function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!hasGizm
   reticleMesh.position.copy(lead); reticleMesh.lookAt(P.pos);
   const pulse=1+0.12*Math.sin(T0*RETICLE_CFG.PULSE_HZ*TAU); reticleMesh.scale.setScalar((2.2+bd*0.015)*pulse);
   reticleMesh.visible=true; }
+// LOCK-ON RETICLE (user 2026-07-13): DOM bracket-box drawn over the player's current auto-aim target in the MAIN
+// (fullscreen chase) view. The fire block (manualControl) only writes s.autoAimId at the INSTANT of a shot, so to
+// keep the reticle live BETWEEN shots we recompute the SAME sensor-gated nearestRival the fire block uses (single
+// cheap loop over ships) and project that target's world pos (tgt.pos) through chaseCam.
+const _lockNDC=new T.Vector3();
+function updateLockReticle(){ const el=document.getElementById('lockRet'); if(!el) return;
+  const P=ships[0], v=VIEW.main;
+  const tgt=(P&&P.alive)?nearestRival(P,senseRangeOf(P)):null;   // exactly what the auto-aim locks (iron law: only what the player SENSES)
+  if(!tgt||v.w<=0||v.h<=0){ if(el.style.display!=='none') el.style.display='none'; return; }
+  _lockNDC.copy(tgt.pos).project(chaseCam);                       // world -> NDC ([-1,1], y-up) through the chase camera
+  if(_lockNDC.z>1||_lockNDC.x<-1||_lockNDC.x>1||_lockNDC.y<-1||_lockNDC.y>1){ if(el.style.display!=='none') el.style.display='none'; return; }   // behind the camera or off the main viewport
+  const sx=v.x+(_lockNDC.x*0.5+0.5)*v.w, sy=innerH()-(v.y+(_lockNDC.y*0.5+0.5)*v.h);   // GL viewport (bottom-origin) -> CSS px (top-origin over VIEW.main)
+  el.style.left=sx+'px'; el.style.top=sy+'px';
+  if(el.style.display!=='block') el.style.display='block'; }
 const SPEAK=[]; const transcript=[];
 function buildSpeech(){ for(const s of ships){ const o=spriteText('',26,'#fff',{bg:'rgba(9,16,28,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS});
   o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o; } }
@@ -4941,7 +4976,7 @@ if(window.PANELS){
   (function(){
     if(document.getElementById('chaseWin')) return;
     var w=document.createElement('div'); w.id='chaseWin';
-    w.style.cssText='position:fixed;left:150px;top:84px;width:400px;height:250px;z-index:40;border:1px solid #46617e;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
+    w.style.cssText='position:fixed;left:150px;top:84px;width:400px;height:250px;z-index:40;border:1px solid #46617e;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none;display:none';
     var bar=document.createElement('div');
     bar.style.cssText='position:absolute;top:0;left:0;right:0;height:20px;background:#0d1a2add;border-bottom:1px solid #46617e;border-radius:7px 7px 0 0;cursor:move;pointer-events:auto;font:700 10px/20px ui-monospace,monospace;color:#8fd0ff;letter-spacing:.08em;padding:0 8px;display:flex;justify-content:space-between;align-items:center';
     bar.innerHTML='<span>◎ 3D VIEW</span><span style="opacity:.55;font-weight:400">drag · resize ↘</span>';
@@ -5078,7 +5113,7 @@ function updateTopCam(){ const c=topCenter||(ships[focus]&&ships[focus].pos)||ne
   topCam.position.set(c.x, CFG.ARENA_R, c.z); topCam.up.set(0,0,-1); topCam.lookAt(c.x,0,c.z); }
 // TOP-DOWN PRIMARY: TOPDOWN_MAIN swaps the big MAIN view to a close top-down follow of the player; the 3D chase view
 // then lives inside the movable/resizable #chaseWin window (VIEW.chase, driven by that element's on-screen rect).
-let TOPDOWN_MAIN=true, mainTopZoom=1;
+let TOPDOWN_MAIN=false, mainTopZoom=1;   // user 2026-07-13 "the 2d view isn't playable, make the 3d view the background again" - false = fullscreen chase cam main; rear gunner + insets stay
 function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3(); const z=mainTopZoom;
   mainTopCam.aspect=(VIEW.main.w/Math.max(1,VIEW.main.h))||1;
   mainTopCam.position.set(c.x, c.y+CFG.TOPCAM_UP*z, c.z+CFG.TOPCAM_BACK*z);   // high above + slight +Z back = top-down WITH depth
@@ -5106,6 +5141,9 @@ function updateRearCam(){ const s=ships[0]; if(!s) return;
   rearCam.lookAt(s.pos.x-fwd.x*CFG.REAR_CAM_LOOK-up.x*CFG.REAR_CAM_LOOKDOWN,
                  s.pos.y-fwd.y*CFG.REAR_CAM_LOOK-up.y*CFG.REAR_CAM_LOOKDOWN,
                  s.pos.z-fwd.z*CFG.REAR_CAM_LOOK-up.z*CFG.REAR_CAM_LOOKDOWN);   // look AFT + slightly down over the dorsal hull, so the whole TOP of the ship sits in frame
+  { const aft=fwd.clone().multiplyScalar(-1);   // REAR BARREL: breach just below/behind the rear cam, muzzle pointing AFT down -fwd toward the pursuers
+    rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aft);
+    rearBarrel.position.copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD).addScaledVector(aft,CFG.REAR_BARREL_LEN*0.5); }
   rearCam.updateProjectionMatrix(); }
 function updateRearView(){ const el=document.getElementById('rearWin');
   if(!el || el.style.display==='none'){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
@@ -5170,7 +5208,7 @@ function renderAll(){ renderer.setScissorTest(true);
   else if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
   renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam);
   if(TOPDOWN_MAIN) renderView(VIEW.chase,scene,chaseCam);   // 3D chase window LAST = always on top (over the minimap/brain insets too); shows through the transparent #chaseWin body
-  if(TOPDOWN_MAIN) renderView(VIEW.rear,scene,rearCam);     // REAR GUNNER window (aft view)
+  renderView(VIEW.rear,scene,rearCam);     // REAR GUNNER window (aft view) - renders regardless of TOPDOWN_MAIN so it survives the 3D-main revert; renderView self-guards on w<=0 when #rearWin is hidden
   renderer.setScissorTest(false); }
 
 // =================================================================================================
@@ -6097,7 +6135,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(); if(rearGunCd>0) rearGunCd-=dt; updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(); if(rearGunCd>0) rearGunCd-=dt; updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
