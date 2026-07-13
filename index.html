@@ -177,52 +177,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713k"></script>
-<script src="fflate.min.js?v=20260713k"></script>
-<script src="fbxloader.js?v=20260713k"></script>
+<script src="three.min.js?v=20260713l"></script>
+<script src="fflate.min.js?v=20260713l"></script>
+<script src="fbxloader.js?v=20260713l"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713k"></script>
-<script src="inhabitant.js?v=20260713k"></script>
-<script src="passenger.js?v=20260713k"></script>
-<script src="gamemod.js?v=20260713k"></script>
-<script src="chatter.js?v=20260713k"></script>
-<script src="speech_gen.js?v=20260713k"></script>
-<script src="speech_input.js?v=20260713k"></script>
-<script src="vision.js?v=20260713k"></script>
-<script src="deliberate.js?v=20260713k"></script>
-<script src="knowledge.js?v=20260713k"></script>
-<script src="acquire.js?v=20260713k"></script>
-<script src="sound.js?v=20260713k"></script>
-<script src="hullmodels.js?v=20260713k"></script>
-<script src="knowledge_hud.js?v=20260713k"></script>
-<script src="knowledge_screen.js?v=20260713k"></script>
-<script src="centroid_mind.js?v=20260713k"></script>
-<script src="kripke_mind.js?v=20260713k"></script>
-<script src="sober_gate.js?v=20260713k"></script>
-<script src="contradiction_ledger.js?v=20260713k"></script>
-<script src="kripke_planner.js?v=20260713k"></script>
-<script src="pillar_router.js?v=20260713k"></script>
-<script src="gravity_well.js?v=20260713k"></script>
-<script src="growth_loop.js?v=20260713k"></script>
-<script src="coop_proof.js?v=20260713k"></script>
-<script src="item_variance.js?v=20260713k"></script>
-<script src="tom_test.js?v=20260713k"></script>
-<script src="thoughts.js?v=20260713k"></script>
-<script src="tami_battle_ui.js?v=20260713k"></script>
-<script src="power_panel.js?v=20260713k"></script>
-<script src="panels.js?v=20260713k"></script>
-<script src="item_icons.js?v=20260713k"></script>
-<script src="engbay.js?v=20260713k"></script>
+<script src="speech_tier.js?v=20260713l"></script>
+<script src="inhabitant.js?v=20260713l"></script>
+<script src="passenger.js?v=20260713l"></script>
+<script src="gamemod.js?v=20260713l"></script>
+<script src="chatter.js?v=20260713l"></script>
+<script src="speech_gen.js?v=20260713l"></script>
+<script src="speech_input.js?v=20260713l"></script>
+<script src="vision.js?v=20260713l"></script>
+<script src="deliberate.js?v=20260713l"></script>
+<script src="knowledge.js?v=20260713l"></script>
+<script src="acquire.js?v=20260713l"></script>
+<script src="sound.js?v=20260713l"></script>
+<script src="hullmodels.js?v=20260713l"></script>
+<script src="knowledge_hud.js?v=20260713l"></script>
+<script src="knowledge_screen.js?v=20260713l"></script>
+<script src="centroid_mind.js?v=20260713l"></script>
+<script src="kripke_mind.js?v=20260713l"></script>
+<script src="sober_gate.js?v=20260713l"></script>
+<script src="contradiction_ledger.js?v=20260713l"></script>
+<script src="kripke_planner.js?v=20260713l"></script>
+<script src="pillar_router.js?v=20260713l"></script>
+<script src="gravity_well.js?v=20260713l"></script>
+<script src="growth_loop.js?v=20260713l"></script>
+<script src="coop_proof.js?v=20260713l"></script>
+<script src="item_variance.js?v=20260713l"></script>
+<script src="tom_test.js?v=20260713l"></script>
+<script src="thoughts.js?v=20260713l"></script>
+<script src="tami_battle_ui.js?v=20260713l"></script>
+<script src="power_panel.js?v=20260713l"></script>
+<script src="panels.js?v=20260713l"></script>
+<script src="item_icons.js?v=20260713l"></script>
+<script src="engbay.js?v=20260713l"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713k"></script>
-<script src="conquest.js?v=20260713k"></script>
-<script src="missions.js?v=20260713k"></script>
-<script src="planetmenu.js?v=20260713k"></script>
-<script src="textquests.js?v=20260713k"></script>
+<script src="starmap.js?v=20260713l"></script>
+<script src="conquest.js?v=20260713l"></script>
+<script src="missions.js?v=20260713l"></script>
+<script src="planetmenu.js?v=20260713l"></script>
+<script src="textquests.js?v=20260713l"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -258,8 +258,12 @@ const CFG = {
   BULLET_SPEED:118, BULLET_LIFE:1.1, BULLET_R:0.9, FIRE_CD:0.27, BULLET_DMG:12, MUZZLE_OFF:1.8,
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
-  REAR_CAM_FOV:70, REAR_CAM_UP:6, REAR_CAM_FWD:4, REAR_CAM_LOOK:45, REAR_CAM_LOOKDOWN:2,   // rear-gunner cam: above + slightly ahead, looking aft over the tail turret so you see the barrel in the lower foreground (user 2026-07-13)
-  REAR_BARREL_LEN:5, REAR_BARREL_RAD:0.42, REAR_BARREL_UP:1.4, REAR_BARREL_FWD:-2.5,   // real tail turret at the SHIP'S TAIL (small, so the muzzle stays near the ship, not off in space); barrel is on the default layer 0 = lit + visible in every view
+  REAR_CAM_FOV:74,                                 // turret field of view
+  REAR_YAW_MAX:2.2, REAR_PITCH_MAX:1.15, REAR_SLEW_LERP:9,   // turret traverse (user 2026-07-13 "move the camera and shoot down the centre"): how far the gunner slews from dead-aft (rad; ~126deg yaw each way covers the rear hemisphere past the flanks, ~66deg pitch up over the dorsal / down under the belly) + the heavy ease-to-cursor rate
+  REAR_MOUNT_UP:1.1, REAR_MOUNT_FWD:-2.6,          // the gun POD on the dorsal spine, just aft of centre (user 2026-07-13 "move the gunner pod")
+  REAR_CAM_BACK:6.5, REAR_CAM_UP:1.4,              // camera sits behind + above the breach so the barrel fills the lower foreground - you look down the barrel
+  REAR_AIM_RANGE:260,                              // bolts converge on the CENTRE crosshair at this range (gun harmonization), so what's under the reticle is what you hit
+  REAR_BARREL_LEN:6.5, REAR_BARREL_RAD:0.42,       // a long tank-turret barrel laid down the view centre; on default layer 0 = lit + visible
 
   AST_KEEP:76, AST_MAX:110, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // scaled with the 9-system galaxy
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:5, AST_SPLIT_KICK:12, AST_DMG:20,
@@ -489,17 +493,21 @@ const mainTopCam=new T.PerspectiveCamera(CFG.TOPCAM_FOV, 1, 0.5, 6000);
 // REAR GUNNER camera (user 2026-07-13 "another 3d view from the back of the ship"): looks AFT from the cockpit so a
 // mouse gunner can shoot pursuers. Positioned + aimed each frame by updateRearCam().
 const rearCam=new T.PerspectiveCamera(CFG.REAR_CAM_FOV, 1, 0.5, 6000);
-// REAR TURRET BARREL (user 2026-07-13 "don't see the turret"): a tank-turret barrel at the ship's tail. It renders on
-// the DEFAULT layer so the scene lights illuminate it and it's visible in every view (the earlier layer-3 version got
-// no light and rendered black). Created once here; positioned + aimed at the gunner's cursor each frame in updateRearCam().
+rearCam.layers.enable(3);   // rearCam ALSO renders layer 3 = the tail-turret barrel (rear-view-only, so it never looms in the main/chase/top views)
+// REAR TURRET BARREL (user 2026-07-13 "see your gun as a long cylinder like a tank turret"): a tail-turret barrel that
+// renders ONLY in the gunner window. It lives on layer 3 (enabled only on rearCam) with UNLIT MeshBasic materials, so
+// it's always bright there yet never looms in the main/chase/top views (the earlier layer-0 version loomed as a big
+// detached ring in the chase cam - the "floating in space" artifact). Positioned + aimed down the view centre each frame.
 const BARREL_UP_AXIS=new T.Vector3(0,1,0);   // CylinderGeometry runs along local +Y; each frame we rotate this onto the aim axis
 const rearBarrel=(function(){ const g=new T.Group();
   const barrel=new T.Mesh(new T.CylinderGeometry(CFG.REAR_BARREL_RAD,CFG.REAR_BARREL_RAD*1.18,CFG.REAR_BARREL_LEN,22),
-    new T.MeshStandardMaterial({color:0x59616c,metalness:0.9,roughness:0.42,emissive:0x1a1e25}));   // stays on layer 0 = LIT by the scene lights + visible in every view (the layer-3 version rendered black); base emissive so it never reads pitch-dark
+    new T.MeshBasicMaterial({color:0x6b7580}));   // UNLIT: bright on the rear-only layer 3 (scene lights only reach layer 0, so a lit material would render black here)
   const muzzle=new T.Mesh(new T.TorusGeometry(CFG.REAR_BARREL_RAD*1.7,CFG.REAR_BARREL_RAD*0.42,10,22),
-    new T.MeshStandardMaterial({color:0x8a95a2,metalness:1.0,roughness:0.3,emissive:0x2a2f36}));
+    new T.MeshBasicMaterial({color:0x9aa6b4}));
   muzzle.rotation.x=Math.PI/2; muzzle.position.y=CFG.REAR_BARREL_LEN*0.5;   // ring at the aft muzzle end (local +Y maps to the aim direction)
-  g.add(barrel); g.add(muzzle); scene.add(g); return g; })();   // NO layer isolation - a real tail turret, lit + visible everywhere (user 2026-07-13 "don't see the turret")
+  g.add(barrel); g.add(muzzle); scene.add(g);
+  g.layers.set(3); barrel.layers.set(3); muzzle.layers.set(3);   // REAR-VIEW-ONLY (only rearCam enables layer 3)
+  return g; })();
 const CHASE_FOV_BASE=60;   // chaseCam's rectilinear fov; the peripheral lens renders WIDER than this then warps back
 
 // ---------------------------------------------------------------- PERIPHERAL LENS (wide-fov render -> edge-warp)
@@ -4996,22 +5004,22 @@ if(window.PANELS){
       else { w.style.width=Math.max(180,drag.ww+(e.clientX-drag.x))+'px'; w.style.height=Math.max(130,drag.hh+(e.clientY-drag.y))+'px'; } });
     window.addEventListener('mouseup',function(){ drag=null; });
   })();
-  // REAR GUNNER window (user 2026-07-13 "rear gun ... 3d view from the back of the ship, shooting with the mouse"):
-  // a second movable/resizable window; rearCam looks AFT (updateRearCam). The gunport captures the mouse - move to
-  // aim (an ORIGINAL ringed-crosshair reticle follows the cursor), click to fire fireRearGun() along that ray. The
-  // reticle art and the laser sound are OURS (the game's own SOUND.play), not any third-party asset.
+  // REAR GUNNER window (user 2026-07-13 "move the gunner pod ... move the camera and shoot down the centre"):
+  // a second movable/resizable window; rearCam is a TURRET that slews (updateRearCam). Moving the mouse in the gunport
+  // slews the camera; a FIXED centre crosshair is the aim point; click/hold fires fireRearGun() straight down the view
+  // centre. The reticle art and the laser sound are OURS (the game's own SOUND.play), not any third-party asset.
   (function(){
     if(document.getElementById('rearWin')) return;
     var w=document.createElement('div'); w.id='rearWin';
     w.style.cssText='position:fixed;left:20px;top:60px;width:400px;height:300px;z-index:41;border:1px solid #7e4646;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
     var bar=document.createElement('div');
     bar.style.cssText='position:absolute;top:0;left:0;right:0;height:20px;background:#2a0d0ddd;border-bottom:1px solid #7e4646;border-radius:7px 7px 0 0;cursor:move;pointer-events:auto;font:700 10px/20px ui-monospace,monospace;color:#ff9a9a;letter-spacing:.08em;padding:0 8px;display:flex;justify-content:space-between;align-items:center';
-    bar.innerHTML='<span>◎ REAR GUNNER</span><span style="opacity:.55;font-weight:400">mouse-aim · click fire</span>';
+    bar.innerHTML='<span>◎ REAR GUNNER</span><span style="opacity:.55;font-weight:400">slew to aim · hold to fire</span>';
     var port=document.createElement('div'); port.id='rearPort';
-    port.style.cssText='position:absolute;left:0;top:20px;right:0;bottom:0;pointer-events:auto;cursor:crosshair;overflow:hidden';
+    port.style.cssText='position:absolute;left:0;top:20px;right:0;bottom:0;pointer-events:auto;cursor:none;overflow:hidden';   // cursor:none - the FIXED centre reticle is the aim point; the mouse only slews the turret
     var ret=document.createElement('div');
-    ret.style.cssText='position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;pointer-events:none;display:none;left:0;top:0';
-    ret.innerHTML='<svg width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="13" fill="none" stroke="#ff6a6a" stroke-width="1.5" opacity="0.92"/><circle cx="19" cy="19" r="2.2" fill="#ff6a6a"/><path d="M19 1v6M19 31v6M1 19h6M31 19h6" stroke="#ff6a6a" stroke-width="1.5"/></svg>';
+    ret.style.cssText='position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;pointer-events:none';   // FIXED at the port centre (user 2026-07-13 "shoot down the centre"): the turret slews, the crosshair stays put, bolts fly through it
+    ret.innerHTML='<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="none" stroke="#ff6a6a" stroke-width="1.4" opacity="0.85"/><circle cx="60" cy="60" r="52" fill="none" stroke="#ff6a6a" stroke-width="1" opacity="0.32"/><path d="M60 8v20M60 92v20M8 60h20M92 60h20" stroke="#ff6a6a" stroke-width="1.4" opacity="0.9"/><path d="M60 42v36M42 60h36" stroke="#ff6a6a" stroke-width="0.8" opacity="0.5"/><circle cx="60" cy="60" r="2.4" fill="#ffd0d0"/><path d="M26 26h11M26 26v11M94 26h-11M94 26v11M26 94h11M26 94v-11M94 94h-11M94 94v-11" stroke="#ff6a6a" stroke-width="1.4" opacity="0.7"/></svg>';
     port.appendChild(ret);
     var grip=document.createElement('div');
     grip.style.cssText='position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;pointer-events:auto;background:repeating-linear-gradient(135deg,#ff6a6acc 0,#ff6a6acc 2px,transparent 2px,transparent 5px);border-radius:0 0 6px 0';
@@ -5019,9 +5027,14 @@ if(window.PANELS){
     function fitRear(){ if(w._userSized) return; var vw=innerWidth||1280, vh=innerHeight||800, rW=Math.round(vw*0.5), rH=Math.round(vh*0.6);
       w.style.left=(vw-rW-12)+'px'; w.style.top='60px'; w.style.bottom='auto'; w.style.width=rW+'px'; w.style.height=rH+'px'; }
     fitRear(); window.addEventListener('resize',fitRear);   // opens at ~HALF THE SCREEN; re-fits on viewport resize until the user drags or sizes it (which sets w._userSized)
-    port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); ret.style.display='block'; ret.style.left=(e.clientX-r.left)+'px'; ret.style.top=(e.clientY-r.top)+'px'; rearMouse={x:e.clientX,y:e.clientY}; });
-    port.addEventListener('mouseleave',function(){ ret.style.display='none'; rearMouse=null; });
-    port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation(); if(typeof fireRearGun==='function') fireRearGun(e.clientX,e.clientY); });
+    // TURRET SLEW: the cursor's offset from the port centre sets the turret's yaw/pitch TARGET; updateRearCam eases the
+    // camera there and the barrel + bolts follow the view centre. You aim by slewing a target under the fixed crosshair.
+    port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); if(r.width<1||r.height<1) return;
+      var nx=((e.clientX-r.left)/r.width)*2-1, ny=((e.clientY-r.top)/r.height)*2-1;
+      rearYawT=-Math.max(-1,Math.min(1,nx))*CFG.REAR_YAW_MAX; rearPitchT=Math.max(-1,Math.min(1,ny))*CFG.REAR_PITCH_MAX; });   // signs chosen so the view pans TOWARD the cursor on screen (the camera looks aft, so screen-right = ship-left; screen-up needs +pitch)
+    port.addEventListener('mouseleave',function(){ rearFiring=false; rearYawT=0; rearPitchT=0; });   // let go -> turret eases back to dead-aft
+    port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation(); rearFiring=true; if(typeof fireRearGun==='function') fireRearGun(); });
+    window.addEventListener('mouseup',function(){ rearFiring=false; });   // hold to keep firing down the centre
     var drag=null;
     bar.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
     grip.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'size',x:e.clientX,y:e.clientY,ww:w.offsetWidth,hh:w.offsetHeight}; e.preventDefault(); e.stopPropagation(); });
@@ -5134,45 +5147,46 @@ function updateChaseView(){ const el=document.getElementById('chaseWin');
   VIEW.chase.x=Math.round(r.left); VIEW.chase.w=Math.round(r.width);
   VIEW.chase.h=Math.round(r.height-TITLE); VIEW.chase.y=Math.round(H-(r.top+r.height));
   chaseCam.aspect=VIEW.chase.w/Math.max(1,VIEW.chase.h); chaseCam.updateProjectionMatrix(); }
-// REAR GUNNER (user 2026-07-13 "another 3d view from the back of the ship, shooting with the mouse"): rearCam looks
-// AFT from the cockpit; #rearWin scissor-renders VIEW.rear (its gunport body). fireRearGun() unprojects the CLICK
-// through rearCam and launches a bolt from the ship along that ray - a pure MOUSE turret (no auto-aim on this one).
-let rearGunCd=0, rearMouse=null;   // rearMouse = last cursor pos over the gunport (drives where the barrel points)
-const rearAimDir=new T.Vector3(0,0,-1), rearMuzzle=new T.Vector3();   // the barrel's live aim direction + muzzle-tip world pos - the laser leaves from HERE, down the barrel
-function updateRearCam(){ const s=ships[0]; if(!s) return;
+// REAR GUNNER (user 2026-07-13 "move the camera and shoot down the centre"): rearCam is a dorsal-aft TURRET the gunner
+// SLEWS with the mouse; #rearWin scissor-renders VIEW.rear (its gunport body). The camera looks straight down its aim
+// axis, so fireRearGun() just launches a bolt from the muzzle through the CENTRE crosshair - a pure manual turret, no
+// auto-aim, no sensor cheat (it hits only what it physically sweeps under the reticle, same as the main gun).
+let rearGunCd=0, rearFiring=false, rearYaw=0, rearPitch=0, rearYawT=0, rearPitchT=0;   // turret: smoothed current + cursor-driven target yaw/pitch (rad) from dead-aft, and whether the trigger is held
+const rearAimDir=new T.Vector3(0,0,-1), rearMuzzle=new T.Vector3();   // the turret's live aim axis (= camera forward = view centre) + the barrel-muzzle world pos the bolt is born at
+function updateRearCam(dt){ const s=ships[0]; if(!s) return;
   const fwd=FWD.clone().applyQuaternion(s.quat), up=UPL.clone().applyQuaternion(s.quat);
+  const right=new T.Vector3().crossVectors(fwd,up).normalize();   // ship's starboard = the pitch axis
+  // TURRET TRAVERSE (user 2026-07-13 "move the camera and shoot down the centre"): ease the current yaw/pitch toward
+  // the cursor target so the turret has weight, then build the aim axis by rotating DEAD-AFT by yaw (about ship up)
+  // and pitch (about ship right). The camera looks straight down this axis, so the fixed centre crosshair, the barrel
+  // and the bolt all share one line - you aim by slewing a target under the crosshair, not by chasing a loose cursor.
+  const k=Math.min(1,Math.max(0,(dt||0.016))*CFG.REAR_SLEW_LERP);
+  rearYaw+=(rearYawT-rearYaw)*k; rearPitch+=(rearPitchT-rearPitch)*k;
+  const q=new T.Quaternion().setFromAxisAngle(up,rearYaw).multiply(new T.Quaternion().setFromAxisAngle(right,rearPitch));
+  const aim=fwd.clone().multiplyScalar(-1).applyQuaternion(q).normalize();   // dead-aft, slewed by the turret angles
+  rearAimDir.copy(aim);
+  const mount=s.pos.clone().addScaledVector(up,CFG.REAR_MOUNT_UP).addScaledVector(fwd,CFG.REAR_MOUNT_FWD);   // the gun POD on the dorsal spine, just aft of centre
   rearCam.aspect=(VIEW.rear.w/Math.max(1,VIEW.rear.h))||1;
-  rearCam.position.copy(s.pos).addScaledVector(up,CFG.REAR_CAM_UP).addScaledVector(fwd,CFG.REAR_CAM_FWD);   // high + ahead of the nose
+  rearCam.position.copy(mount).addScaledVector(aim,-CFG.REAR_CAM_BACK).addScaledVector(up,CFG.REAR_CAM_UP);   // sit behind + above the breach so the barrel fills the lower foreground
   rearCam.up.copy(up);
-  rearCam.lookAt(s.pos.x-fwd.x*CFG.REAR_CAM_LOOK-up.x*CFG.REAR_CAM_LOOKDOWN,
-                 s.pos.y-fwd.y*CFG.REAR_CAM_LOOK-up.y*CFG.REAR_CAM_LOOKDOWN,
-                 s.pos.z-fwd.z*CFG.REAR_CAM_LOOK-up.z*CFG.REAR_CAM_LOOKDOWN);   // look AFT + slightly down over the dorsal hull, so the whole TOP of the ship sits in frame
-  { let aim=null; const bel=document.getElementById('rearPort'), br=(rearMouse&&bel)?bel.getBoundingClientRect():null;   // REAR BARREL now AIMS where the mouse points in the gunport (user 2026-07-13 "look down the barrel like you're shooting the gun")
-    if(br&&br.width>0){ const nx=((rearMouse.x-br.left)/br.width)*2-1, ny=-(((rearMouse.y-br.top)/br.height)*2-1);
-      aim=new T.Vector3(nx,ny,0.5).unproject(rearCam).sub(s.pos).normalize(); }
-    if(!aim) aim=fwd.clone().multiplyScalar(-1);   // cursor off the gunport -> barrel rests pointing straight aft
-    rearAimDir.copy(aim);
-    const breach=new T.Vector3().copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD);   // breach sits just below+ahead of the rear cam
-    rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aim);   // point the barrel down the aim line
-    rearBarrel.position.copy(breach).addScaledVector(aim,CFG.REAR_BARREL_LEN*0.5);   // barrel body centered breach->muzzle
-    rearMuzzle.copy(breach).addScaledVector(aim,CFG.REAR_BARREL_LEN); }   // muzzle tip = where the laser is born
-  rearCam.updateProjectionMatrix(); }
+  rearCam.lookAt(rearCam.position.x+aim.x, rearCam.position.y+aim.y, rearCam.position.z+aim.z);   // forward == aim EXACTLY -> screen centre is the bolt's vanishing point
+  rearCam.updateProjectionMatrix();
+  rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aim);   // barrel points down the aim line (local +Y -> aim)
+  rearBarrel.position.copy(mount).addScaledVector(aim,CFG.REAR_BARREL_LEN*0.5);   // barrel body centred breach->muzzle
+  rearMuzzle.copy(mount).addScaledVector(aim,CFG.REAR_BARREL_LEN); }   // muzzle tip = where the bolt is born
 function updateRearView(){ const el=document.getElementById('rearWin');
   if(!el || el.style.display==='none'){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
   const r=el.getBoundingClientRect(), H=innerH(), TITLE=20;
   if(r.width<8||r.height<8+TITLE){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
   VIEW.rear.x=Math.round(r.left); VIEW.rear.w=Math.round(r.width);
   VIEW.rear.h=Math.round(r.height-TITLE); VIEW.rear.y=Math.round(H-(r.top+r.height)); }
-function fireRearGun(mx,my){ const s=ships[0]; if(!s||!s.alive||s.docked) return;
+function fireRearGun(){ const s=ships[0]; if(!s||!s.alive||s.docked) return;
   if(rearGunCd>0) return; if(s.capLaser!=null && s.capLaser<=0) return;   // shares the laser capacitor gate with the main gun
-  const el=document.getElementById('rearPort'); if(!el) return; const r=el.getBoundingClientRect();
-  const ndcX=((mx-r.left)/Math.max(1,r.width))*2-1, ndcY=-(((my-r.top)/Math.max(1,r.height))*2-1);
-  const dir=new T.Vector3(ndcX,ndcY,0.5).unproject(rearCam).sub(s.pos).normalize();   // where the gunport cursor points = the barrel's line
-  const up=UPL.clone().applyQuaternion(s.quat), fwd=FWD.clone().applyQuaternion(s.quat);
-  const muzzle=new T.Vector3().copy(s.pos).addScaledVector(up,CFG.REAR_BARREL_UP).addScaledVector(fwd,CFG.REAR_BARREL_FWD).addScaledVector(dir,CFG.REAR_BARREL_LEN);   // the barrel TIP - same math as the barrel placement, so the laser leaves exactly from the muzzle, down the barrel
+  const aimPoint=rearCam.position.clone().addScaledVector(rearAimDir,CFG.REAR_AIM_RANGE);   // the world point under the CENTRE crosshair, at gun-harmonization range
+  const dir=aimPoint.sub(rearMuzzle).normalize();   // the bolt leaves the muzzle and passes exactly through the crosshair
   const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy, base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1));
   const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null, shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
-  spawnBullet(muzzle, dir, s.id, spec);
+  spawnBullet(rearMuzzle.clone(), dir, s.id, spec);
   if(s.capLaser!=null) s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);
   rearGunCd=CFG.REAR_GUN_CD; if(window.SOUND) SOUND.play('shoot'); }
 let brainZoom=1, brainCenter={x:300,y:235};
@@ -6149,7 +6163,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(); if(rearGunCd>0) rearGunCd-=dt; updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); if(rearGunCd>0) rearGunCd-=dt; if(rearFiring) fireRearGun(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
