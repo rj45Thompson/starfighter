@@ -177,52 +177,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713l"></script>
-<script src="fflate.min.js?v=20260713l"></script>
-<script src="fbxloader.js?v=20260713l"></script>
+<script src="three.min.js?v=20260713m"></script>
+<script src="fflate.min.js?v=20260713m"></script>
+<script src="fbxloader.js?v=20260713m"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713l"></script>
-<script src="inhabitant.js?v=20260713l"></script>
-<script src="passenger.js?v=20260713l"></script>
-<script src="gamemod.js?v=20260713l"></script>
-<script src="chatter.js?v=20260713l"></script>
-<script src="speech_gen.js?v=20260713l"></script>
-<script src="speech_input.js?v=20260713l"></script>
-<script src="vision.js?v=20260713l"></script>
-<script src="deliberate.js?v=20260713l"></script>
-<script src="knowledge.js?v=20260713l"></script>
-<script src="acquire.js?v=20260713l"></script>
-<script src="sound.js?v=20260713l"></script>
-<script src="hullmodels.js?v=20260713l"></script>
-<script src="knowledge_hud.js?v=20260713l"></script>
-<script src="knowledge_screen.js?v=20260713l"></script>
-<script src="centroid_mind.js?v=20260713l"></script>
-<script src="kripke_mind.js?v=20260713l"></script>
-<script src="sober_gate.js?v=20260713l"></script>
-<script src="contradiction_ledger.js?v=20260713l"></script>
-<script src="kripke_planner.js?v=20260713l"></script>
-<script src="pillar_router.js?v=20260713l"></script>
-<script src="gravity_well.js?v=20260713l"></script>
-<script src="growth_loop.js?v=20260713l"></script>
-<script src="coop_proof.js?v=20260713l"></script>
-<script src="item_variance.js?v=20260713l"></script>
-<script src="tom_test.js?v=20260713l"></script>
-<script src="thoughts.js?v=20260713l"></script>
-<script src="tami_battle_ui.js?v=20260713l"></script>
-<script src="power_panel.js?v=20260713l"></script>
-<script src="panels.js?v=20260713l"></script>
-<script src="item_icons.js?v=20260713l"></script>
-<script src="engbay.js?v=20260713l"></script>
+<script src="speech_tier.js?v=20260713m"></script>
+<script src="inhabitant.js?v=20260713m"></script>
+<script src="passenger.js?v=20260713m"></script>
+<script src="gamemod.js?v=20260713m"></script>
+<script src="chatter.js?v=20260713m"></script>
+<script src="speech_gen.js?v=20260713m"></script>
+<script src="speech_input.js?v=20260713m"></script>
+<script src="vision.js?v=20260713m"></script>
+<script src="deliberate.js?v=20260713m"></script>
+<script src="knowledge.js?v=20260713m"></script>
+<script src="acquire.js?v=20260713m"></script>
+<script src="sound.js?v=20260713m"></script>
+<script src="hullmodels.js?v=20260713m"></script>
+<script src="knowledge_hud.js?v=20260713m"></script>
+<script src="knowledge_screen.js?v=20260713m"></script>
+<script src="centroid_mind.js?v=20260713m"></script>
+<script src="kripke_mind.js?v=20260713m"></script>
+<script src="sober_gate.js?v=20260713m"></script>
+<script src="contradiction_ledger.js?v=20260713m"></script>
+<script src="kripke_planner.js?v=20260713m"></script>
+<script src="pillar_router.js?v=20260713m"></script>
+<script src="gravity_well.js?v=20260713m"></script>
+<script src="growth_loop.js?v=20260713m"></script>
+<script src="coop_proof.js?v=20260713m"></script>
+<script src="item_variance.js?v=20260713m"></script>
+<script src="tom_test.js?v=20260713m"></script>
+<script src="thoughts.js?v=20260713m"></script>
+<script src="tami_battle_ui.js?v=20260713m"></script>
+<script src="power_panel.js?v=20260713m"></script>
+<script src="panels.js?v=20260713m"></script>
+<script src="item_icons.js?v=20260713m"></script>
+<script src="engbay.js?v=20260713m"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713l"></script>
-<script src="conquest.js?v=20260713l"></script>
-<script src="missions.js?v=20260713l"></script>
-<script src="planetmenu.js?v=20260713l"></script>
-<script src="textquests.js?v=20260713l"></script>
+<script src="starmap.js?v=20260713m"></script>
+<script src="conquest.js?v=20260713m"></script>
+<script src="missions.js?v=20260713m"></script>
+<script src="planetmenu.js?v=20260713m"></script>
+<script src="textquests.js?v=20260713m"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -263,7 +263,8 @@ const CFG = {
   REAR_MOUNT_UP:1.1, REAR_MOUNT_FWD:-2.6,          // the gun POD on the dorsal spine, just aft of centre (user 2026-07-13 "move the gunner pod")
   REAR_CAM_BACK:6.5, REAR_CAM_UP:1.4,              // camera sits behind + above the breach so the barrel fills the lower foreground - you look down the barrel
   REAR_AIM_RANGE:260,                              // bolts converge on the CENTRE crosshair at this range (gun harmonization), so what's under the reticle is what you hit
-  REAR_BARREL_LEN:6.5, REAR_BARREL_RAD:0.42,       // a long tank-turret barrel laid down the view centre; on default layer 0 = lit + visible
+  REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
+  REAR_BARREL_LEN:6.5, REAR_BARREL_RAD:0.42,       // a long tank-turret barrel laid down the view centre; unlit, on a rear-only render layer
 
   AST_KEEP:76, AST_MAX:110, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // scaled with the 9-system galaxy
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:5, AST_SPLIT_KICK:12, AST_DMG:20,
@@ -5014,33 +5015,71 @@ if(window.PANELS){
     w.style.cssText='position:fixed;left:20px;top:60px;width:400px;height:300px;z-index:41;border:1px solid #7e4646;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
     var bar=document.createElement('div');
     bar.style.cssText='position:absolute;top:0;left:0;right:0;height:20px;background:#2a0d0ddd;border-bottom:1px solid #7e4646;border-radius:7px 7px 0 0;cursor:move;pointer-events:auto;font:700 10px/20px ui-monospace,monospace;color:#ff9a9a;letter-spacing:.08em;padding:0 8px;display:flex;justify-content:space-between;align-items:center';
-    bar.innerHTML='<span>◎ REAR GUNNER</span><span style="opacity:.55;font-weight:400">slew to aim · hold to fire</span>';
+    bar.innerHTML='<span>◎ REAR GUNNER</span><span class="rhint" style="opacity:.55;font-weight:400">click to man turret · slew to aim</span>';
     var port=document.createElement('div'); port.id='rearPort';
-    port.style.cssText='position:absolute;left:0;top:20px;right:0;bottom:0;pointer-events:auto;cursor:none;overflow:hidden';   // cursor:none - the FIXED centre reticle is the aim point; the mouse only slews the turret
+    port.style.cssText='position:absolute;left:0;top:20px;right:0;bottom:0;pointer-events:auto;cursor:crosshair;overflow:hidden';   // crosshair while UNLOCKED (you see your real mouse + the handle near the edge); pointer-lock hides it (cursor:none) once you man the turret
     var ret=document.createElement('div');
     ret.style.cssText='position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;pointer-events:none';   // FIXED at the port centre (user 2026-07-13 "shoot down the centre"): the turret slews, the crosshair stays put, bolts fly through it
     ret.innerHTML='<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="none" stroke="#ff6a6a" stroke-width="1.4" opacity="0.85"/><circle cx="60" cy="60" r="52" fill="none" stroke="#ff6a6a" stroke-width="1" opacity="0.32"/><path d="M60 8v20M60 92v20M8 60h20M92 60h20" stroke="#ff6a6a" stroke-width="1.4" opacity="0.9"/><path d="M60 42v36M42 60h36" stroke="#ff6a6a" stroke-width="0.8" opacity="0.5"/><circle cx="60" cy="60" r="2.4" fill="#ffd0d0"/><path d="M26 26h11M26 26v11M94 26h-11M94 26v11M26 94h11M26 94v-11M94 94h-11M94 94v-11" stroke="#ff6a6a" stroke-width="1.4" opacity="0.7"/></svg>';
     port.appendChild(ret);
+    // SLEW HANDLE (user 2026-07-13 "show an indicator of the mouse"): a marker at the mouse's aim-input position, shown
+    // when NOT pointer-locked so the hidden-cursor problem is gone; it goes red as it nears the traverse limit / panel edge.
+    var handle=document.createElement('div'); handle.id='rearHandle';
+    handle.style.cssText='position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none;display:none;border:2px solid #ffd27a;border-radius:50%;box-shadow:0 0 8px #ffb03a99;z-index:2';
+    port.appendChild(handle);
+    // EDGE WARNINGS (user 2026-07-13 "show that it's going to go out of bounds"): a side glows when the turret is near its
+    // traverse limit on that side - you are about to run out of gun / off the panel. Driven each frame by updateRearCam.
+    var edgeWrap=document.createElement('div'); edgeWrap.id='rearEdgeWrap'; edgeWrap.style.cssText='position:absolute;inset:0;pointer-events:none';
+    function mkEdge(id,css){ var d=document.createElement('div'); d.id=id; d.style.cssText='position:absolute;opacity:0;transition:opacity .1s;'+css; edgeWrap.appendChild(d); }
+    mkEdge('rearEdgeT','left:0;right:0;top:0;height:36px;background:linear-gradient(to bottom,#ff5a5acc,transparent)');
+    mkEdge('rearEdgeB','left:0;right:0;bottom:0;height:36px;background:linear-gradient(to top,#ff5a5acc,transparent)');
+    mkEdge('rearEdgeL','top:0;bottom:0;left:0;width:36px;background:linear-gradient(to right,#ff5a5acc,transparent)');
+    mkEdge('rearEdgeR','top:0;bottom:0;right:0;width:36px;background:linear-gradient(to left,#ff5a5acc,transparent)');
+    port.appendChild(edgeWrap);
+    // RESIZE (user 2026-07-13 "make the rear gunner window resizable"): a big corner grip + thin right/bottom edge strips,
+    // all above the port with stopProp so grabbing them never fires the gun.
     var grip=document.createElement('div');
-    grip.style.cssText='position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;pointer-events:auto;background:repeating-linear-gradient(135deg,#ff6a6acc 0,#ff6a6acc 2px,transparent 2px,transparent 5px);border-radius:0 0 6px 0';
-    w.appendChild(bar); w.appendChild(port); w.appendChild(grip); document.body.appendChild(w);
+    grip.style.cssText='position:absolute;right:0;bottom:0;width:22px;height:22px;z-index:4;cursor:nwse-resize;pointer-events:auto;background:repeating-linear-gradient(135deg,#ff9a9a 0,#ff9a9a 2px,transparent 2px,transparent 5px);border-radius:0 0 6px 0';
+    var edgeR=document.createElement('div'); edgeR.style.cssText='position:absolute;top:20px;bottom:22px;right:0;width:9px;z-index:3;cursor:ew-resize;pointer-events:auto';
+    var edgeB=document.createElement('div'); edgeB.style.cssText='position:absolute;left:0;right:22px;bottom:0;height:9px;z-index:3;cursor:ns-resize;pointer-events:auto';
+    w.appendChild(bar); w.appendChild(port); w.appendChild(edgeR); w.appendChild(edgeB); w.appendChild(grip); document.body.appendChild(w);
     function fitRear(){ if(w._userSized) return; var vw=innerWidth||1280, vh=innerHeight||800, rW=Math.round(vw*0.5), rH=Math.round(vh*0.6);
       w.style.left=(vw-rW-12)+'px'; w.style.top='60px'; w.style.bottom='auto'; w.style.width=rW+'px'; w.style.height=rH+'px'; }
     fitRear(); window.addEventListener('resize',fitRear);   // opens at ~HALF THE SCREEN; re-fits on viewport resize until the user drags or sizes it (which sets w._userSized)
-    // TURRET SLEW: the cursor's offset from the port centre sets the turret's yaw/pitch TARGET; updateRearCam eases the
-    // camera there and the barrel + bolts follow the view centre. You aim by slewing a target under the fixed crosshair.
+    var hintEl=bar.querySelector('.rhint'); function setHint(t){ if(hintEl) hintEl.textContent=t; }
+    // POINTER LOCK (user 2026-07-13 "limit mouse to only that window ... don't let it go out of bounds"): click the port to
+    // MAN the turret - the OS mouse is captured here so it can't wander off, and movement slews the turret (relative). Esc
+    // releases. When NOT locked, absolute cursor mapping + the visible handle keep it usable AND testable, and the edge
+    // glow warns before the cursor leaves the panel. Signs keep the view panning TOWARD the input on both axes.
+    var locked=false;
+    function onLockChange(){ locked=(document.pointerLockElement===port);
+      port.style.cursor=locked?'none':'crosshair';
+      if(locked){ handle.style.display='none'; setHint('Esc to release · hold to fire'); }
+      else { rearFiring=false; setHint('click to man turret · slew to aim'); } }
+    document.addEventListener('pointerlockchange',onLockChange);
     port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); if(r.width<1||r.height<1) return;
-      var nx=((e.clientX-r.left)/r.width)*2-1, ny=((e.clientY-r.top)/r.height)*2-1;
-      rearYawT=-Math.max(-1,Math.min(1,nx))*CFG.REAR_YAW_MAX; rearPitchT=Math.max(-1,Math.min(1,ny))*CFG.REAR_PITCH_MAX; });   // signs chosen so the view pans TOWARD the cursor on screen (the camera looks aft, so screen-right = ship-left; screen-up needs +pitch)
-    port.addEventListener('mouseleave',function(){ rearFiring=false; rearYawT=0; rearPitchT=0; });   // let go -> turret eases back to dead-aft
-    port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation(); rearFiring=true; if(typeof fireRearGun==='function') fireRearGun(); });
+      if(locked){   // RELATIVE: accumulate mouse deltas, clamped to the traverse limit (the mouse is captured, it can't leave)
+        rearYawT=Math.max(-CFG.REAR_YAW_MAX,Math.min(CFG.REAR_YAW_MAX, rearYawT-(e.movementX||0)*CFG.REAR_LOCK_SENS));
+        rearPitchT=Math.max(-CFG.REAR_PITCH_MAX,Math.min(CFG.REAR_PITCH_MAX, rearPitchT+(e.movementY||0)*CFG.REAR_LOCK_SENS)); }
+      else {   // ABSOLUTE: the cursor's offset from centre = the traverse; show + tint the visible input handle
+        var nx=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width)*2-1)), ny=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height)*2-1));
+        rearYawT=-nx*CFG.REAR_YAW_MAX; rearPitchT=ny*CFG.REAR_PITCH_MAX;
+        handle.style.left=(e.clientX-r.left)+'px'; handle.style.top=(e.clientY-r.top)+'px'; handle.style.display='block';
+        handle.style.borderColor=(Math.abs(nx)>CFG.REAR_EDGE_WARN||Math.abs(ny)>CFG.REAR_EDGE_WARN)?'#ff5a5a':'#ffd27a'; } });   // handle goes red near the edge = about to go out of bounds
+    port.addEventListener('mouseleave',function(){ if(!locked) handle.style.display='none'; });   // unlocked: HOLD the current aim (no jarring recentre) - the turret keeps pointing where you left it
+    port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation();
+      if(!locked && port.requestPointerLock){ try{ port.requestPointerLock(); }catch(_){} }   // first click MANS the turret (captures the mouse to this window)
+      rearFiring=true; if(typeof fireRearGun==='function') fireRearGun(); });
     window.addEventListener('mouseup',function(){ rearFiring=false; });   // hold to keep firing down the centre
     var drag=null;
     bar.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
-    grip.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'size',x:e.clientX,y:e.clientY,ww:w.offsetWidth,hh:w.offsetHeight}; e.preventDefault(); e.stopPropagation(); });
+    function startSize(mode,e){ w._userSized=true; drag={mode:mode,x:e.clientX,y:e.clientY,ww:w.offsetWidth,hh:w.offsetHeight}; e.preventDefault(); e.stopPropagation(); }
+    grip.addEventListener('mousedown',function(e){ startSize('size',e); });     // corner = both dimensions
+    edgeR.addEventListener('mousedown',function(e){ startSize('sizeW',e); });   // right edge = width only
+    edgeB.addEventListener('mousedown',function(e){ startSize('sizeH',e); });   // bottom edge = height only
     window.addEventListener('mousemove',function(e){ if(!drag) return;
       if(drag.mode==='move'){ w.style.bottom='auto'; w.style.left=Math.max(0,Math.min(innerWidth-70,drag.l+(e.clientX-drag.x)))+'px'; w.style.top=Math.max(0,Math.min(innerHeight-40,drag.t+(e.clientY-drag.y)))+'px'; }
-      else { w.style.width=Math.max(180,drag.ww+(e.clientX-drag.x))+'px'; w.style.height=Math.max(130,drag.hh+(e.clientY-drag.y))+'px'; } });
+      else { if(drag.mode!=='sizeH') w.style.width=Math.max(220,drag.ww+(e.clientX-drag.x))+'px'; if(drag.mode!=='sizeW') w.style.height=Math.max(160,drag.hh+(e.clientY-drag.y))+'px'; } });   // sizeW=width only, sizeH=height only, size=both
     window.addEventListener('mouseup',function(){ drag=null; });
   })();
 }
@@ -5153,6 +5192,11 @@ function updateChaseView(){ const el=document.getElementById('chaseWin');
 // auto-aim, no sensor cheat (it hits only what it physically sweeps under the reticle, same as the main gun).
 let rearGunCd=0, rearFiring=false, rearYaw=0, rearPitch=0, rearYawT=0, rearPitchT=0;   // turret: smoothed current + cursor-driven target yaw/pitch (rad) from dead-aft, and whether the trigger is held
 const rearAimDir=new T.Vector3(0,0,-1), rearMuzzle=new T.Vector3();   // the turret's live aim axis (= camera forward = view centre) + the barrel-muzzle world pos the bolt is born at
+let _rEdge=null;   // cached edge-warning DOM refs, built lazily once the rear window exists
+function rearEdgeGlow(){ if(!_rEdge){ const t=document.getElementById('rearEdgeT'); if(!t) return; _rEdge={t:t,b:document.getElementById('rearEdgeB'),l:document.getElementById('rearEdgeL'),r:document.getElementById('rearEdgeR')}; }
+  const TH=CFG.REAR_EDGE_WARN, yf=rearYaw/CFG.REAR_YAW_MAX, pf=rearPitch/CFG.REAR_PITCH_MAX;   // yaw<0 aims screen-right, pitch<0 aims screen-up
+  _rEdge.r.style.opacity=yf<-TH?'1':'0'; _rEdge.l.style.opacity=yf>TH?'1':'0';               // glow the side the turret is slewed hard toward = "about to run out of gun"
+  _rEdge.t.style.opacity=pf<-TH?'1':'0'; _rEdge.b.style.opacity=pf>TH?'1':'0'; }
 function updateRearCam(dt){ const s=ships[0]; if(!s) return;
   const fwd=FWD.clone().applyQuaternion(s.quat), up=UPL.clone().applyQuaternion(s.quat);
   const right=new T.Vector3().crossVectors(fwd,up).normalize();   // ship's starboard = the pitch axis
@@ -5173,7 +5217,8 @@ function updateRearCam(dt){ const s=ships[0]; if(!s) return;
   rearCam.updateProjectionMatrix();
   rearBarrel.quaternion.setFromUnitVectors(BARREL_UP_AXIS,aim);   // barrel points down the aim line (local +Y -> aim)
   rearBarrel.position.copy(mount).addScaledVector(aim,CFG.REAR_BARREL_LEN*0.5);   // barrel body centred breach->muzzle
-  rearMuzzle.copy(mount).addScaledVector(aim,CFG.REAR_BARREL_LEN); }   // muzzle tip = where the bolt is born
+  rearMuzzle.copy(mount).addScaledVector(aim,CFG.REAR_BARREL_LEN);   // muzzle tip = where the bolt is born
+  rearEdgeGlow(); }   // update the "about to go out of bounds" edge glow from the turret's actual deflection
 function updateRearView(){ const el=document.getElementById('rearWin');
   if(!el || el.style.display==='none'){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
   const r=el.getBoundingClientRect(), H=innerH(), TITLE=20;
