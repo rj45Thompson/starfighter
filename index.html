@@ -200,52 +200,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713q"></script>
-<script src="fflate.min.js?v=20260713q"></script>
-<script src="fbxloader.js?v=20260713q"></script>
+<script src="three.min.js?v=20260713r"></script>
+<script src="fflate.min.js?v=20260713r"></script>
+<script src="fbxloader.js?v=20260713r"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713q"></script>
-<script src="inhabitant.js?v=20260713q"></script>
-<script src="passenger.js?v=20260713q"></script>
-<script src="gamemod.js?v=20260713q"></script>
-<script src="chatter.js?v=20260713q"></script>
-<script src="speech_gen.js?v=20260713q"></script>
-<script src="speech_input.js?v=20260713q"></script>
-<script src="vision.js?v=20260713q"></script>
-<script src="deliberate.js?v=20260713q"></script>
-<script src="knowledge.js?v=20260713q"></script>
-<script src="acquire.js?v=20260713q"></script>
-<script src="sound.js?v=20260713q"></script>
-<script src="hullmodels.js?v=20260713q"></script>
-<script src="knowledge_hud.js?v=20260713q"></script>
-<script src="knowledge_screen.js?v=20260713q"></script>
-<script src="centroid_mind.js?v=20260713q"></script>
-<script src="kripke_mind.js?v=20260713q"></script>
-<script src="sober_gate.js?v=20260713q"></script>
-<script src="contradiction_ledger.js?v=20260713q"></script>
-<script src="kripke_planner.js?v=20260713q"></script>
-<script src="pillar_router.js?v=20260713q"></script>
-<script src="gravity_well.js?v=20260713q"></script>
-<script src="growth_loop.js?v=20260713q"></script>
-<script src="coop_proof.js?v=20260713q"></script>
-<script src="item_variance.js?v=20260713q"></script>
-<script src="tom_test.js?v=20260713q"></script>
-<script src="thoughts.js?v=20260713q"></script>
-<script src="tami_battle_ui.js?v=20260713q"></script>
-<script src="power_panel.js?v=20260713q"></script>
-<script src="panels.js?v=20260713q"></script>
-<script src="item_icons.js?v=20260713q"></script>
-<script src="engbay.js?v=20260713q"></script>
+<script src="speech_tier.js?v=20260713r"></script>
+<script src="inhabitant.js?v=20260713r"></script>
+<script src="passenger.js?v=20260713r"></script>
+<script src="gamemod.js?v=20260713r"></script>
+<script src="chatter.js?v=20260713r"></script>
+<script src="speech_gen.js?v=20260713r"></script>
+<script src="speech_input.js?v=20260713r"></script>
+<script src="vision.js?v=20260713r"></script>
+<script src="deliberate.js?v=20260713r"></script>
+<script src="knowledge.js?v=20260713r"></script>
+<script src="acquire.js?v=20260713r"></script>
+<script src="sound.js?v=20260713r"></script>
+<script src="hullmodels.js?v=20260713r"></script>
+<script src="knowledge_hud.js?v=20260713r"></script>
+<script src="knowledge_screen.js?v=20260713r"></script>
+<script src="centroid_mind.js?v=20260713r"></script>
+<script src="kripke_mind.js?v=20260713r"></script>
+<script src="sober_gate.js?v=20260713r"></script>
+<script src="contradiction_ledger.js?v=20260713r"></script>
+<script src="kripke_planner.js?v=20260713r"></script>
+<script src="pillar_router.js?v=20260713r"></script>
+<script src="gravity_well.js?v=20260713r"></script>
+<script src="growth_loop.js?v=20260713r"></script>
+<script src="coop_proof.js?v=20260713r"></script>
+<script src="item_variance.js?v=20260713r"></script>
+<script src="tom_test.js?v=20260713r"></script>
+<script src="thoughts.js?v=20260713r"></script>
+<script src="tami_battle_ui.js?v=20260713r"></script>
+<script src="power_panel.js?v=20260713r"></script>
+<script src="panels.js?v=20260713r"></script>
+<script src="item_icons.js?v=20260713r"></script>
+<script src="engbay.js?v=20260713r"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713q"></script>
-<script src="conquest.js?v=20260713q"></script>
-<script src="missions.js?v=20260713q"></script>
-<script src="planetmenu.js?v=20260713q"></script>
-<script src="textquests.js?v=20260713q"></script>
+<script src="starmap.js?v=20260713r"></script>
+<script src="conquest.js?v=20260713r"></script>
+<script src="missions.js?v=20260713r"></script>
+<script src="planetmenu.js?v=20260713r"></script>
+<script src="textquests.js?v=20260713r"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -518,7 +518,7 @@ const mainTopCam=new T.PerspectiveCamera(CFG.TOPCAM_FOV, 1, 0.5, 6000);
 // REAR GUNNER camera (user 2026-07-13 "another 3d view from the back of the ship"): looks AFT from the cockpit so a
 // mouse gunner can shoot pursuers. Positioned + aimed each frame by updateRearCam().
 const rearCam=new T.PerspectiveCamera(CFG.REAR_CAM_FOV, 1, 0.5, 6000);
-mainTopCam.layers.enable(3);   // the EXTERNAL rear-gun turret (layer 3) shows in the OUTSIDE views (chase + top-down) as an aim indicator, but NOT in the rear gunner's own first-person view (rearCam no longer enables layer 3) - it just shows which way the gunner is pointing (user 2026-07-13)
+mainTopCam.layers.enable(3); rearCam.layers.enable(3);   // the rear-gun turret (layer 3) shows in BOTH the outside views (chase + top-down, as an aim indicator on the ship) AND the rear gunner's own first-person view (user 2026-07-13 "i want to see the gun in both views")
 // EXTERNAL REAR-GUN TURRET (user 2026-07-13 "make the ball smaller ... we shouldn't see the ball in the rear gunner
 // view. it just shows which way the gunner is pointing"): a SMALL ball turret that sits ON the ship's back and shows in
 // the OUTSIDE views (chase/top, layer 3) - NOT in the rear gunner's own first-person view. Its barrel swivels to the
@@ -5697,7 +5697,7 @@ const keysDown=new Set();
 // left-mouse fires, Shift boosts. The ARROW keys + right-Shift always work as an un-rebindable fallback, so a bad rebind
 // can never lock you out of flying.
 const KB_DEFAULT={ thrust:'Space', pitchDown:'KeyW', pitchUp:'KeyS', yawLeft:'KeyA', yawRight:'KeyD', nitro:'ShiftLeft', fire:'KeyF' };
-const OPT_DEFAULT={ mouseSteer:true, invertY:false, rightMouseThrust:true, mouseSens:0.9 };
+const OPT_DEFAULT={ mouseSteer:false, invertY:false, rightMouseThrust:true, mouseSens:0.9 };   // mouse STEER off by default (user 2026-07-13 "remove the mouse controls from the front view for now ... just use wasd"); left-click fire + right-mouse thrust are separate and stay on; re-enable steer in the options panel
 let KEYBIND=Object.assign({},KB_DEFAULT), OPT=Object.assign({},OPT_DEFAULT);
 const KB_ACTIONS=[['thrust','Thrust'],['pitchDown','Pitch down'],['pitchUp','Pitch up'],['yawLeft','Yaw left'],['yawRight','Yaw right'],['nitro','Boost'],['fire','Fire (key)']];
 function loadControls(){ try{ const j=JSON.parse(localStorage.getItem('SF_CONTROLS_v1')||'null'); if(j){ if(j.keybind) KEYBIND=Object.assign({},KB_DEFAULT,j.keybind); if(j.opt) OPT=Object.assign({},OPT_DEFAULT,j.opt); } }catch(e){} }
