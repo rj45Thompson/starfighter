@@ -362,6 +362,26 @@
         { freq: 620, when: 0.13, dur: 0.14, r: 0.04 }
       ], { wave: 'square', mWave: 'square', mRatio: 1, mDepth: 30, a: 0.004, d: 0.0, s: 0.9, gain: 0.24 }, opt.vol);
     },
+    // Rear BEAM: a short sustained saw "hum" - replayed every ~0.11s while the beam is held for a continuous cutting
+    // tone. Pitch rises with opt.rate (fed the ramp), so a beam that's been on target longer SOUNDS hotter.
+    beam: function (opt) {
+      var f = 150 * (opt.rate && isFinite(opt.rate) ? opt.rate : 1);
+      voice({ wave: 'sawtooth', freq: f, f2: f * 1.28, mWave: 'square', mRatio: 2.01, mDepth: 130, mDepthEnd: 55,
+              a: 0.008, d: 0.0, s: 0.9, r: 0.05, dur: 0.15, gain: 0.15, lp: 2400 }, opt.vol, opt.when);
+    },
+    // Missile/gun LOCK: a scary rising three-note warble - fires when an enemy gets a firing solution on you.
+    lockon: function (opt) {
+      seq([
+        { freq: 1180, dur: 0.06, r: 0.02 },
+        { freq: 1430, when: 0.075, dur: 0.06, r: 0.02 },
+        { freq: 1720, when: 0.15, dur: 0.14, r: 0.06 }
+      ], { wave: 'square', mWave: 'square', mRatio: 1, mDepth: 44, a: 0.003, d: 0.0, s: 0.9, gain: 0.2 }, opt.vol);
+    },
+    // JAMMED: a downward, defused "swallowed" sweep - your ECM smothering their lock (the reassuring counterpart).
+    jammed: function (opt) {
+      voice({ wave: 'sawtooth', freq: 460, f2: 120, mWave: 'square', mRatio: 0.5, mDepth: 210, mDepthEnd: 20,
+              a: 0.005, d: 0.05, r: 0.12, dur: 0.3, gain: 0.17, lp: 1500, lpEnd: 280 }, opt.vol, opt.when);
+    },
     // Thought: soft, short, high sine-ish blip - an AGI reasoning tick.
     thought: function (opt) {
       voice({ wave: 'triangle', freq: 1760, f2: 2093, mWave: 'sine', mRatio: 4, mDepth: 24,
