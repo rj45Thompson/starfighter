@@ -194,8 +194,8 @@
 <div class="vlabel" id="lblBrain">SHIP CONTROLS <span>· scroll zoom · drag pan</span></div>
 <div id="vdiv"></div><div id="hdiv"></div><div id="hdiv2"></div>
 <div id="powerdock"></div><!-- always-on power dock: radial hull ring + TechSlider tick bars (power_panel.js docked mode) -->
-<!-- LOCK-ON RETICLE (user 2026-07-13): original amber/red bracket-box, absolutely positioned, pointer-events:none. updateLockReticle() projects the player's auto-aim target through chaseCam and drops this box on it; centered via translate(-50%,-50%). -->
-<div id="lockRet" style="position:fixed;left:0;top:0;width:76px;height:76px;pointer-events:none;display:none;z-index:8;transform:translate(-50%,-50%);will-change:left,top"><svg viewBox="0 0 100 100" width="100%" height="100%" style="overflow:visible;filter:drop-shadow(0 0 4px rgba(255,70,30,.85))"><g fill="none" stroke="#ffb020" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M40 24 H24 V40"/><path d="M60 24 H76 V40"/><path d="M40 76 H24 V60"/><path d="M60 76 H76 V60"/></g><circle cx="50" cy="50" r="2.6" fill="#ff4a2a"/></svg></div>
+<!-- LOCK-ON WARNING (user 2026-07-14): centred banner + threat arrow shown when a hostile has a firing solution on you. updateLockReticle() finds any enemy whose nose is on you within range and rotates #lockArrow toward it; your ECM jammer blinks it out. -->
+<div id="lockRet" style="position:fixed;left:50%;top:13%;transform:translate(-50%,0);pointer-events:none;display:none;z-index:14;text-align:center"><div id="lockLab" style="font:700 15px/1.2 ui-monospace,Menlo,monospace;color:#ff5a5a;letter-spacing:3px;text-shadow:0 0 9px rgba(255,40,20,.95)">⊙ LOCKED</div><div id="lockArrow" style="width:0;height:0;margin:6px auto 0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:13px solid #ff5a5a;filter:drop-shadow(0 0 4px rgba(255,40,20,.9))"></div></div>
 <input id="chat" autocomplete="off" spellcheck="false" placeholder="type anything - commands run ('help')  ·  ask ORION what are you doing  ·  orders in plain English  ·  everything else reaches the thing living behind your ears">
 <button id="micBtn" type="button" title="talk instead of type - click for one line, or `talk on` for a hands-free conversation">🎤</button>
 <button id="voiceBtn" type="button" title="hear the Passenger and pilots speak ALOUD (off by default - click to toggle, or type `voices on`)">🔇</button>
@@ -214,52 +214,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713z"></script>
-<script src="fflate.min.js?v=20260713z"></script>
-<script src="fbxloader.js?v=20260713z"></script>
+<script src="three.min.js?v=20260714a"></script>
+<script src="fflate.min.js?v=20260714a"></script>
+<script src="fbxloader.js?v=20260714a"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713z"></script>
-<script src="inhabitant.js?v=20260713z"></script>
-<script src="passenger.js?v=20260713z"></script>
-<script src="gamemod.js?v=20260713z"></script>
-<script src="chatter.js?v=20260713z"></script>
-<script src="speech_gen.js?v=20260713z"></script>
-<script src="speech_input.js?v=20260713z"></script>
-<script src="vision.js?v=20260713z"></script>
-<script src="deliberate.js?v=20260713z"></script>
-<script src="knowledge.js?v=20260713z"></script>
-<script src="acquire.js?v=20260713z"></script>
-<script src="sound.js?v=20260713z"></script>
-<script src="hullmodels.js?v=20260713z"></script>
-<script src="knowledge_hud.js?v=20260713z"></script>
-<script src="knowledge_screen.js?v=20260713z"></script>
-<script src="centroid_mind.js?v=20260713z"></script>
-<script src="kripke_mind.js?v=20260713z"></script>
-<script src="sober_gate.js?v=20260713z"></script>
-<script src="contradiction_ledger.js?v=20260713z"></script>
-<script src="kripke_planner.js?v=20260713z"></script>
-<script src="pillar_router.js?v=20260713z"></script>
-<script src="gravity_well.js?v=20260713z"></script>
-<script src="growth_loop.js?v=20260713z"></script>
-<script src="coop_proof.js?v=20260713z"></script>
-<script src="item_variance.js?v=20260713z"></script>
-<script src="tom_test.js?v=20260713z"></script>
-<script src="thoughts.js?v=20260713z"></script>
-<script src="tami_battle_ui.js?v=20260713z"></script>
-<script src="power_panel.js?v=20260713z"></script>
-<script src="panels.js?v=20260713z"></script>
-<script src="item_icons.js?v=20260713z"></script>
-<script src="engbay.js?v=20260713z"></script>
+<script src="speech_tier.js?v=20260714a"></script>
+<script src="inhabitant.js?v=20260714a"></script>
+<script src="passenger.js?v=20260714a"></script>
+<script src="gamemod.js?v=20260714a"></script>
+<script src="chatter.js?v=20260714a"></script>
+<script src="speech_gen.js?v=20260714a"></script>
+<script src="speech_input.js?v=20260714a"></script>
+<script src="vision.js?v=20260714a"></script>
+<script src="deliberate.js?v=20260714a"></script>
+<script src="knowledge.js?v=20260714a"></script>
+<script src="acquire.js?v=20260714a"></script>
+<script src="sound.js?v=20260714a"></script>
+<script src="hullmodels.js?v=20260714a"></script>
+<script src="knowledge_hud.js?v=20260714a"></script>
+<script src="knowledge_screen.js?v=20260714a"></script>
+<script src="centroid_mind.js?v=20260714a"></script>
+<script src="kripke_mind.js?v=20260714a"></script>
+<script src="sober_gate.js?v=20260714a"></script>
+<script src="contradiction_ledger.js?v=20260714a"></script>
+<script src="kripke_planner.js?v=20260714a"></script>
+<script src="pillar_router.js?v=20260714a"></script>
+<script src="gravity_well.js?v=20260714a"></script>
+<script src="growth_loop.js?v=20260714a"></script>
+<script src="coop_proof.js?v=20260714a"></script>
+<script src="item_variance.js?v=20260714a"></script>
+<script src="tom_test.js?v=20260714a"></script>
+<script src="thoughts.js?v=20260714a"></script>
+<script src="tami_battle_ui.js?v=20260714a"></script>
+<script src="power_panel.js?v=20260714a"></script>
+<script src="panels.js?v=20260714a"></script>
+<script src="item_icons.js?v=20260714a"></script>
+<script src="engbay.js?v=20260714a"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713z"></script>
-<script src="conquest.js?v=20260713z"></script>
-<script src="missions.js?v=20260713z"></script>
-<script src="planetmenu.js?v=20260713z"></script>
-<script src="textquests.js?v=20260713z"></script>
+<script src="starmap.js?v=20260714a"></script>
+<script src="conquest.js?v=20260714a"></script>
+<script src="missions.js?v=20260714a"></script>
+<script src="planetmenu.js?v=20260714a"></script>
+<script src="textquests.js?v=20260714a"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -294,6 +294,8 @@ const CFG = {
   STANDOFF_R:12, BRAKE_R:26, CRUISE_THR:0.5,   // CH7 fix: throttle brakes/coasts to a target's standoff range (was hardcoded always-on -> "full throttle, never stop")
   BULLET_SPEED:118, BULLET_LIFE:1.1, BULLET_R:0.9, FIRE_CD:0.27, BULLET_DMG:12, MUZZLE_OFF:1.8,
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
+  AIM_BASE_ERR:2.6, AIM_COMP_ERR:0.4, AIM_JAM_ERR:8.0, AIM_ERR_RANGE:110, AIM_JITTER_HZ:1.7,   // FIRE-CONTROL fidelity (user 2026-07-14 "box ... depending on your computer and the other agent's jammer"): lead-box error in world units - BASIC fire control is loose, the Targeting Computer gizmo tightens it (AIM_COMP_ERR), the target's ECM jammer widens + wobbles it (AIM_JAM_ERR); error grows with range; the GUN aims at the SAME shown box, so a jammed solution honestly misses
+  LOCKON_RANGE:95, LOCKON_ARC:0.72,                // an enemy within LOCKON_RANGE and facing you within LOCKON_ARC (cos) has a firing solution ON you -> lock-on warning; your own ECM jammer flickers/denies their lock
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
   REAR_CAM_FOV:74,                                 // turret field of view
   REAR_YAW_MAX:Math.PI, REAR_PITCH_MAX:1.5, REAR_SLEW_LERP:9,   // turret traverse (user 2026-07-13 "swivel around all the way"): FULL 360 yaw (in locked mode yaw accumulates with no clamp at all - point anywhere incl. straight ahead), pitch to ~86deg (near straight up/down); REAR_YAW_MAX is the absolute-mode cursor-to-edge span
@@ -517,9 +519,10 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.outputEncoding=T.
 stage.appendChild(renderer.domElement);
 
 const scene=new T.Scene();
-scene.add(new T.HemisphereLight(0x9fc0ff,0x10131c,0.9));
-const sun=new T.DirectionalLight(0xfff0d8,1.1); sun.position.set(80,120,40); scene.add(sun);
-const rim=new T.DirectionalLight(0x6ea8ff,0.5); rim.position.set(-60,40,-80); scene.add(rim);
+scene.add(new T.HemisphereLight(0xbcd4ff,0x1a2030,1.35));   // user 2026-07-14 "the lighting is too dark": brighter sky + a lifted ground term so nothing reads pitch-black
+const sun=new T.DirectionalLight(0xfff0d8,1.6); sun.position.set(80,120,40); scene.add(sun);
+const rim=new T.DirectionalLight(0x8fb8ff,0.8); rim.position.set(-60,40,-80); scene.add(rim);
+scene.add(new T.AmbientLight(0x384156,0.55));   // gentle fill so back-facing rock/ship faces aren't crushed to black
 
 const chaseCam=new T.PerspectiveCamera(60,1,0.5,6000); chaseCam.position.set(0,CFG.CAM_UP,CFG.CAM_BACK);
 chaseCam.layers.enable(2); chaseCam.layers.enable(3);       // chase/main view shows SPEECH (layer 2) + the EXTERNAL rear-gun turret indicator (layer 3) sitting on the ship's back
@@ -908,8 +911,8 @@ function _procRockGeo(seed){ const g=new T.IcosahedronGeometry(1,1), p=g.attribu
 function buildRockPools(){ if(ROCK_POOLS) return;
   const CAP=Math.ceil(CFG.AST_MAX/ROCK_GEO_VARIANTS)+80;   // per-pool capacity: total 8*CAP >> AST_MAX, so a lopsided shade/shape split (or a burst of splits) always has room
   _rockProcGeos=[]; for(let i=0;i<ROCK_GEO_VARIANTS;i++) _rockProcGeos.push(_procRockGeo(i*13.7+1));
-  const mats=[ new T.MeshStandardMaterial({map:rockTex[0],color:0x9a9489,roughness:0.96,metalness:0.04,flatShading:true}),
-              new T.MeshStandardMaterial({map:rockTex[1],color:0x9a9489,roughness:0.96,metalness:0.04,flatShading:true}) ];
+  const mats=[ new T.MeshStandardMaterial({map:rockTex[0],color:0xa8a196,emissive:0x22201c,emissiveIntensity:0.6,roughness:0.95,metalness:0.04,flatShading:true}),
+              new T.MeshStandardMaterial({map:rockTex[1],color:0xa8a196,emissive:0x22201c,emissiveIntensity:0.6,roughness:0.95,metalness:0.04,flatShading:true}) ];   // user 2026-07-14: slightly lighter + faint self-glow so rocks aren't murky in the dark
   ROCK_POOLS=[];
   for(let gi=0;gi<ROCK_GEO_VARIANTS;gi++) for(let sh=0;sh<ROCK_SHADES;sh++){
     const inst=new T.InstancedMesh(_rockProcGeos[gi], mats[sh], CAP); inst.count=0; inst.frustumCulled=false; inst.instanceMatrix.setUsage(T.DynamicDrawUsage); scene.add(inst);
@@ -2322,35 +2325,55 @@ function spriteText(text,fs,col,opts){ opts=opts||{}; const ws=opts.ws||1,weight
     tex.image=c; tex.needsUpdate=true; sp.scale.set(w/SS*ws,h/SS*ws,1); sp.userData.w=w/SS*ws; sp.userData.h=h/SS*ws; }
   set(text,col); return { sp, set, get w(){return sp.userData.w;}, get h(){return sp.userData.h;} };
 }
-// TARGETING COMPUTER RETICLE (user 2026-07-07): a square at the LEAD point - where a hostile will BE by the time
-// your shot arrives (distance / bullet speed, projected along its current velocity) - not where it is now. Only
-// resolves with the equipment bought AND enough weapons power routed, so it stays tied to the X-Wing power system
-// rather than being a free always-on aimbot.
+// FIRE-CONTROL SOLUTION + LEAD BOX (user 2026-07-07 "square where they will be"; 2026-07-14 "box ... depending on
+// your computer and the other agent's jammer"). ONE solution per frame, cached in _playerSol, consumed by BOTH the
+// box below AND the forward gun (manualControl) - so bullets go exactly where the box is. The box is a 3D object,
+// so it rides the SAME peripheral-lens warp as the world and always sits where the shot lands. Fidelity:
+//   - BASIC fire control: everyone gets a loose amber box (AIM_BASE_ERR).
+//   - Targeting Computer gizmo (+>=60% weapons power): tight GREEN box (AIM_COMP_ERR).
+//   - Target's ECM jammer: wide, wobbling RED box (AIM_JAM_ERR) - and the gun aims at that wobble, so you scatter.
 const RETICLE_CFG={ POWER_THRESH:60, PULSE_HZ:3.2 };
-const reticleMesh=(function(){ const g=new T.EdgesGeometry(new T.PlaneGeometry(1,1)); const m=new T.LineSegments(g,new T.LineBasicMaterial({color:0xff5a5a,transparent:true,opacity:0.9})); m.visible=false; m.renderOrder=25; scene.add(m); return m; })();
-function updateTargetingReticle(dt){ const P=ships[0]; if(!P||!P.alive||!hasGizmo(P,'targeting')){ reticleMesh.visible=false; return; }   // ENGINEERING BAY: now a mountable gizmo, not a permanent flag
-  const wPct=shipPower(P).weapons; if(wPct<RETICLE_CFG.POWER_THRESH){ reticleMesh.visible=false; return; }
-  let best=null,bd=P.senseR; for(const o of ships){ if(o===P||!o.alive||o.team!=='pirate') continue; const d=P.pos.distanceTo(o.pos); if(d<bd){bd=d;best=o;} }
-  if(!best){ reticleMesh.visible=false; return; }
+const reticleMesh=(function(){ const g=new T.EdgesGeometry(new T.PlaneGeometry(1,1)); const m=new T.LineSegments(g,new T.LineBasicMaterial({color:0xffd24a,transparent:true,opacity:0.95})); m.visible=false; m.renderOrder=25; scene.add(m); return m; })();
+let _playerSol=null; const _solLead=new T.Vector3(), _solJit=new T.Vector3(), _solFwd=new T.Vector3(), _solTmp=new T.Vector3(), _solAim=new T.Vector3();
+function computePlayerSolution(){ _playerSol=null; const P=ships[0]; if(!P||!P.alive||P.docked) return null;
+  _solFwd.copy(FWD).applyQuaternion(P.quat);
+  let best=null,bd=senseRangeOf(P);
+  for(const o of ships){ if(o===P||!o.alive||o.docked||o.team===P.team) continue; const d=P.pos.distanceTo(o.pos); if(d>bd) continue;
+    if(_solTmp.copy(o.pos).sub(P.pos).normalize().dot(_solFwd)<CFG.AUTOAIM_ARC) continue;   // only hostiles roughly ahead get the box
+    bd=d; best=o; }
+  if(!best) return null;
   const W=WEAPONS[P.weaponType||'energy']||WEAPONS.energy, speed=W.speed||CFG.BULLET_SPEED;
-  const tImpact=bd/speed, lead=_v.copy(best.pos).addScaledVector(best.vel,tImpact);
-  reticleMesh.position.copy(lead); reticleMesh.lookAt(P.pos);
-  const pulse=1+0.12*Math.sin(T0*RETICLE_CFG.PULSE_HZ*TAU); reticleMesh.scale.setScalar((2.2+bd*0.015)*pulse);
+  const tImpact=bd/speed; _solLead.copy(best.pos).addScaledVector(best.vel,tImpact);   // first-order intercept: where it will be when the shot arrives
+  const computer=hasGizmo(P,'targeting') && shipPower(P).weapons>=RETICLE_CFG.POWER_THRESH, jammed=hasGizmo(best,'ecm');
+  const err=((computer?CFG.AIM_COMP_ERR:CFG.AIM_BASE_ERR)+(jammed?CFG.AIM_JAM_ERR:0))*(0.5+0.5*bd/CFG.AIM_ERR_RANGE);
+  const ph=T0*CFG.AIM_JITTER_HZ*TAU, id=best.id;   // deterministic wander shared by box + gun -> jammed = big wobble = honest miss
+  _solJit.set(Math.sin(ph*1.3+id), Math.sin(ph*0.9+id*2.1), Math.sin(ph*1.7+id*3.3)).multiplyScalar(err);
+  _playerSol={ target:best, lead:_solLead.clone().add(_solJit), dist:bd, err, jammed, computer };
+  return _playerSol; }
+function updateTargetingReticle(dt){ const P=ships[0], sol=_playerSol, fr=document.getElementById('fwdReticle'), v=VIEW.main;
+  if(!P||!P.alive||!sol){ reticleMesh.visible=false;   // no target -> show the fixed BORESIGHT crosshair at view centre (dead ahead is warp-invariant, so straight fire lands there)
+    if(fr){ if(P&&P.alive&&!P.docked&&!MAN.rearActive&&v&&v.w>2){ fr.style.left=(v.x+v.w/2)+'px'; fr.style.top=(innerH()-(v.y+v.h/2))+'px'; fr.style.display='block'; } else fr.style.display='none'; } return; }
+  if(fr) fr.style.display='none';   // a target box is up -> the box IS the reticle
+  reticleMesh.position.copy(sol.lead); reticleMesh.lookAt(P.pos);
+  const pulse=1+0.12*Math.sin(T0*RETICLE_CFG.PULSE_HZ*TAU);
+  reticleMesh.scale.setScalar((1.6+sol.err*1.1+sol.dist*0.006)*pulse);   // box GROWS with uncertainty - reads lock quality at a glance
+  reticleMesh.material.color.setHex(sol.jammed?0xff4a4a:(sol.computer?0x66ff9a:0xffd24a));   // red jammed / green tight computer lock / amber basic
   reticleMesh.visible=true; }
-// LOCK-ON RETICLE (user 2026-07-13): DOM bracket-box drawn over the player's current auto-aim target in the MAIN
-// (fullscreen chase) view. The fire block (manualControl) only writes s.autoAimId at the INSTANT of a shot, so to
-// keep the reticle live BETWEEN shots we recompute the SAME sensor-gated nearestRival the fire block uses (single
-// cheap loop over ships) and project that target's world pos (tgt.pos) through chaseCam.
-const _lockNDC=new T.Vector3();
+// LOCK-ON WARNING (user 2026-07-14 "when locked on by another enemy ... he has his reticle on the box"): when a
+// hostile is within LOCKON_RANGE and its NOSE points within LOCKON_ARC of you, it has a firing solution ON you -
+// flash a centred warning + an arrow toward the threat. Your own ECM jammer blinks their solution out (lock denial).
+const _lockNDC=new T.Vector3(), _lockFwd=new T.Vector3();
 function updateLockReticle(){ const el=document.getElementById('lockRet'); if(!el) return;
-  const P=ships[0], v=VIEW.main;
-  const tgt=(P&&P.alive)?nearestRival(P,senseRangeOf(P)):null;   // exactly what the auto-aim locks (iron law: only what the player SENSES)
-  if(!tgt||v.w<=0||v.h<=0){ if(el.style.display!=='none') el.style.display='none'; return; }
-  _lockNDC.copy(tgt.pos).project(chaseCam);                       // world -> NDC ([-1,1], y-up) through the chase camera
-  if(_lockNDC.z>1||_lockNDC.x<-1||_lockNDC.x>1||_lockNDC.y<-1||_lockNDC.y>1){ if(el.style.display!=='none') el.style.display='none'; return; }   // behind the camera or off the main viewport
-  const sx=v.x+(_lockNDC.x*0.5+0.5)*v.w, sy=innerH()-(v.y+(_lockNDC.y*0.5+0.5)*v.h);   // GL viewport (bottom-origin) -> CSS px (top-origin over VIEW.main)
-  el.style.left=sx+'px'; el.style.top=sy+'px';
-  if(el.style.display!=='block') el.style.display='block'; }
+  const P=ships[0]; if(!P||!P.alive||P.docked){ el.style.display='none'; return; }
+  let threat=null,bd=CFG.LOCKON_RANGE;
+  for(const o of ships){ if(o===P||!o.alive||o.docked||o.team===P.team) continue; const d=P.pos.distanceTo(o.pos); if(d>bd) continue;
+    if(_solTmp.copy(P.pos).sub(o.pos).normalize().dot(_lockFwd.copy(FWD).applyQuaternion(o.quat))<CFG.LOCKON_ARC) continue;   // is its nose on you?
+    bd=d; threat=o; }
+  if(!threat){ el.style.display='none'; return; }
+  const jam=hasGizmo(P,'ecm');   // your jammer doesn't hide that they're aiming - it DEGRADES their solution (they miss via ECM_DODGE); show it amber so you know you're covered
+  el.style.display='block'; el.style.opacity=(0.55+0.45*Math.abs(Math.sin(T0*4))).toFixed(2);
+  const lab=document.getElementById('lockLab'); if(lab){ lab.textContent=jam?'LOCK JAMMED':'⊙ LOCKED'; lab.style.color=jam?'#ffb020':'#ff5a5a'; }
+  const arrow=document.getElementById('lockArrow'); if(arrow){ _lockNDC.copy(threat.pos).project(chaseCam); const ang=Math.atan2(_lockNDC.x,_lockNDC.y); arrow.style.transform='rotate('+(ang*180/Math.PI)+'deg)'; } }
 const SPEAK=[]; const transcript=[];
 function buildSpeech(){ for(const s of ships){ const o=spriteText('',26,'#fff',{bg:'rgba(9,16,28,0.82)',border:true,pad:9,r:10,align:'center',ws:CFG.SPEECH_WS});
   o.sp.layers.set(2); o.sp.renderOrder=20; o.sp.visible=false; scene.add(o.sp); SPEAK[s.id]=o; } }
@@ -5808,7 +5831,8 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
     // FORWARD-GUN MOUSE-AIM (user 2026-07-13 "make the mouse where the forward gun shoots"): fire along the cursor's
     // world RAY (MAN.aimDir, unprojected from the forward view). Cursor not over the view -> straight ahead.
-    let aim=(MAN.aimDir?MAN.aimDir:fwd); s.autoAimId=null;
+    let aim; if(_playerSol && _playerSol.target && _playerSol.target.alive){ aim=_solAim.copy(_playerSol.lead).sub(s.pos).normalize(); s.autoAimId=_playerSol.target.id; }   // forward gun CONVERGES on the fire-control lead box - what you see is what you hit; the jammer/computer error is already baked into sol.lead
+    else { aim=fwd; s.autoAimId=null; }   // no target ahead -> fire straight down the nose (matches the boresight crosshair)
     if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),aim,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),aim,s.id,spec); }
     else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),aim,s.id,spec); }
   s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false, autoAim:s.autoAimId||null }; }
@@ -5947,16 +5971,11 @@ window.addEventListener('mouseup',e=>{ if(e.button===0 && MAN.mouseFire){ MAN.mo
 // MOUSE STEERING: cursor offset from the forward-view CENTRE = a virtual-joystick rate (Starblast-style); gated to when
 // the cursor is directly over the game canvas (e.target===canvas) so hovering a HUD panel or an open menu never steers.
 window.addEventListener('mousemove',e=>{
-  const fr=document.getElementById('fwdReticle');
+  MAN.aimDir=null;   // forward gun no longer mouse-aims (user 2026-07-14 "shoot where the reticle goes") - it converges on the fire-control lead box; updateTargetingReticle owns the #fwdReticle boresight crosshair
   const overMain = (e.target===canvas && viewAt(e.clientX,e.clientY)==='main');
-  if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; if(fr) fr.style.display='none'; return; }   // manning the rear turret -> no forward aim/steer/reticle
-  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; if(fr) fr.style.display='none'; return; }
-  const s0=ships[0]; if(!s0){ MAN.aimDir=null; if(fr) fr.style.display='none'; return; }
-  if(fr){ fr.style.left=e.clientX+'px'; fr.style.top=e.clientY+'px'; fr.style.display='block'; }   // FORWARD-GUN RETICLE follows the cursor (user 2026-07-13 "shoot at a separate reticle") - the aim tilts from forward toward it
-  const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2;
-  const nx=clamp((e.clientX-cx)/(v.w/2),-1.2,1.2), ny=clamp((e.clientY-cyC)/(v.h/2),-1.2,1.2);   // cursor offset from the view centre
-  const afwd=FWD.clone().applyQuaternion(s0.quat), aright=RGT.clone().applyQuaternion(s0.quat), aup=UPL.clone().applyQuaternion(s0.quat);
-  MAN.aimDir=afwd.addScaledVector(aright, nx*CFG.AIM_SPREAD).addScaledVector(aup, -ny*CFG.AIM_SPREAD).normalize();   // aim tilts from FORWARD toward the cursor's screen direction (ship frame ~= the chase cam frame); cursor centre = dead ahead
+  if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }   // manning the rear turret -> no forward steer
+  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
+  const s0=ships[0]; if(!s0) return;
   if(OPT.mouseSteer){ const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2, dz=0.05;   // optional Starblast-style steering (off by default)
     const sx=clamp((e.clientX-cx)/(v.w/2),-1,1), sy=clamp((e.clientY-cyC)/(v.h/2),-1,1);
     MAN.mouseYaw=Math.abs(sx)<dz?0:clamp(sx*OPT.mouseSens,-1,1); MAN.mousePitch=Math.abs(sy)<dz?0:clamp(sy*OPT.mouseSens*(OPT.invertY?-1:1),-1,1);
@@ -6484,6 +6503,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
+  computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
   step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateRearShield(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
