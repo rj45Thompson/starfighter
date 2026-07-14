@@ -212,52 +212,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713t"></script>
-<script src="fflate.min.js?v=20260713t"></script>
-<script src="fbxloader.js?v=20260713t"></script>
+<script src="three.min.js?v=20260713u"></script>
+<script src="fflate.min.js?v=20260713u"></script>
+<script src="fbxloader.js?v=20260713u"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713t"></script>
-<script src="inhabitant.js?v=20260713t"></script>
-<script src="passenger.js?v=20260713t"></script>
-<script src="gamemod.js?v=20260713t"></script>
-<script src="chatter.js?v=20260713t"></script>
-<script src="speech_gen.js?v=20260713t"></script>
-<script src="speech_input.js?v=20260713t"></script>
-<script src="vision.js?v=20260713t"></script>
-<script src="deliberate.js?v=20260713t"></script>
-<script src="knowledge.js?v=20260713t"></script>
-<script src="acquire.js?v=20260713t"></script>
-<script src="sound.js?v=20260713t"></script>
-<script src="hullmodels.js?v=20260713t"></script>
-<script src="knowledge_hud.js?v=20260713t"></script>
-<script src="knowledge_screen.js?v=20260713t"></script>
-<script src="centroid_mind.js?v=20260713t"></script>
-<script src="kripke_mind.js?v=20260713t"></script>
-<script src="sober_gate.js?v=20260713t"></script>
-<script src="contradiction_ledger.js?v=20260713t"></script>
-<script src="kripke_planner.js?v=20260713t"></script>
-<script src="pillar_router.js?v=20260713t"></script>
-<script src="gravity_well.js?v=20260713t"></script>
-<script src="growth_loop.js?v=20260713t"></script>
-<script src="coop_proof.js?v=20260713t"></script>
-<script src="item_variance.js?v=20260713t"></script>
-<script src="tom_test.js?v=20260713t"></script>
-<script src="thoughts.js?v=20260713t"></script>
-<script src="tami_battle_ui.js?v=20260713t"></script>
-<script src="power_panel.js?v=20260713t"></script>
-<script src="panels.js?v=20260713t"></script>
-<script src="item_icons.js?v=20260713t"></script>
-<script src="engbay.js?v=20260713t"></script>
+<script src="speech_tier.js?v=20260713u"></script>
+<script src="inhabitant.js?v=20260713u"></script>
+<script src="passenger.js?v=20260713u"></script>
+<script src="gamemod.js?v=20260713u"></script>
+<script src="chatter.js?v=20260713u"></script>
+<script src="speech_gen.js?v=20260713u"></script>
+<script src="speech_input.js?v=20260713u"></script>
+<script src="vision.js?v=20260713u"></script>
+<script src="deliberate.js?v=20260713u"></script>
+<script src="knowledge.js?v=20260713u"></script>
+<script src="acquire.js?v=20260713u"></script>
+<script src="sound.js?v=20260713u"></script>
+<script src="hullmodels.js?v=20260713u"></script>
+<script src="knowledge_hud.js?v=20260713u"></script>
+<script src="knowledge_screen.js?v=20260713u"></script>
+<script src="centroid_mind.js?v=20260713u"></script>
+<script src="kripke_mind.js?v=20260713u"></script>
+<script src="sober_gate.js?v=20260713u"></script>
+<script src="contradiction_ledger.js?v=20260713u"></script>
+<script src="kripke_planner.js?v=20260713u"></script>
+<script src="pillar_router.js?v=20260713u"></script>
+<script src="gravity_well.js?v=20260713u"></script>
+<script src="growth_loop.js?v=20260713u"></script>
+<script src="coop_proof.js?v=20260713u"></script>
+<script src="item_variance.js?v=20260713u"></script>
+<script src="tom_test.js?v=20260713u"></script>
+<script src="thoughts.js?v=20260713u"></script>
+<script src="tami_battle_ui.js?v=20260713u"></script>
+<script src="power_panel.js?v=20260713u"></script>
+<script src="panels.js?v=20260713u"></script>
+<script src="item_icons.js?v=20260713u"></script>
+<script src="engbay.js?v=20260713u"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713t"></script>
-<script src="conquest.js?v=20260713t"></script>
-<script src="missions.js?v=20260713t"></script>
-<script src="planetmenu.js?v=20260713t"></script>
-<script src="textquests.js?v=20260713t"></script>
+<script src="starmap.js?v=20260713u"></script>
+<script src="conquest.js?v=20260713u"></script>
+<script src="missions.js?v=20260713u"></script>
+<script src="planetmenu.js?v=20260713u"></script>
+<script src="textquests.js?v=20260713u"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -5153,7 +5153,7 @@ if(window.PANELS){
     var locked=false;
     function onLockChange(){ locked=(document.pointerLockElement===port);
       port.style.cursor=locked?'none':'crosshair';
-      if(locked){ handle.style.display='none'; setHint('Esc to release · hold to fire'); }
+      if(locked){ handle.style.display='none'; setHint('right-click or Esc to release · hold to fire'); }
       else { rearFiring=false; setHint('click to man turret · slew to aim'); } }
     document.addEventListener('pointerlockchange',onLockChange);
     port.addEventListener('mousemove',function(e){ var r=port.getBoundingClientRect(); if(r.width<1||r.height<1) return;
@@ -5166,9 +5166,12 @@ if(window.PANELS){
         handle.style.left=(e.clientX-r.left)+'px'; handle.style.top=(e.clientY-r.top)+'px'; handle.style.display='block';
         handle.style.borderColor=(Math.abs(nx)>CFG.REAR_EDGE_WARN||Math.abs(ny)>CFG.REAR_EDGE_WARN)?'#ff5a5a':'#ffd27a'; } });   // handle goes red near the edge = about to go out of bounds
     port.addEventListener('mouseleave',function(){ if(!locked) handle.style.display='none'; });   // unlocked: HOLD the current aim (no jarring recentre) - the turret keeps pointing where you left it
-    port.addEventListener('mousedown',function(e){ if(e.button!==0) return; e.preventDefault(); e.stopPropagation();
-      if(!locked && port.requestPointerLock){ try{ port.requestPointerLock(); }catch(_){} }   // first click MANS the turret (captures the mouse to this window)
+    port.addEventListener('mousedown',function(e){
+      if(e.button===2){ e.preventDefault(); e.stopPropagation(); if(locked && document.exitPointerLock) document.exitPointerLock(); return; }   // RIGHT-CLICK releases the turret without Escape (user 2026-07-13)
+      if(e.button!==0) return; e.preventDefault(); e.stopPropagation();
+      if(!locked && port.requestPointerLock){ try{ port.requestPointerLock(); }catch(_){} }   // first LEFT click MANS the turret (captures the mouse to this window)
       rearFiring=true; if(typeof fireRearGun==='function') fireRearGun(); });
+    port.addEventListener('contextmenu',function(e){ e.preventDefault(); });   // right-click is "release the turret", never the browser context menu
     window.addEventListener('mouseup',function(){ rearFiring=false; });   // hold to keep firing down the centre
     var drag=null;
     bar.addEventListener('mousedown',function(e){ w._userSized=true; drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
