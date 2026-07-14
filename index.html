@@ -212,52 +212,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713v"></script>
-<script src="fflate.min.js?v=20260713v"></script>
-<script src="fbxloader.js?v=20260713v"></script>
+<script src="three.min.js?v=20260713w"></script>
+<script src="fflate.min.js?v=20260713w"></script>
+<script src="fbxloader.js?v=20260713w"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713v"></script>
-<script src="inhabitant.js?v=20260713v"></script>
-<script src="passenger.js?v=20260713v"></script>
-<script src="gamemod.js?v=20260713v"></script>
-<script src="chatter.js?v=20260713v"></script>
-<script src="speech_gen.js?v=20260713v"></script>
-<script src="speech_input.js?v=20260713v"></script>
-<script src="vision.js?v=20260713v"></script>
-<script src="deliberate.js?v=20260713v"></script>
-<script src="knowledge.js?v=20260713v"></script>
-<script src="acquire.js?v=20260713v"></script>
-<script src="sound.js?v=20260713v"></script>
-<script src="hullmodels.js?v=20260713v"></script>
-<script src="knowledge_hud.js?v=20260713v"></script>
-<script src="knowledge_screen.js?v=20260713v"></script>
-<script src="centroid_mind.js?v=20260713v"></script>
-<script src="kripke_mind.js?v=20260713v"></script>
-<script src="sober_gate.js?v=20260713v"></script>
-<script src="contradiction_ledger.js?v=20260713v"></script>
-<script src="kripke_planner.js?v=20260713v"></script>
-<script src="pillar_router.js?v=20260713v"></script>
-<script src="gravity_well.js?v=20260713v"></script>
-<script src="growth_loop.js?v=20260713v"></script>
-<script src="coop_proof.js?v=20260713v"></script>
-<script src="item_variance.js?v=20260713v"></script>
-<script src="tom_test.js?v=20260713v"></script>
-<script src="thoughts.js?v=20260713v"></script>
-<script src="tami_battle_ui.js?v=20260713v"></script>
-<script src="power_panel.js?v=20260713v"></script>
-<script src="panels.js?v=20260713v"></script>
-<script src="item_icons.js?v=20260713v"></script>
-<script src="engbay.js?v=20260713v"></script>
+<script src="speech_tier.js?v=20260713w"></script>
+<script src="inhabitant.js?v=20260713w"></script>
+<script src="passenger.js?v=20260713w"></script>
+<script src="gamemod.js?v=20260713w"></script>
+<script src="chatter.js?v=20260713w"></script>
+<script src="speech_gen.js?v=20260713w"></script>
+<script src="speech_input.js?v=20260713w"></script>
+<script src="vision.js?v=20260713w"></script>
+<script src="deliberate.js?v=20260713w"></script>
+<script src="knowledge.js?v=20260713w"></script>
+<script src="acquire.js?v=20260713w"></script>
+<script src="sound.js?v=20260713w"></script>
+<script src="hullmodels.js?v=20260713w"></script>
+<script src="knowledge_hud.js?v=20260713w"></script>
+<script src="knowledge_screen.js?v=20260713w"></script>
+<script src="centroid_mind.js?v=20260713w"></script>
+<script src="kripke_mind.js?v=20260713w"></script>
+<script src="sober_gate.js?v=20260713w"></script>
+<script src="contradiction_ledger.js?v=20260713w"></script>
+<script src="kripke_planner.js?v=20260713w"></script>
+<script src="pillar_router.js?v=20260713w"></script>
+<script src="gravity_well.js?v=20260713w"></script>
+<script src="growth_loop.js?v=20260713w"></script>
+<script src="coop_proof.js?v=20260713w"></script>
+<script src="item_variance.js?v=20260713w"></script>
+<script src="tom_test.js?v=20260713w"></script>
+<script src="thoughts.js?v=20260713w"></script>
+<script src="tami_battle_ui.js?v=20260713w"></script>
+<script src="power_panel.js?v=20260713w"></script>
+<script src="panels.js?v=20260713w"></script>
+<script src="item_icons.js?v=20260713w"></script>
+<script src="engbay.js?v=20260713w"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713v"></script>
-<script src="conquest.js?v=20260713v"></script>
-<script src="missions.js?v=20260713v"></script>
-<script src="planetmenu.js?v=20260713v"></script>
-<script src="textquests.js?v=20260713v"></script>
+<script src="starmap.js?v=20260713w"></script>
+<script src="conquest.js?v=20260713w"></script>
+<script src="missions.js?v=20260713w"></script>
+<script src="planetmenu.js?v=20260713w"></script>
+<script src="textquests.js?v=20260713w"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -298,6 +298,7 @@ const CFG = {
   REAR_MOUNT_UP:1.1, REAR_MOUNT_FWD:-2.6,          // the gun POD on the dorsal spine, just aft of centre (user 2026-07-13 "move the gunner pod")
   REAR_CAM_BACK:6.5, REAR_CAM_UP:1.4,              // camera sits behind + above the breach so the barrel fills the lower foreground - you look down the barrel
   REAR_AIM_RANGE:260,                              // bolts converge on the CENTRE crosshair at this range (gun harmonization), so what's under the reticle is what you hit
+  REAR_BEAM_DPS:120, REAR_BEAM_RANGE:340, REAR_BEAM_R:2.2, THROTTLE_WHEEL:0.08, AIM_SPREAD:1.0,   // rear gun = a continuous SOLID BEAM (user 2026-07-13): damage/sec, reach, hit radius; + mouse-wheel throttle step; AIM_SPREAD = how far the forward gun tilts toward the cursor at the screen edge
   REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
   REAR_BARREL_LEN:2.6, REAR_BARREL_RAD:0.3, REAR_BALL_R:0.55,   // a SMALL EXTERNAL ball-turret on the ship's back (user 2026-07-13 "make the ball smaller ... it just shows which way the gunner is pointing"); unlit, external-view-only layer (chase/top, NOT the rear gunner's own view)
 
@@ -5151,7 +5152,7 @@ if(window.PANELS){
     // releases. When NOT locked, absolute cursor mapping + the visible handle keep it usable AND testable, and the edge
     // glow warns before the cursor leaves the panel. Signs keep the view panning TOWARD the input on both axes.
     var locked=false;
-    function onLockChange(){ locked=(document.pointerLockElement===port);
+    function onLockChange(){ locked=(document.pointerLockElement===port); MAN.rearActive=locked;   // manning the rear turret disables the forward gun (user 2026-07-13 "when you click rear gun you can't shoot the forward gun")
       port.style.cursor=locked?'none':'crosshair';
       if(locked){ handle.style.display='none'; setHint('right-click or Esc to release · hold to fire'); }
       else { rearFiring=false; setHint('click to man turret · slew to aim'); } }
@@ -5170,7 +5171,7 @@ if(window.PANELS){
       if(e.button===2){ e.preventDefault(); e.stopPropagation(); if(locked && document.exitPointerLock) document.exitPointerLock(); return; }   // RIGHT-CLICK releases the turret without Escape (user 2026-07-13)
       if(e.button!==0) return; e.preventDefault(); e.stopPropagation();
       if(!locked && port.requestPointerLock){ try{ port.requestPointerLock(); }catch(_){} }   // first LEFT click MANS the turret (captures the mouse to this window)
-      rearFiring=true; if(typeof fireRearGun==='function') fireRearGun(); });
+      rearFiring=true; });   // the beam is driven by updateRearBeam() each frame while rearFiring
     port.addEventListener('contextmenu',function(e){ e.preventDefault(); });   // right-click is "release the turret", never the browser context menu
     window.addEventListener('mouseup',function(){ rearFiring=false; });   // hold to keep firing down the centre
     var drag=null;
@@ -5294,6 +5295,12 @@ function updateChaseView(){ const el=document.getElementById('chaseWin');
 // auto-aim, no sensor cheat (it hits only what it physically sweeps under the reticle, same as the main gun).
 let rearGunCd=0, rearFiring=false, rearYaw=0, rearPitch=0, rearYawT=0, rearPitchT=0;   // turret: smoothed current + cursor-driven target yaw/pitch (rad) from dead-aft, and whether the trigger is held
 const rearAimDir=new T.Vector3(0,0,-1), rearMuzzle=new T.Vector3();   // the turret's live aim axis (= camera forward = view centre) + the barrel-muzzle world pos the bolt is born at
+const _beamA=new T.Vector3(), _beamB=new T.Vector3();   // scratch for the rear-beam raycast
+const rearBeam=(function(){ const g=new T.Group();   // REAR BEAM (user 2026-07-13 "a laser beam that shoots solid, no delay"): a solid cylinder from the muzzle to the hit point
+  const outer=new T.Mesh(new T.CylinderGeometry(0.5,0.5,1,8,1,true), new T.MeshBasicMaterial({color:0x62ffc0,transparent:true,opacity:0.5,blending:T.AdditiveBlending,depthWrite:false}));
+  const core=new T.Mesh(new T.CylinderGeometry(0.2,0.2,1,8,1,true), new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.92,blending:T.AdditiveBlending,depthWrite:false}));
+  g.add(outer); g.add(core); scene.add(g); g.visible=false;
+  g.layers.set(3); outer.layers.set(3); core.layers.set(3); return g; })();   // layer 3 = shows in the rear view + the external views, like the turret
 let _rEdge=null;   // cached edge-warning DOM refs, built lazily once the rear window exists
 function rearEdgeGlow(){ if(!_rEdge){ const t=document.getElementById('rearEdgeT'); if(!t) return; _rEdge={t:t,b:document.getElementById('rearEdgeB'),l:document.getElementById('rearEdgeL'),r:document.getElementById('rearEdgeR')}; }
   const TH=CFG.REAR_EDGE_WARN, pf=rearPitch/CFG.REAR_PITCH_MAX;   // yaw swivels 360 with NO limit now -> only PITCH can "run out" (near straight up/down)
@@ -5329,15 +5336,23 @@ function updateRearView(){ const el=document.getElementById('rearWin');
   if(r.width<8||r.height<8+TITLE){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
   VIEW.rear.x=Math.round(r.left); VIEW.rear.w=Math.round(r.width);
   VIEW.rear.h=Math.round(r.height-TITLE); VIEW.rear.y=Math.round(H-(r.top+r.height)); }
-function fireRearGun(){ const s=ships[0]; if(!s||!s.alive||s.docked) return;
-  if(rearGunCd>0) return; if(s.capLaser!=null && s.capLaser<=0) return;   // shares the laser capacitor gate with the main gun
-  const aimPoint=rearCam.position.clone().addScaledVector(rearAimDir,CFG.REAR_AIM_RANGE);   // the world point under the CENTRE crosshair, at gun-harmonization range
-  const dir=aimPoint.sub(rearMuzzle).normalize();   // the bolt leaves the muzzle and passes exactly through the crosshair
-  const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy, base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1));
-  const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null, shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
-  spawnBullet(rearMuzzle.clone(), dir, s.id, spec);
-  if(s.capLaser!=null) s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);
-  rearGunCd=CFG.REAR_GUN_CD; if(window.SOUND) SOUND.play('shoot'); }
+// REAR BEAM damage: continuous (no i-frames, no cooldown) - same shields->hull->kill path a bullet uses, minus the gate.
+function beamDamage(target,dmg,fromPos,owner){ if(!target.alive||target.docked) return;
+  const d=dmg*hullResFor(target,'energy'); applyHullDamage(target, drainShield(target,d,fromPos)*(1-shieldGenPctFor(target)), fromPos);
+  if(target.hp<=0) killByShip(target,owner); }
+function updateRearBeam(dt){ const s=ships[0];
+  if(!rearFiring||!s||!s.alive||s.docked){ rearBeam.visible=false; return; }   // solid, no delay - shown + damaging every frame the trigger is held
+  const muzzle=rearMuzzle, dir=rearAimDir; let hitDist=CFG.REAR_BEAM_RANGE, hitShip=null, hitAst=null;
+  for(const o of ships){ if(o===s||!o.alive||o.team===s.team||o.docked) continue;
+    _beamA.copy(o.pos).sub(muzzle); const t=_beamA.dot(dir); if(t<1||t>hitDist) continue;   // only in front of the muzzle + within the current nearest hit
+    const rad=CFG.SHIP_R+CFG.REAR_BEAM_R; if(_beamA.lengthSq()-t*t < rad*rad){ hitDist=t; hitShip=o; hitAst=null; } }
+  for(const a of asteroids){ _beamA.copy(a.pos).sub(muzzle); const t=_beamA.dot(dir); if(t<1||t>hitDist) continue;
+    const rad=a.scale+CFG.REAR_BEAM_R; if(_beamA.lengthSq()-t*t < rad*rad){ hitDist=t; hitAst=a; hitShip=null; } }
+  rearBeam.visible=true; _beamB.copy(muzzle).addScaledVector(dir,hitDist*0.5);
+  rearBeam.position.copy(_beamB); rearBeam.quaternion.setFromUnitVectors(BARREL_UP_AXIS,dir); rearBeam.scale.set(1,hitDist,1);   // cylinder base height 1 -> scale.y = length
+  const hitPos=_beamA.copy(muzzle).addScaledVector(dir,hitDist);
+  if(hitShip){ beamDamage(hitShip, CFG.REAR_BEAM_DPS*dt, hitPos, s); if(rand(0,1)<0.5) burst(hitPos,0x9fffdd,2,9,1.6); }
+  else if(hitAst){ hitAst.hp-=CFG.REAR_BEAM_DPS*dt; if(hitAst.hp<=0){ const idx=asteroids.indexOf(hitAst); if(idx>=0) destroyAsteroid(idx,s); } if(rand(0,1)<0.5) burst(hitPos,0xffd890,2,9,1.6); } }
 let brainZoom=1, brainCenter={x:300,y:235};
 function sizeBrainCam(vw,vh){ vw=vw||VIEW.brain.w||1; vh=vh||VIEW.brain.h||1; const va=vw/vh, ca=600/470; let hw,hh;
   if(va>ca){ hh=235*brainZoom; hw=hh*va; } else { hw=300*brainZoom; hh=hw/va; }
@@ -5667,7 +5682,7 @@ document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].nam
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
-const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false, throttle:0 };   // throttle = the persistent THROTTLE LEVER (user 2026-07-13 "set it, don't hold it"); mouse* = forward-view mouse-flight inputs; all combined in manualControl
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false, throttle:0, aimDir:null, rearActive:false };   // throttle = persistent lever; aimDir = forward-gun MOUSE aim (world dir toward the cursor); rearActive = manning the rear turret (disables the forward gun); all read in manualControl (user 2026-07-13)
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
   s.ctrl={ thr:clamp(Math.max(MAN.throttle||0, MAN.thr, MAN.mouseThr?1:0),0,1), pitch:clamp(MAN.pitch+(MAN.mousePitch||0),-1,1), yaw:clamp(MAN.yaw+(MAN.mouseYaw||0),-1,1) };   // thrust = the persistent THROTTLE lever, overridden UP by a held Space / right-mouse boost (user 2026-07-13 "set it, don't hold it")
@@ -5697,21 +5712,15 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
   else if(!nitroWanted) s._nitroSounded=false;
   s.fire-=dt;
   if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
-  if(MAN.fire && s.fire<=0 && s.capLaser>0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');
+  if(MAN.fire && !MAN.rearActive && s.fire<=0 && s.capLaser>0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');   // !rearActive: manning the rear turret disables the forward gun (user 2026-07-13)
     s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
     s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);   // SR X-WING CAPACITORS: hits 0 -> next fire attempt is blocked until it regens
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
-    // AUTO-AIM IN DEPTH (user 2026-07-13 "when you control the 2d view auto aim in depth"): snap the shot onto the
-    // nearest SENSED enemy's LEAD position in full 3D - predicts where the target will be given bullet travel time +
-    // its own velocity (depth-aware, not flat-screen) - but only inside the front arc so it reads as aim-ASSIST, not a
-    // 360 turret. Sensor-gated (iron law: only what you sense) and reuses the AI's own nearestRival targeting.
-    let aim=fwd, atgt=nearestRival(s, senseRangeOf(s));
-    if(atgt){ const dd=s.pos.distanceTo(atgt.pos);
-      if(dd>1e-3){ const tHit=dd/(spec.speed||CFG.BULLET_SPEED);
-        const lead=new T.Vector3().copy(atgt.pos); if(atgt.vel) lead.addScaledVector(atgt.vel,tHit); lead.sub(s.pos).normalize();
-        if(fwd.dot(lead)>CFG.AUTOAIM_ARC){ aim=lead; s.autoAimId=atgt.id; } } }
+    // FORWARD-GUN MOUSE-AIM (user 2026-07-13 "make the mouse where the forward gun shoots"): fire along the cursor's
+    // world RAY (MAN.aimDir, unprojected from the forward view). Cursor not over the view -> straight ahead.
+    let aim=(MAN.aimDir?MAN.aimDir:fwd); s.autoAimId=null;
     if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),aim,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),aim,s.id,spec); }
     else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),aim,s.id,spec); }
   s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false, autoAim:s.autoAimId||null }; }
@@ -5803,7 +5812,7 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
   track.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.touches[0].clientY); },{passive:false});
   track.addEventListener('touchmove',e=>{ if(drag){ e.preventDefault(); setY(e.touches[0].clientY); } },{passive:false});
   window.addEventListener('touchend',()=>{ drag=false; });
-  render(); })();
+  window.__thrRender=render; render(); })();   // exposed so the mouse-wheel throttle can refresh the slider
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
@@ -5838,7 +5847,8 @@ function topWorldAt(mx,my){ const H=innerH(), v=VIEW.top; const lx=(mx-v.x)/v.w*
 let drag=null;
 canvas.addEventListener('wheel',e=>{ const vp=viewAt(e.clientX,e.clientY);
   if(vp==='top'){ e.preventDefault(); topZoom=clamp(topZoom*(e.deltaY>0?1.12:0.89),0.22,7); }
-  else if(vp==='brain'){ e.preventDefault(); brainZoom=clamp(brainZoom*(e.deltaY>0?1.12:0.89),0.4,4.5); sizeBrainCam(); } },{passive:false});
+  else if(vp==='brain'){ e.preventDefault(); brainZoom=clamp(brainZoom*(e.deltaY>0?1.12:0.89),0.4,4.5); sizeBrainCam(); }
+  else if(vp==='main'){ e.preventDefault(); MAN.throttle=clamp((MAN.throttle||0)+(e.deltaY<0?CFG.THROTTLE_WHEEL:-CFG.THROTTLE_WHEEL),0,1); if(window.__thrRender) window.__thrRender(); manOn(); } },{passive:false});   // MOUSE-WHEEL THROTTLE (user 2026-07-13 "mousewheel controls thrust"): scroll up = more thrust
 canvas.addEventListener('mousedown',e=>{ const vp=viewAt(e.clientX,e.clientY);
   if(vp==='top'||vp==='brain'){ drag={vp,x0:e.clientX,y0:e.clientY,mx:e.clientX,my:e.clientY,moved:0}; return; }
   if(vp==='main'){   // FORWARD-VIEW MOUSE (user 2026-07-13): left = fire forward, right = thrust
@@ -5849,13 +5859,20 @@ window.addEventListener('mouseup',e=>{ if(e.button===0 && MAN.mouseFire){ MAN.mo
 // MOUSE STEERING: cursor offset from the forward-view CENTRE = a virtual-joystick rate (Starblast-style); gated to when
 // the cursor is directly over the game canvas (e.target===canvas) so hovering a HUD panel or an open menu never steers.
 window.addEventListener('mousemove',e=>{
-  if(!OPT.mouseSteer || e.target!==canvas || viewAt(e.clientX,e.clientY)!=='main'){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
-  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
-  const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2, dz=0.05;
-  const nx=clamp((e.clientX-cx)/(v.w/2),-1,1), ny=clamp((e.clientY-cyC)/(v.h/2),-1,1);
-  MAN.mouseYaw = Math.abs(nx)<dz?0:clamp(nx*OPT.mouseSens,-1,1);
-  MAN.mousePitch = Math.abs(ny)<dz?0:clamp(ny*OPT.mouseSens*(OPT.invertY?-1:1),-1,1);   // cursor below centre = nose down; invert-Y flips it
-  if(MAN.mouseYaw||MAN.mousePitch) manOn(); });
+  const overMain = (e.target===canvas && viewAt(e.clientX,e.clientY)==='main');
+  if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; return; }   // manning the rear turret -> no forward aim/steer
+  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; return; }
+  // FORWARD-GUN MOUSE-AIM (user 2026-07-13 "make the mouse where the forward gun shoots"): the cursor's world RAY = the aim
+  const s0=ships[0]; if(!s0){ MAN.aimDir=null; return; }
+  const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2;
+  const nx=clamp((e.clientX-cx)/(v.w/2),-1.2,1.2), ny=clamp((e.clientY-cyC)/(v.h/2),-1.2,1.2);   // cursor offset from the view centre
+  const afwd=FWD.clone().applyQuaternion(s0.quat), aright=RGT.clone().applyQuaternion(s0.quat), aup=UPL.clone().applyQuaternion(s0.quat);
+  MAN.aimDir=afwd.addScaledVector(aright, nx*CFG.AIM_SPREAD).addScaledVector(aup, -ny*CFG.AIM_SPREAD).normalize();   // aim tilts from FORWARD toward the cursor's screen direction (ship frame ~= the chase cam frame); cursor centre = dead ahead
+  if(OPT.mouseSteer){ const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2, dz=0.05;   // optional Starblast-style steering (off by default)
+    const sx=clamp((e.clientX-cx)/(v.w/2),-1,1), sy=clamp((e.clientY-cyC)/(v.h/2),-1,1);
+    MAN.mouseYaw=Math.abs(sx)<dz?0:clamp(sx*OPT.mouseSens,-1,1); MAN.mousePitch=Math.abs(sy)<dz?0:clamp(sy*OPT.mouseSens*(OPT.invertY?-1:1),-1,1);
+    if(MAN.mouseYaw||MAN.mousePitch) manOn(); }
+  else { MAN.mouseYaw=0; MAN.mousePitch=0; } });
 window.addEventListener('mousemove',e=>{ if(!drag) return; const dx=e.clientX-drag.mx, dy=e.clientY-drag.my; drag.mx=e.clientX; drag.my=e.clientY; drag.moved+=Math.abs(dx)+Math.abs(dy);
   if(drag.vp==='top'){ topCenter=topCenter||(ships[focus]?ships[focus].pos.clone():new T.Vector3()); const wpp=(topCam.right-topCam.left)/VIEW.top.w; topCenter.x-=dx*wpp; topCenter.z-=dy*wpp; }
   else if(drag.vp==='brain'){ const wpp=(brainCam.right-brainCam.left)/VIEW.brain.w; brainCenter.x-=dx*wpp; brainCenter.y+=dy*wpp; sizeBrainCam(); } });
@@ -6378,7 +6395,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); if(rearGunCd>0) rearGunCd-=dt; if(rearFiring) fireRearGun(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
