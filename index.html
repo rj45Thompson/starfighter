@@ -31,6 +31,7 @@
   #throttleFill{ position:absolute; left:2px; right:2px; bottom:2px; height:0%; border-radius:13px; background:linear-gradient(to top,#1e6fff,#9fe0ff); opacity:.9; pointer-events:none; }
   #throttleKnob{ position:absolute; left:-4px; right:-4px; height:16px; bottom:0; margin-bottom:-8px; background:#e6f2ff; border:1px solid #4a6f92; border-radius:7px; box-shadow:0 1px 5px #000b; pointer-events:none; }
   #throttleLabel{ font:800 13px/1 ui-monospace,monospace; color:#9fe0ff; min-width:34px; text-align:center; }
+  #fwdReticle{ position:fixed; left:0; top:0; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:16; pointer-events:none; display:none; }   /* FORWARD-GUN reticle (user 2026-07-13): follows the cursor, positioned by JS */
   #gearMenu{ position:fixed; right:14px; top:80px; z-index:20; display:none; pointer-events:auto;
     background:#0c1623ee; border:1px solid #29405a; border-radius:8px; padding:8px; min-width:170px;
     font:11px ui-monospace,monospace; color:#cfe2f5; box-shadow:0 6px 26px #000a; }
@@ -171,6 +172,7 @@
   <div id="throttleTag">THR</div>
   <div id="throttleTrack"><div id="throttleFill"></div><div id="throttleKnob"></div></div>
   <div id="throttleLabel">0%</div></div>
+<div id="fwdReticle"><svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="15" fill="none" stroke="#66ffcc" stroke-width="1.4" opacity="0.85"/><circle cx="23" cy="23" r="2.4" fill="#66ffcc"/><path d="M23 2v10M23 34v10M2 23h10M34 23h10" stroke="#66ffcc" stroke-width="1.4"/></svg></div>
 <button id="gearBtn" type="button" title="options">⚙</button>
 <div id="gearMenu"><div class="gm-hdr">OPTIONS</div>
   <div class="gm-sec">GENERAL</div>
@@ -212,52 +214,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713w"></script>
-<script src="fflate.min.js?v=20260713w"></script>
-<script src="fbxloader.js?v=20260713w"></script>
+<script src="three.min.js?v=20260713x"></script>
+<script src="fflate.min.js?v=20260713x"></script>
+<script src="fbxloader.js?v=20260713x"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713w"></script>
-<script src="inhabitant.js?v=20260713w"></script>
-<script src="passenger.js?v=20260713w"></script>
-<script src="gamemod.js?v=20260713w"></script>
-<script src="chatter.js?v=20260713w"></script>
-<script src="speech_gen.js?v=20260713w"></script>
-<script src="speech_input.js?v=20260713w"></script>
-<script src="vision.js?v=20260713w"></script>
-<script src="deliberate.js?v=20260713w"></script>
-<script src="knowledge.js?v=20260713w"></script>
-<script src="acquire.js?v=20260713w"></script>
-<script src="sound.js?v=20260713w"></script>
-<script src="hullmodels.js?v=20260713w"></script>
-<script src="knowledge_hud.js?v=20260713w"></script>
-<script src="knowledge_screen.js?v=20260713w"></script>
-<script src="centroid_mind.js?v=20260713w"></script>
-<script src="kripke_mind.js?v=20260713w"></script>
-<script src="sober_gate.js?v=20260713w"></script>
-<script src="contradiction_ledger.js?v=20260713w"></script>
-<script src="kripke_planner.js?v=20260713w"></script>
-<script src="pillar_router.js?v=20260713w"></script>
-<script src="gravity_well.js?v=20260713w"></script>
-<script src="growth_loop.js?v=20260713w"></script>
-<script src="coop_proof.js?v=20260713w"></script>
-<script src="item_variance.js?v=20260713w"></script>
-<script src="tom_test.js?v=20260713w"></script>
-<script src="thoughts.js?v=20260713w"></script>
-<script src="tami_battle_ui.js?v=20260713w"></script>
-<script src="power_panel.js?v=20260713w"></script>
-<script src="panels.js?v=20260713w"></script>
-<script src="item_icons.js?v=20260713w"></script>
-<script src="engbay.js?v=20260713w"></script>
+<script src="speech_tier.js?v=20260713x"></script>
+<script src="inhabitant.js?v=20260713x"></script>
+<script src="passenger.js?v=20260713x"></script>
+<script src="gamemod.js?v=20260713x"></script>
+<script src="chatter.js?v=20260713x"></script>
+<script src="speech_gen.js?v=20260713x"></script>
+<script src="speech_input.js?v=20260713x"></script>
+<script src="vision.js?v=20260713x"></script>
+<script src="deliberate.js?v=20260713x"></script>
+<script src="knowledge.js?v=20260713x"></script>
+<script src="acquire.js?v=20260713x"></script>
+<script src="sound.js?v=20260713x"></script>
+<script src="hullmodels.js?v=20260713x"></script>
+<script src="knowledge_hud.js?v=20260713x"></script>
+<script src="knowledge_screen.js?v=20260713x"></script>
+<script src="centroid_mind.js?v=20260713x"></script>
+<script src="kripke_mind.js?v=20260713x"></script>
+<script src="sober_gate.js?v=20260713x"></script>
+<script src="contradiction_ledger.js?v=20260713x"></script>
+<script src="kripke_planner.js?v=20260713x"></script>
+<script src="pillar_router.js?v=20260713x"></script>
+<script src="gravity_well.js?v=20260713x"></script>
+<script src="growth_loop.js?v=20260713x"></script>
+<script src="coop_proof.js?v=20260713x"></script>
+<script src="item_variance.js?v=20260713x"></script>
+<script src="tom_test.js?v=20260713x"></script>
+<script src="thoughts.js?v=20260713x"></script>
+<script src="tami_battle_ui.js?v=20260713x"></script>
+<script src="power_panel.js?v=20260713x"></script>
+<script src="panels.js?v=20260713x"></script>
+<script src="item_icons.js?v=20260713x"></script>
+<script src="engbay.js?v=20260713x"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713w"></script>
-<script src="conquest.js?v=20260713w"></script>
-<script src="missions.js?v=20260713w"></script>
-<script src="planetmenu.js?v=20260713w"></script>
-<script src="textquests.js?v=20260713w"></script>
+<script src="starmap.js?v=20260713x"></script>
+<script src="conquest.js?v=20260713x"></script>
+<script src="missions.js?v=20260713x"></script>
+<script src="planetmenu.js?v=20260713x"></script>
+<script src="textquests.js?v=20260713x"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -298,7 +300,8 @@ const CFG = {
   REAR_MOUNT_UP:1.1, REAR_MOUNT_FWD:-2.6,          // the gun POD on the dorsal spine, just aft of centre (user 2026-07-13 "move the gunner pod")
   REAR_CAM_BACK:6.5, REAR_CAM_UP:1.4,              // camera sits behind + above the breach so the barrel fills the lower foreground - you look down the barrel
   REAR_AIM_RANGE:260,                              // bolts converge on the CENTRE crosshair at this range (gun harmonization), so what's under the reticle is what you hit
-  REAR_BEAM_DPS:120, REAR_BEAM_RANGE:340, REAR_BEAM_R:2.2, THROTTLE_WHEEL:0.08, AIM_SPREAD:1.0,   // rear gun = a continuous SOLID BEAM (user 2026-07-13): damage/sec, reach, hit radius; + mouse-wheel throttle step; AIM_SPREAD = how far the forward gun tilts toward the cursor at the screen edge
+  REAR_BEAM_DPS:240, REAR_BEAM_RANGE:340, REAR_BEAM_R:2.2, REAR_BEAM_CAP_DRAIN:55,   // rear beam (user 2026-07-13 "a lot of damage but uses power quickly"): high damage/sec + drains the laser capacitor fast (LASER_CAP_MAX 100 -> ~2s of continuous fire); beam stops at 0 until it regens
+  THROTTLE_WHEEL:0.08, AIM_SPREAD:1.0, REAR_SHIELD_ABSORB:0.5, REAR_SHIELD_FLASH:0.35,   // mouse-wheel throttle step; forward-gun aim spread; rear-gunner shield: damage reduction while manned + energy-absorb flash duration (s)
   REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
   REAR_BARREL_LEN:2.6, REAR_BARREL_RAD:0.3, REAR_BALL_R:0.55,   // a SMALL EXTERNAL ball-turret on the ship's back (user 2026-07-13 "make the ball smaller ... it just shows which way the gunner is pointing"); unlit, external-view-only layer (chase/top, NOT the rear gunner's own view)
 
@@ -2062,7 +2065,8 @@ function step(dt){
         if(b.dmgType==='missile' && (HULLS[s.hullClass]&&HULLS[s.hullClass].pd) && rand(0,1)<HULLS[s.hullClass].pd){   // STANDARD GEAR SLOTS: point defense - some hulls shoot down an incoming missile before it connects, no damage at all
           burst(b.pos,0x8fd0ff,6,11,2.0); scene.remove(b.mesh); bullets.splice(i,1); break; }
         const rawDmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
-        const dmg=rawDmg*hullResFor(s,b.dmgType);   // STANDARD GEAR SLOTS + MANUFACTURER: E/S/M hull+manufacturer susceptibility, applied before shields
+        let dmg=rawDmg*hullResFor(s,b.dmgType);   // STANDARD GEAR SLOTS + MANUFACTURER: E/S/M hull+manufacturer susceptibility, applied before shields
+        if(s.role==='player'&&MAN.rearActive){ dmg*=(1-CFG.REAR_SHIELD_ABSORB); rearShieldHit(b.pos); }   // REAR-GUNNER SHIELD (user 2026-07-13): while manning the rear turret, the extra shield eats part of the hit + shows the energy-absorb flash
         applyHullDamage(s, drainShield(s,dmg,b.pos)*(1-shieldGenPctFor(s)), b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // gems-as-hull buffer fires on GUNFIRE now (shared sink); I1 FIX: attacker IDENTITY only learnable if on sensors; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
         if(b.slow>0){ s.slowT=T0+CFG.SLOW_DUR; s.slowMul=b.slow; }   // SR TRETON: a hit slows the target's engines for SLOW_DUR seconds
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
@@ -5301,6 +5305,17 @@ const rearBeam=(function(){ const g=new T.Group();   // REAR BEAM (user 2026-07-
   const core=new T.Mesh(new T.CylinderGeometry(0.2,0.2,1,8,1,true), new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.92,blending:T.AdditiveBlending,depthWrite:false}));
   g.add(outer); g.add(core); scene.add(g); g.visible=false;
   g.layers.set(3); outer.layers.set(3); core.layers.set(3); return g; })();   // layer 3 = shows in the rear view + the external views, like the turret
+// REAR-GUNNER SHIELD (user 2026-07-13 "see the extra rear gunner shield up ... energy absorb effect when hit"): a
+// translucent bubble around the ship, shown while you're MANNING the rear turret; flares on hit (the absorb effect).
+let _rShieldFlash=0;
+const rearShield=(function(){ const m=new T.Mesh(new T.SphereGeometry(CFG.SHIP_R*2.3,20,14), new T.MeshBasicMaterial({color:0x5aa8ff,transparent:true,opacity:0.1,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+  scene.add(m); m.visible=false; m.layers.set(3); return m; })();
+function rearShieldHit(pos){ _rShieldFlash=T0+CFG.REAR_SHIELD_FLASH; if(pos) burst(pos,0x9fd6ff,7,11,2.4); }   // energy-absorb: flare the bubble + a ripple burst at the impact
+function updateRearShield(){ const s=ships[0];
+  if(!MAN.rearActive||!s||!s.alive){ rearShield.visible=false; return; }
+  rearShield.visible=true; rearShield.position.copy(s.pos);
+  const flash=Math.max(0,(_rShieldFlash-T0)/CFG.REAR_SHIELD_FLASH);   // 1 right after a hit, decays to 0
+  rearShield.material.opacity=0.1+0.6*flash; rearShield.scale.setScalar(1+0.14*flash); }   // idle faint blue; bright + a slight expand ripple on hit
 let _rEdge=null;   // cached edge-warning DOM refs, built lazily once the rear window exists
 function rearEdgeGlow(){ if(!_rEdge){ const t=document.getElementById('rearEdgeT'); if(!t) return; _rEdge={t:t,b:document.getElementById('rearEdgeB'),l:document.getElementById('rearEdgeL'),r:document.getElementById('rearEdgeR')}; }
   const TH=CFG.REAR_EDGE_WARN, pf=rearPitch/CFG.REAR_PITCH_MAX;   // yaw swivels 360 with NO limit now -> only PITCH can "run out" (near straight up/down)
@@ -5341,7 +5356,8 @@ function beamDamage(target,dmg,fromPos,owner){ if(!target.alive||target.docked) 
   const d=dmg*hullResFor(target,'energy'); applyHullDamage(target, drainShield(target,d,fromPos)*(1-shieldGenPctFor(target)), fromPos);
   if(target.hp<=0) killByShip(target,owner); }
 function updateRearBeam(dt){ const s=ships[0];
-  if(!rearFiring||!s||!s.alive||s.docked){ rearBeam.visible=false; return; }   // solid, no delay - shown + damaging every frame the trigger is held
+  if(!rearFiring||!s||!s.alive||s.docked||(s.capLaser!=null&&s.capLaser<=0)){ rearBeam.visible=false; return; }   // solid; STOPS when the laser capacitor is empty - it burns power fast (user 2026-07-13)
+  if(s.capLaser!=null) s.capLaser=Math.max(0, s.capLaser-CFG.REAR_BEAM_CAP_DRAIN*dt);   // drain the capacitor while the beam is on
   const muzzle=rearMuzzle, dir=rearAimDir; let hitDist=CFG.REAR_BEAM_RANGE, hitShip=null, hitAst=null;
   for(const o of ships){ if(o===s||!o.alive||o.team===s.team||o.docked) continue;
     _beamA.copy(o.pos).sub(muzzle); const t=_beamA.dot(dir); if(t<1||t>hitDist) continue;   // only in front of the muzzle + within the current nearest hit
@@ -5859,11 +5875,12 @@ window.addEventListener('mouseup',e=>{ if(e.button===0 && MAN.mouseFire){ MAN.mo
 // MOUSE STEERING: cursor offset from the forward-view CENTRE = a virtual-joystick rate (Starblast-style); gated to when
 // the cursor is directly over the game canvas (e.target===canvas) so hovering a HUD panel or an open menu never steers.
 window.addEventListener('mousemove',e=>{
+  const fr=document.getElementById('fwdReticle');
   const overMain = (e.target===canvas && viewAt(e.clientX,e.clientY)==='main');
-  if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; return; }   // manning the rear turret -> no forward aim/steer
-  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; return; }
-  // FORWARD-GUN MOUSE-AIM (user 2026-07-13 "make the mouse where the forward gun shoots"): the cursor's world RAY = the aim
-  const s0=ships[0]; if(!s0){ MAN.aimDir=null; return; }
+  if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; if(fr) fr.style.display='none'; return; }   // manning the rear turret -> no forward aim/steer/reticle
+  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; MAN.aimDir=null; if(fr) fr.style.display='none'; return; }
+  const s0=ships[0]; if(!s0){ MAN.aimDir=null; if(fr) fr.style.display='none'; return; }
+  if(fr){ fr.style.left=e.clientX+'px'; fr.style.top=e.clientY+'px'; fr.style.display='block'; }   // FORWARD-GUN RETICLE follows the cursor (user 2026-07-13 "shoot at a separate reticle") - the aim tilts from forward toward it
   const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2;
   const nx=clamp((e.clientX-cx)/(v.w/2),-1.2,1.2), ny=clamp((e.clientY-cyC)/(v.h/2),-1.2,1.2);   // cursor offset from the view centre
   const afwd=FWD.clone().applyQuaternion(s0.quat), aright=RGT.clone().applyQuaternion(s0.quat), aup=UPL.clone().applyQuaternion(s0.quat);
@@ -6395,7 +6412,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateRearShield(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
