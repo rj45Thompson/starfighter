@@ -214,52 +214,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713x"></script>
-<script src="fflate.min.js?v=20260713x"></script>
-<script src="fbxloader.js?v=20260713x"></script>
+<script src="three.min.js?v=20260713y"></script>
+<script src="fflate.min.js?v=20260713y"></script>
+<script src="fbxloader.js?v=20260713y"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713x"></script>
-<script src="inhabitant.js?v=20260713x"></script>
-<script src="passenger.js?v=20260713x"></script>
-<script src="gamemod.js?v=20260713x"></script>
-<script src="chatter.js?v=20260713x"></script>
-<script src="speech_gen.js?v=20260713x"></script>
-<script src="speech_input.js?v=20260713x"></script>
-<script src="vision.js?v=20260713x"></script>
-<script src="deliberate.js?v=20260713x"></script>
-<script src="knowledge.js?v=20260713x"></script>
-<script src="acquire.js?v=20260713x"></script>
-<script src="sound.js?v=20260713x"></script>
-<script src="hullmodels.js?v=20260713x"></script>
-<script src="knowledge_hud.js?v=20260713x"></script>
-<script src="knowledge_screen.js?v=20260713x"></script>
-<script src="centroid_mind.js?v=20260713x"></script>
-<script src="kripke_mind.js?v=20260713x"></script>
-<script src="sober_gate.js?v=20260713x"></script>
-<script src="contradiction_ledger.js?v=20260713x"></script>
-<script src="kripke_planner.js?v=20260713x"></script>
-<script src="pillar_router.js?v=20260713x"></script>
-<script src="gravity_well.js?v=20260713x"></script>
-<script src="growth_loop.js?v=20260713x"></script>
-<script src="coop_proof.js?v=20260713x"></script>
-<script src="item_variance.js?v=20260713x"></script>
-<script src="tom_test.js?v=20260713x"></script>
-<script src="thoughts.js?v=20260713x"></script>
-<script src="tami_battle_ui.js?v=20260713x"></script>
-<script src="power_panel.js?v=20260713x"></script>
-<script src="panels.js?v=20260713x"></script>
-<script src="item_icons.js?v=20260713x"></script>
-<script src="engbay.js?v=20260713x"></script>
+<script src="speech_tier.js?v=20260713y"></script>
+<script src="inhabitant.js?v=20260713y"></script>
+<script src="passenger.js?v=20260713y"></script>
+<script src="gamemod.js?v=20260713y"></script>
+<script src="chatter.js?v=20260713y"></script>
+<script src="speech_gen.js?v=20260713y"></script>
+<script src="speech_input.js?v=20260713y"></script>
+<script src="vision.js?v=20260713y"></script>
+<script src="deliberate.js?v=20260713y"></script>
+<script src="knowledge.js?v=20260713y"></script>
+<script src="acquire.js?v=20260713y"></script>
+<script src="sound.js?v=20260713y"></script>
+<script src="hullmodels.js?v=20260713y"></script>
+<script src="knowledge_hud.js?v=20260713y"></script>
+<script src="knowledge_screen.js?v=20260713y"></script>
+<script src="centroid_mind.js?v=20260713y"></script>
+<script src="kripke_mind.js?v=20260713y"></script>
+<script src="sober_gate.js?v=20260713y"></script>
+<script src="contradiction_ledger.js?v=20260713y"></script>
+<script src="kripke_planner.js?v=20260713y"></script>
+<script src="pillar_router.js?v=20260713y"></script>
+<script src="gravity_well.js?v=20260713y"></script>
+<script src="growth_loop.js?v=20260713y"></script>
+<script src="coop_proof.js?v=20260713y"></script>
+<script src="item_variance.js?v=20260713y"></script>
+<script src="tom_test.js?v=20260713y"></script>
+<script src="thoughts.js?v=20260713y"></script>
+<script src="tami_battle_ui.js?v=20260713y"></script>
+<script src="power_panel.js?v=20260713y"></script>
+<script src="panels.js?v=20260713y"></script>
+<script src="item_icons.js?v=20260713y"></script>
+<script src="engbay.js?v=20260713y"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713x"></script>
-<script src="conquest.js?v=20260713x"></script>
-<script src="missions.js?v=20260713x"></script>
-<script src="planetmenu.js?v=20260713x"></script>
-<script src="textquests.js?v=20260713x"></script>
+<script src="starmap.js?v=20260713y"></script>
+<script src="conquest.js?v=20260713y"></script>
+<script src="missions.js?v=20260713y"></script>
+<script src="planetmenu.js?v=20260713y"></script>
+<script src="textquests.js?v=20260713y"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -305,8 +305,9 @@ const CFG = {
   REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
   REAR_BARREL_LEN:2.6, REAR_BARREL_RAD:0.3, REAR_BALL_R:0.55,   // a SMALL EXTERNAL ball-turret on the ship's back (user 2026-07-13 "make the ball smaller ... it just shows which way the gunner is pointing"); unlit, external-view-only layer (chase/top, NOT the rear gunner's own view)
 
-  AST_KEEP:76, AST_MAX:110, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // scaled with the 9-system galaxy
-  AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:5, AST_SPLIT_KICK:12, AST_DMG:20,
+  AST_KEEP:2000, AST_MAX:2600, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // user 2026-07-13 "MAKE 100X MORE ASTEROIDS ... a guy can go off and just mine and level up without battling": a HUGE field (was 76), 75% of it packed into the peaceful CERES BELT so you can grind ore safely. A spatial hash (astGrid) keeps the collision loops O(local) not O(all) so the count scales; rendering is still one low-poly mesh per rock, so if a GPU chugs, dial AST_KEEP down (or ask for the GPU-instanced pass for literal 100x).
+  AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:3, AST_SPLIT_KICK:12, AST_DMG:20,
+  AST_CELL:60, MINE_BELT_FRAC:0.75, MINE_BELT_RIN:0.12, MINE_BELT_ROUT:1.3, MINE_BELT_THICK:46, RADAR_ROCK_CAP:24,   // AST_CELL: spatial-hash cell edge (>> ship+rock+one-frame-bullet-step, so a 3x3x3 query is exact). MINE_BELT_*: fraction of rocks that spawn in the peaceful belt + the thick DISC they fill (inner/outer frac of SYSTEM_R, Y half-thickness) so it reads as a ring you fly through. RADAR_ROCK_CAP: cap rock blips so a dense field can't starve enemy/gem blips on the brain radar.
   GEM_CREDIT_PER_SCALE:2, GEM_FOOD:9, GEM_PICK_R:8.5, GEM_LIFE:26, GEM_MAGNET:26, GEM_GRAB_R:55,
   HP_BASE:100, HP_PER_HULL:0.20, REGEN:2.2, WEAPON_FIRE:0.16, WEAPON_DMG:0.24, ENGINE_GAIN:0.15,
   TECH_RES_PER_LVL:0.04, TECH_RES_FLOOR:0.55,   // TECH LEVEL (user, SR "8 hull materials... higher tech = better resistance profiles"): folded into the EXISTING `upgrade hull` progression (s.lvl.hull) rather than a new parallel currency/slot - each level -4% E/S/M susceptibility, floored so it's never free armor. Lv1 (everyone's default) = ×1.00, zero change to existing balance for anyone who never upgrades.
@@ -861,11 +862,32 @@ function spawnAsteroid(pos,scale,vel){ const a={ pos:pos.clone(),
     vel:vel?vel.clone():new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(1,CFG.AST_DRIFT)),
     scale, hp:scale*CFG.AST_HP_PER_SCALE, level:Math.max(1,Math.round(scale/2)), mesh:rockMesh(scale,Math.random()<0.5),
     spin:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(0.2,0.9)) };
-  a.mesh.position.copy(a.pos); scene.add(a.mesh); asteroids.push(a); return a; }
-function spawnAtShell(){ const sys=systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()};
+  a.mesh.position.copy(a.pos); scene.add(a.mesh); asteroids.push(a); if(_astGridLive) _astInsert(a); return a; }
+let miningBelt=null;   // the peaceful CERES BELT system (set by makeMiningBelt) - most rocks live here, no pirates
+function spawnAtShell(){
+  if(miningBelt && Math.random()<CFG.MINE_BELT_FRAC){   // pack most of the field into the peaceful belt, on a thick DISC you fly through (a real ring, not a sphere)
+    const u=rand(0,TAU), r=CFG.SYSTEM_R*rand(CFG.MINE_BELT_RIN,CFG.MINE_BELT_ROUT), y=rand(-1,1)*CFG.MINE_BELT_THICK;
+    const pos=miningBelt.center.clone().add(new T.Vector3(Math.cos(u)*r, y, Math.sin(u)*r));
+    return spawnAsteroid(pos,rand(CFG.AST_SCALE_MIN,CFG.AST_SCALE_MAX),new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(1,CFG.AST_DRIFT))); }
+  const pool=systems.filter(sy=>!sy.peaceful), sys=pool.length?pool[randi(0,pool.length-1)]:(systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()});
   const u=rand(0,TAU),el=rand(-0.5,0.5),cs=Math.cos(el),r=CFG.SYSTEM_R*rand(0.35,0.98);
   const pos=sys.center.clone().add(new T.Vector3(Math.cos(u)*r*cs,Math.sin(el)*r*0.6,Math.sin(u)*r*cs));
-  spawnAsteroid(pos,rand(CFG.AST_SCALE_MIN,CFG.AST_SCALE_MAX),new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(2,CFG.AST_DRIFT))); }
+  return spawnAsteroid(pos,rand(CFG.AST_SCALE_MIN,CFG.AST_SCALE_MAX),new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(2,CFG.AST_DRIFT))); }
+// ===== ASTEROID SPATIAL HASH (user 2026-07-13: dense field) =====
+// A uniform grid so the per-frame collision loops cost O(bullets+ships)x(3^3 cells) instead of O(n) over the
+// whole field. Rebuilt once per frame AFTER rocks move. AST_CELL is chosen >> (SHIP_R + max rock scale + one
+// frame of bullet travel), so a 3x3x3 neighborhood query is exact - nothing tunnels through unseen.
+const astGrid=new Map(); let _astGridLive=false;
+function _astKey(x,y,z){ return Math.floor(x/CFG.AST_CELL)+'_'+Math.floor(y/CFG.AST_CELL)+'_'+Math.floor(z/CFG.AST_CELL); }
+function _astInsert(a){ const k=_astKey(a.pos.x,a.pos.y,a.pos.z); let c=astGrid.get(k); if(!c){ c=[]; astGrid.set(k,c); } c.push(a); }
+function rebuildAstGrid(){ astGrid.clear(); for(const a of asteroids){ if(!a.gone) _astInsert(a); } _astGridLive=true; }
+function _astNear(x,y,z,fn){ const cx=Math.floor(x/CFG.AST_CELL),cy=Math.floor(y/CFG.AST_CELL),cz=Math.floor(z/CFG.AST_CELL);
+  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++){ const c=astGrid.get((cx+dx)+'_'+(cy+dy)+'_'+(cz+dz)); if(!c) continue;
+    for(const a of c){ if(!a.gone && fn(a)) return a; } } return null; }
+function astHitBullet(b){ return _astNear(b.pos.x,b.pos.y,b.pos.z,a=>{ const ar=a.scale+CFG.BULLET_R; return segDistSq(b.prev,b.pos,a.pos)<ar*ar; }); }
+function astHitShip(s){ return _astNear(s.pos.x,s.pos.y,s.pos.z,a=>{ const rr=CFG.SHIP_R+a.scale; return s.pos.distanceToSquared(a.pos)<rr*rr; }); }
+function destroyAsteroidObj(a,owner){ const i=asteroids.indexOf(a); if(i>=0) destroyAsteroid(i,owner); }
+function inPeaceful(pos){ for(const sy of systems){ if(sy.peaceful && pos.distanceTo(sy.center)<CFG.SYSTEM_R*1.05) return true; } return false; }   // no-combat guard: pirates never target a ship inside the belt
 function spawnGem(pos,scale){ const credits=Math.max(1,Math.round(scale*CFG.GEM_CREDIT_PER_SCALE));
   const col=new T.Color().setHSL(credits>8?0.42:0.13,0.9,0.6);
   const gemGeo=ASSETS.gemGeos.length?ASSETS.gemGeos[randi(0,ASSETS.gemGeos.length-1)]:new T.OctahedronGeometry(1.5,0);   // Gems Ultimate Pack shapes when loaded
@@ -1049,6 +1071,17 @@ function makeScienceStation(){ if(!systems.length) return; const sys=systems[Mat
   const lab=spriteText('⚗ '+p.name,26,'#c0f0ff',{bg:'rgba(8,26,32,0.75)',pad:8,r:8,align:'center',ws:0.075}); lab.sp.position.copy(c); lab.sp.position.y+=p.radius+9; lab.sp.renderOrder=9; scene.add(lab.sp); p.label=lab;
   p.blip=topBlip('#4ad0e0',15,1); p.blip.position.copy(c);
   sys.planets.push(p); planets.push(p); scienceStation=p; }
+// CERES BELT (user 2026-07-14 "a guy can go off and just mine and level up without battling"): a PEACEFUL
+// asteroid belt. Pick a generic ring system - not home(0), not the science hub, not the lawless frontier -
+// and mark it no-combat. spawnAtShell packs 75% of the field here; addPirate + targeting skip peaceful systems.
+function makeMiningBelt(){ if(!systems.length) return;
+  const sciIdx=Math.floor(systems.length/2); let sys=null;
+  for(let i=1;i<systems.length;i++){ const sy=systems[i]; if(sy.lawless||i===sciIdx) continue; sys=sy; break; }
+  if(!sys) sys=systems[Math.min(1,systems.length-1)];
+  sys.peaceful=true; sys.mining=true; sys.name='Ceres Belt'; miningBelt=sys;
+  const c=sys.center;
+  const lab=spriteText('⛏ CERES BELT · mining haven (no combat)',26,'#bfe6c8',{bg:'rgba(10,28,18,0.72)',pad:8,r:8,align:'center',ws:0.06}); lab.sp.position.copy(c); lab.sp.position.y+=CFG.SUN_R+16; lab.sp.renderOrder=9; scene.add(lab.sp);
+  sys.beaconBlip=topBlip('#8fe6a8',15,1); sys.beaconBlip.position.copy(c); }
 function atBase(s){ return base && s.pos.distanceTo(base.pos)<CFG.BASE_R; }
 // =================================================================================================
 //  X-WING POWER MANAGEMENT (user 2026-07-07): "power reroute to shields engines or lasers all use the
@@ -1398,7 +1431,8 @@ let pirateCd=0, chainSpeakCd=3;
 function addPirate(force){ if(!force && ships.filter(s=>s.team==='pirate').length>=enemyCap()) return null;   // force: bypass the population cap for a guaranteed one-off spawn (the finale enemy - see spawnFinaleEnemy)
   const ti=Math.max(0, hegTier()-(rand(0,1)<0.4?1:0)), HT=HEG_TIERS[ti];   // mostly current tier, some lower
   const lawlessSys=systems.find(sy=>sy.lawless);
-  const sys=(lawlessSys && rand(0,1)<CFG.LAWLESS_SPAWN_BIAS) ? lawlessSys : (systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()});
+  const _ppool=systems.filter(sy=>!sy.peaceful);   // pirates never spawn in the peaceful CERES BELT
+  const sys=(lawlessSys && rand(0,1)<CFG.LAWLESS_SPAWN_BIAS) ? lawlessSys : (_ppool.length?_ppool[randi(0,_ppool.length-1)]:(systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()}));
   const off=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.SYSTEM_R*rand(0.8,1.15));
   const rosterName=novelPirateName();   // N3: synod roster canon name when the novel roster is loaded; else legacy HEG tier name
   const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
@@ -1636,9 +1670,9 @@ function aimAt(s,dir){ const D=new T.Vector3().copy(dir).normalize(); const fwd=
   const local=D.clone().applyQuaternion(_q.copy(s.quat).invert());
   const yawErr=Math.atan2(local.x,-local.z), pitchErr=Math.atan2(local.y,Math.hypot(local.x,local.z));
   return { yaw:clamp(yawErr*CFG.KP_YAW,-1,1), pitch:clamp(pitchErr*CFG.KP_PITCH,-1,1), dot }; }
-function nearestRival(s,R){ let best=null,bd=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; const d=s.pos.distanceTo(o.pos); if(R&&d>R) continue; if(d<bd){bd=d;best=o;} } return best; }   // IRON LAW: pass R=senseRangeOf(s) at combat sites so a ship can only target what it SENSES (was: globally omniscient - the AI could chase an enemy anywhere in the galaxy); R omitted = legacy global read
+function nearestRival(s,R){ let best=null,bd=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; if(inPeaceful(o.pos)) continue; const d=s.pos.distanceTo(o.pos); if(R&&d>R) continue; if(d<bd){bd=d;best=o;} } return best; }   // IRON LAW: pass R=senseRangeOf(s) at combat sites so a ship can only target what it SENSES (was: globally omniscient - the AI could chase an enemy anywhere in the galaxy); R omitted = legacy global read
 function senseRangeOf(s){ return ((s&&s.senseR)||CFG.SENSE_R) * ((s&&s.radarInst&&s.radarInst.powerMul)||1); }   // one honest sensor limit for EVERYONE - radar gear raises it, symmetric for AI + player; SR ITEM VARIANCE: radar instance powerMul scales it (ship-agnostic)
-function weakestEnemyNear(s,R){ let best=null,bw=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; if(s.pos.distanceTo(o.pos)<R && o.hp<bw){ bw=o.hp; best=o; } } return best; }   // pick off the weak
+function weakestEnemyNear(s,R){ let best=null,bw=1e9; for(const o of ships){ if(o===s||!o.alive||o.team===s.team) continue; if(inPeaceful(o.pos)) continue; if(s.pos.distanceTo(o.pos)<R && o.hp<bw){ bw=o.hp; best=o; } } return best; }   // pick off the weak
 // inter-agent communication: a message that also CHANGES nearby allies' behavior (real coordination)
 // ===== A1: EMERGENT SIGNALING (Lewis referential game) - the squad LEARNS a symbol→meaning code ONLINE =====
 // GIVEN: 3 real situations a ship can detect + a fixed cooperative task (correct response per situation).
@@ -1839,7 +1873,7 @@ function think(s,dt){
     if(host){ mode='HUNT'; target=host; aimDir=_v.copy(host.pos).sub(s.pos); s.lastThreat=T0; }
     else { mode='ESCORT'; aimDir=_v.copy(s.home.pos).sub(s.pos); if(s.pos.distanceTo(s.home.pos)<CFG.DEFEND_R*0.5) ease=0.35;
       if(T0-s.lastThreat>CFG.DEF_DESPAWN) s.despawn=true; } }
-  else if(s.role==='pirate'){ let tgt=(s.huntTarget&&s.huntTarget.alive&&s.huntTarget.team!==s.team)?s.huntTarget:(weakestEnemyNear(s,Math.min(CFG.PIRATE_HUNT_R,senseRangeOf(s)))||nearestRival(s,senseRangeOf(s)));   // dumb marauder: charge the weakest prey
+  else if(s.role==='pirate'){ let tgt=(s.huntTarget&&s.huntTarget.alive&&s.huntTarget.team!==s.team&&!inPeaceful(s.huntTarget.pos))?s.huntTarget:(weakestEnemyNear(s,Math.min(CFG.PIRATE_HUNT_R,senseRangeOf(s)))||nearestRival(s,senseRangeOf(s)));   // dumb marauder: charge the weakest prey (but breaks off if prey reaches the peaceful belt)
     if(s.hp<s.maxHp*CFG.EVADE_HP && tgt){   // SR "train them up" pass 3: a marauder that's LOSING now flees instead of fighting to the death, and calls the pack in behind it
       mode='EVADE'; target=tgt; aimDir=_v.copy(s.pos).sub(tgt.pos); s.huntTarget=null; broadcast(s,'help',tgt); }   // reuses the SAME "converge on my attacker" rally coalition ships already use - nearby pirates come help fight the thing that hurt me
     else{ if(tgt && tgt!==s._packTgt){ s._packTgt=tgt; broadcast(s,'tally',tgt); }   // SR pass 2: call nearby pack-mates onto the SAME prey instead of each pirate hunting independently
@@ -2090,13 +2124,14 @@ function step(dt){
     const shr=13+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,stronghold.pos)<shr*shr){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,b.col!=null?b.col:0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }   // SR-M6: weapon's own color
   for(let i=asteroids.length-1;i>=0;i--){ const a=asteroids[i]; a.pos.addScaledVector(a.vel,dt);
     if(a.pos.length()>CFG.ARENA_R-a.scale){ a.pos.setLength(CFG.ARENA_R-a.scale); const n=a.pos.clone().normalize(); a.vel.addScaledVector(n,-2*a.vel.dot(n)); }
-    a.mesh.position.copy(a.pos); a.mesh.rotation.x+=a.spin.x*dt; a.mesh.rotation.y+=a.spin.y*dt; a.mesh.rotation.z+=a.spin.z*dt;
-    for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const ar=a.scale+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,a.pos)<ar*ar){ const owner=shipById[b.owner];
-      a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color
-      if(a.hp<=0){ destroyAsteroid(i,owner); break; } } } }
+    a.mesh.position.copy(a.pos); a.mesh.rotation.x+=a.spin.x*dt; a.mesh.rotation.y+=a.spin.y*dt; a.mesh.rotation.z+=a.spin.z*dt; }
+  rebuildAstGrid();   // dense-field broad phase: hash all rocks ONCE, then the two collision loops below query only nearby cells (not the whole field)
+  for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const a=astHitBullet(b); if(!a) continue; const owner=shipById[b.owner];
+    a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color
+    if(a.hp<=0) destroyAsteroidObj(a,owner); }
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
-  for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; for(const a of asteroids){ if(s.pos.distanceTo(a.pos)<CFG.SHIP_R+a.scale){
-    hurt(s,CFG.AST_DMG,a.pos); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); break; } } }
+  for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; const a=astHitShip(s); if(a){
+    hurt(s,CFG.AST_DMG,a.pos); s.iframe=CFG.IFRAME; const n=s.pos.clone().sub(a.pos).setLength(1); s.vel.addScaledVector(n,16); burst(s.pos,0xff8a5a,10,16,2.6); } }
   shipCollisions();   // pairwise ship-body contact: separate + bounce + hull scrape on hard rams
   for(let i=gems.length-1;i>=0;i--){ const g=gems[i]; g.age+=dt; let taken=false;
     if(!g.mesh||!g.mesh.material){ if(g.mesh) scene.remove(g.mesh); gems.splice(i,1); continue; }   // DEFENSIVE (crash fix 2026-07-13): a gem with no renderable mesh/material can't be shown or picked up - drop it rather than crash the frame loop
@@ -2222,7 +2257,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
   // its death is the real win condition now, not the Stronghold's. Guarded the same way as the old Stronghold path.
   if(victim.isFinale && matchEndCd==null){ ev(`<b>☠☠→★ ${CFG.FINALE_NAME} DESTROYED</b> - the Hegemon's last stand is broken.`);
     term(`★★ You destroyed the ${CFG.FINALE_NAME}. The galaxy will be reborn - a fresh ship, the minds keep everything they learned.`,'sys'); endgameConclude(); } }   // the boss falling is the ONLY reset trigger now (never a bare warWin, which would spawn a second titan)
-function destroyAsteroid(i,owner){ const a=asteroids[i]; if(owner) owner.score+=a.level;
+function destroyAsteroid(i,owner){ const a=asteroids[i]; if(!a) return; a.gone=true; if(owner) owner.score+=a.level;   // gone flag: any stale spatial-hash ref to this rock is skipped by _astNear
   if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
   if(a.scale>=CFG.AST_NOSPLIT && asteroids.length<CFG.AST_MAX){ const n=randi(CFG.AST_SPLIT_MIN,CFG.AST_SPLIT_MAX),cs=a.scale*CFG.AST_CHILD_FRAC;
@@ -5019,7 +5054,7 @@ function updateBrain(){ const s=ships[focus], b=s&&s.brain; if(activeTab==='thou
     const fx=rel.dot(right), fz=rel.dot(fwd), dd=Math.hypot(fx,fz)||1, r=RR*clamp(rel.length()/CFG.SENSE_R,0.12,1);
     const px=RC.x+(fx/dd)*r, py=RC.y+(fz/dd)*r; blip.position.set(px,py,1); blip.material.color.set(col); blip.scale.setScalar(sel?13:8); blip.visible=true;
     if(sel) selPos={x:px,y:py}; ents.push({px,py,label,col,sel,d:rel.length()}); };
-  for(const a of asteroids){ if(s.pos.distanceTo(a.pos)<CFG.SENSE_R) place(a.pos,'#8aa0b8',a===b.target,'rock'); }
+  let _rb=0; for(const a of asteroids){ if(_rb>=CFG.RADAR_ROCK_CAP) break; if(s.pos.distanceTo(a.pos)<CFG.SENSE_R){ place(a.pos,'#8aa0b8',a===b.target,'rock'); _rb++; } }   // cap rock blips: a dense belt otherwise eats the whole blip pool, hiding ships/gems
   for(const g of gems){ if(s.pos.distanceTo(g.pos)<CFG.SENSE_R) place(g.pos,'#ffd24a',g===b.target,g.credits+'c'); }
   for(const o of ships){ if(o!==s && o.alive && s.pos.distanceTo(o.pos)<CFG.SENSE_R) place(o.pos, o.team!==s.team?'#ff5a5a':o.color.getStyle(), o===b.target, o.name); }
   for(const pl of planets){ if(s.pos.distanceTo(pl.pos)<CFG.SENSE_R*1.4) place(pl.pos, '#'+new T.Color(pl.type.col).getHexString(), false, pl.name); }
@@ -5513,6 +5548,7 @@ makePlanets();
 makeBase();   // M8: the Ranger Command hub
 makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
 makeScienceStation();   // SR-M19: the Athenaeum - artifact analysis + mineral probes, paid in CORES
+makeMiningBelt();   // user 2026-07-14: the peaceful CERES BELT - dense rocks, no pirates (must run BEFORE the initial spawnAtShell loop so the belt gets its share)
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; P.obj=null; P.docked=null; P.credits=500; P.fuel=CFG.FUEL_CAP; P.contraband={}; P.backstory='the newest Warden on the roster, still earning your wings against the Iron Synod'; applyHull(P,'scout'); })();   // player starts in a SCOUT hull (user 2026-07-13 "all this should start at scout"); 500c (was 320 - user: "free units to spare" for testing hulls/gear
 const _loadedSave=loadGame();   // SR-M1: restores credits/rank/rep/hull/war/campaign over the fresh-boot defaults above, if a prior session saved one
