@@ -200,52 +200,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713r"></script>
-<script src="fflate.min.js?v=20260713r"></script>
-<script src="fbxloader.js?v=20260713r"></script>
+<script src="three.min.js?v=20260713s"></script>
+<script src="fflate.min.js?v=20260713s"></script>
+<script src="fbxloader.js?v=20260713s"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713r"></script>
-<script src="inhabitant.js?v=20260713r"></script>
-<script src="passenger.js?v=20260713r"></script>
-<script src="gamemod.js?v=20260713r"></script>
-<script src="chatter.js?v=20260713r"></script>
-<script src="speech_gen.js?v=20260713r"></script>
-<script src="speech_input.js?v=20260713r"></script>
-<script src="vision.js?v=20260713r"></script>
-<script src="deliberate.js?v=20260713r"></script>
-<script src="knowledge.js?v=20260713r"></script>
-<script src="acquire.js?v=20260713r"></script>
-<script src="sound.js?v=20260713r"></script>
-<script src="hullmodels.js?v=20260713r"></script>
-<script src="knowledge_hud.js?v=20260713r"></script>
-<script src="knowledge_screen.js?v=20260713r"></script>
-<script src="centroid_mind.js?v=20260713r"></script>
-<script src="kripke_mind.js?v=20260713r"></script>
-<script src="sober_gate.js?v=20260713r"></script>
-<script src="contradiction_ledger.js?v=20260713r"></script>
-<script src="kripke_planner.js?v=20260713r"></script>
-<script src="pillar_router.js?v=20260713r"></script>
-<script src="gravity_well.js?v=20260713r"></script>
-<script src="growth_loop.js?v=20260713r"></script>
-<script src="coop_proof.js?v=20260713r"></script>
-<script src="item_variance.js?v=20260713r"></script>
-<script src="tom_test.js?v=20260713r"></script>
-<script src="thoughts.js?v=20260713r"></script>
-<script src="tami_battle_ui.js?v=20260713r"></script>
-<script src="power_panel.js?v=20260713r"></script>
-<script src="panels.js?v=20260713r"></script>
-<script src="item_icons.js?v=20260713r"></script>
-<script src="engbay.js?v=20260713r"></script>
+<script src="speech_tier.js?v=20260713s"></script>
+<script src="inhabitant.js?v=20260713s"></script>
+<script src="passenger.js?v=20260713s"></script>
+<script src="gamemod.js?v=20260713s"></script>
+<script src="chatter.js?v=20260713s"></script>
+<script src="speech_gen.js?v=20260713s"></script>
+<script src="speech_input.js?v=20260713s"></script>
+<script src="vision.js?v=20260713s"></script>
+<script src="deliberate.js?v=20260713s"></script>
+<script src="knowledge.js?v=20260713s"></script>
+<script src="acquire.js?v=20260713s"></script>
+<script src="sound.js?v=20260713s"></script>
+<script src="hullmodels.js?v=20260713s"></script>
+<script src="knowledge_hud.js?v=20260713s"></script>
+<script src="knowledge_screen.js?v=20260713s"></script>
+<script src="centroid_mind.js?v=20260713s"></script>
+<script src="kripke_mind.js?v=20260713s"></script>
+<script src="sober_gate.js?v=20260713s"></script>
+<script src="contradiction_ledger.js?v=20260713s"></script>
+<script src="kripke_planner.js?v=20260713s"></script>
+<script src="pillar_router.js?v=20260713s"></script>
+<script src="gravity_well.js?v=20260713s"></script>
+<script src="growth_loop.js?v=20260713s"></script>
+<script src="coop_proof.js?v=20260713s"></script>
+<script src="item_variance.js?v=20260713s"></script>
+<script src="tom_test.js?v=20260713s"></script>
+<script src="thoughts.js?v=20260713s"></script>
+<script src="tami_battle_ui.js?v=20260713s"></script>
+<script src="power_panel.js?v=20260713s"></script>
+<script src="panels.js?v=20260713s"></script>
+<script src="item_icons.js?v=20260713s"></script>
+<script src="engbay.js?v=20260713s"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713r"></script>
-<script src="conquest.js?v=20260713r"></script>
-<script src="missions.js?v=20260713r"></script>
-<script src="planetmenu.js?v=20260713r"></script>
-<script src="textquests.js?v=20260713r"></script>
+<script src="starmap.js?v=20260713s"></script>
+<script src="conquest.js?v=20260713s"></script>
+<script src="missions.js?v=20260713s"></script>
+<script src="planetmenu.js?v=20260713s"></script>
+<script src="textquests.js?v=20260713s"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -640,15 +640,23 @@ const ring=new T.Mesh(new T.SphereGeometry(CFG.ARENA_R,32,24),
   scene.add(new T.Points(g,new T.PointsMaterial({color:0xbfd8ff,size:2.2,sizeAttenuation:false,transparent:true,opacity:0.8,depthWrite:false}))); })();
 
 // ---------------------------------------------------------------- fighter mesh (3D dart)
-// ENGINE EXHAUST (user 2026-07-13 "change the ship exhaust ... it looks too much like the bolt"): a tapered PLUME cone,
-// NOT a round GLOW sprite (which read identically to the bolt halos). Hue-tinted outer flame + a white-hot inner core;
-// step() drives its opacity + uniform scale from thrust. toEngPlume swaps an already-built sprite-eng (e.g. a hull from
-// HULLMODELS, whose eng is made in another file) for a plume, preserving its position.
-function makeEngPlume(hue){ const c=new T.Color().setHSL(hue,0.85,0.6);
-  const flame=new T.Mesh(new T.ConeGeometry(0.5,1.9,14,1,true), new T.MeshBasicMaterial({color:c,transparent:true,opacity:0.6,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
-  flame.rotation.x=Math.PI/2;   // ConeGeometry apex is +Y; rotate so the apex points +Z (aft) - a plume tapering backward off the tail
-  const core=new T.Mesh(new T.ConeGeometry(0.26,1.55,12,1,true), new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.85,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
-  flame.add(core); return flame; }
+// ENGINE EXHAUST (user 2026-07-13 "the thruster balls look too much like bullets ... find a .png and make it a real
+// thruster looking thing"): a hand-painted plasma-FLAME texture (white-hot core + cyan-blue plasma + radial flame rays -
+// deliberately NOT the smooth round GLOW disc the bolts use) on a sprite. The rays + engine-blue read as a jet even when
+// the chase cam sees the exhaust end-on. step() drives its opacity + scale from thrust; toEngPlume swaps an
+// already-built sprite-eng (e.g. a HULLMODELS hull, whose eng is made in another file) for this one, keeping its spot.
+const THRUST_TEX=(function(){ const N=128, cv=document.createElement('canvas'); cv.width=cv.height=N; const g=cv.getContext('2d'), cx=N/2, cy=N/2;
+  const rg=g.createRadialGradient(cx,cy,0,cx,cy,N*0.5);
+  rg.addColorStop(0,'rgba(255,255,255,1)'); rg.addColorStop(0.15,'rgba(216,242,255,0.96)'); rg.addColorStop(0.4,'rgba(98,178,255,0.55)'); rg.addColorStop(0.72,'rgba(48,112,232,0.15)'); rg.addColorStop(1,'rgba(40,90,200,0)');
+  g.fillStyle=rg; g.fillRect(0,0,N,N);
+  g.globalCompositeOperation='lighter';   // additive flame rays so it reads as a jet, not a smooth disc
+  for(let i=0;i<15;i++){ const a=(i/15)*Math.PI*2, len=N*(0.30+0.17*Math.abs(Math.sin(i*2.7+1)));
+    const lg=g.createLinearGradient(cx,cy,cx+Math.cos(a)*len,cy+Math.sin(a)*len);
+    lg.addColorStop(0,'rgba(234,247,255,0.5)'); lg.addColorStop(1,'rgba(120,180,255,0)');
+    g.strokeStyle=lg; g.lineWidth=2.3; g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len); g.stroke(); }
+  const t=new T.CanvasTexture(cv); t.needsUpdate=true; return t; })();
+function makeEngPlume(hue){ const spr=new T.Sprite(new T.SpriteMaterial({map:THRUST_TEX,color:new T.Color().setHSL(hue,0.38,0.9),blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.8}));
+  spr.scale.set(1.9,1.9,1); return spr; }   // the plasma-flame sprite; scale.setScalar in step() pulses it with thrust
 function toEngPlume(grp,hue){ if(!grp||!grp.userData) return; const old=grp.userData.eng, pos=old?old.position.clone():new T.Vector3(0,0,2);
   if(old) grp.remove(old); const p=makeEngPlume(hue); p.position.copy(pos); grp.add(p); grp.userData.eng=p; }
 function fighterMesh(hue){
