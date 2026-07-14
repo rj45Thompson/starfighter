@@ -31,6 +31,19 @@
   #gearMenu button{ display:block; width:100%; text-align:left; background:#152234; border:1px solid #29405a;
     color:#cfe2f5; border-radius:5px; padding:6px 8px; cursor:pointer; font:11px ui-monospace,monospace; }
   #gearMenu button:hover{ border-color:var(--red); color:var(--red); }
+  #gearMenu{ max-height:74vh; overflow-y:auto; min-width:214px; }   /* full options panel now, not a one-button dropdown */
+  #gearMenu .gm-sec{ font-size:9px; letter-spacing:.1em; color:#6f93a8; margin:9px 0 4px; border-top:1px solid #1c2c40; padding-top:7px; }
+  #gearMenu .gm-opt{ display:flex; align-items:center; gap:7px; padding:3px 1px; cursor:pointer; }
+  #gearMenu .gm-opt input[type=checkbox]{ accent-color:var(--cyan); }
+  #gearMenu .gm-range{ flex-wrap:wrap; }
+  #gearMenu .gm-range input[type=range]{ width:100%; margin-top:3px; accent-color:var(--cyan); }
+  #gearMenu .kb-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 0; }
+  #gearMenu .kb-row span{ color:#a9c3d8; }
+  #gearMenu .kb-key{ min-width:78px; text-align:center; background:#152234; border:1px solid #29405a; color:#cfe2f5;
+    border-radius:5px; padding:4px 6px; cursor:pointer; font:10px ui-monospace,monospace; }
+  #gearMenu .kb-key:hover{ border-color:var(--cyan); color:var(--cyan); }
+  #gearMenu .kb-key.awaiting{ border-color:var(--red); color:var(--red); }
+  #gearMenu #resetControlsBtn, #gearMenu #resetLayoutBtn{ margin-top:6px; }
   #pillars{ left:14px; top:12px; display:flex; gap:7px; flex-wrap:wrap; max-width:52%; }
   .pill{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.1em; color:#8fb0cc;
     border:1px solid #29405a; background:#0c1623aa; border-radius:5px; padding:4px 7px; }
@@ -147,7 +160,17 @@
 </div>
 <div class="hud" id="creditsHud">0c</div>
 <button id="gearBtn" type="button" title="options">⚙</button>
-<div id="gearMenu"><div class="gm-hdr">OPTIONS</div><button id="resetLayoutBtn">RESET LAYOUT</button></div>
+<div id="gearMenu"><div class="gm-hdr">OPTIONS</div>
+  <div class="gm-sec">GENERAL</div>
+  <label class="gm-opt"><input type="checkbox" id="optMouseSteer"><span>Mouse steering (forward view)</span></label>
+  <label class="gm-opt"><input type="checkbox" id="optRMThrust"><span>Right-mouse = thrust</span></label>
+  <label class="gm-opt"><input type="checkbox" id="optInvertY"><span>Invert mouse Y</span></label>
+  <label class="gm-opt gm-range"><span>Mouse sensitivity</span><input type="range" id="optSens" min="0.2" max="2" step="0.05"></label>
+  <div class="gm-sec">FLIGHT KEYS <span style="opacity:.5;font-weight:400">· click to rebind</span></div>
+  <div id="kbRows"></div>
+  <button id="resetControlsBtn">RESET CONTROLS</button>
+  <button id="resetLayoutBtn">RESET LAYOUT</button>
+</div>
 <div class="hud" id="pillars"></div>
 <div class="hud" id="rosterWrap"><div id="roster"></div></div>
 <div class="hud" id="missionlog"><div id="missionlogBody"></div></div>
@@ -177,52 +200,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713p"></script>
-<script src="fflate.min.js?v=20260713p"></script>
-<script src="fbxloader.js?v=20260713p"></script>
+<script src="three.min.js?v=20260713q"></script>
+<script src="fflate.min.js?v=20260713q"></script>
+<script src="fbxloader.js?v=20260713q"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713p"></script>
-<script src="inhabitant.js?v=20260713p"></script>
-<script src="passenger.js?v=20260713p"></script>
-<script src="gamemod.js?v=20260713p"></script>
-<script src="chatter.js?v=20260713p"></script>
-<script src="speech_gen.js?v=20260713p"></script>
-<script src="speech_input.js?v=20260713p"></script>
-<script src="vision.js?v=20260713p"></script>
-<script src="deliberate.js?v=20260713p"></script>
-<script src="knowledge.js?v=20260713p"></script>
-<script src="acquire.js?v=20260713p"></script>
-<script src="sound.js?v=20260713p"></script>
-<script src="hullmodels.js?v=20260713p"></script>
-<script src="knowledge_hud.js?v=20260713p"></script>
-<script src="knowledge_screen.js?v=20260713p"></script>
-<script src="centroid_mind.js?v=20260713p"></script>
-<script src="kripke_mind.js?v=20260713p"></script>
-<script src="sober_gate.js?v=20260713p"></script>
-<script src="contradiction_ledger.js?v=20260713p"></script>
-<script src="kripke_planner.js?v=20260713p"></script>
-<script src="pillar_router.js?v=20260713p"></script>
-<script src="gravity_well.js?v=20260713p"></script>
-<script src="growth_loop.js?v=20260713p"></script>
-<script src="coop_proof.js?v=20260713p"></script>
-<script src="item_variance.js?v=20260713p"></script>
-<script src="tom_test.js?v=20260713p"></script>
-<script src="thoughts.js?v=20260713p"></script>
-<script src="tami_battle_ui.js?v=20260713p"></script>
-<script src="power_panel.js?v=20260713p"></script>
-<script src="panels.js?v=20260713p"></script>
-<script src="item_icons.js?v=20260713p"></script>
-<script src="engbay.js?v=20260713p"></script>
+<script src="speech_tier.js?v=20260713q"></script>
+<script src="inhabitant.js?v=20260713q"></script>
+<script src="passenger.js?v=20260713q"></script>
+<script src="gamemod.js?v=20260713q"></script>
+<script src="chatter.js?v=20260713q"></script>
+<script src="speech_gen.js?v=20260713q"></script>
+<script src="speech_input.js?v=20260713q"></script>
+<script src="vision.js?v=20260713q"></script>
+<script src="deliberate.js?v=20260713q"></script>
+<script src="knowledge.js?v=20260713q"></script>
+<script src="acquire.js?v=20260713q"></script>
+<script src="sound.js?v=20260713q"></script>
+<script src="hullmodels.js?v=20260713q"></script>
+<script src="knowledge_hud.js?v=20260713q"></script>
+<script src="knowledge_screen.js?v=20260713q"></script>
+<script src="centroid_mind.js?v=20260713q"></script>
+<script src="kripke_mind.js?v=20260713q"></script>
+<script src="sober_gate.js?v=20260713q"></script>
+<script src="contradiction_ledger.js?v=20260713q"></script>
+<script src="kripke_planner.js?v=20260713q"></script>
+<script src="pillar_router.js?v=20260713q"></script>
+<script src="gravity_well.js?v=20260713q"></script>
+<script src="growth_loop.js?v=20260713q"></script>
+<script src="coop_proof.js?v=20260713q"></script>
+<script src="item_variance.js?v=20260713q"></script>
+<script src="tom_test.js?v=20260713q"></script>
+<script src="thoughts.js?v=20260713q"></script>
+<script src="tami_battle_ui.js?v=20260713q"></script>
+<script src="power_panel.js?v=20260713q"></script>
+<script src="panels.js?v=20260713q"></script>
+<script src="item_icons.js?v=20260713q"></script>
+<script src="engbay.js?v=20260713q"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713p"></script>
-<script src="conquest.js?v=20260713p"></script>
-<script src="missions.js?v=20260713p"></script>
-<script src="planetmenu.js?v=20260713p"></script>
-<script src="textquests.js?v=20260713p"></script>
+<script src="starmap.js?v=20260713q"></script>
+<script src="conquest.js?v=20260713q"></script>
+<script src="missions.js?v=20260713q"></script>
+<script src="planetmenu.js?v=20260713q"></script>
+<script src="textquests.js?v=20260713q"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -617,6 +640,17 @@ const ring=new T.Mesh(new T.SphereGeometry(CFG.ARENA_R,32,24),
   scene.add(new T.Points(g,new T.PointsMaterial({color:0xbfd8ff,size:2.2,sizeAttenuation:false,transparent:true,opacity:0.8,depthWrite:false}))); })();
 
 // ---------------------------------------------------------------- fighter mesh (3D dart)
+// ENGINE EXHAUST (user 2026-07-13 "change the ship exhaust ... it looks too much like the bolt"): a tapered PLUME cone,
+// NOT a round GLOW sprite (which read identically to the bolt halos). Hue-tinted outer flame + a white-hot inner core;
+// step() drives its opacity + uniform scale from thrust. toEngPlume swaps an already-built sprite-eng (e.g. a hull from
+// HULLMODELS, whose eng is made in another file) for a plume, preserving its position.
+function makeEngPlume(hue){ const c=new T.Color().setHSL(hue,0.85,0.6);
+  const flame=new T.Mesh(new T.ConeGeometry(0.5,1.9,14,1,true), new T.MeshBasicMaterial({color:c,transparent:true,opacity:0.6,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+  flame.rotation.x=Math.PI/2;   // ConeGeometry apex is +Y; rotate so the apex points +Z (aft) - a plume tapering backward off the tail
+  const core=new T.Mesh(new T.ConeGeometry(0.26,1.55,12,1,true), new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.85,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+  flame.add(core); return flame; }
+function toEngPlume(grp,hue){ if(!grp||!grp.userData) return; const old=grp.userData.eng, pos=old?old.position.clone():new T.Vector3(0,0,2);
+  if(old) grp.remove(old); const p=makeEngPlume(hue); p.position.copy(pos); grp.add(p); grp.userData.eng=p; }
 function fighterMesh(hue){
   const S=1.55;
   const v=[ 0,0,-2.6, 0,0.55,0, 0,-0.5,0.2, -2,0,1, 2,0,1, 0,0,1.5, 0,1.05,1.2 ].map(x=>x*S);
@@ -629,8 +663,7 @@ function fighterMesh(hue){
   const grp=new T.Group(); grp.add(body);
   const cock=new T.Mesh(new T.SphereGeometry(0.4,10,10),new T.MeshStandardMaterial({color:0xbfefff,emissive:0x66ccff,emissiveIntensity:0.8,roughness:0.2}));
   cock.position.set(0,0.28,-0.9*S); grp.add(cock);
-  const eng=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:new T.Color().setHSL(hue,0.9,0.62),blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
-  eng.scale.set(1.7,1.7,1); eng.position.set(0,0,2.0*S); grp.add(eng); grp.userData.eng=eng;
+  const eng=makeEngPlume(hue); eng.position.set(0,0,2.0*S+0.7); grp.add(eng); grp.userData.eng=eng;   // tapered plume, not a round glow (user 2026-07-13 "exhaust looks too much like the bolt")
   return grp;
 }
 
@@ -737,6 +770,7 @@ function applyShipModel(s){
   const visKey=(HULLS[s.hullClass]&&HULLS[s.hullClass].visualClass)||s.hullClass;
   if(!isPirate && window.HULLMODELS && typeof HULLMODELS.build==='function'){
     try{ grp=HULLMODELS.build(visKey||'fighter', T, {color:s.color}); }catch(e){ grp=null; }
+    if(grp) toEngPlume(grp, s.hue);   // swap HULLMODELS' round glow-sprite exhaust for a tapered plume (user 2026-07-13: it read too much like the bolt)
   }
   if(!grp){
     const key=shipModelKey(s), base=ASSETS.ships[key]; if(!base) return false;
@@ -747,8 +781,7 @@ function applyShipModel(s){
       grp.scale.setScalar(HT.scale); }
     else{ grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, SHIP_TEX.player, SHIP_TEX.playerNrm, s.role==='trader'?0x9fb0c0:null); });   // traders: a cool grey wash on the same good texture (their own bundled skin was a broken 32x32) - only reachable if HULLMODELS failed to load
       if(visKey && ASSET_CFG.VIS_SCALE[visKey]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[visKey]); }
-    const eng=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:new T.Color().setHSL(s.hue,0.9,0.62),blending:T.AdditiveBlending,transparent:true,depthWrite:false}));
-    eng.scale.set(1.7,1.7,1); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;   // step() dereferences userData.eng UNGUARDED - always present; HULLMODELS.build() already guarantees its own, this is only the FBX-fallback path
+    const eng=makeEngPlume(s.hue); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;   // tapered plume (user 2026-07-13); step() dereferences userData.eng UNGUARDED - always present
   }
   grp.position.copy(s.pos); grp.quaternion.copy(s.quat); grp.visible=s.mesh.visible;
   scene.remove(s.mesh); s.mesh=grp; scene.add(grp); return true; }
@@ -5610,10 +5643,10 @@ document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].nam
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
-const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false };
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false };   // mouse* = forward-view mouse-flight inputs, combined with the keyboard in manualControl (user 2026-07-13)
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
-  s.ctrl={ thr:clamp(MAN.thr,0,1), pitch:clamp(MAN.pitch,-1,1), yaw:clamp(MAN.yaw,-1,1) };
+  s.ctrl={ thr:clamp((MAN.thr||(MAN.mouseThr?1:0)),0,1), pitch:clamp(MAN.pitch+(MAN.mousePitch||0),-1,1), yaw:clamp(MAN.yaw+(MAN.mouseYaw||0),-1,1) };   // keyboard + forward-view mouse-flight combined (user 2026-07-13: right-mouse thrust, mouse-steer)
   // SR X-WING CAPACITORS (user 2026-07-08: "when I hold shift I don't want my recharge rates to change it would just
   // go through my engine capacitor"): nitro now drains its OWN dedicated engine capacitor directly - it no longer
   // reroutes the shared weapons/engines/shields power pool at all (that used to force weapons+shields DOWN to feed
@@ -5659,13 +5692,28 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
     else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),aim,s.id,spec); }
   s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false, autoAim:s.autoAimId||null }; }
 const keysDown=new Set();
-function applyKeys(){ MAN.thr=keysDown.has('KeyW')?1:0;
-  MAN.yaw=(keysDown.has('KeyD')||keysDown.has('ArrowRight')?1:0)-(keysDown.has('KeyA')||keysDown.has('ArrowLeft')?1:0);
-  MAN.pitch=(keysDown.has('ArrowDown')||keysDown.has('KeyS')?1:0)-(keysDown.has('ArrowUp')?1:0);
-  MAN.fire=keysDown.has('Space');
-  MAN.nitro=keysDown.has('ShiftLeft')||keysDown.has('ShiftRight');
-  if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire||MAN.nitro) manOn(); }
-addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElement.id==='chat') return;
+// CONFIGURABLE CONTROLS (user 2026-07-13 "make all the keys optional ... options panel"): rebindable FLIGHT keys + mouse
+// options, persisted to localStorage. Defaults: thrust=Space (also right-mouse), WASD flies (W=nose DOWN, S=up, A/D=yaw),
+// left-mouse fires, Shift boosts. The ARROW keys + right-Shift always work as an un-rebindable fallback, so a bad rebind
+// can never lock you out of flying.
+const KB_DEFAULT={ thrust:'Space', pitchDown:'KeyW', pitchUp:'KeyS', yawLeft:'KeyA', yawRight:'KeyD', nitro:'ShiftLeft', fire:'KeyF' };
+const OPT_DEFAULT={ mouseSteer:true, invertY:false, rightMouseThrust:true, mouseSens:0.9 };
+let KEYBIND=Object.assign({},KB_DEFAULT), OPT=Object.assign({},OPT_DEFAULT);
+const KB_ACTIONS=[['thrust','Thrust'],['pitchDown','Pitch down'],['pitchUp','Pitch up'],['yawLeft','Yaw left'],['yawRight','Yaw right'],['nitro','Boost'],['fire','Fire (key)']];
+function loadControls(){ try{ const j=JSON.parse(localStorage.getItem('SF_CONTROLS_v1')||'null'); if(j){ if(j.keybind) KEYBIND=Object.assign({},KB_DEFAULT,j.keybind); if(j.opt) OPT=Object.assign({},OPT_DEFAULT,j.opt); } }catch(e){} }
+function saveControls(){ try{ localStorage.setItem('SF_CONTROLS_v1', JSON.stringify({keybind:KEYBIND,opt:OPT})); }catch(e){} }
+loadControls();
+function flightBound(code){ for(const a in KEYBIND) if(KEYBIND[a]===code) return true; return ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftRight'].includes(code); }
+function applyKeys(){ const k=c=>keysDown.has(c);
+  MAN.thr = k(KEYBIND.thrust)?1:0;
+  MAN.yaw = ((k(KEYBIND.yawRight)||k('ArrowRight'))?1:0) - ((k(KEYBIND.yawLeft)||k('ArrowLeft'))?1:0);
+  MAN.pitch = ((k(KEYBIND.pitchDown)||k('ArrowDown'))?1:0) - ((k(KEYBIND.pitchUp)||k('ArrowUp'))?1:0);   // pitchDown key + ArrowDown = nose down (user 2026-07-13 "w turn down"); pitchUp + ArrowUp = up
+  MAN.keyFire = k(KEYBIND.fire);
+  MAN.fire = MAN.keyFire || MAN.mouseFire;   // fire = the fire KEY, or LEFT-mouse in the forward view
+  MAN.nitro = k(KEYBIND.nitro)||k('ShiftRight');
+  if(MAN.thr||MAN.yaw||MAN.pitch||MAN.fire||MAN.nitro||MAN.mouseThr) manOn(); }
+addEventListener('keydown',e=>{ if(window._rebindCapture){ window._rebindCapture(e); return; }   // options-panel key rebind grabs the next keypress
+  if(document.activeElement&&document.activeElement.id==='chat') return;
   if(AWAY.active()){ if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyF','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault(); AWAY.key(e,true); return; }
   if(e.key==='Enter'){ e.preventDefault(); const c=document.getElementById('chat'); if(c) c.focus(); return; }   // user 2026-07-07: "hitting enter will focus the typing terminal" - from anywhere in flight, not just while already typing
   if(e.code==='Tab'){ e.preventDefault(); focus=(focus+1)%CFG.NSHIPS; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[focus].name; return; }
@@ -5677,7 +5725,7 @@ addEventListener('keydown',e=>{ if(document.activeElement&&document.activeElemen
   // ROOT CAUSE of user 2026-07-07 "holding shift does not boost speed": ShiftLeft/ShiftRight were missing from
   // this whitelist, so keysDown never actually recorded Shift during real flight - MAN.nitro could never turn
   // true no matter what the nitro physics in flyStep/manualControl did with it. Added here.
-  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight'].includes(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });
+  if(flightBound(e.code)){ e.preventDefault(); keysDown.add(e.code); applyKeys(); } });   // capture whatever the flight keys are bound to (rebindable) + the always-on arrow / right-shift fallbacks
 addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if(keysDown.delete(e.code)) applyKeys(); });
 // on-screen touch flight controls (multi-touch: steer + thrust + fire at once)
 (function(){ const stick=document.getElementById('stick'), knob=document.getElementById('knob'), thb=document.getElementById('btnThr'), fb=document.getElementById('btnFire'); if(!stick) return; const R=46; let sid=null;
@@ -5695,8 +5743,29 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
 (function(){ const gb=document.getElementById('gearBtn'), gm=document.getElementById('gearMenu'), rl=document.getElementById('resetLayoutBtn');
   if(!gb||!gm||!rl) return;
   gb.onclick=(e)=>{ e.stopPropagation(); gm.classList.toggle('open'); };
-  document.addEventListener('click',(e)=>{ if(gm.classList.contains('open') && !gm.contains(e.target) && e.target!==gb) gm.classList.remove('open'); });
-  rl.onclick=()=>{ if(window.confirm('Reset all panel layouts to default? This reloads the page - your game save is not affected.')){ if(window.PANELS&&PANELS.resetLayout) PANELS.resetLayout(); } }; })();
+  document.addEventListener('click',(e)=>{ if(gm.classList.contains('open') && !gm.contains(e.target) && e.target!==gb && !window._rebindCapture) gm.classList.remove('open'); });
+  rl.onclick=()=>{ if(window.confirm('Reset all panel layouts to default? This reloads the page - your game save is not affected.')){ if(window.PANELS&&PANELS.resetLayout) PANELS.resetLayout(); } };
+  // OPTIONS PANEL (user 2026-07-13 "make all the keys optional and put general options in there"): general toggles +
+  // rebindable flight keys, persisted via saveControls(). Rebind = arm window._rebindCapture, which the keydown handler
+  // routes the next keypress to. Esc cancels a rebind.
+  const keyLabel=c=>({Space:'Space',ShiftLeft:'L-Shift',ShiftRight:'R-Shift'}[c]) || (c?String(c).replace(/^Key/,'').replace(/^Arrow/,'↑↓ '):'-');
+  const cbSteer=document.getElementById('optMouseSteer'), cbRM=document.getElementById('optRMThrust'), cbInv=document.getElementById('optInvertY'), sens=document.getElementById('optSens'), rows=document.getElementById('kbRows'), rc=document.getElementById('resetControlsBtn');
+  function syncOpt(){ if(cbSteer)cbSteer.checked=OPT.mouseSteer; if(cbRM)cbRM.checked=OPT.rightMouseThrust; if(cbInv)cbInv.checked=OPT.invertY; if(sens)sens.value=OPT.mouseSens; }
+  function buildRows(){ if(!rows) return; rows.innerHTML='';
+    for(const [act,lbl] of KB_ACTIONS){ const row=document.createElement('div'); row.className='kb-row';
+      const s=document.createElement('span'); s.textContent=lbl; const b=document.createElement('button'); b.type='button'; b.className='kb-key'; b.textContent=keyLabel(KEYBIND[act]);
+      b.onclick=(e)=>{ e.stopPropagation();
+        rows.querySelectorAll('.kb-key.awaiting').forEach(x=>{ x.classList.remove('awaiting'); }); buildRows();   // clear any other in-progress rebind
+        const btn=[...rows.querySelectorAll('.kb-key')][KB_ACTIONS.findIndex(a=>a[0]===act)]; if(!btn) return; btn.classList.add('awaiting'); btn.textContent='press key…';
+        window._rebindCapture=(ev)=>{ ev.preventDefault(); ev.stopPropagation(); window._rebindCapture=null;
+          if(ev.code && ev.code!=='Escape'){ KEYBIND[act]=ev.code; saveControls(); } buildRows(); }; };
+      row.appendChild(s); row.appendChild(b); rows.appendChild(row); } }
+  if(cbSteer)cbSteer.onchange=()=>{ OPT.mouseSteer=cbSteer.checked; if(!OPT.mouseSteer){ MAN.mouseYaw=0; MAN.mousePitch=0; } saveControls(); };
+  if(cbRM)cbRM.onchange=()=>{ OPT.rightMouseThrust=cbRM.checked; if(!OPT.rightMouseThrust) MAN.mouseThr=false; saveControls(); };
+  if(cbInv)cbInv.onchange=()=>{ OPT.invertY=cbInv.checked; saveControls(); };
+  if(sens)sens.oninput=()=>{ OPT.mouseSens=parseFloat(sens.value)||0.9; saveControls(); };
+  if(rc)rc.onclick=(e)=>{ e.stopPropagation(); KEYBIND=Object.assign({},KB_DEFAULT); OPT=Object.assign({},OPT_DEFAULT); saveControls(); syncOpt(); buildRows(); };
+  syncOpt(); buildRows(); })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
@@ -5732,7 +5801,23 @@ let drag=null;
 canvas.addEventListener('wheel',e=>{ const vp=viewAt(e.clientX,e.clientY);
   if(vp==='top'){ e.preventDefault(); topZoom=clamp(topZoom*(e.deltaY>0?1.12:0.89),0.22,7); }
   else if(vp==='brain'){ e.preventDefault(); brainZoom=clamp(brainZoom*(e.deltaY>0?1.12:0.89),0.4,4.5); sizeBrainCam(); } },{passive:false});
-canvas.addEventListener('mousedown',e=>{ const vp=viewAt(e.clientX,e.clientY); if(vp==='top'||vp==='brain') drag={vp,x0:e.clientX,y0:e.clientY,mx:e.clientX,my:e.clientY,moved:0}; });
+canvas.addEventListener('mousedown',e=>{ const vp=viewAt(e.clientX,e.clientY);
+  if(vp==='top'||vp==='brain'){ drag={vp,x0:e.clientX,y0:e.clientY,mx:e.clientX,my:e.clientY,moved:0}; return; }
+  if(vp==='main'){   // FORWARD-VIEW MOUSE (user 2026-07-13): left = fire forward, right = thrust
+    if(e.button===0){ MAN.mouseFire=true; applyKeys(); manOn(); }
+    else if(e.button===2 && OPT.rightMouseThrust){ e.preventDefault(); MAN.mouseThr=true; manOn(); } } });
+canvas.addEventListener('contextmenu',e=>{ if(viewAt(e.clientX,e.clientY)==='main' && OPT.rightMouseThrust) e.preventDefault(); });   // no context menu while right-mouse is the thrust control
+window.addEventListener('mouseup',e=>{ if(e.button===0 && MAN.mouseFire){ MAN.mouseFire=false; applyKeys(); } if(e.button===2 && MAN.mouseThr){ MAN.mouseThr=false; } });
+// MOUSE STEERING: cursor offset from the forward-view CENTRE = a virtual-joystick rate (Starblast-style); gated to when
+// the cursor is directly over the game canvas (e.target===canvas) so hovering a HUD panel or an open menu never steers.
+window.addEventListener('mousemove',e=>{
+  if(!OPT.mouseSteer || e.target!==canvas || viewAt(e.clientX,e.clientY)!=='main'){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
+  const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
+  const cx=v.x+v.w/2, cyC=Hh-v.y-v.h/2, dz=0.05;
+  const nx=clamp((e.clientX-cx)/(v.w/2),-1,1), ny=clamp((e.clientY-cyC)/(v.h/2),-1,1);
+  MAN.mouseYaw = Math.abs(nx)<dz?0:clamp(nx*OPT.mouseSens,-1,1);
+  MAN.mousePitch = Math.abs(ny)<dz?0:clamp(ny*OPT.mouseSens*(OPT.invertY?-1:1),-1,1);   // cursor below centre = nose down; invert-Y flips it
+  if(MAN.mouseYaw||MAN.mousePitch) manOn(); });
 window.addEventListener('mousemove',e=>{ if(!drag) return; const dx=e.clientX-drag.mx, dy=e.clientY-drag.my; drag.mx=e.clientX; drag.my=e.clientY; drag.moved+=Math.abs(dx)+Math.abs(dy);
   if(drag.vp==='top'){ topCenter=topCenter||(ships[focus]?ships[focus].pos.clone():new T.Vector3()); const wpp=(topCam.right-topCam.left)/VIEW.top.w; topCenter.x-=dx*wpp; topCenter.z-=dy*wpp; }
   else if(drag.vp==='brain'){ const wpp=(brainCam.right-brainCam.left)/VIEW.brain.w; brainCenter.x-=dx*wpp; brainCenter.y+=dy*wpp; sizeBrainCam(); } });
