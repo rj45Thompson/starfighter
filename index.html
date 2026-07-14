@@ -23,6 +23,14 @@
     background:#0c1623cc; border:1px solid #29405a; border-radius:7px; color:#8fb0cc; font-size:15px;
     display:flex; align-items:center; justify-content:center; }
   #gearBtn:hover{ border-color:var(--cyan); color:var(--cyan); }
+  /* THROTTLE LEVER (user 2026-07-13 "big slider on the right ... set it, don't hold it"): a tall vertical throttle on the right edge */
+  #throttle{ position:fixed; right:16px; top:50%; transform:translateY(-50%); z-index:19; width:56px; pointer-events:auto;
+    display:flex; flex-direction:column; align-items:center; gap:7px; user-select:none; -webkit-user-select:none; }
+  #throttleTag{ font:700 8.5px/1 ui-monospace,monospace; letter-spacing:.16em; color:#8fb0cc; }
+  #throttleTrack{ position:relative; width:30px; height:260px; background:#0c1623dd; border:1px solid #29405a; border-radius:15px; cursor:pointer; box-shadow:0 4px 18px #0008; }
+  #throttleFill{ position:absolute; left:2px; right:2px; bottom:2px; height:0%; border-radius:13px; background:linear-gradient(to top,#1e6fff,#9fe0ff); opacity:.9; pointer-events:none; }
+  #throttleKnob{ position:absolute; left:-4px; right:-4px; height:16px; bottom:0; margin-bottom:-8px; background:#e6f2ff; border:1px solid #4a6f92; border-radius:7px; box-shadow:0 1px 5px #000b; pointer-events:none; }
+  #throttleLabel{ font:800 13px/1 ui-monospace,monospace; color:#9fe0ff; min-width:34px; text-align:center; }
   #gearMenu{ position:fixed; right:14px; top:80px; z-index:20; display:none; pointer-events:auto;
     background:#0c1623ee; border:1px solid #29405a; border-radius:8px; padding:8px; min-width:170px;
     font:11px ui-monospace,monospace; color:#cfe2f5; box-shadow:0 6px 26px #000a; }
@@ -159,6 +167,10 @@
   <div id="missionArrowLabel" style="font:600 10px/1.2 ui-monospace,monospace;color:#ffd27a;text-shadow:0 1px 3px #000;margin-top:1px;white-space:nowrap"></div>
 </div>
 <div class="hud" id="creditsHud">0c</div>
+<div id="throttle" title="THROTTLE - drag to set a cruise level, then release (the ship holds it); Space / right-mouse still boost">
+  <div id="throttleTag">THR</div>
+  <div id="throttleTrack"><div id="throttleFill"></div><div id="throttleKnob"></div></div>
+  <div id="throttleLabel">0%</div></div>
 <button id="gearBtn" type="button" title="options">⚙</button>
 <div id="gearMenu"><div class="gm-hdr">OPTIONS</div>
   <div class="gm-sec">GENERAL</div>
@@ -200,52 +212,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260713s"></script>
-<script src="fflate.min.js?v=20260713s"></script>
-<script src="fbxloader.js?v=20260713s"></script>
+<script src="three.min.js?v=20260713t"></script>
+<script src="fflate.min.js?v=20260713t"></script>
+<script src="fbxloader.js?v=20260713t"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260713s"></script>
-<script src="inhabitant.js?v=20260713s"></script>
-<script src="passenger.js?v=20260713s"></script>
-<script src="gamemod.js?v=20260713s"></script>
-<script src="chatter.js?v=20260713s"></script>
-<script src="speech_gen.js?v=20260713s"></script>
-<script src="speech_input.js?v=20260713s"></script>
-<script src="vision.js?v=20260713s"></script>
-<script src="deliberate.js?v=20260713s"></script>
-<script src="knowledge.js?v=20260713s"></script>
-<script src="acquire.js?v=20260713s"></script>
-<script src="sound.js?v=20260713s"></script>
-<script src="hullmodels.js?v=20260713s"></script>
-<script src="knowledge_hud.js?v=20260713s"></script>
-<script src="knowledge_screen.js?v=20260713s"></script>
-<script src="centroid_mind.js?v=20260713s"></script>
-<script src="kripke_mind.js?v=20260713s"></script>
-<script src="sober_gate.js?v=20260713s"></script>
-<script src="contradiction_ledger.js?v=20260713s"></script>
-<script src="kripke_planner.js?v=20260713s"></script>
-<script src="pillar_router.js?v=20260713s"></script>
-<script src="gravity_well.js?v=20260713s"></script>
-<script src="growth_loop.js?v=20260713s"></script>
-<script src="coop_proof.js?v=20260713s"></script>
-<script src="item_variance.js?v=20260713s"></script>
-<script src="tom_test.js?v=20260713s"></script>
-<script src="thoughts.js?v=20260713s"></script>
-<script src="tami_battle_ui.js?v=20260713s"></script>
-<script src="power_panel.js?v=20260713s"></script>
-<script src="panels.js?v=20260713s"></script>
-<script src="item_icons.js?v=20260713s"></script>
-<script src="engbay.js?v=20260713s"></script>
+<script src="speech_tier.js?v=20260713t"></script>
+<script src="inhabitant.js?v=20260713t"></script>
+<script src="passenger.js?v=20260713t"></script>
+<script src="gamemod.js?v=20260713t"></script>
+<script src="chatter.js?v=20260713t"></script>
+<script src="speech_gen.js?v=20260713t"></script>
+<script src="speech_input.js?v=20260713t"></script>
+<script src="vision.js?v=20260713t"></script>
+<script src="deliberate.js?v=20260713t"></script>
+<script src="knowledge.js?v=20260713t"></script>
+<script src="acquire.js?v=20260713t"></script>
+<script src="sound.js?v=20260713t"></script>
+<script src="hullmodels.js?v=20260713t"></script>
+<script src="knowledge_hud.js?v=20260713t"></script>
+<script src="knowledge_screen.js?v=20260713t"></script>
+<script src="centroid_mind.js?v=20260713t"></script>
+<script src="kripke_mind.js?v=20260713t"></script>
+<script src="sober_gate.js?v=20260713t"></script>
+<script src="contradiction_ledger.js?v=20260713t"></script>
+<script src="kripke_planner.js?v=20260713t"></script>
+<script src="pillar_router.js?v=20260713t"></script>
+<script src="gravity_well.js?v=20260713t"></script>
+<script src="growth_loop.js?v=20260713t"></script>
+<script src="coop_proof.js?v=20260713t"></script>
+<script src="item_variance.js?v=20260713t"></script>
+<script src="tom_test.js?v=20260713t"></script>
+<script src="thoughts.js?v=20260713t"></script>
+<script src="tami_battle_ui.js?v=20260713t"></script>
+<script src="power_panel.js?v=20260713t"></script>
+<script src="panels.js?v=20260713t"></script>
+<script src="item_icons.js?v=20260713t"></script>
+<script src="engbay.js?v=20260713t"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260713s"></script>
-<script src="conquest.js?v=20260713s"></script>
-<script src="missions.js?v=20260713s"></script>
-<script src="planetmenu.js?v=20260713s"></script>
-<script src="textquests.js?v=20260713s"></script>
+<script src="starmap.js?v=20260713t"></script>
+<script src="conquest.js?v=20260713t"></script>
+<script src="missions.js?v=20260713t"></script>
+<script src="planetmenu.js?v=20260713t"></script>
+<script src="textquests.js?v=20260713t"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -5651,10 +5663,10 @@ document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].nam
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
-const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false };   // mouse* = forward-view mouse-flight inputs, combined with the keyboard in manualControl (user 2026-07-13)
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false, throttle:0 };   // throttle = the persistent THROTTLE LEVER (user 2026-07-13 "set it, don't hold it"); mouse* = forward-view mouse-flight inputs; all combined in manualControl
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
-  s.ctrl={ thr:clamp((MAN.thr||(MAN.mouseThr?1:0)),0,1), pitch:clamp(MAN.pitch+(MAN.mousePitch||0),-1,1), yaw:clamp(MAN.yaw+(MAN.mouseYaw||0),-1,1) };   // keyboard + forward-view mouse-flight combined (user 2026-07-13: right-mouse thrust, mouse-steer)
+  s.ctrl={ thr:clamp(Math.max(MAN.throttle||0, MAN.thr, MAN.mouseThr?1:0),0,1), pitch:clamp(MAN.pitch+(MAN.mousePitch||0),-1,1), yaw:clamp(MAN.yaw+(MAN.mouseYaw||0),-1,1) };   // thrust = the persistent THROTTLE lever, overridden UP by a held Space / right-mouse boost (user 2026-07-13 "set it, don't hold it")
   // SR X-WING CAPACITORS (user 2026-07-08: "when I hold shift I don't want my recharge rates to change it would just
   // go through my engine capacitor"): nitro now drains its OWN dedicated engine capacitor directly - it no longer
   // reroutes the shared weapons/engines/shields power pool at all (that used to force weapons+shields DOWN to feed
@@ -5774,6 +5786,20 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
   if(sens)sens.oninput=()=>{ OPT.mouseSens=parseFloat(sens.value)||0.9; saveControls(); };
   if(rc)rc.onclick=(e)=>{ e.stopPropagation(); KEYBIND=Object.assign({},KB_DEFAULT); OPT=Object.assign({},OPT_DEFAULT); saveControls(); syncOpt(); buildRows(); };
   syncOpt(); buildRows(); })();
+// THROTTLE LEVER (user 2026-07-13 "make the thrust a big slider on the right ... set it, don't hold it"): drag the track
+// to set MAN.throttle (0..1); the ship holds that cruise level continuously (manualControl reads it as the base thrust).
+// Space / right-mouse still momentarily BOOST above it. Setting it activates manual control.
+(function(){ const track=document.getElementById('throttleTrack'), fill=document.getElementById('throttleFill'), knob=document.getElementById('throttleKnob'), lbl=document.getElementById('throttleLabel'); if(!track) return;
+  function render(){ const f=Math.max(0,Math.min(1,MAN.throttle||0)); fill.style.height=(f*100)+'%'; knob.style.bottom=(f*100)+'%'; lbl.textContent=Math.round(f*100)+'%'; }
+  function setY(clientY){ const r=track.getBoundingClientRect(); const f=1-(clientY-r.top)/r.height; MAN.throttle=Math.max(0,Math.min(1,f)); render(); if(typeof manOn==='function') manOn(); }
+  let drag=false;
+  track.addEventListener('mousedown',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.clientY); });
+  window.addEventListener('mousemove',e=>{ if(drag) setY(e.clientY); });
+  window.addEventListener('mouseup',()=>{ drag=false; });
+  track.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.touches[0].clientY); },{passive:false});
+  track.addEventListener('touchmove',e=>{ if(drag){ e.preventDefault(); setY(e.touches[0].clientY); } },{passive:false});
+  window.addEventListener('touchend',()=>{ drag=false; });
+  render(); })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
