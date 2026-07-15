@@ -19,6 +19,18 @@
 // user's "time doesn't matter"). 0-FABRICATION: every answer is a real edge/path; a chain is VALID only if every
 // leaf grounds in the graph, so the engine reasons over THIS world, not a memorized one (shuffle the graph and the
 // same chain goes invalid - the bench proves it). window.DELIBERATE + node module.exports.
+//
+// CANONICAL LINEAGE (consolidation 2026-07-12): this engine is the canonical JS PORT of the far more mature
+// Warship4JuneHyperdineCrystals SelfDirectedReasoner contract (TDRE/src/tdre/agi_loop.py). Structure borrowed:
+//   - TYPED TERMINAL VERDICTS (agi_loop's cardinal rule): a decision NEVER ends in a silent/untyped state -
+//     COMMITTED, or a NAMED abstention saying exactly which capability was missing, or BUDGET_EXHAUSTED (the
+//     budget ran out while still ambiguous - previously that was misreported as a generic gap, hiding "I didn't
+//     look far enough" behind "the route doesn't exist"), or UNKNOWN.
+//   - VERIFIER-FIRST COMMIT: recommend only on full 4/4 convergence (was true; now stated as the law).
+//   - PROVENANCE on acquired knowledge (agi_loop DenoiseChannel.provenance): every edge seek() reveals is tagged
+//     with the world it came from; an edge with no attested provenance earns no corroboration credit.
+//   - FREE vs PAID accounting (agi_loop StepMetrics.free_resolutions): a seek round that converges without
+//     revealing anything was FREE (existing knowledge sufficed); reveals are the PAID experiments.
 'use strict';
 (function(){
 const CFG = {
@@ -29,6 +41,19 @@ const CFG = {
   BEAM: 8,            // branches expanded per frontier layer (priority by importance)
   MAX_DEPTH: 12,      // recursion depth cap for sub-decisions (deep chains, bounded)
 };
+// ---- typed terminal verdicts (canonical set, mirrored from agi_loop.py) --------------------------------------
+// The cardinal rule: an unresolved decision is NEVER a wrong commit - it is an explicit, TYPED abstention.
+const VERDICTS = {
+  COMMITTED:             'COMMITTED',               // 4/4 convergence + a concrete first action
+  ABSTAINED_NO_ROUTE:    'ABSTAINED_NO_ROUTE',      // HOW dissents: goal unreachable through explored ground
+  ABSTAINED_UNJUSTIFIED: 'ABSTAINED_UNJUSTIFIED',   // WHY dissents: no serves-chain roots the goal in a value
+  ABSTAINED_NO_OPTIONS:  'ABSTAINED_NO_OPTIONS',    // WHAT dissents: no action-edges out of the state
+  ABSTAINED_ORDER:       'ABSTAINED_ORDER',         // WHEN dissents: waypoint dependencies inconsistent
+  BUDGET_EXHAUSTED:      'BUDGET_EXHAUSTED',        // budget hit while still ambiguous (NOT a claim about the world)
+  UNKNOWN:               'UNKNOWN',                 // no verdict basis at all
+};
+const GAP_TO_VERDICT = { reach:VERDICTS.ABSTAINED_NO_ROUTE, justify:VERDICTS.ABSTAINED_UNJUSTIFIED,
+  options:VERDICTS.ABSTAINED_NO_OPTIONS, order:VERDICTS.ABSTAINED_ORDER };
 // relation roles (a domain maps its own relations onto these four - the ONLY thing a domain must declare):
 const DEFAULT_ROLES = { action:['action','moves','goes','leads'], serves:['serves','enables','for','because'],
   requires:['requires','before','needs','after'] };
@@ -107,7 +132,7 @@ function deliberate(graph, decision, opts){
   const dist=bfsDist(idx, state), cent=betweenness(idx, state, goal);
   const explored=new Set(); const exploredEdges=[];
   let rng = (function(s){ let a=(s>>>0)||1; return ()=>{ a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296; }; })((opts.seed||7));
-  const steps=[]; let nodesUsed=0;
+  const steps=[]; let nodesUsed=0; let budgetHit=false;
   // importance of expanding option-node `n`: geometric goal-pull + centrality + novelty. In the UNIFORM ablation
   // this signal is discarded (random order) - the control that proves the GEOMETRY, not the search, does the work.
   function importance(n){
@@ -118,7 +143,7 @@ function deliberate(graph, decision, opts){
   // recursive sub-decision expansion (the LARGE chain): at each state, answer all four axes, then recurse into the
   // highest-importance options toward the goal.
   function expand(cur, depth){
-    if(nodesUsed++ > cfg.MAX_NODES || depth > cfg.MAX_DEPTH) return;
+    if(nodesUsed++ > cfg.MAX_NODES || depth > cfg.MAX_DEPTH){ budgetHit=true; return; }
     explored.add(cur);
     const what=axisWHAT(idx, cur);
     const how=axisHOW(idx, cur, goal);
@@ -161,12 +186,19 @@ function deliberate(graph, decision, opts){
   const dissent=Object.keys(conv).filter(k=>!conv[k]);
   const agreement=4-dissent.length;
   const gapType = dissent.includes('HOW')?'reach' : dissent.includes('WHY')?'justify' : dissent.includes('WHAT')?'options' : dissent.includes('WHEN')?'order' : null;
+  // TYPED VERDICT (verifier-first commit): COMMITTED only on 4/4 + a concrete action. A HOW-dissent while the
+  // exploration budget was exhausted is BUDGET_EXHAUSTED, not ABSTAINED_NO_ROUTE - "I didn't look far enough"
+  // must never masquerade as "the route doesn't exist" (that distinction is what tells seek() to keep going).
+  const verdict = (agreement===4 && firstAction) ? VERDICTS.COMMITTED
+                : (gapType==='reach' && budgetHit) ? VERDICTS.BUDGET_EXHAUSTED
+                : (GAP_TO_VERDICT[gapType] || VERDICTS.UNKNOWN);
   const chain={ decision, order, steps:flat, nodes_explored:explored.size, tree_nodes:steps.length,
+    nodes_budget:cfg.MAX_NODES, budget_exhausted:budgetHit, verdict,
     recommended: firstAction? {action:firstAction.o, via:firstAction.r, first_edge:firstAction} : null,
     reached_goal_in_tree: !!treePath, justified: conv.WHY,
     convergence:{ axes:conv, agreement, converged:agreement===4, dissent, gap:gapType },
-    conclusion: (agreement===4 && firstAction)? {take:firstAction.o, via:firstAction.r, because:'all four axes meet - reachable, justified, ordered, and an available option'}
-              : { abstain:true, gap:gapType, need: gapDescription(gapType, decision) } };
+    conclusion: (agreement===4 && firstAction)? {verdict, take:firstAction.o, via:firstAction.r, because:'all four axes meet - reachable, justified, ordered, and an available option'}
+              : { verdict, abstain:true, gap:gapType, need: gapDescription(gapType, decision) } };
   chain.grounded = verifyChain(graph, chain);
   return chain;
 }
@@ -215,10 +247,14 @@ function seek(known, decision, world, opts){
   const known_edge=e=>K.edges.some(x=>x.s===e.s&&x.r===e.r&&x.o===e.o);
   const worldRng=(function(s){let a=(s>>>0)||1;return ()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})(opts.seed||3);
   const trace=[]; let revealed=0;
+  const worldName=opts.worldName||'world';           // provenance tag for every revealed edge
   for(let r=0; r<=rounds; r++){
     const chain=deliberate(K, decision, {order:'geometry', cfg, seed:opts.seed});
-    trace.push({ round:r, agreement:chain.convergence.agreement, gap:chain.convergence.gap, revealed_so_far:revealed });
-    if(chain.convergence.converged){ return { converged:true, chain, revealed, rounds:r, trace, verified_zero_fab:true }; }
+    // FREE vs PAID (agi_loop StepMetrics): converging with 0 reveals this round = free resolution
+    trace.push({ round:r, action: revealed>0?'seek':'deliberate', agreement:chain.convergence.agreement,
+      verdict:chain.verdict, gap:chain.convergence.gap, revealed_so_far:revealed });
+    if(chain.convergence.converged){ return { converged:true, chain, verdict:chain.verdict, revealed,
+      free_resolution:revealed===0, rounds:r, trace, verified_zero_fab:true }; }
     // NOT converged → SEEK the specific gap. Reveal targeted world-edges the gap needs.
     const gap=chain.convergence.gap; let toReveal=[];
     const wIdx=buildIndex(world, opts.roles);
@@ -240,15 +276,19 @@ function seek(known, decision, world, opts){
     }
     toReveal=toReveal.slice(0, perRound);
     if(!toReveal.length) continue;                            // nothing left to pull for this gap this round
-    for(const e of toReveal){ if(!known_edge(e) && world.edges.some(x=>x.s===e.s&&x.r===e.r&&x.o===e.o)){ K.edges.push(e); revealed++; } }  // 0-fab: only edges that EXIST in the world
+    for(const e of toReveal){ if(!known_edge(e) && world.edges.some(x=>x.s===e.s&&x.r===e.r&&x.o===e.o)){
+      // 0-fab: only edges that EXIST in the world, each stamped with attested provenance (agi_loop's
+      // DenoiseChannel.provenance): un-attested knowledge earns no corroboration credit downstream.
+      K.edges.push(Object.assign({}, e, {prov:worldName})); revealed++; } }
   }
   const final=deliberate(K, decision, {order:'geometry', cfg, seed:opts.seed});
-  return { converged:final.convergence.converged, chain:final, revealed, rounds:rounds+1, trace,
+  return { converged:final.convergence.converged, chain:final, verdict:final.verdict, revealed,
+    free_resolution:false, rounds:rounds+1, trace,
     verified_zero_fab: K.edges.every(e=>world.edges.some(x=>x.s===e.s&&x.r===e.r&&x.o===e.o)),
     abstained: !final.convergence.converged };
 }
 
-const api={ CFG, deliberate, transcript, buildIndex, shortestPath, betweenness, verifyChain, gapDescription, seek };
+const api={ CFG, VERDICTS, deliberate, transcript, buildIndex, shortestPath, betweenness, verifyChain, gapDescription, seek };
 if(typeof window!=='undefined') window.DELIBERATE=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;
 })();
