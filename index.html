@@ -31,7 +31,7 @@
   #throttleFill{ position:absolute; left:2px; right:2px; bottom:2px; height:0%; border-radius:13px; background:linear-gradient(to top,#1e6fff,#9fe0ff); opacity:.9; pointer-events:none; }
   #throttleKnob{ position:absolute; left:-4px; right:-4px; height:16px; bottom:0; margin-bottom:-8px; background:#e6f2ff; border:1px solid #4a6f92; border-radius:7px; box-shadow:0 1px 5px #000b; pointer-events:none; }
   #throttleLabel{ font:800 13px/1 ui-monospace,monospace; color:#9fe0ff; min-width:34px; text-align:center; }
-  #fwdReticle{ position:fixed; left:0; top:0; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:16; pointer-events:none; display:none; }   /* FORWARD-GUN reticle (user 2026-07-13): follows the cursor, positioned by JS */
+  #fwdReticle{ position:fixed; left:0; top:0; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:16; pointer-events:none; display:none; }   /* FORWARD-GUN BORESIGHT crosshair: parked at the view centre by updateTargetingReticle when no lead box is up (centre is warp-invariant, so straight fire lands there) */
   #gearMenu{ position:fixed; right:14px; top:80px; z-index:20; display:none; pointer-events:auto;
     background:#0c1623ee; border:1px solid #29405a; border-radius:8px; padding:8px; min-width:170px;
     font:11px ui-monospace,monospace; color:#cfe2f5; box-shadow:0 6px 26px #000a; }
@@ -215,52 +215,52 @@
 <style>@keyframes burstPulse{from{opacity:.82;transform:translateX(-50%) scale(1)}to{opacity:1;transform:translateX(-50%) scale(1.06)}}</style>
 <div id="boot">loading squadron…</div>
 
-<script src="three.min.js?v=20260714b"></script>
-<script src="fflate.min.js?v=20260714b"></script>
-<script src="fbxloader.js?v=20260714b"></script>
+<script src="three.min.js?v=20260714c"></script>
+<script src="fflate.min.js?v=20260714c"></script>
+<script src="fbxloader.js?v=20260714c"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
      sibling files served from relative paths (deploy copies these alongside index.html). Load BEFORE the main script
      so their globals (CSOFF/SPEAK_CFG/TAMI_SPEAK/loreSpeak · INH_CFG/SENSE_WHITELIST/INH) exist by the time the main
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
-<script src="speech_tier.js?v=20260714b"></script>
-<script src="inhabitant.js?v=20260714b"></script>
-<script src="passenger.js?v=20260714b"></script>
-<script src="gamemod.js?v=20260714b"></script>
-<script src="chatter.js?v=20260714b"></script>
-<script src="speech_gen.js?v=20260714b"></script>
-<script src="speech_input.js?v=20260714b"></script>
-<script src="vision.js?v=20260714b"></script>
-<script src="deliberate.js?v=20260714b"></script>
-<script src="knowledge.js?v=20260714b"></script>
-<script src="acquire.js?v=20260714b"></script>
-<script src="sound.js?v=20260714b"></script>
-<script src="hullmodels.js?v=20260714b"></script>
-<script src="knowledge_hud.js?v=20260714b"></script>
-<script src="knowledge_screen.js?v=20260714b"></script>
-<script src="centroid_mind.js?v=20260714b"></script>
-<script src="kripke_mind.js?v=20260714b"></script>
-<script src="sober_gate.js?v=20260714b"></script>
-<script src="contradiction_ledger.js?v=20260714b"></script>
-<script src="kripke_planner.js?v=20260714b"></script>
-<script src="pillar_router.js?v=20260714b"></script>
-<script src="gravity_well.js?v=20260714b"></script>
-<script src="growth_loop.js?v=20260714b"></script>
-<script src="coop_proof.js?v=20260714b"></script>
-<script src="item_variance.js?v=20260714b"></script>
-<script src="tom_test.js?v=20260714b"></script>
-<script src="thoughts.js?v=20260714b"></script>
-<script src="tami_battle_ui.js?v=20260714b"></script>
-<script src="power_panel.js?v=20260714b"></script>
-<script src="panels.js?v=20260714b"></script>
-<script src="item_icons.js?v=20260714b"></script>
-<script src="engbay.js?v=20260714b"></script>
+<script src="speech_tier.js?v=20260714c"></script>
+<script src="inhabitant.js?v=20260714c"></script>
+<script src="passenger.js?v=20260714c"></script>
+<script src="gamemod.js?v=20260714c"></script>
+<script src="chatter.js?v=20260714c"></script>
+<script src="speech_gen.js?v=20260714c"></script>
+<script src="speech_input.js?v=20260714c"></script>
+<script src="vision.js?v=20260714c"></script>
+<script src="deliberate.js?v=20260714c"></script>
+<script src="knowledge.js?v=20260714c"></script>
+<script src="acquire.js?v=20260714c"></script>
+<script src="sound.js?v=20260714c"></script>
+<script src="hullmodels.js?v=20260714c"></script>
+<script src="knowledge_hud.js?v=20260714c"></script>
+<script src="knowledge_screen.js?v=20260714c"></script>
+<script src="centroid_mind.js?v=20260714c"></script>
+<script src="kripke_mind.js?v=20260714c"></script>
+<script src="sober_gate.js?v=20260714c"></script>
+<script src="contradiction_ledger.js?v=20260714c"></script>
+<script src="kripke_planner.js?v=20260714c"></script>
+<script src="pillar_router.js?v=20260714c"></script>
+<script src="gravity_well.js?v=20260714c"></script>
+<script src="growth_loop.js?v=20260714c"></script>
+<script src="coop_proof.js?v=20260714c"></script>
+<script src="item_variance.js?v=20260714c"></script>
+<script src="tom_test.js?v=20260714c"></script>
+<script src="thoughts.js?v=20260714c"></script>
+<script src="tami_battle_ui.js?v=20260714c"></script>
+<script src="power_panel.js?v=20260714c"></script>
+<script src="panels.js?v=20260714c"></script>
+<script src="item_icons.js?v=20260714c"></script>
+<script src="engbay.js?v=20260714c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
-<script src="starmap.js?v=20260714b"></script>
-<script src="conquest.js?v=20260714b"></script>
-<script src="missions.js?v=20260714b"></script>
-<script src="planetmenu.js?v=20260714b"></script>
-<script src="textquests.js?v=20260714b"></script>
+<script src="starmap.js?v=20260714c"></script>
+<script src="conquest.js?v=20260714c"></script>
+<script src="missions.js?v=20260714c"></script>
+<script src="planetmenu.js?v=20260714c"></script>
+<script src="textquests.js?v=20260714c"></script>
 <script>
 "use strict";
 // =================================================================================================
@@ -305,8 +305,8 @@ const CFG = {
   REAR_AIM_RANGE:260,                              // bolts converge on the CENTRE crosshair at this range (gun harmonization), so what's under the reticle is what you hit
   REAR_BEAM_DPS:240, REAR_BEAM_RANGE:340, REAR_BEAM_R:2.2, REAR_BEAM_CAP_DRAIN:55,   // rear beam (user 2026-07-13 "a lot of damage but uses power quickly"): high damage/sec + drains the laser capacitor fast (LASER_CAP_MAX 100 -> ~2s of continuous fire); beam stops at 0 until it regens
   REAR_BEAM_RAMP:1.35, REAR_BEAM_RAMP_MAX:5.0, REAR_BEAM_PIERCE:true,   // user 2026-07-14: the rear beam CUTS THROUGH shields (damage straight to hull) and its damage RAMPS LINEARLY the longer it stays on ONE target (+135%/s, caps at 5x); dwell resets when you break contact or switch targets
-  REAR_CAP_MAX:100, REAR_CAP_REGEN:16, AI_REAR_ARC:0.55, AI_REAR_RANGE:300, AI_REAR_DPS_FRAC:0.7, AI_REAR_BEAMS:14, LOCK_SND_CD:1.6,   // "give all players the rear gunner laser": every AI ship auto-fires a rear beam at a pursuer in its rear cone (AI_REAR_ARC cos / AI_REAR_RANGE) at AI_REAR_DPS_FRAC of the player DPS, spending a per-ship capacitor (REAR_CAP_*); AI_REAR_BEAMS = pooled visible beams (nearest to you shown); LOCK_SND_CD = min seconds between lock-warning beeps
-  THROTTLE_WHEEL:0.08, AIM_SPREAD:1.0, REAR_SHIELD_ABSORB:0.5, REAR_SHIELD_FLASH:0.35,   // mouse-wheel throttle step; forward-gun aim spread; rear-gunner shield: damage reduction while manned + energy-absorb flash duration (s)
+  REAR_CAP_MAX:100, REAR_CAP_REGEN:16, REAR_CAP_ARM:60, AI_REAR_ARC:0.55, AI_REAR_RANGE:300, AI_REAR_DPS_FRAC:0.06, AI_REAR_PIERCE:false, AI_REAR_BEAMS:14, LOCK_SND_CD:1.6,   // "give all players the rear gunner laser": every AI ship auto-fires a rear beam at a pursuer in its rear cone (AI_REAR_ARC cos / AI_REAR_RANGE), spending a per-ship capacitor (REAR_CAP_*). BALANCE 2026-07-14 (measured): the AI mount is an AUTOMATED deterrent, so it does NOT pierce and runs at AI_REAR_DPS_FRAC of the player's manually-aimed turret - at the first-cut 0.7 + pierce, ONE tailing enemy deleted a 70hp player in 0.32s with no reaction window. Same mechanic for everyone, weaker automated mount. AI_REAR_BEAMS = pooled visible beams (nearest to you shown); LOCK_SND_CD = min seconds between lock-warning beeps
+  THROTTLE_WHEEL:0.08, REAR_SHIELD_ABSORB:0.5, REAR_SHIELD_FLASH:0.35,   // mouse-wheel throttle step; rear-gunner shield: damage reduction while manned + energy-absorb flash duration (s). (AIM_SPREAD retired 2026-07-14: the forward gun stopped mouse-tilting when it moved onto the fire-control lead box.)
   REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
   REAR_BARREL_LEN:2.6, REAR_BARREL_RAD:0.3, REAR_BALL_R:0.55,   // a SMALL EXTERNAL ball-turret on the ship's back (user 2026-07-13 "make the ball smaller ... it just shows which way the gunner is pointing"); unlit, external-view-only layer (chase/top, NOT the rear gunner's own view)
 
@@ -2770,12 +2770,13 @@ function engineOf(s){ return ENGINES[s.engineType||'standard']||ENGINES.standard
 // GIZMOS: the electronics bay - GIZMO_SLOTS mount points (see CFG.GIZMO_SLOTS), each holding at most one gizmo key.
 // TARGETING COMPUTER (user 2026-07-07: "add item in itemshop targeting computer that will put a square to help you
 // target ships where they will be so you can accurately shoot better.. make it expensive and use a lot of power"):
-// expensive, and it only RESOLVES (shows the lead reticle) when weapons power is high enough - ties it honestly
-// into the X-Wing power system instead of a bolted-on always-on freebie. Used to be a permanent EQUIP purchase;
-// now lives here so it can be unmounted to free the slot for something else, like a real Ranger loadout choice.
+// expensive, and it only RESOLVES when weapons power is high enough - tied honestly into the X-Wing power system.
+// 2026-07-14 REVISED: every ship now has BASIC fire control (a loose amber lead box, AIM_BASE_ERR), so this gizmo no
+// longer GRANTS the box - it TIGHTENS it to a precise green lock (AIM_COMP_ERR). The descs below now say that; they
+// used to claim it granted the reticle outright, which stopped being true the moment the basic box went in.
 const GIZMOS={
-  targeting:  {n:'Targeting Computer', cost:900, desc:'predictive lead reticle on your locked target - needs 60%+ weapons power to resolve'},
-  ecm:        {n:'ECM Jammer', cost:850, desc:'scrambles enemy fire control - hostiles shooting at you have a flat chance to simply miss'},
+  targeting:  {n:'Targeting Computer', cost:900, desc:'tightens your lead box from a loose estimate into a precise green lock - needs 60%+ weapons power to resolve'},
+  ecm:        {n:'ECM Jammer', cost:850, desc:'scrambles enemy fire control: their lead box on you goes wide and wobbles (they scatter), incoming shots can outright miss, and your lock warning reads JAMMED'},
   shieldboost:{n:'Shield Capacitor Booster', cost:800, desc:'+40% shield regen rate, both arcs'} };
 const GIZMO_KEYS=Object.keys(GIZMOS);
 const GIZMO_SELL_FRAC=0.5;   // selling a mounted gizmo back returns half its listed cost - depreciated, matches the existing hull-trade-in convention
@@ -5452,10 +5453,10 @@ function updateRearView(){ const el=document.getElementById('rearWin');
   VIEW.rear.x=Math.round(r.left); VIEW.rear.w=Math.round(r.width);
   VIEW.rear.h=Math.round(r.height-TITLE); VIEW.rear.y=Math.round(H-(r.top+r.height)); }
 // REAR BEAM damage: continuous (no i-frames, no cooldown) - same shields->hull->kill path a bullet uses, minus the gate.
-function beamDamage(target,dmg,fromPos,owner){ if(!target.alive||target.docked) return;
+function beamDamage(target,dmg,fromPos,owner,pierce){ if(!target.alive||target.docked) return;
   const d=dmg*hullResFor(target,'energy');
-  if(CFG.REAR_BEAM_PIERCE){ triggerHitFx(target,fromPos||target.pos,d); applyHullDamage(target, d, fromPos); }   // user 2026-07-14 "cuts through shields instantly": full damage straight to HULL - shields still flare (hit FX) but absorb nothing
-  else applyHullDamage(target, drainShield(target,d,fromPos)*(1-shieldGenPctFor(target)), fromPos);
+  if(pierce){ triggerHitFx(target,fromPos||target.pos,d); applyHullDamage(target, d, fromPos); }   // user 2026-07-14 "cuts through shields instantly": full damage straight to HULL - shields still flare (hit FX) but absorb nothing
+  else applyHullDamage(target, drainShield(target,d,fromPos)*(1-shieldGenPctFor(target)), fromPos);   // AI auto-mounts do NOT pierce (see AI_REAR_PIERCE) - otherwise a single tailing enemy deletes a 70hp player in 0.3s (measured)
   if(target.hp<=0) killByShip(target,owner); }
 function updateRearBeam(dt){ const s=ships[0];
   if(!rearFiring||!s||!s.alive||s.docked||(s.capLaser!=null&&s.capLaser<=0)){ rearBeam.visible=false; return; }   // solid; STOPS when the laser capacitor is empty - it burns power fast (user 2026-07-13)
@@ -5471,7 +5472,7 @@ function updateRearBeam(dt){ const s=ships[0];
   let ramp=1;
   if(hitShip){ if(s._rearDwellId===hitShip.id) s._rearDwell=(s._rearDwell||0)+dt; else { s._rearDwellId=hitShip.id; s._rearDwell=0; }   // RAMP builds only while held on the SAME ship
     ramp=Math.min(CFG.REAR_BEAM_RAMP_MAX, 1+CFG.REAR_BEAM_RAMP*(s._rearDwell||0));
-    beamDamage(hitShip, CFG.REAR_BEAM_DPS*dt*ramp, hitPos, s); if(rand(0,1)<0.5) burst(hitPos, ramp>3?0xffffff:0x9fffdd, 2+(ramp|0), 9, 1.4); }
+    beamDamage(hitShip, CFG.REAR_BEAM_DPS*dt*ramp, hitPos, s, CFG.REAR_BEAM_PIERCE); if(rand(0,1)<0.5) burst(hitPos, ramp>3?0xffffff:0x9fffdd, 2+(ramp|0), 9, 1.4); }
   else if(hitAst){ s._rearDwellId=null; s._rearDwell=0; hitAst.hp-=CFG.REAR_BEAM_DPS*dt; if(hitAst.hp<=0){ const idx=asteroids.indexOf(hitAst); if(idx>=0) destroyAsteroid(idx,s); } if(rand(0,1)<0.5) burst(hitPos,0xffd890,2,9,1.6); }
   else { s._rearDwellId=null; s._rearDwell=0; }
   const th=1+(ramp-1)*0.32;   // beam THICKENS as the ramp builds (cool factor)
@@ -5496,12 +5497,13 @@ function updateAIRearBeams(dt){ const P=ships[0]; const firing=[];
       if(inPeaceful(o.pos)) continue;   // no combat inside the peaceful belt
       _airA.copy(o.pos).sub(s.pos).normalize(); if(_airA.dot(back)<CFG.AI_REAR_ARC) continue;   // must be BEHIND the ship
       bd=d; tgt=o; }
-    if(tgt && s.rearCap>0){ s.rearCap=Math.max(0, s.rearCap-CFG.REAR_BEAM_CAP_DRAIN*dt);
+    const canFire = !!tgt && (s._rearArmed ? s.rearCap>0 : s.rearCap>=CFG.REAR_CAP_ARM);   // HYSTERESIS: needs a real charge to START, fires until dry, then must recharge to ARM before firing again -> clean bursts + lulls, instead of stuttering on/off every frame with the capacitor pinned at 0
+    if(canFire){ s._rearArmed=true; s.rearCap=Math.max(0, s.rearCap-CFG.REAR_BEAM_CAP_DRAIN*dt); if(s.rearCap<=0) s._rearArmed=false;
       if(s._rearDwellId===tgt.id) s._rearDwell=(s._rearDwell||0)+dt; else { s._rearDwellId=tgt.id; s._rearDwell=0; }
       const ramp=Math.min(CFG.REAR_BEAM_RAMP_MAX, 1+CFG.REAR_BEAM_RAMP*(s._rearDwell||0));
-      beamDamage(tgt, CFG.REAR_BEAM_DPS*CFG.AI_REAR_DPS_FRAC*dt*ramp, s.pos, s);
+      beamDamage(tgt, CFG.REAR_BEAM_DPS*CFG.AI_REAR_DPS_FRAC*dt*ramp, s.pos, s, CFG.AI_REAR_PIERCE);
       firing.push({s,tgt,ramp,d:(P&&P.alive)?P.pos.distanceToSquared(s.pos):1e18}); }
-    else { s.rearCap=Math.min(CFG.REAR_CAP_MAX, s.rearCap+CFG.REAR_CAP_REGEN*dt); if(!tgt){ s._rearDwellId=null; s._rearDwell=0; } } }
+    else { s._rearArmed=false; s.rearCap=Math.min(CFG.REAR_CAP_MAX, s.rearCap+CFG.REAR_CAP_REGEN*dt); s._rearDwellId=null; s._rearDwell=0; } }   // beam not FIRING (no target OR recharging) -> ramp resets; "stacks while held" means held, not merely aimed
   firing.sort((a,b)=>a.d-b.d);   // draw the beams nearest the player
   for(let i=0;i<AI_REAR_POOL.length;i++){ const g=AI_REAR_POOL[i];
     if(i<firing.length){ const f=firing[i], up=UPL.clone().applyQuaternion(f.s.quat), fwd=FWD.clone().applyQuaternion(f.s.quat);
@@ -5843,7 +5845,7 @@ document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].nam
 resize(); addEventListener('resize',resize);
 // ---- MANUAL FLIGHT: you pilot YOU (ships[0]); keyboard + on-screen touch controls OVERRIDE the AI. It latches on
 //      first input and releases when you issue an autopilot order (go/dock/mine/attack/…). See step() manualControl. ----
-const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false, throttle:0, aimDir:null, rearActive:false };   // throttle = persistent lever; aimDir = forward-gun MOUSE aim (world dir toward the cursor); rearActive = manning the rear turret (disables the forward gun); all read in manualControl (user 2026-07-13)
+const MAN={ thr:0, pitch:0, yaw:0, fire:false, nitro:false, active:false, mouseYaw:0, mousePitch:0, mouseThr:false, mouseFire:false, throttle:0, rearActive:false };   // throttle = persistent lever; rearActive = manning the rear turret (disables the forward gun); all read in manualControl. (aimDir retired 2026-07-14 - the forward gun aims at the fire-control lead box, not the cursor.)
 function manOn(){ MAN.active=true; if(focus!==0){ focus=0; buildRoster(); document.getElementById('lblBrain').textContent='SHIP CONTROLS · '+ships[0].name; } }
 function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=null;
   s.ctrl={ thr:clamp(Math.max(MAN.throttle||0, MAN.thr, MAN.mouseThr?1:0),0,1), pitch:clamp(MAN.pitch+(MAN.mousePitch||0),-1,1), yaw:clamp(MAN.yaw+(MAN.mouseYaw||0),-1,1) };   // thrust = the persistent THROTTLE lever, overridden UP by a held Space / right-mouse boost (user 2026-07-13 "set it, don't hold it")
@@ -5879,8 +5881,8 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
     const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
-    // FORWARD-GUN MOUSE-AIM (user 2026-07-13 "make the mouse where the forward gun shoots"): fire along the cursor's
-    // world RAY (MAN.aimDir, unprojected from the forward view). Cursor not over the view -> straight ahead.
+    // FORWARD GUN (user 2026-07-14 "shoot where the reticle goes"): fire at the fire-control lead box - the SAME
+    // world point updateTargetingReticle draws - so what you see is what you hit. Nothing ahead -> straight boresight.
     let aim; if(_playerSol && _playerSol.target && _playerSol.target.alive){ aim=_solAim.copy(_playerSol.lead).sub(s.pos).normalize(); s.autoAimId=_playerSol.target.id; }   // forward gun CONVERGES on the fire-control lead box - what you see is what you hit; the jammer/computer error is already baked into sol.lead
     else { aim=fwd; s.autoAimId=null; }   // no target ahead -> fire straight down the nose (matches the boresight crosshair)
     if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),aim,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),aim,s.id,spec); }
@@ -6021,7 +6023,8 @@ window.addEventListener('mouseup',e=>{ if(e.button===0 && MAN.mouseFire){ MAN.mo
 // MOUSE STEERING: cursor offset from the forward-view CENTRE = a virtual-joystick rate (Starblast-style); gated to when
 // the cursor is directly over the game canvas (e.target===canvas) so hovering a HUD panel or an open menu never steers.
 window.addEventListener('mousemove',e=>{
-  MAN.aimDir=null;   // forward gun no longer mouse-aims (user 2026-07-14 "shoot where the reticle goes") - it converges on the fire-control lead box; updateTargetingReticle owns the #fwdReticle boresight crosshair
+  // the forward gun does NOT mouse-aim (2026-07-14) - it converges on the fire-control lead box, and
+  // updateTargetingReticle owns the #fwdReticle boresight. The mouse here only does optional flight steering.
   const overMain = (e.target===canvas && viewAt(e.clientX,e.clientY)==='main');
   if(!overMain || MAN.rearActive){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }   // manning the rear turret -> no forward steer
   const v=VIEW.main, Hh=innerH(); if(!v||v.w<2||v.h<2){ MAN.mouseYaw=0; MAN.mousePitch=0; return; }
