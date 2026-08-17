@@ -1,0 +1,66 @@
+name: verify
+
+# The repo's own law, enforced on every push: a capability counts as shipped only when a human -
+# or CI - can run its test. Two independent gates, neither able to mask the other.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-tests:
+    name: Module self-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # no package.json and no dependencies by design - the suites run on stdlib alone,
+          # so there is nothing to install and nothing to cache.
+
+      - name: Run every self-testing module
+        run: node tools/run_selftests.js
+
+      - name: Upload self-test report
+        # the report is most valuable exactly when the step above failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-report
+          path: selftest-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  bench-audit:
+    name: Capability bench audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Audit the committed bench record
+        run: node tools/check_bench.js
+
+      - name: Upload bench record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: bench_results.json
+          if-no-files-found: error
+          retention-days: 30
