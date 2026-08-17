@@ -42,8 +42,12 @@ function discover() {
     .filter(m => m.src.includes('require.main === module'))
     .map(m => ({
       file: m.file,
-      // a module that never exits non-zero cannot fail on its own - classify it honestly
-      kind: m.src.includes('process.exit(1)') ? 'gate' : 'smoke',
+      // A module that never exits non-zero cannot fail on its own - classify it honestly.
+      // Both forms count: process.exit(1) terminates immediately, process.exitCode = 1 sets the
+      // status for a normal exit. Checking only the first misreports a real gate as smoke -
+      // which is the mirror image of the false-green bug this runner exists to catch, so it
+      // gets the same scrutiny.
+      kind: /process\.exit\s*\(\s*1\s*\)|process\.exitCode\s*=\s*[1-9]/.test(m.src) ? 'gate' : 'smoke',
     }))
     .sort((a, b) => a.file.localeCompare(b.file));
 }
@@ -70,8 +74,12 @@ function parseCounts(out) {
 }
 
 // A module with no tally is still failed if it announced a failure in prose.
+// Anchoring FAIL to the start of a line is not enough: suites print trailing verdicts such as
+// "  build() guards missing THREE: FAIL", where the word sits mid-line after a label. Match a
+// standalone FAIL token anywhere, but require a word boundary on both sides so ordinary words
+// (FAILURE, FAILED, failing) do not trip it.
 function announcesFailure(out) {
-  return /RESULT:\s*FAIL/.test(out) || /^\s*FAIL\b/m.test(out);
+  return /RESULT:\s*FAIL\b/.test(out) || /(^|[\s:>\-])FAIL(?![A-Za-z])/m.test(out);
 }
 
 // ---- run one module -----------------------------------------------------------------------------
