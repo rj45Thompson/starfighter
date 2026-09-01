@@ -1,6 +1,6 @@
 /* The public page finding the desk on its own: no address to carry, no reload. */
 import { chromium } from "playwright";
-import { CHROME, CODE, testPage, tally } from "./testkit.mjs";
+import { CHROME, CODE, testPage, tally, enterCode } from "./testkit.mjs";
 
 const t = tally(), ok = t.ok;
 const HTML = testPage();
@@ -18,6 +18,8 @@ await page.route("https://rj45thompson.github.io/**", async (route) => {
   const u = new URL(route.request().url());
   if (u.pathname.endsWith("relay.json"))
     return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(relay) });
+  if (u.pathname.endsWith("notify.json"))
+    return route.fulfill({ status: 200, contentType: "application/json", body: '{"url":""}' });
   return route.fulfill({ status: 200, contentType: "text/html", body: HTML });
 });
 await page.route("https://desk.example/**", async (route) => {
@@ -26,10 +28,10 @@ await page.route("https://desk.example/**", async (route) => {
                         body: JSON.stringify({ text: "Lead with the ops work." }) });
 });
 
+// The page no longer asks for a code to open; the relay still asks for one to
+// answer, so a visitor who has been given one has it in storage.
+await enterCode(page);
 await page.goto("https://rj45thompson.github.io/starfighter/muster/index.html");
-await page.fill("#gateInput", CODE);
-await page.click("#gateGo");
-await page.waitForFunction(() => !document.documentElement.classList.contains("gated"));
 
 console.log("\nthe desk is not up");
 await page.waitForFunction(() => document.querySelector("#statusText").textContent !== "connecting…");

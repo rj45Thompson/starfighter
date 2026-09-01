@@ -26,9 +26,6 @@ async function open(seed) {
   page.on("pageerror", e => { t.bad(); console.log("  FAIL page error: " + e.message); });
   await page.addInitScript(seed);
   await page.goto("http://localhost:8099/");
-  await page.fill("#gateInput", CODE);
-  await page.click("#gateGo");
-  await page.waitForFunction(() => !document.documentElement.classList.contains("gated"));
   return { ctx, page };
 }
 

@@ -148,15 +148,6 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 .file button:hover{color:var(--brick)}
 .file.bad{border-color:var(--brick);color:var(--brick)}
 
-.gate{position:fixed;inset:0;z-index:60;background:var(--paper);display:grid;place-items:center;padding:24px}
-.gatebox{width:min(360px,100%);text-align:center;display:flex;flex-direction:column;gap:11px;align-items:center}
-.gatebox .mark{width:44px;height:44px;font-size:22px;border-radius:11px}
-.gatebox h1{font-family:var(--display);font-size:26px;font-weight:600;margin:4px 0 0;letter-spacing:-.015em}
-.gatebox p{color:var(--soft);margin:0;font-size:13.5px;text-wrap:balance}
-.gatebox input{width:100%;text-align:center;font-family:var(--mono);font-size:13px;letter-spacing:.02em}
-.gatebox .btn{width:100%}
-.gateerr{color:var(--brick);font-weight:500}
-.gated .shell,.gated .fab{display:none}
 
 .fab{display:none;position:fixed;right:15px;bottom:15px;z-index:20;background:var(--brick);color:#FFF8F5;border:0;border-radius:99px;padding:12px 18px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.22);cursor:pointer}
 @media (max-width:1060px){
@@ -177,18 +168,6 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 
 </head>
 <body>
-<div class="gate" id="gate" hidden>
-  <form class="gatebox" id="gateForm">
-    <div class="mark">M</div>
-    <h1>Muster</h1>
-    <p>This preview is private. Enter the access code you were sent.</p>
-    <input id="gateInput" type="password" autocomplete="off" spellcheck="false"
-           placeholder="access code" aria-label="Access code">
-    <button class="btn" type="submit" id="gateGo">Open</button>
-    <p class="gateerr" id="gateErr" hidden>That code is not right.</p>
-  </form>
-</div>
-
 <div class="shell" id="shell">
   <aside class="rail">
     <div class="brand">
@@ -242,25 +221,23 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 
 const $ = (s) => document.querySelector(s);
 
-/* ---------- the access gate ----------
+/* ---------- the access code ----------
  *
- * Be clear about what this is. The page is static HTML that the browser has
- * already downloaded, so a screen in front of it is a doorknob, not a lock:
- * anyone who opens the developer tools can step around it. It is here to keep
- * a link you hand out from being wandered into, which is a real thing to want
- * and a different thing from access control.
+ * There is no longer a screen in front of the page. Anyone with the link
+ * reads it, which is the point of sending a link.
  *
- * What is NOT here is the code itself. The page carries a PBKDF2 verifier —
- * salt, iteration count, and the derived key — so it can check an answer
- * without containing one. That matters, because the same code is what the
- * relay demands before it will spend anyone's API budget: publish the code in
- * the page and that check would be worthless. Bypass the screen and you get an
- * assistant that refuses to talk to you.
- *
- * For a page that genuinely cannot be read without the code, it has to be
- * served by something that can withhold it — the relay itself, or Cloudflare
- * Access in front of it. That is a different deployment, not a stronger
- * version of this. */
+ * The code did two jobs and only one of them is gone. It never really kept
+ * anyone out - the page is static HTML the browser has already downloaded, so
+ * a screen over it was a doorknob, not a lock. What it does still do is stop
+ * the assistant being spent by whoever finds the URL: the desk this page talks
+ * to runs on one person's Claude subscription, and it refuses a request that
+ * does not carry the code. So the verifier stays, the wall does not, and
+ * somebody who wants to chat is asked for a code at the point it matters. */
+
+/* Salt, iteration count and derived key. The code itself is not here and never
+ * was: the page can check an answer without containing one, which is what lets
+ * the same code be the thing the relay demands before it spends anyone's
+ * subscription. Publish the code in the page and that check is worthless. */
 const GATE = {
   salt: "8ff1ec62bf326915a2a17d63bb4458cd",
   hash: "6ace66186919b6aab8c953ce2e7ff8badfcdc265d7280535507dc7633ddc5014",
@@ -279,52 +256,68 @@ async function derive(pass, saltHex, iterations) {
   return hex(bits);
 }
 
-/* Resolves once the visitor is through, or immediately if they already are.
- * A failure to derive (very old browser, no crypto.subtle over plain http)
- * leaves the screen up rather than letting everyone in. */
-function openGate() {
-  return new Promise((resolve) => {
-    const saved = store.get("code", "");
-    const gate = $("#gate"), form = $("#gateForm"),
-          input = $("#gateInput"), err = $("#gateErr"), go = $("#gateGo");
+/* ---------- telling the owner someone is here ----------
+ *
+ * A static page cannot send an email; something with a server has to. So the
+ * page posts a two-line fact to whatever endpoint notify.json names, and that
+ * endpoint is what turns it into mail - a form service, a webhook, or the
+ * relay Worker, whichever is set. No endpoint, no ping, no error.
+ *
+ * What is sent is deliberately thin: which event, when, and where the link was
+ * followed from. No profile, no chat text, no fingerprint, nothing typed into
+ * the page. The endpoint sees an IP because every HTTP request has one; the
+ * page adds nothing to that.
+ *
+ * Once per browsing session per event, so an open tab does not become a
+ * mailing list. It is best-effort throughout: a blocked or missing endpoint is
+ * silent, because a page that breaks when its analytics break is worse than a
+ * page nobody is watching. */
 
-    const pass = async (code) => {
-      try { return (await derive(code, GATE.salt, GATE.iterations)) === GATE.hash; }
-      catch { return false; }
-    };
+let notifyUrl = null;                        // null until notify.json is read
 
-    const show = () => {
-      document.documentElement.classList.add("gated");
-      gate.hidden = false;
-      input.focus();
-    };
-    const enter = (code) => {
-      store.set("code", code);
-      document.documentElement.classList.remove("gated");
-      gate.hidden = true;
-      resolve(code);
-    };
-
-    // Someone who is already through should not be asked again.
-    if (saved) {
-      pass(saved).then((ok) => ok ? enter(saved) : (store.set("code", ""), show()));
-    } else {
-      show();
-    }
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const code = input.value.trim();
-      if (!code) return;
-      go.disabled = true; go.textContent = "Checking…"; err.hidden = true;
-      const ok = await pass(code);
-      go.disabled = false; go.textContent = "Open";
-      if (ok) return enter(code);
-      err.hidden = false;
-      input.select();
-    });
-  });
+async function findNotify() {
+  try {
+    const res = await fetch("notify.json", { cache: "no-store" });
+    if (!res.ok) return "";
+    const j = await res.json();
+    const url = (j && typeof j.url === "string") ? j.url.trim() : "";
+    return /^https:\/\//.test(url) ? url : "";
+  } catch { return ""; }
 }
+
+async function ping(event) {
+  try {
+    const once = "muster:pinged:" + event;
+    if (sessionStorage.getItem(once)) return;
+    sessionStorage.setItem(once, "1");
+    if (notifyUrl === null) notifyUrl = await findNotify();
+    if (!notifyUrl) return;
+    await fetch(notifyUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      // keepalive so a ping fired as the tab closes still leaves.
+      keepalive: true,
+      body: JSON.stringify({
+        event,
+        subject: event === "visit" ? "Someone opened Muster"
+               : event === "chat"  ? "Someone used the Muster assistant"
+               :                     "Muster: " + event,
+        at: new Date().toISOString(),
+        from: document.referrer || "(typed or bookmarked)",
+        page: location.href
+      })
+    });
+  } catch { /* never let this break the page */ }
+}
+
+/* True when a code has been entered that matches the verifier. Checked before
+ * offering the chat, never before showing the page. */
+async function codeOk(code) {
+  if (!code) return false;
+  try { return (await derive(code, GATE.salt, GATE.iterations)) === GATE.hash; }
+  catch { return false; }
+}
+
 const store = {
   get(k, d) { try { const v = localStorage.getItem("muster:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("muster:" + k, JSON.stringify(v)); return true; } catch { return false; } }
@@ -744,7 +737,12 @@ function renderAssistant(w) {
   p2.textContent = "A URL that accepts {system, messages, model} as JSON and answers with either "
     + "an Anthropic-style event stream or {text}. Use this when you want visitors to chat without "
     + "a key of their own. It takes precedence over the key above.";
-  c2.append(p2, mk("Relay endpoint", "aRelay", ASSIST.relay, "https://…/chat", "url"));
+  const pc = document.createElement("p");
+  pc.textContent = "The relay this page ships with runs on one person's Claude subscription, so it "
+    + "asks for the access code before it will answer. Put the code you were sent here. It is not "
+    + "needed for your own key or your own relay.";
+  c2.append(p2, mk("Relay endpoint", "aRelay", ASSIST.relay, "https://…/chat", "url"),
+            pc, mk("Access code", "aCode", store.get("code", ""), "the code you were sent", "password"));
 
   const row = document.createElement("div");
   row.style.cssText = "display:flex;gap:9px;flex-wrap:wrap;margin-top:14px";
@@ -760,9 +758,17 @@ function renderAssistant(w) {
     store.set("apiKey", ASSIST.key);
     store.set("relay", ASSIST.relay);
     store.set("model", ASSIST.model);
+    const code = $("#aCode").value.trim();
+    store.set("code", code);
     applyRoute(sample ? "claude" : relayUrl() ? "relay" : ASSIST.key ? "key" : "none");
-    note.textContent = route === "none" ? "Nothing entered." : "Connected.";
-    go(current);
+    // Check the code here rather than letting the relay be the one to say no
+    // three seconds later. A wrong code is a typo far more often than a lie.
+    const codeNote = code && !(await codeOk(code)) ? " That code is not right." : "";
+    // No go(current) here. Re-rendering the panel throws away the note that
+    // was just written into it, which is why saving has always looked like it
+    // did nothing. The fields already show what was typed, and applyRoute has
+    // updated the status light, so there is nothing left to redraw.
+    note.textContent = (route === "none" ? "Nothing entered." : "Connected.") + codeNote;
   };
   off.onclick = () => {
     ASSIST.key = ""; ASSIST.relay = "";
@@ -870,7 +876,8 @@ const ERRS = {
   empty_completion:"Nothing came back. Ask for less at once.",
   prompt_too_large:"This conversation got too long. Clear it and start again.",
   invalid_request:"The page asked wrongly — that is a bug in the page.",
-  bad_code:"That access code was refused. Ask whoever sent you the link for the current one.",
+  bad_code:"That access code was refused. Put the code you were sent in the Assistant tab, "
+    + "or ask whoever sent you the link for the current one.",
   bad_key:"That key was rejected. Check it on console.anthropic.com and paste it again.",
   no_credit:"That Anthropic account is out of credit. Top it up and try again.",
   no_route:"The assistant is not connected yet. Open the Assistant tab to set it up.",
@@ -1246,6 +1253,7 @@ async function send() {
   attached = []; renderFiles();
 
   box.value = ""; box.style.height = "auto";
+  ping("chat");
   bubble("me","You", names.length ? said + "\n\u2014 " + names.join(", ") : said);
   turns.push({ role:"user", content });
 
@@ -1376,9 +1384,9 @@ async function detectRoute() {
 /* ---------- boot ---------- */
 go(current); setStatus("", "connecting…"); greet();
 (async () => {
-  await openGate();                      // nothing starts until they are through
   applyRoute(await detectRoute());
   watch();
+  ping("visit");
 })();
 </script>
 </body>

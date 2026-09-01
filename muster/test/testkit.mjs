@@ -1,9 +1,14 @@
 /* Shared rig for the page tests.
  *
- * The page ships with a PBKDF2 verifier and no code in it, which is the point
- * of the lock screen - so a test cannot simply type the real one. It builds a
- * copy with the verifier swapped for a code it knows, and tests that copy.
- * Everything else about the file is the file that ships. */
+ * The page ships with a PBKDF2 verifier and no code in it - the code is what
+ * the relay demands before it spends anyone's subscription, so publishing it
+ * in the page would make that check worthless. A test therefore cannot type
+ * the real one. It builds a copy with the verifier swapped for a code it
+ * knows, and tests that copy. Everything else is the file that ships.
+ *
+ * There is no longer a screen in front of the page, so nothing has to be
+ * unlocked to reach it; enterCode() puts a code in storage for the tests that
+ * need the chat to be allowed. */
 import { readFileSync } from "node:fs";
 import { pbkdf2Sync } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -27,6 +32,10 @@ export function testPage() {
   if (want === hash) throw new Error("the shipped code is 'open-sesame' - change it");
   return src.replace(`hash: "${hash}"`, `hash: "${want}"`);
 }
+
+/** Seed the code a visitor would have typed into the Assistant tab. */
+export const enterCode = (page, code = CODE) =>
+  page.addInitScript((c) => localStorage.setItem("muster:code", JSON.stringify(c)), code);
 
 export function tally() {
   let pass = 0, fail = 0;
