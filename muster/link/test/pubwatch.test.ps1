@@ -21,8 +21,13 @@ echo "`$@" >> "$seen"
 chmod +x $py
 
 # Lift the watcher out of the launcher so the code under test is the shipped code.
-$launcher = Join-Path (Split-Path -Parent $PSScriptRoot) "bridge_up.ps1"
-if (-not (Test-Path $launcher)) { throw "bridge_up.ps1 is not beside the link folder" }
+# The launcher sits at the root of the bridge, or beside the link folder in
+# the copy that ships with the page. Take whichever is here.
+$link = Split-Path -Parent $PSScriptRoot
+$launcher = @((Join-Path $link "bridge_up.ps1"),
+              (Join-Path (Split-Path -Parent $link) "bridge_up.ps1")) |
+            Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $launcher) { throw "cannot find bridge_up.ps1 from $PSScriptRoot" }
 $src = Get-Content $launcher -Raw
 $m = [regex]::Match($src, '(?s)\$watcher = Start-Job -ArgumentList \$log, \$py, \$publish -ScriptBlock \{\s*(.*?)\n    \}\n\}')
 ok "found the watcher in the launcher" $m.Success ""
