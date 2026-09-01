@@ -14,6 +14,20 @@ MODEL      = "claude-opus-5"
 EFFORT     = "low"       # low/medium/high/xhigh/max — chat rarely needs above low
 MAX_TOKENS = "1200"
 
+# Per-IP throttle. On by default, no binding needed. It counts in one isolate's
+# memory, so it stops a single machine looping and not a distributed attacker -
+# a speed bump, not a quota. The quota is the spend limit on the Anthropic
+# workspace, which is the guard that cannot be argued with.
+RATE_MAX      = "20"   # requests per IP per window
+RATE_WINDOW_S = "60"
+
+# Where unusual activity gets reported. Any URL that accepts a JSON POST: a
+# webhook-to-email service, Slack, Discord, your own endpoint. Leave it unset
+# and the detectors simply stay quiet. See "The unusual activity zoo" in the
+# README for what gets reported and what each one means.
+# ALERT_WEBHOOK   = "https://..."
+ALERT_COOLDOWN_S = "900"   # at most one message per species per 15 minutes
+
 # The access code is NOT here either - same reason. Set it as a secret and the
 # relay refuses any request without it, whatever anyone does to the page:
 #     wrangler secret put ACCESS_CODE
@@ -22,11 +36,3 @@ MAX_TOKENS = "1200"
 # The API key is NOT here. Set it as a secret so it never enters this file
 # or your git history:
 #     wrangler secret put ANTHROPIC_API_KEY
-
-# Optional per-IP rate limit. Uncomment to switch it on; the Worker picks it
-# up automatically and keeps working without it.
-# [[unsafe.bindings]]
-# name = "RATE_LIMITER"
-# type = "ratelimit"
-# namespace_id = "1001"
-# simple = { limit = 20, period = 60 }
