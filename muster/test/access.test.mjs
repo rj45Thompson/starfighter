@@ -166,6 +166,75 @@ console.log("\nthe code still guards the assistant");
   await ctx.close();
 }
 
+/* ---- an address handed over in the link ---- */
+console.log("\na desk named in the link");
+{
+  notify = { url: "" };
+  relay = { url: "" };                       // nothing published: the link is all there is
+  const base = "https://rj45thompson.github.io/starfighter/muster/index.html";
+  const desk = "https://desk.example/bridge/chat";
+
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  page.setDefaultTimeout(8000);
+  page.on("pageerror", (e) => { t.bad(); console.log("  FAIL page error: " + e.message); });
+  await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+  await page.route("https://rj45thompson.github.io/**", async (route) => {
+    const u = new URL(route.request().url());
+    if (u.pathname.endsWith(".json"))
+      return route.fulfill({ status: 200, contentType: "application/json", body: '{"url":""}' });
+    return route.fulfill({ status: 200, contentType: "text/html", body: HTML });
+  });
+  const asks = [];
+  await page.route("https://desk.example/**", async (route) => {
+    asks.push(JSON.parse(route.request().postData()));
+    await route.fulfill({ status: 200, contentType: "application/json",
+                          body: JSON.stringify({ text: "Lead with the ops work." }) });
+  });
+
+  await page.goto(base + "#desk=" + encodeURIComponent(desk));
+  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
+  ok("the link alone brings the assistant up",
+     /assistant/.test(await page.textContent("#statusText")), await page.textContent("#statusText"));
+  ok("the address is out of the bar once it is read", !(await page.evaluate(() => location.hash)));
+  ok("and remembered",
+     await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay"))) === desk);
+
+  await page.fill("#input", "What should I lead with?");
+  await page.click("#send");
+  await page.waitForFunction(() => /Lead with the ops work/.test(document.querySelector("#log").textContent));
+  ok("and it answers through that desk", asks.length === 1);
+
+  // A reload with no fragment still works, because it was remembered.
+  await page.goto(base);
+  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
+  ok("a reload without the link keeps working",
+     /assistant/.test(await page.textContent("#statusText")));
+
+  // An empty fragment is how you forget a desk that has gone.
+  await page.goto(base + "#desk=");
+  await page.waitForFunction(
+    () => document.querySelector("#statusText").textContent === "waiting for the desk"
+  ).catch(() => {});
+  ok("an empty one forgets it", (await page.textContent("#statusText")) === "waiting for the desk",
+     await page.textContent("#statusText"));
+  ok("and the address is gone from storage",
+     !(await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay") || '""'))));
+
+  // Anything that is not https is not a desk. A malformed link is ignored
+  // rather than treated as a clear: it must not be able to knock out a desk
+  // that is working.
+  await page.goto(base + "#desk=" + encodeURIComponent(desk));
+  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
+  await page.goto(base + "#desk=" + encodeURIComponent("http://evil.example/chat"));
+  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
+  ok("a plaintext address in the link is not adopted",
+     await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay") || '""')) === desk);
+  ok("and the desk that was working still is",
+     /assistant/.test(await page.textContent("#statusText")));
+  await ctx.close();
+}
+
 console.log("\nthe code itself is not in the page");
 {
   ok("the shipped file carries a verifier, not a code",

@@ -371,6 +371,48 @@ async function findHostedRelay() {
       ? url : "";
   } catch { return ""; }
 }
+/* An address handed over in the link itself: .../index.html#desk=https://x.trycloudflare.com
+ *
+ * This exists because the alternative was worse. A quick tunnel takes a new
+ * hostname every run, and the way to keep the page in step was for the desk to
+ * write the address into relay.json through the GitHub API - which needs a
+ * token set up once before anything works at all. A link that carries its own
+ * address needs nothing set up: the launcher prints one, and whoever gets it
+ * is talking to that desk.
+ *
+ * Same https-only rule as relay.json, with the same exemption for a desk on
+ * this machine. It is remembered, so a reload without the fragment still
+ * works, and #desk= with nothing after it forgets. */
+function deskFromLink() {
+  const m = /[#&]desk=([^&]*)/.exec(location.hash || "");
+  if (!m) return null;
+  let url = "";
+  try { url = decodeURIComponent(m[1]).trim(); } catch { url = m[1].trim(); }
+  if (!url) return "";                                   // #desk= clears it
+  return /^https:\/\//.test(url) || /^http:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url)
+    ? url : null;                                        // anything else: ignore
+}
+
+/* Adopt whatever the link names, and say so. Shared by the boot and by
+ * hashchange, because pasting a new link into a tab that is already open
+ * changes only the fragment - the browser does not reload, so nothing would
+ * see the new address if this only ran once at startup. */
+function adoptDesk() {
+  const linked = deskFromLink();
+  if (linked === null) return false;          // not a desk: leave what we have
+  ASSIST.relay = linked;
+  store.set("relay", linked);
+  // Take it out of the address bar. It has been read, and a link left lying in
+  // the bar gets copied and pasted long after that desk has gone.
+  history.replaceState(null, "", location.pathname + location.search);
+  return true;
+}
+
+addEventListener("hashchange", async () => {
+  if (!adoptDesk()) return;
+  applyRoute(await detectRoute());
+});
+
 const relayUrl = () => ASSIST.relay || hostedRelay;
 
 /* ---------- profile fields: exactly what the extension fills ---------- */
@@ -1384,6 +1426,9 @@ async function detectRoute() {
 /* ---------- boot ---------- */
 go(current); setStatus("", "connecting…"); greet();
 (async () => {
+  // A desk named in the link wins: someone handed that link over on purpose,
+  // and it is newer than anything remembered here.
+  adoptDesk();
   applyRoute(await detectRoute());
   watch();
   ping("visit");
