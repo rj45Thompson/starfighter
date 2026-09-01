@@ -332,6 +332,15 @@ const ASSIST = {
   model: store.get("model", "claude-sonnet-5")
 };
 
+/* Where the assistant actually runs when this page has no backend.
+ *
+ * A static file cannot hold an API key — publish one and it is scraped and
+ * revoked within hours — so this page cannot host a chat by itself. The
+ * artifact can: it runs inside claude.ai, which supplies Claude, and each
+ * visitor uses their own account. So rather than a dead end, the unconnected
+ * state points at the copy that works. */
+const LIVE_DEMO = "https://claude.ai/code/artifact/680a5cc7-1156-418d-ae95-f1a759c5e29c";
+
 /* The hosted relay, if this deployment has one. Kept in a separate small file
  * rather than baked in here, so pointing Muster at a backend is a one-line
  * edit rather than a rebuild of this page. Absent, empty or unreachable is a
@@ -652,9 +661,28 @@ function renderAssistant(w) {
     claude: ["Running inside Claude", "This page is open in claude.ai, so the assistant uses Claude directly. Nothing to set up, and no key needed."],
     relay:  ["Connected", "The chat is working — there is nothing for you to set up. Messages go to this site's relay, which holds the key. Your profile goes with them so the assistant does not ask for what you have already filled in; your resume does not."],
     key:    ["Using your own key", "Messages go straight from this browser to Anthropic. Your key is stored in this browser only and is never sent anywhere else."],
-    none:   ["Not connected", "The rest of Muster works without this. The chat needs one of the two options below."]
+    none:   ["The chat is on the live demo",
+             "This page holds your profile, resume and applications, and hands them to the "
+             + "extension. What it cannot do is host the assistant: a static page has nowhere "
+             + "to keep an API key, and one published here would be scraped within hours. So "
+             + "the chat runs on the live demo instead, where Claude is already present. The "
+             + "two options below are for running it here on your own account."]
   };
   const [head, blurb] = HOW[route] || HOW.none;
+
+  if (route === "none") {
+    const cd = document.createElement("div"); cd.className = "card";
+    cd.innerHTML = '<p class="eyebrow">The live demo</p>';
+    const pd = document.createElement("p");
+    pd.textContent = "Same workspace, with a working assistant and nothing to configure. "
+      + "It also has a Workshop tab, where you can describe a change and watch the app "
+      + "rewrite itself — with a restore, so nothing you try is permanent.";
+    const ad = document.createElement("a");
+    ad.className = "btn"; ad.href = LIVE_DEMO; ad.target = "_blank"; ad.rel = "noopener";
+    ad.textContent = "Open the live demo";
+    ad.style.cssText = "display:inline-block;text-decoration:none;margin-top:6px";
+    cd.append(pd, ad); w.append(cd);
+  }
 
   const c0 = document.createElement("div"); c0.className = "card";
   c0.innerHTML = '<p class="eyebrow">Status</p>';
@@ -1039,12 +1067,17 @@ function applyRoute(r) {
   const btn = $("#send"), input = $("#input");
   if (r === "none") {
     mode = "preview";
-    setStatus("off", "assistant not connected");
+    setStatus("off", "chat runs on the live demo");
     input.disabled = true;
-    input.placeholder = "Connect the assistant to start.";
+    input.placeholder = "The chat lives on the live demo — open it to talk.";
     btn.disabled = false;
-    btn.textContent = "Connect";
-    btn.onclick = () => go(PANELS.find(p => p.id === "assistant"));
+    btn.textContent = "Open chat";
+    btn.onclick = () => window.open(LIVE_DEMO, "_blank", "noopener");
+    log.innerHTML = "";
+    bubble("", "Assistant",
+      "The chat for this workspace runs on the live demo, where Claude is "
+      + "already present — nothing to set up and no key needed. Press Open chat, "
+      + "or use the Assistant tab if you would rather run it on your own key.");
     return;
   }
   mode = "live";
