@@ -13,13 +13,12 @@
  * THE SECURITY MODEL, stated plainly, because a public relay on your key is
  * exactly the thing that gets abused:
  *
- *   1. The system prompt is a CONSTANT and no caller input reaches it. This is
- *      the one that matters. A relay that lets a caller influence its
- *      instructions is an open Claude proxy with your credit card on it. Here
- *      a caller supplies chat turns and profile fields, and the profile
- *      travels as quarantined data in a user turn — never as instruction.
+ *   1. The system prompt is built HERE and the client's is ignored. This is
+ *      the one that matters. A relay that forwards a caller's system prompt is
+ *      an open Claude proxy with your credit card on it. Here the caller can
+ *      only supply chat turns and profile fields; the instructions are ours.
  *   2. Origin allowlist. Stops other sites embedding it. Spoofable by a
- *      script, so it is a filter, not a wall — which is why the rest exist.
+ *      script, so it is a filter, not a wall — which is why 1, 3 and 4 exist.
  *   3. Hard caps: turns, characters, output tokens. Bounds the cost of any
  *      single request no matter what is asked.
  *   4. A per-IP throttle. Read what it is honestly: the counter lives in one
@@ -30,7 +29,6 @@
  *      the one on the page: that screen is a doorknob anyone can step around,
  *      but a request without the code never reaches Anthropic and never costs
  *      anything. Set it when you hand the link to people.
- *   6. The zoo below, which watches and reports but never blocks.
  *
  * And the guard that does not live in this file at all: set a spend limit on
  * the workspace whose key this is, and use a key you can revoke. Code can be
@@ -257,17 +255,22 @@ function bad(status, message, origin) {
 /* The instructions. A constant: no caller input is interpolated into them, so
  * there is nothing here for a caller to influence and the prefix caches. */
 const SYSTEM = "You are the assistant inside Muster, a job-application workspace. "
-  + "You help one person get applications out. Be concrete and brief: short "
-  + "paragraphs, no preamble, no filler. Ask at most one clarifying question, "
-  + "and only if you genuinely cannot proceed.\n\n"
-  + "You cannot browse, open files, send email, or fill forms yourself — a "
+  + "You help one person get applications out.\n\n"
+  + "LENGTH. Answer in at most three short sentences. If asked to draft "
+  + "something, give only the draft. No preamble, no summary of what you are "
+  + "about to do, no offer of further help, no bulleted menu of options, no "
+  + "closing question. Longer is allowed only when explicitly asked for a full "
+  + "letter or a list. When in doubt, stop sooner.\n\n"
+  + "Ask at most one clarifying question, and only if you genuinely cannot "
+  + "proceed.\n\n"
+  + "You cannot browse, open files, send email, or fill forms yourself \u2014 a "
   + "browser extension does the filling. If something needs doing out there, "
   + "say plainly what to do, and draft the exact wording where that helps.\n\n"
   + "Never invent facts about this person. If a detail is missing, write the "
   + "sentence and mark the gap in square brackets.\n\n"
   + "One standing rule about relocation: never frame them as someone who needs "
   + "to relocate or wants relocation support. Write it as availability that is "
-  + "already true — \"available on site in <city>\", \"available to start "
+  + "already true \u2014 \"available on site in <city>\", \"available to start "
   + "immediately\". Framing it as a hurdle costs interviews.\n\n"
   + "Stay on job applications, resumes, interviews and the search itself. If "
   + "asked for something unrelated, say that is not what you are here for and "

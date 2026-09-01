@@ -135,6 +135,18 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 15px 11px}
 .chip{background:var(--sunk);border:1px solid var(--line-soft);border-radius:99px;padding:5px 11px;font-size:12.5px;cursor:pointer;text-align:left}
 .chip:hover{border-color:var(--brick);color:var(--brick)}
+.clip{width:34px;height:34px;flex:none;border:1px solid var(--line);background:var(--sunk);
+  border-radius:9px;font-size:19px;line-height:1;color:var(--soft);cursor:pointer}
+.clip:hover{border-color:var(--brick);color:var(--brick)}
+.clip[disabled]{opacity:.45;cursor:default}
+.files{display:flex;flex-wrap:wrap;gap:6px;padding:0 11px 8px}
+.file{display:flex;align-items:center;gap:6px;background:var(--sunk);border:1px solid var(--line);
+  border-radius:8px;padding:4px 8px;font-size:12px;max-width:100%}
+.file b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.file span{color:var(--faint);font-family:var(--mono);font-size:10.5px}
+.file button{border:0;background:none;color:var(--faint);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}
+.file button:hover{color:var(--brick)}
+.file.bad{border-color:var(--brick);color:var(--brick)}
 
 .gate{position:fixed;inset:0;z-index:60;background:var(--paper);display:grid;place-items:center;padding:24px}
 .gatebox{width:min(360px,100%);text-align:center;display:flex;flex-direction:column;gap:11px;align-items:center}
@@ -207,7 +219,11 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
     </div>
     <div class="log" id="log"></div>
     <div class="chips" id="chips"></div>
+    <div class="files" id="files"></div>
     <div class="composer">
+      <button class="clip" id="clip" title="Attach a file" aria-label="Attach a file">+</button>
+      <input type="file" id="pick" multiple hidden
+             accept=".txt,.md,.csv,.json,.pdf,image/png,image/jpeg,image/webp">
       <textarea id="input" rows="1" placeholder="Ask, or paste a job posting…"></textarea>
       <button class="btn" id="send">Send</button>
     </div>
@@ -332,6 +348,10 @@ const ASSIST = {
   model: store.get("model", "claude-sonnet-5")
 };
 
+/* The hosted relay, if this deployment has one. Kept in a separate small file
+ * rather than baked in here, so pointing Muster at a backend is a one-line
+ * edit rather than a rebuild of this page. Absent, empty or unreachable is a
+ * normal state: the page then asks the visitor for their own key instead. */
 /* Where the assistant actually runs when this page has no backend.
  *
  * A static file cannot hold an API key — publish one and it is scraped and
@@ -341,10 +361,6 @@ const ASSIST = {
  * state points at the copy that works. */
 const LIVE_DEMO = "https://claude.ai/code/artifact/680a5cc7-1156-418d-ae95-f1a759c5e29c";
 
-/* The hosted relay, if this deployment has one. Kept in a separate small file
- * rather than baked in here, so pointing Muster at a backend is a one-line
- * edit rather than a rebuild of this page. Absent, empty or unreachable is a
- * normal state: the page then asks the visitor for their own key instead. */
 let hostedRelay = "";
 async function findHostedRelay() {
   try {
@@ -676,7 +692,7 @@ function renderAssistant(w) {
     const pd = document.createElement("p");
     pd.textContent = "Same workspace, with a working assistant and nothing to configure. "
       + "It also has a Workshop tab, where you can describe a change and watch the app "
-      + "rewrite itself — with a restore, so nothing you try is permanent.";
+      + "rewrite itself \u2014 with a restore, so nothing you try is permanent.";
     const ad = document.createElement("a");
     ad.className = "btn"; ad.href = LIVE_DEMO; ad.target = "_blank"; ad.rel = "noopener";
     ad.textContent = "Open the live demo";
@@ -820,8 +836,12 @@ function renderChips() {
 function charter() {
   const known = KEYS.filter(k => profile[k]).map(k => `${k}: ${profile[k]}`).join("\n");
   return "You are the assistant inside Muster, a job-application workspace. You help one person get "
-    + "applications out. Be concrete and brief: short paragraphs, no preamble, no filler. Ask at most one "
-    + "clarifying question, and only if you genuinely cannot proceed.\n\n"
+    + "applications out.\n\n"
+    + "LENGTH. Answer in at most three short sentences. If asked to draft something, give only the "
+    + "draft. No preamble, no summary of what you are about to do, no offer of further help, no "
+    + "bulleted menu of options, no closing question. Longer is allowed only when explicitly asked "
+    + "for a full letter or a list. When in doubt, stop sooner.\n\n"
+    + "Ask at most one clarifying question, and only if you genuinely cannot proceed.\n\n"
     + "You cannot browse, open files, send email, or fill forms yourself — a browser extension does the "
     + "filling. If something needs doing out there, say plainly what to do, and draft the exact wording "
     + "where that helps.\n\n"
@@ -860,12 +880,214 @@ function trim() {
   let bytes = new Blob([charter()]).size;
   const kept = [];
   for (let i = turns.length - 1; i >= 0; i--) {
-    const b = new Blob([turns[i].content]).size;
+    const b = sizeOf(turns[i].content);
     if (bytes + b > 46000) break;
     bytes += b; kept.unshift(turns[i]);
   }
   while (kept.length && kept[0].role === "assistant") kept.shift();
   return kept;
+}
+
+/* ---------- attachments ----------
+ *
+ * Text files are read straight. PDFs are read here rather than with a library:
+ * the artifact runtime allows scripts from a CDN but blocks the runtime fetches
+ * a PDF library makes for its worker, so pulling one in would half-work. The
+ * browser can already inflate a stream, which is the only hard part.
+ *
+ * This reads text-based PDFs - anything exported from Word, Pages, Google Docs
+ * or LaTeX. It will not read a scan, and it will not read a PDF whose fonts
+ * encode text as glyph ids. When it comes back with too little to be a
+ * document it says so and asks for the text instead, rather than sending a
+ * page of noise to the model as though it were a resume. */
+
+const MAX_ATTACH = 4;
+const MAX_TEXT = 60000;
+let attached = [];
+
+async function inflate(bytes, how) {
+  const s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(how));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+
+/* One stream's worth of bytes as text. Almost every PDF uses FlateDecode with
+ * a zlib header; a few write it raw; a few leave it uncompressed. Try each. */
+async function stream(bytes) {
+  for (const how of ["deflate", "deflate-raw"]) {
+    try { return latin(await inflate(bytes, how)); } catch { /* next */ }
+  }
+  return latin(bytes);
+}
+
+const latin = (b) => new TextDecoder("latin1").decode(b);
+
+/* PDF string literals: escapes, octal, and a backslash before a newline is a
+ * line continuation rather than a character. */
+function unescapePdf(raw) {
+  let out = "";
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    if (c !== "\\") { out += c; continue; }
+    const n = raw[++i];
+    if (n === undefined) break;
+    if (n >= "0" && n <= "7") {
+      let oct = n;
+      while (oct.length < 3 && raw[i + 1] >= "0" && raw[i + 1] <= "7") oct += raw[++i];
+      out += String.fromCharCode(parseInt(oct, 8));
+    } else if (n === "n") out += "\n";
+    else if (n === "r") out += "\r";
+    else if (n === "t") out += "\t";
+    else if (n === "b" || n === "f") out += " ";
+    else if (n === "\n" || n === "\r") { /* continuation: nothing */ }
+    else out += n;
+  }
+  return out;
+}
+
+/* Walk the text-showing operators inside BT..ET and reassemble lines. */
+function harvest(content) {
+  const lines = [];
+  for (const block of content.split(/\bBT\b/).slice(1)) {
+    const body = block.split(/\bET\b/)[0];
+    let line = "";
+    // T* has no word boundary after the star, so it needs its own branch.
+    const re = /\((?:\\[\s\S]|[^\\()])*\)|T\*|\bT[dDmJj]\b/g;
+    let m;
+    while ((m = re.exec(body))) {
+      const tok = m[0];
+      if (tok[0] === "(") line += unescapePdf(tok.slice(1, -1));
+      else if (tok === "Td" || tok === "TD" || tok === "T*" || tok === "Tm") {
+        if (line.trim()) { lines.push(line.trim()); line = ""; }
+      }
+    }
+    if (line.trim()) lines.push(line.trim());
+  }
+  return lines.join("\n");
+}
+
+async function pdfText(buf) {
+  const bytes = new Uint8Array(buf);
+  const raw = latin(bytes);
+  const chunks = [];
+  // \b keeps this off the word "endstream", whose tail spells stream too.
+  const re = /\bstream\r?\n/g;
+  let m;
+  while ((m = re.exec(raw))) {
+    const from = m.index + m[0].length;
+    const to = raw.indexOf("endstream", from);
+    if (to < 0) break;
+    // Most writers put an end-of-line between the data and the keyword, and a
+    // decompressor treats that as junk after the stream, so cut it off.
+    let end = to;
+    while (end > from && (bytes[end - 1] === 10 || bytes[end - 1] === 13)) end--;
+    chunks.push(await stream(bytes.subarray(from, end)));
+    re.lastIndex = to + 9;
+  }
+  return harvest(chunks.join("\n")).replace(/[ \t]+/g, " ").trim();
+}
+
+async function readAttachment(file) {
+  const name = file.name;
+  const kb = Math.max(1, Math.round(file.size / 1024));
+  if (file.size > 8 * 1024 * 1024) {
+    return { name, kb, error: "over 8 MB" };
+  }
+  if (/^image\//.test(file.type)) {
+    if (file.size > 3.5 * 1024 * 1024) return { name, kb, error: "image over 3.5 MB" };
+    const data = await new Promise((res) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result).split(",")[1]);
+      r.onerror = () => res(null);
+      r.readAsDataURL(file);
+    });
+    return data ? { name, kb, image: { type: file.type, data } }
+                : { name, kb, error: "could not be read" };
+  }
+  if (/\.pdf$/i.test(name) || file.type === "application/pdf") {
+    let text = "";
+    try { text = await pdfText(await file.arrayBuffer()); } catch { text = ""; }
+    if (text.length < 40) {
+      return { name, kb, error: "no text in it — if it is a scan, paste the text instead" };
+    }
+    return { name, kb, text: text.slice(0, MAX_TEXT) };
+  }
+  const text = await file.text().catch(() => "");
+  if (!text.trim()) return { name, kb, error: "empty" };
+  return { name, kb, text: text.slice(0, MAX_TEXT) };
+}
+
+function renderFiles() {
+  const box = $("#files");
+  box.innerHTML = "";
+  attached.forEach((a, i) => {
+    const d = document.createElement("div");
+    d.className = "file" + (a.error ? " bad" : "");
+    const b = document.createElement("b"); b.textContent = a.name;
+    const s = document.createElement("span");
+    s.textContent = a.error ? a.error : (a.image ? "image" : `${a.kb} KB`);
+    const x = document.createElement("button");
+    x.textContent = "✕"; x.title = "Remove";
+    x.onclick = () => { attached.splice(i, 1); renderFiles(); };
+    d.append(b, s, x); box.append(d);
+  });
+}
+
+/* The + button owns a hidden file input. Each file is read once, here, so a
+ * failure shows on its chip instead of surfacing later as a bad answer. */
+$("#clip").onclick = () => $("#pick").click();
+$("#pick").addEventListener("change", async (e) => {
+  const picked = [...e.target.files];
+  e.target.value = "";                    // so the same file can be picked twice
+  const clip = $("#clip");
+  clip.disabled = true; clip.textContent = "\u2026";
+  for (const f of picked) {
+    if (attached.length >= MAX_ATTACH) {
+      bubble("err", "Problem", `Four files at a time \u2014 ${f.name} was not added.`);
+      break;
+    }
+    attached.push(await readAttachment(f));
+    renderFiles();
+  }
+  clip.disabled = false; clip.textContent = "+";
+  $("#input").focus();
+});
+
+/* A user turn is a plain string until something is attached; then it becomes
+ * Messages-API content blocks, because that is the only way an image travels.
+ * Routes that cannot carry blocks flatten them back to text. */
+function blocksFor(text) {
+  if (!attached.length) return text;
+  const out = [];
+  for (const a of attached) {
+    if (a.error) continue;
+    if (a.image) {
+      out.push({ type: "image",
+                 source: { type: "base64", media_type: a.image.type, data: a.image.data } });
+    } else {
+      const name = a.name.replace(/[<>"]/g, "");
+      out.push({ type: "text",
+                 text: `<file name="${name}">\n${a.text.replace(/<\/file>/g, "<\\/file>")}\n</file>` });
+    }
+  }
+  if (!out.length) return text;
+  out.push({ type: "text", text });
+  return out;
+}
+
+function flatten(content) {
+  if (typeof content === "string") return content;
+  return content.map(b => b.type === "text" ? b.text
+    : "[an image was attached; this route cannot carry pictures]").join("\n\n");
+}
+
+function flatTurns(msgs) {
+  return msgs.map(m => ({ role: m.role, content: flatten(m.content) }));
+}
+
+function sizeOf(content) {
+  if (typeof content === "string") return new Blob([content]).size;
+  return content.reduce((n, b) => n +
+    (b.type === "text" ? new Blob([b.text]).size : b.source.data.length * 0.75), 0);
 }
 
 /* ---------- talking to Claude ----------
@@ -971,7 +1193,7 @@ async function askRelay(_sys, msgs, opts) {
       method: "POST", signal: opts.signal,
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        messages: msgs,
+        messages: flatTurns(msgs),
         profile: relayProfile(),
         hasResume: !!profile.resumeFile,
         appCount: apps.length,
@@ -1000,7 +1222,7 @@ async function askRelay(_sys, msgs, opts) {
 async function ask(msgs, opts) {
   const sys = charter();
   if (route === "claude") {
-    const r = await sample([{ role: "user", content: sys }, ...msgs],
+    const r = await sample([{ role: "user", content: sys }, ...flatTurns(msgs)],
       { cache: false, signal: opts.signal, onText: opts.onText });
     return r.text;
   }
@@ -1011,10 +1233,18 @@ async function ask(msgs, opts) {
 
 async function send() {
   const box = $("#input"); const text = box.value.trim();
-  if (!text || mode !== "live" || ctl) return;
+  if ((!text && !attached.length) || mode !== "live" || ctl) return;
+
+  // Build the turn before clearing the tray, then clear it: a file goes with
+  // the message it was attached to and does not ride along on the next one.
+  const said = text || "Read the attached file.";
+  const content = blocksFor(said);
+  const names = attached.filter(a => !a.error).map(a => a.name);
+  attached = []; renderFiles();
+
   box.value = ""; box.style.height = "auto";
-  bubble("me","You",text);
-  turns.push({ role:"user", content:text });
+  bubble("me","You", names.length ? said + "\n\u2014 " + names.join(", ") : said);
+  turns.push({ role:"user", content });
 
   const holder = bubble("think","Assistant","Thinking…");
   ctl = new AbortController();
@@ -1058,8 +1288,7 @@ $("#input").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shift
 $("#input").addEventListener("input", e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight,150) + "px"; });
 $("#chatClear").onclick = () => { turns = []; log.innerHTML = ""; greet(); };
 function greet() {
-  bubble("","Assistant","Paste a job posting and I will tell you what to lead with, or ask me to draft "
-    + "something. I can see your profile, so I will not ask for what you have already filled in.");
+  bubble("","Assistant","Paste a job posting, or attach one with +. I can see your profile.");
 }
 
 function applyRoute(r) {
@@ -1069,14 +1298,14 @@ function applyRoute(r) {
     mode = "preview";
     setStatus("off", "chat runs on the live demo");
     input.disabled = true;
-    input.placeholder = "The chat lives on the live demo — open it to talk.";
+    input.placeholder = "The chat lives on the live demo \u2014 open it to talk.";
     btn.disabled = false;
     btn.textContent = "Open chat";
     btn.onclick = () => window.open(LIVE_DEMO, "_blank", "noopener");
     log.innerHTML = "";
     bubble("", "Assistant",
       "The chat for this workspace runs on the live demo, where Claude is "
-      + "already present — nothing to set up and no key needed. Press Open chat, "
+      + "already present \u2014 nothing to set up and no key needed. Press Open chat, "
       + "or use the Assistant tab if you would rather run it on your own key.");
     return;
   }
