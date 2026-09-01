@@ -360,6 +360,9 @@ const ASSIST = {
  * visitor uses their own account. So rather than a dead end, the unconnected
  * state points at the copy that works. */
 const LIVE_DEMO = "https://claude.ai/code/artifact/680a5cc7-1156-418d-ae95-f1a759c5e29c";
+/* True when this page is the hosted copy rather than a local file or the
+ * artifact, so it does not offer to send anyone to itself. */
+const onDemo = () => /(^|\.)github\.io$/.test(location.hostname);
 
 let hostedRelay = "";
 async function findHostedRelay() {
@@ -1269,6 +1272,8 @@ async function send() {
       if (e && e.text) { holder.textContent = e.text; holder.parentElement.className = "msg"; }
       else holder.parentElement.remove();
       bubble("err","Problem", ERRS[code] || ERRS.upstream_error);
+      // A relay that stopped answering has usually moved rather than died.
+      if (route === "relay" && (code === "blocked" || code === "upstream_error")) recheck();
       if (turns[turns.length-1] && turns[turns.length-1].role === "user") turns.pop();
       if (FATAL.has(code)) { mode = "preview"; setStatus("off","assistant unavailable"); lock(); }
     }
@@ -1296,13 +1301,27 @@ function applyRoute(r) {
   const btn = $("#send"), input = $("#input");
   if (r === "none") {
     mode = "preview";
-    setStatus("off", "chat runs on the live demo");
     input.disabled = true;
+    log.innerHTML = "";
+    // On the demo itself, pointing at the demo is a loop. There the honest
+    // answer is that the desk it talks to is not up yet, and the page is
+    // watching for it.
+    if (onDemo()) {
+      setStatus("off", "waiting for the desk");
+      input.placeholder = "Waiting for the assistant to come up\u2026";
+      btn.disabled = true;
+      btn.textContent = "Send";
+      bubble("", "Assistant",
+        "The assistant is not up yet. It runs on the owner's machine, and this "
+        + "page connects by itself the moment it comes online \u2014 leave the tab open. "
+        + "Or open the Assistant tab and put in your own key.");
+      return;
+    }
+    setStatus("off", "chat runs on the live demo");
     input.placeholder = "The chat lives on the live demo \u2014 open it to talk.";
     btn.disabled = false;
     btn.textContent = "Open chat";
     btn.onclick = () => window.open(LIVE_DEMO, "_blank", "noopener");
-    log.innerHTML = "";
     bubble("", "Assistant",
       "The chat for this workspace runs on the live demo, where Claude is "
       + "already present \u2014 nothing to set up and no key needed. Press Open chat, "
@@ -1320,6 +1339,30 @@ function applyRoute(r) {
   btn.onclick = send;
 }
 
+/* The address the desktop publishes is not fixed: a quick tunnel hands out a
+ * new one every time it is restarted. Rather than have anyone paste it
+ * anywhere, the desktop writes it into relay.json beside this page and the
+ * page keeps looking. Start the desktop and an open page connects by itself. */
+async function recheck() {
+  const found = await findHostedRelay();
+  if (found === hostedRelay) return false;
+  const was = route;
+  hostedRelay = found;
+  applyRoute(sample ? "claude" : relayUrl() ? "relay" : ASSIST.key ? "key" : "none");
+  // Say it however it happened - on the timer, or because a dropped call sent
+  // us looking. Somebody watching a dead page should see it come alive.
+  if (was === "none" && route === "relay") bubble("", "Assistant", "Connected. Ask away.");
+  return true;
+}
+
+let watching = null;
+function watch() {
+  if (watching || ASSIST.relay) return;      // a relay they set themselves stays put
+  watching = setInterval(() => {
+    if (route === "none" || route === "relay") recheck();
+  }, 20000);
+}
+
 async function detectRoute() {
   try { sample = window.claude ? await window.claude.use("sample") : null; } catch { sample = null; }
   if (sample) return "claude";
@@ -1335,6 +1378,7 @@ go(current); setStatus("", "connecting…"); greet();
 (async () => {
   await openGate();                      // nothing starts until they are through
   applyRoute(await detectRoute());
+  watch();
 })();
 </script>
 </body>
