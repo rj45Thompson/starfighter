@@ -121,6 +121,17 @@ tr:last-child td{border-bottom:0}
 pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:11px 13px;
   font-family:var(--mono);font-size:11.5px;overflow-x:auto;margin:9px 0 0;max-height:190px;white-space:pre-wrap;word-break:break-all}
 
+/* On the dashboard the chat is not a sidebar, it is the page. Same element,
+ * moved rather than duplicated - two chat boxes with two histories would be a
+ * worse bug than no chat at all. */
+.chatpane.inline{border-left:0;border:1px solid var(--line);border-radius:13px;
+  position:static;height:auto;min-height:min(64vh,560px);max-height:none;
+  margin:0 0 18px;box-shadow:none}
+.chatpane.inline .log{min-height:200px}
+.shell.dash-chat{grid-template-columns:var(--rail) minmax(0,1fr) 0}
+.shell.dash-chat .fab{display:none}
+.askline{font-family:var(--display);font-size:20px;font-weight:600;margin:2px 0 10px;
+  letter-spacing:-.01em}
 .chatpane{border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
 .chathead{display:flex;align-items:center;gap:8px;padding:14px 15px;border-bottom:1px solid var(--line-soft)}
 .chathead b{font-family:var(--display);font-size:15px;font-weight:600;flex:1}
@@ -154,6 +165,8 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
   .shell,.shell.chat-hidden{grid-template-columns:var(--rail) minmax(0,1fr)}
   .chatpane{position:fixed;inset:auto 0 0 0;height:78vh;z-index:30;border-left:0;border-top:1px solid var(--line);border-radius:13px 13px 0 0;display:none;box-shadow:0 -8px 34px rgba(0,0,0,.2)}
   .shell.chat-open .chatpane{display:flex}
+  .chatpane.inline{position:static;inset:auto;height:auto;display:flex;
+    border-radius:13px;border:1px solid var(--line);z-index:auto}
   .fab{display:block}
 }
 @media (max-width:720px){
@@ -423,13 +436,43 @@ PANELS.forEach(p => {
   nav.append(b);
 });
 
+/* The chat lives in one place at a time. On the dashboard it sits at the top of
+ * the panel as the main thing; everywhere else it goes back to being the pane
+ * on the right. Moving the node keeps one log, one history, one composer. */
+function stowChat() {
+  const pane = $("#chatpane"), shell = $("#shell");
+  if (pane && pane.parentElement !== shell) shell.append(pane);
+}
+
+function placeChat(inline, panel) {
+  const pane = $("#chatpane"), shell = $("#shell");
+  if (!pane) return;
+  if (inline) {
+    const ask = document.createElement("h2");
+    ask.className = "askline";
+    ask.textContent = "Ask about anything in your search";
+    panel.append(ask, pane);
+    pane.classList.add("inline");
+    shell.classList.add("dash-chat");
+    shell.classList.remove("chat-open");
+  } else {
+    pane.classList.remove("inline");
+    shell.classList.remove("dash-chat");
+  }
+  // Landing on the page should mean landing in the box you are meant to type in.
+  if (inline && !narrow()) { const i = $("#input"); if (!i.disabled) i.focus(); }
+}
+
 function go(p) {
   current = p; store.set("panel", p.id);
   $("#ptitle").textContent = p.title;
   $("#psub").textContent = p.sub;
   document.querySelectorAll(".navbtn").forEach(b => b.setAttribute("aria-current", String(b.dataset.id === p.id)));
   const nc = $("#navCount"); if (nc) nc.textContent = apps.length || "";
-  const w = $("#panel"); w.innerHTML = "";
+  const w = $("#panel");
+  stowChat();              // before the clear below, or the chat goes with it
+  w.innerHTML = "";
+  placeChat(p.id === "dash", w);
   ({ dash: renderDash, profile: renderProfile, apps: renderApps,
      connect: renderConnect })[p.id](w);
   renderChips();
