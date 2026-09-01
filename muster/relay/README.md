@@ -26,6 +26,7 @@ store; the page only ever talks to the Worker.
 | Text | `MODEL` | `claude-opus-5` |
 | Text | `EFFORT` | `low` |
 | Text | `MAX_TOKENS` | `1200` |
+| Text | `ALERT_WEBHOOK` | optional — see the zoo below |
 
 **CLI.**
 
@@ -82,18 +83,83 @@ to be served by something that can withhold it - Cloudflare Access in front of
 it, or serve the HTML from this Worker. That is a different deployment, not a
 stronger version of this one.
 
+## The unusual activity zoo
+
+Set `ALERT_WEBHOOK` to any URL that accepts a JSON POST and the relay reports
+things that should not happen much. Nine species, each with the signal that
+catches it:
+
+| Species | Severity | What tripped it |
+|---|---|---|
+| `code_probing` | critical | Three or more **different** wrong codes from one address. Guessing, not typos. |
+| `ip_fanout` | high | More than 25 addresses in ten minutes. The link has spread past who you gave it to. |
+| `foreign_origin` | high | A request from a site that is not yours. |
+| `injection` | high | A profile field shaped like an instruction override. A first name does not say "ignore all previous instructions". |
+| `bad_code` | medium | A single wrong access code. |
+| `no_origin` | medium | No Origin header, so not a browser tab. curl, a script, a scanner. |
+| `hammering` | medium | One address hit the rate limit three times over. |
+| `refusal` | medium | Claude declined the request, or the API errored. |
+| `oversized` | low | A request at the size ceiling. Usually probing the limits. |
+
+Three things about how it behaves.
+
+**Nothing here blocks.** Blocking is done by the checks below; a detector that
+is also a gate becomes a way to switch itself off. `injection` in particular
+reports and then serves the request normally, because the profile is
+quarantined as data either way.
+
+**One message per species per 15 minutes** (`ALERT_COOLDOWN_S`), so a flood
+cannot bury you. Suppressed events are counted, not dropped: the next message
+says how many it stands for, so a quiet inbox never means a quiet relay.
+
+**These are sightings, not an audit log.** The counters live in one isolate's
+memory, which Cloudflare evicts when it likes. A clumsy attacker is seen
+reliably; a distributed one is seen less often. Worth having, not worth
+trusting as a complete record.
+
+## Getting the alerts as email
+
+A Worker cannot send email by itself, so the webhook is the mechanism and you
+need one hop. The payload already carries preformatted `subject` and `text`
+fields for exactly this, so a forwarder needs no transformation:
+
+```json
+{ "source": "muster-relay", "species": "code_probing", "severity": "critical",
+  "meaning": "Several DIFFERENT wrong codes from one address...",
+  "at": "2026-09-01T05:00:00.000Z",
+  "detail": { "ip": "203.0.113.4", "distinctCodesTried": 3 },
+  "sinceLastAlert": 0,
+  "subject": "Muster relay: code_probing (critical)",
+  "text": "Several DIFFERENT wrong codes from one address...\n\nspecies: ..." }
+```
+
+Easiest routes, no code:
+
+- **Zapier / Make / Pipedream / IFTTT** - "webhook in, email out". Paste the URL
+  they give you into `ALERT_WEBHOOK`, map `subject` and `text`. Free tiers cover
+  this volume comfortably.
+- **Slack or Discord** - both accept a JSON POST at an incoming-webhook URL. Not
+  email, but it reaches your phone faster.
+- **Cloudflare Email Workers** - keeps it inside Cloudflare with no third party.
+  Needs a `send_email` binding and a verified destination address; check their
+  current docs for the binding syntax rather than trusting a snippet.
+
 ## What stops this being an open Claude proxy
 
-The one that matters: **the system prompt is built in the Worker and the
-caller's is ignored.** A relay that forwards a caller-supplied system prompt is
-a general-purpose Claude proxy running on your credit card. Here a caller can
-supply only chat turns and profile fields; the instructions, model, token cap
-and effort are all set server-side.
+The one that matters: **the system prompt is a constant and no caller input
+reaches it.** A relay that lets a caller influence its instructions is a
+general-purpose Claude proxy running on your credit card. Here a caller
+supplies chat turns and profile fields, and the profile travels as quarantined
+data inside a user turn with its angle brackets stripped, so a value cannot
+close the tag it sits in and pose as the surrounding document.
+
+That was a real hole, not a hypothetical one: profile fields used to be
+interpolated into the system prompt, and `security.test.mjs` is the suite that
+caught it.
 
 Around that: an origin allowlist (stops other sites embedding it — spoofable by
 a script, so it is a filter rather than a wall), hard caps on turns, characters
-and output tokens, and an optional per-IP rate limit you can bind in
-`wrangler.toml`.
+and output tokens, a per-IP throttle, and the access code.
 
 ## The guard that is not in this code
 
@@ -107,6 +173,17 @@ cannot be argued with. Do this before you send the link to anyone.
 the big dial: Sonnet 5 is roughly two and a half times cheaper per token than
 Opus 5 and is more than good enough for drafting a cover-letter paragraph.
 Change the variable, no redeploy of the page needed.
+
+## Tests
+
+```
+node relay/test/security.test.mjs   # 38 adversarial assertions
+node relay/test/zoo.test.mjs        # 25 assertions on the detectors
+```
+
+No framework, nothing to install. Both import the real worker with a stubbed
+upstream, so they check what would actually have been sent to Anthropic rather
+than what the source appears to say.
 
 ## The contract, if you want to write your own
 
