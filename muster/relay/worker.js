@@ -22,6 +22,10 @@
  *   3. Hard caps: turns, characters, output tokens. Bounds the cost of any
  *      single request no matter what is asked.
  *   4. Optional per-IP rate limit, if you bind one (see wrangler.toml).
+ *   5. An access code, if you set ACCESS_CODE. This is the real gate behind
+ *      the one on the page: that screen is a doorknob anyone can step around,
+ *      but a request without the code never reaches Anthropic and never costs
+ *      anything. Set it when you hand the link to people.
  *
  * And the guard that does not live in this file at all: set a spend limit on
  * the workspace whose key this is, and use a key you can revoke. Code can be
@@ -65,6 +69,20 @@ function allowedOrigin(request, env) {
   const allowed = list.length ? list : DEFAULT_ORIGINS;
   const origin = request.headers.get("origin") || "";
   return allowed.includes(origin) ? origin : null;
+}
+
+/* Compare without leaking length or position through timing. Digest both
+ * sides and diff every byte: same work whatever the input. */
+async function sameSecret(a, b) {
+  const enc = new TextEncoder();
+  const [x, y] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(a || "")),
+    crypto.subtle.digest("SHA-256", enc.encode(b || ""))
+  ]);
+  const u = new Uint8Array(x), v = new Uint8Array(y);
+  let diff = 0;
+  for (let i = 0; i < u.length; i++) diff |= u[i] ^ v[i];
+  return diff === 0;
 }
 
 function bad(status, message, origin) {
@@ -171,6 +189,15 @@ export default {
 
     const read = readBody(body);
     if (read.error) return bad(400, read.error, origin);
+
+    // Set ACCESS_CODE and the relay is private, whatever anyone does to the
+    // page. Leave it unset and the relay is open to the allowed origins.
+    if (env.ACCESS_CODE) {
+      const code = typeof body.code === "string" ? body.code : "";
+      if (!(await sameSecret(code, env.ACCESS_CODE))) {
+        return bad(403, "That access code was refused.", origin);
+      }
+    }
 
     // Note what is NOT taken from the client: system, model, max_tokens,
     // effort, tools. Those are the parameters that would turn this into a

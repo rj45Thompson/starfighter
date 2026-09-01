@@ -14,6 +14,11 @@ MODEL      = "claude-opus-5"
 EFFORT     = "low"       # low/medium/high/xhigh/max — chat rarely needs above low
 MAX_TOKENS = "1200"
 
+# The access code is NOT here either - same reason. Set it as a secret and the
+# relay refuses any request without it, whatever anyone does to the page:
+#     wrangler secret put ACCESS_CODE
+# Leave it unset and the relay serves the allowed origins with no code.
+
 # The API key is NOT here. Set it as a secret so it never enters this file
 # or your git history:
 #     wrangler secret put ANTHROPIC_API_KEY

@@ -21,6 +21,7 @@ store; the page only ever talks to the Worker.
 | Kind | Name | Value |
 |---|---|---|
 | Secret | `ANTHROPIC_API_KEY` | your key from console.anthropic.com |
+| Secret | `ACCESS_CODE` | the access code you hand out with the link |
 | Text | `ALLOWED_ORIGINS` | `https://rj45thompson.github.io` |
 | Text | `MODEL` | `claude-opus-5` |
 | Text | `EFFORT` | `low` |
@@ -32,6 +33,7 @@ store; the page only ever talks to the Worker.
 npm i -g wrangler
 wrangler login
 wrangler secret put ANTHROPIC_API_KEY
+wrangler secret put ACCESS_CODE
 wrangler deploy
 ```
 
@@ -49,6 +51,36 @@ That is the whole wiring. The page fetches that file on load; if it names a
 URL, the chat connects by itself and the visitor sets up nothing. If the file
 is missing, empty, or unreachable, the page falls back to asking for the
 visitor's own key — it never breaks, it just asks.
+
+## The access code
+
+The page shows a lock screen, but understand what that is: the HTML is already
+in the browser by then, so the screen is a doorknob anyone can step around with
+the developer tools. It keeps a link you hand out from being wandered into. It
+is not access control.
+
+`ACCESS_CODE` is the half that is. The relay refuses any request without it, so
+someone who bypasses the screen gets a page whose assistant will not talk to
+them, and spends nothing of yours. The page never contains the code, only a
+PBKDF2 verifier - salt, iteration count, derived key - so view-source cannot
+reveal what the relay is checking for.
+
+To change it: set the new `ACCESS_CODE` secret on the Worker, then replace
+`GATE` in `index.html` with a verifier for the new phrase.
+
+```python
+import secrets, hashlib, binascii
+phrase = "your-new-code"
+salt = secrets.token_bytes(16)
+print("salt:", binascii.hexlify(salt).decode())
+print("hash:", binascii.hexlify(
+    hashlib.pbkdf2_hmac("sha256", phrase.encode(), salt, 100000, 32)).decode())
+```
+
+If you want the page itself to be genuinely unreadable without a code, it has
+to be served by something that can withhold it - Cloudflare Access in front of
+it, or serve the HTML from this Worker. That is a different deployment, not a
+stronger version of this one.
 
 ## What stops this being an open Claude proxy
 
@@ -83,7 +115,8 @@ POST /
 { "messages": [{"role":"user","content":"..."}],
   "profile":  {"firstName":"...", "city":"..."},
   "hasResume": true,
-  "appCount": 3 }
+  "appCount": 3,
+  "code": "the access code, if one is set" }
 
 → text/event-stream, Anthropic's format, passed through unchanged
 ```
