@@ -136,6 +136,16 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 .chip{background:var(--sunk);border:1px solid var(--line-soft);border-radius:99px;padding:5px 11px;font-size:12.5px;cursor:pointer;text-align:left}
 .chip:hover{border-color:var(--brick);color:var(--brick)}
 
+.gate{position:fixed;inset:0;z-index:60;background:var(--paper);display:grid;place-items:center;padding:24px}
+.gatebox{width:min(360px,100%);text-align:center;display:flex;flex-direction:column;gap:11px;align-items:center}
+.gatebox .mark{width:44px;height:44px;font-size:22px;border-radius:11px}
+.gatebox h1{font-family:var(--display);font-size:26px;font-weight:600;margin:4px 0 0;letter-spacing:-.015em}
+.gatebox p{color:var(--soft);margin:0;font-size:13.5px;text-wrap:balance}
+.gatebox input{width:100%;text-align:center;font-family:var(--mono);font-size:13px;letter-spacing:.02em}
+.gatebox .btn{width:100%}
+.gateerr{color:var(--brick);font-weight:500}
+.gated .shell,.gated .fab{display:none}
+
 .fab{display:none;position:fixed;right:15px;bottom:15px;z-index:20;background:var(--brick);color:#FFF8F5;border:0;border-radius:99px;padding:12px 18px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.22);cursor:pointer}
 @media (max-width:1060px){
   .shell,.shell.chat-hidden{grid-template-columns:var(--rail) minmax(0,1fr)}
@@ -155,6 +165,18 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 
 </head>
 <body>
+<div class="gate" id="gate" hidden>
+  <form class="gatebox" id="gateForm">
+    <div class="mark">M</div>
+    <h1>Muster</h1>
+    <p>This preview is private. Enter the access code you were sent.</p>
+    <input id="gateInput" type="password" autocomplete="off" spellcheck="false"
+           placeholder="access code" aria-label="Access code">
+    <button class="btn" type="submit" id="gateGo">Open</button>
+    <p class="gateerr" id="gateErr" hidden>That code is not right.</p>
+  </form>
+</div>
+
 <div class="shell" id="shell">
   <aside class="rail">
     <div class="brand">
@@ -203,6 +225,90 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
    ------------------------------------------------------------------ */
 
 const $ = (s) => document.querySelector(s);
+
+/* ---------- the access gate ----------
+ *
+ * Be clear about what this is. The page is static HTML that the browser has
+ * already downloaded, so a screen in front of it is a doorknob, not a lock:
+ * anyone who opens the developer tools can step around it. It is here to keep
+ * a link you hand out from being wandered into, which is a real thing to want
+ * and a different thing from access control.
+ *
+ * What is NOT here is the code itself. The page carries a PBKDF2 verifier —
+ * salt, iteration count, and the derived key — so it can check an answer
+ * without containing one. That matters, because the same code is what the
+ * relay demands before it will spend anyone's API budget: publish the code in
+ * the page and that check would be worthless. Bypass the screen and you get an
+ * assistant that refuses to talk to you.
+ *
+ * For a page that genuinely cannot be read without the code, it has to be
+ * served by something that can withhold it — the relay itself, or Cloudflare
+ * Access in front of it. That is a different deployment, not a stronger
+ * version of this. */
+const GATE = {
+  salt: "8ff1ec62bf326915a2a17d63bb4458cd",
+  hash: "6ace66186919b6aab8c953ce2e7ff8badfcdc265d7280535507dc7633ddc5014",
+  iterations: 100000
+};
+
+const hex = (buf) => [...new Uint8Array(buf)]
+  .map((b) => b.toString(16).padStart(2, "0")).join("");
+const unhex = (h) => new Uint8Array((h.match(/../g) || []).map((b) => parseInt(b, 16)));
+
+async function derive(pass, saltHex, iterations) {
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: unhex(saltHex), iterations, hash: "SHA-256" }, key, 256);
+  return hex(bits);
+}
+
+/* Resolves once the visitor is through, or immediately if they already are.
+ * A failure to derive (very old browser, no crypto.subtle over plain http)
+ * leaves the screen up rather than letting everyone in. */
+function openGate() {
+  return new Promise((resolve) => {
+    const saved = store.get("code", "");
+    const gate = $("#gate"), form = $("#gateForm"),
+          input = $("#gateInput"), err = $("#gateErr"), go = $("#gateGo");
+
+    const pass = async (code) => {
+      try { return (await derive(code, GATE.salt, GATE.iterations)) === GATE.hash; }
+      catch { return false; }
+    };
+
+    const show = () => {
+      document.documentElement.classList.add("gated");
+      gate.hidden = false;
+      input.focus();
+    };
+    const enter = (code) => {
+      store.set("code", code);
+      document.documentElement.classList.remove("gated");
+      gate.hidden = true;
+      resolve(code);
+    };
+
+    // Someone who is already through should not be asked again.
+    if (saved) {
+      pass(saved).then((ok) => ok ? enter(saved) : (store.set("code", ""), show()));
+    } else {
+      show();
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const code = input.value.trim();
+      if (!code) return;
+      go.disabled = true; go.textContent = "Checking…"; err.hidden = true;
+      const ok = await pass(code);
+      go.disabled = false; go.textContent = "Open";
+      if (ok) return enter(code);
+      err.hidden = false;
+      input.select();
+    });
+  });
+}
 const store = {
   get(k, d) { try { const v = localStorage.getItem("muster:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("muster:" + k, JSON.stringify(v)); return true; } catch { return false; } }
@@ -713,6 +819,7 @@ const ERRS = {
   empty_completion:"Nothing came back. Ask for less at once.",
   prompt_too_large:"This conversation got too long. Clear it and start again.",
   invalid_request:"The page asked wrongly — that is a bug in the page.",
+  bad_code:"That access code was refused. Ask whoever sent you the link for the current one.",
   bad_key:"That key was rejected. Check it on console.anthropic.com and paste it again.",
   no_credit:"That Anthropic account is out of credit. Top it up and try again.",
   no_route:"The assistant is not connected yet. Open the Assistant tab to set it up.",
@@ -756,7 +863,8 @@ async function httpErr(res) {
   let detail = "";
   try { const j = await res.json(); detail = (j && j.error && j.error.message) || ""; } catch { /* not JSON */ }
   let code = "upstream_error";
-  if (res.status === 401 || res.status === 403) code = "bad_key";
+  if (res.status === 403 && /access code/i.test(detail)) code = "bad_code";
+  else if (res.status === 401 || res.status === 403) code = "bad_key";
   else if (res.status === 429) code = "rate_limited";
   else if (res.status === 400 && /credit|balance/i.test(detail)) code = "no_credit";
   else if (res.status === 400 || res.status === 422) code = "invalid_request";
@@ -838,7 +946,10 @@ async function askRelay(_sys, msgs, opts) {
         messages: msgs,
         profile: relayProfile(),
         hasResume: !!profile.resumeFile,
-        appCount: apps.length
+        appCount: apps.length,
+        // The relay checks this. Stepping around the screen above gets you the
+        // page; it does not get you an assistant.
+        code: store.get("code", "")
       })
     });
   } catch (e) {
@@ -959,7 +1070,10 @@ async function detectRoute() {
 
 /* ---------- boot ---------- */
 go(current); setStatus("", "connecting…"); greet();
-(async () => { applyRoute(await detectRoute()); })();
+(async () => {
+  await openGate();                      // nothing starts until they are through
+  applyRoute(await detectRoute());
+})();
 </script>
 </body>
 </html>
