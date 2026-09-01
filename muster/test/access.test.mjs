@@ -96,7 +96,7 @@ console.log("\nusing the assistant is reported separately");
   relay = { url: "https://desk.example/bridge/chat" };
   pings.length = 0;
   const { ctx, page } = await open(enterCode);
-  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "assistant ready");
+  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");
   ok("no chat ping before anyone chats", pings.every((p) => p.event !== "chat"));
   await page.fill("#input", "What should I lead with?");
   await page.click("#send");
@@ -134,111 +134,45 @@ console.log("\nan http endpoint is refused");
   await ctx.close();
 }
 
-/* ---- the assistant is still gated ---- */
-console.log("\nthe code still guards the assistant");
+/* ---- the code arrives in the link, not in a settings field ---- */
+console.log("\nthe code comes with the link");
 {
   notify = { url: "" };
-  relay = { url: "https://desk.example/bridge/chat" };
-  const { ctx, page } = await open();
-  await page.click(".navbtn[data-id='assistant']");
-  await page.waitForSelector("#aCode");
-  ok("there is somewhere to put the code", true);
-  ok("it is a password field, not plain text",
-     (await page.getAttribute("#aCode", "type")) === "password");
-
-  await page.fill("#aCode", "hunter2");
-  await page.click("text=Save and connect");
-  await page.waitForTimeout(700);
-  // The note lives beside the save button, not in the last card - there is a
-  // third card after it explaining what leaves the page.
-  const saveNote = () => page.textContent("#panel");
-  ok("a wrong code is called out on the spot",
-     /not right/.test(await saveNote()), "no complaint shown");
-
-  await page.click(".navbtn[data-id='assistant']");
-  await page.waitForSelector("#aCode");
-  await page.fill("#aCode", CODE);
-  await page.click("text=Save and connect");
-  await page.waitForTimeout(700);
-  ok("the right one is accepted quietly", !/not right/.test(await saveNote()));
-  ok("and it is what travels to the relay",
-     await page.evaluate(() => JSON.parse(localStorage.getItem("muster:code"))) === CODE);
-  await ctx.close();
-}
-
-/* ---- an address handed over in the link ---- */
-console.log("\na desk named in the link");
-{
-  notify = { url: "" };
-  relay = { url: "" };                       // nothing published: the link is all there is
+  relay = { url: "" };
   const base = "https://rj45thompson.github.io/starfighter/muster/index.html";
   const desk = "https://desk.example/bridge/chat";
-
-  const ctx = await browser.newContext();
-  const page = await ctx.newPage();
-  page.setDefaultTimeout(8000);
-  page.on("pageerror", (e) => { t.bad(); console.log("  FAIL page error: " + e.message); });
-  await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
-  await page.route("https://rj45thompson.github.io/**", async (route) => {
-    const u = new URL(route.request().url());
-    if (u.pathname.endsWith(".json"))
-      return route.fulfill({ status: 200, contentType: "application/json", body: '{"url":""}' });
-    return route.fulfill({ status: 200, contentType: "text/html", body: HTML });
-  });
+  const { ctx, page } = await open();
   const asks = [];
+  await page.unroute("https://desk.example/**");
   await page.route("https://desk.example/**", async (route) => {
     asks.push(JSON.parse(route.request().postData()));
     await route.fulfill({ status: 200, contentType: "application/json",
                           body: JSON.stringify({ text: "Lead with the ops work." }) });
   });
 
-  await page.goto(base + "#desk=" + encodeURIComponent(desk));
-  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
-  ok("the link alone brings the assistant up",
-     /assistant/.test(await page.textContent("#statusText")), await page.textContent("#statusText"));
-  ok("the address is out of the bar once it is read", !(await page.evaluate(() => location.hash)));
-  ok("and remembered",
-     await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay"))) === desk);
+  await page.goto(base + "#desk=" + encodeURIComponent(desk) + "&code=" + encodeURIComponent(CODE));
+  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");
+  ok("one link is the whole setup", true);
+  ok("nothing is left in the address bar", !(await page.evaluate(() => location.hash)));
 
   await page.fill("#input", "What should I lead with?");
   await page.click("#send");
   await page.waitForFunction(() => /Lead with the ops work/.test(document.querySelector("#log").textContent));
-  ok("and it answers through that desk", asks.length === 1);
+  ok("the code went with the question", asks[0].code === CODE, asks[0].code);
 
-  // A reload with no fragment still works, because it was remembered.
-  await page.goto(base);
-  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
-  ok("a reload without the link keeps working",
-     /assistant/.test(await page.textContent("#statusText")));
-
-  // An empty fragment is how you forget a desk that has gone.
-  await page.goto(base + "#desk=");
-  await page.waitForFunction(
-    () => document.querySelector("#statusText").textContent === "waiting for the desk"
-  ).catch(() => {});
-  ok("an empty one forgets it", (await page.textContent("#statusText")) === "waiting for the desk",
-     await page.textContent("#statusText"));
-  ok("and the address is gone from storage",
-     !(await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay") || '""'))));
-
-  // Anything that is not https is not a desk. A malformed link is ignored
-  // rather than treated as a clear: it must not be able to knock out a desk
-  // that is working.
-  await page.goto(base + "#desk=" + encodeURIComponent(desk));
-  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
-  await page.goto(base + "#desk=" + encodeURIComponent("http://evil.example/chat"));
-  await page.waitForFunction(() => /assistant/.test(document.querySelector("#statusText").textContent));
-  ok("a plaintext address in the link is not adopted",
-     await page.evaluate(() => JSON.parse(localStorage.getItem("muster:relay") || '""')) === desk);
-  ok("and the desk that was working still is",
-     /assistant/.test(await page.textContent("#statusText")));
+  ok("and there is no settings tab to visit",
+     (await page.$(".navbtn[data-id='assistant']")) === null);
+  ok("nor anywhere to type a key", (await page.$("#aKey")) === null);
   await ctx.close();
 }
 
 console.log("\nthe code itself is not in the page");
 {
-  ok("the shipped file carries a verifier, not a code",
-     !testPage().includes("bellows-sequoia"));
+  // It travels in the link and is kept per browser. It is never baked into the
+  // file everyone downloads.
+  const page = testPage();
+  ok("no code is baked into the page", !page.includes("bellows-sequoia"));
+  ok("and no verifier is left over either", !/const GATE =/.test(page));
 }
 
 await browser.close();

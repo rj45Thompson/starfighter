@@ -35,7 +35,7 @@ await page.goto("https://rj45thompson.github.io/starfighter/muster/index.html");
 
 console.log("\nthe desk is not up");
 await page.waitForFunction(() => document.querySelector("#statusText").textContent !== "connecting…");
-ok("it says so plainly", (await page.textContent("#statusText")) === "waiting for the desk",
+ok("it says so plainly", (await page.textContent("#statusText")) === "offline",
    await page.textContent("#statusText"));
 ok("it does not offer to send you to itself",
    !/Open chat/.test(await page.textContent("#send")), await page.textContent("#send"));
@@ -47,7 +47,7 @@ console.log("\nthe desk comes up");
 relay = { url: "https://desk.example/bridge/chat" };
 await page.evaluate(() => recheck());
 ok("the page went live with no reload",
-   (await page.textContent("#statusText")) === "assistant ready", await page.textContent("#statusText"));
+   (await page.textContent("#statusText")) === "ready", await page.textContent("#statusText"));
 ok("the composer opened", await page.isEnabled("#input"));
 ok("it said so", /Connected/.test(await page.textContent("#log")));
 
@@ -70,7 +70,7 @@ ok("the next question goes to the new address", asks.length === 2);
 console.log("\nthe desk goes down");
 relay = { url: "" };
 await page.evaluate(() => recheck());
-ok("back to waiting", (await page.textContent("#statusText")) === "waiting for the desk",
+ok("back to waiting", (await page.textContent("#statusText")) === "offline",
    await page.textContent("#statusText"));
 ok("still watching", await page.evaluate(() => watching !== null));
 

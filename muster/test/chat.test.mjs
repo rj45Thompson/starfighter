@@ -51,7 +51,7 @@ console.log("\nclaude route (in-artifact sampling)");
     };
   });
 
-  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "assistant live");
+  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");
   ok("route is live", true);
 
   await page.setInputFiles("#pick", [{ name: "resume.pdf", mimeType: "application/pdf", buffer: PDF }]);
@@ -84,43 +84,39 @@ console.log("\nclaude route (in-artifact sampling)");
   await ctx.close();
 }
 
-/* ---- 2. the key route: real Messages-API content blocks, images included ---- */
-console.log("\nkey route (direct Anthropic)");
+/* ---- 2. the relay route: text travels, a picture says it cannot ---- */
+console.log("\nrelay route (the desk)");
 {
   const { ctx, page } = await open(() => {
-    localStorage.setItem("muster:apiKey", JSON.stringify("sk-ant-test"));
+    localStorage.setItem("muster:relay", JSON.stringify("https://desk.example/bridge/chat"));
   });
   let body = null;
-  await page.route("https://api.anthropic.com/**", async (route) => {
+  await page.route("https://desk.example/**", async (route) => {
     body = JSON.parse(route.request().postData());
-    await route.fulfill({
-      status: 200, contentType: "text/event-stream",
-      body: 'data: {"type":"content_block_delta","delta":{"text":"Seen."}}\n\n'
-    });
+    await route.fulfill({ status: 200, contentType: "application/json",
+                          body: JSON.stringify({ text: "Seen." }) });
   });
-  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "assistant on your key");
-  ok("falls through to the key route", true);
+  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");
+  ok("the desk is the route", true);
 
   await page.setInputFiles("#pick", [
     { name: "shot.png", mimeType: "image/png", buffer: PNG },
     { name: "resume.pdf", mimeType: "application/pdf", buffer: PDF }
   ]);
   await page.waitForFunction(() => document.querySelectorAll("#files .file").length === 2);
-  ok("two chips", true);
-
   await page.fill("#input", "Read these.");
   await page.click("#send");
   await page.waitForFunction(() => /Seen\./.test(document.querySelector("#log").textContent));
 
   const turn = body.messages[body.messages.length - 1];
-  ok("user turn is content blocks", Array.isArray(turn.content), typeof turn.content);
-  const img = turn.content.find(b => b.type === "image");
-  ok("image block is base64 png", !!img && img.source.type === "base64" && img.source.media_type === "image/png");
-  ok("image data is the file", !!img && img.source.data === PNG.toString("base64"));
-  ok("pdf came through as text", turn.content.some(b => b.type === "text" && /RJ Thompson/.test(b.text)));
-  ok("the typed line is the last block", turn.content[turn.content.length - 1].text === "Read these.");
-  ok("no system prompt leaked into a user turn", !/three short sentences/.test(JSON.stringify(turn)));
-  ok("system is sent separately", /three short sentences/.test(body.system));
+  ok("the desk is sent plain text", typeof turn.content === "string", typeof turn.content);
+  ok("the pdf's words are in it", /RJ Thompson/.test(turn.content));
+  ok("the typed line is in it", /Read these\./.test(turn.content));
+  // The desk runs the CLI, which reads text. An image cannot travel that way,
+  // and saying so beats dropping it silently and answering about nothing.
+  ok("a picture says it could not come", /cannot carry pictures/.test(turn.content), turn.content.slice(0, 120));
+  ok("no system prompt is handed to the desk", !("system" in body));
+  ok("the access code travels", "code" in body);
   await ctx.close();
 }
 
@@ -135,7 +131,7 @@ console.log("\nrefusals");
       return { text: "ok" };
     } };
   });
-  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "assistant live");
+  await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");
 
   await page.setInputFiles("#pick", [{ name: "scan.pdf", mimeType: "application/pdf",
     buffer: Buffer.from("%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n") }]);

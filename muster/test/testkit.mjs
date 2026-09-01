@@ -10,7 +10,6 @@
  * unlocked to reach it; enterCode() puts a code in storage for the tests that
  * need the chat to be allowed. */
 import { readFileSync } from "node:fs";
-import { pbkdf2Sync } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -25,15 +24,12 @@ export const CHROME = process.env.CHROME
   || undefined;                       // let playwright find its own
 
 export function testPage() {
-  const src = readFileSync(PAGE, "utf8");
-  const salt = /salt: "([0-9a-f]+)"/.exec(src)[1];
-  const hash = /hash: "([0-9a-f]+)"/.exec(src)[1];
-  const want = pbkdf2Sync(CODE, Buffer.from(salt, "hex"), 100000, 32, "sha256").toString("hex");
-  if (want === hash) throw new Error("the shipped code is 'open-sesame' - change it");
-  return src.replace(`hash: "${hash}"`, `hash: "${want}"`);
+  // Nothing to rewrite any more: the page holds no verifier, so a test code is
+  // just a string that has to survive the trip to the desk.
+  return readFileSync(PAGE, "utf8");
 }
 
-/** Seed the code a visitor would have typed into the Assistant tab. */
+/** Seed a code the way a link would have delivered one. */
 export const enterCode = (page, code = CODE) =>
   page.addInitScript((c) => localStorage.setItem("muster:code", JSON.stringify(c)), code);
 

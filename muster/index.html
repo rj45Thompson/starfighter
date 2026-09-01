@@ -221,40 +221,11 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 
 const $ = (s) => document.querySelector(s);
 
-/* ---------- the access code ----------
- *
- * There is no longer a screen in front of the page. Anyone with the link
- * reads it, which is the point of sending a link.
- *
- * The code did two jobs and only one of them is gone. It never really kept
- * anyone out - the page is static HTML the browser has already downloaded, so
- * a screen over it was a doorknob, not a lock. What it does still do is stop
- * the assistant being spent by whoever finds the URL: the desk this page talks
- * to runs on one person's Claude subscription, and it refuses a request that
- * does not carry the code. So the verifier stays, the wall does not, and
- * somebody who wants to chat is asked for a code at the point it matters. */
-
-/* Salt, iteration count and derived key. The code itself is not here and never
- * was: the page can check an answer without containing one, which is what lets
- * the same code be the thing the relay demands before it spends anyone's
- * subscription. Publish the code in the page and that check is worthless. */
-const GATE = {
-  salt: "8ff1ec62bf326915a2a17d63bb4458cd",
-  hash: "6ace66186919b6aab8c953ce2e7ff8badfcdc265d7280535507dc7633ddc5014",
-  iterations: 100000
-};
-
-const hex = (buf) => [...new Uint8Array(buf)]
-  .map((b) => b.toString(16).padStart(2, "0")).join("");
-const unhex = (h) => new Uint8Array((h.match(/../g) || []).map((b) => parseInt(b, 16)));
-
-async function derive(pass, saltHex, iterations) {
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: unhex(saltHex), iterations, hash: "SHA-256" }, key, 256);
-  return hex(bits);
-}
+/* The access code is not this page's business. It arrives in the link, it is
+ * kept so a reload does not lose it, and it is handed to the desk with every
+ * question. The desk is what checks it - it is the thing with something to
+ * protect. A verifier here only ever told somebody their typing was wrong on a
+ * screen that no longer exists. */
 
 /* ---------- telling the owner someone is here ----------
  *
@@ -310,14 +281,6 @@ async function ping(event) {
   } catch { /* never let this break the page */ }
 }
 
-/* True when a code has been entered that matches the verifier. Checked before
- * offering the chat, never before showing the page. */
-async function codeOk(code) {
-  if (!code) return false;
-  try { return (await derive(code, GATE.salt, GATE.iterations)) === GATE.hash; }
-  catch { return false; }
-}
-
 const store = {
   get(k, d) { try { const v = localStorage.getItem("muster:" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("muster:" + k, JSON.stringify(v)); return true; } catch { return false; } }
@@ -335,28 +298,18 @@ let sample = null, mode = "checking", turns = [], ctl = null, route = "none";
  *            straight to api.anthropic.com. It never passes through Muster,
  *            because Muster has no server to pass it through.
  * Nothing here is a password and nothing is shared. */
-const ASSIST = {
-  relay: store.get("relay", ""),      // a relay this visitor typed in themselves
-  key:   store.get("apiKey", ""),
-  model: store.get("model", "claude-sonnet-5")
-};
+/* Where the chat gets answered. One field, because there is one answer: a desk.
+ *
+ * This page used to offer three ways to connect an assistant and a screen to
+ * choose between them. That screen was the product asking the person using it
+ * to solve the product's problem. It is gone. The address arrives in the link
+ * or in relay.json, and the chat either works or says it is offline. */
+const ASSIST = { relay: store.get("relay", "") };
 
 /* The hosted relay, if this deployment has one. Kept in a separate small file
  * rather than baked in here, so pointing Muster at a backend is a one-line
  * edit rather than a rebuild of this page. Absent, empty or unreachable is a
  * normal state: the page then asks the visitor for their own key instead. */
-/* Where the assistant actually runs when this page has no backend.
- *
- * A static file cannot hold an API key — publish one and it is scraped and
- * revoked within hours — so this page cannot host a chat by itself. The
- * artifact can: it runs inside claude.ai, which supplies Claude, and each
- * visitor uses their own account. So rather than a dead end, the unconnected
- * state points at the copy that works. */
-const LIVE_DEMO = "https://claude.ai/code/artifact/680a5cc7-1156-418d-ae95-f1a759c5e29c";
-/* True when this page is the hosted copy rather than a local file or the
- * artifact, so it does not offer to send anyone to itself. */
-const onDemo = () => /(^|\.)github\.io$/.test(location.hostname);
-
 let hostedRelay = "";
 async function findHostedRelay() {
   try {
@@ -398,8 +351,17 @@ function deskFromLink() {
  * changes only the fragment - the browser does not reload, so nothing would
  * see the new address if this only ran once at startup. */
 function adoptDesk() {
+  // The code travels with the address. Asking somebody to paste one into a
+  // settings field is asking them to do the product's job; a link that carries
+  // both is a link that just works.
+  const c = /[#&]code=([^&]*)/.exec(location.hash || "");
+  if (c) { try { store.set("code", decodeURIComponent(c[1]).trim()); } catch { /* leave it */ } }
+
   const linked = deskFromLink();
-  if (linked === null) return false;          // not a desk: leave what we have
+  if (linked === null) {
+    if (c) history.replaceState(null, "", location.pathname + location.search);
+    return false;                             // a code alone, or not a desk
+  }
   ASSIST.relay = linked;
   store.set("relay", linked);
   // Take it out of the address bar. It has been read, and a link left lying in
@@ -445,8 +407,7 @@ const PANELS = [
   { id:"dash",    label:"Dashboard",   title:"Where things stand",  sub:"Everything out, and what came back." },
   { id:"profile", label:"Profile",     title:"What gets filled in", sub:"The answers the extension types for you." },
   { id:"apps",    label:"Applications",title:"What you have sent",  sub:"One row per application." },
-  { id:"connect", label:"Extension",   title:"Pair the extension",  sub:"Hand this profile to Apply Assist." },
-  { id:"assistant",label:"Assistant",  title:"Connect the assistant",sub:"Where the chat gets its answers." }
+  { id:"connect", label:"Extension",   title:"Pair the extension",  sub:"Hand this profile to Apply Assist." }
 ];
 
 let current = PANELS.find(p => p.id === store.get("panel","")) || PANELS[0];
@@ -469,8 +430,8 @@ function go(p) {
   document.querySelectorAll(".navbtn").forEach(b => b.setAttribute("aria-current", String(b.dataset.id === p.id)));
   const nc = $("#navCount"); if (nc) nc.textContent = apps.length || "";
   const w = $("#panel"); w.innerHTML = "";
-  ({ dash: renderDash, profile: renderProfile, apps: renderApps, connect: renderConnect,
-     assistant: renderAssistant })[p.id](w);
+  ({ dash: renderDash, profile: renderProfile, apps: renderApps,
+     connect: renderConnect })[p.id](w);
   renderChips();
 }
 
@@ -709,129 +670,6 @@ function renderConnect(w) {
   w.append(c3);
 }
 
-/* ---------- assistant setup ---------- */
-function renderAssistant(w) {
-  const HOW = {
-    claude: ["Running inside Claude", "This page is open in claude.ai, so the assistant uses Claude directly. Nothing to set up, and no key needed."],
-    relay:  ["Connected", "The chat is working — there is nothing for you to set up. Messages go to this site's relay, which holds the key. Your profile goes with them so the assistant does not ask for what you have already filled in; your resume does not."],
-    key:    ["Using your own key", "Messages go straight from this browser to Anthropic. Your key is stored in this browser only and is never sent anywhere else."],
-    none:   ["The chat is on the live demo",
-             "This page holds your profile, resume and applications, and hands them to the "
-             + "extension. What it cannot do is host the assistant: a static page has nowhere "
-             + "to keep an API key, and one published here would be scraped within hours. So "
-             + "the chat runs on the live demo instead, where Claude is already present. The "
-             + "two options below are for running it here on your own account."]
-  };
-  const [head, blurb] = HOW[route] || HOW.none;
-
-  if (route === "none") {
-    const cd = document.createElement("div"); cd.className = "card";
-    cd.innerHTML = '<p class="eyebrow">The live demo</p>';
-    const pd = document.createElement("p");
-    pd.textContent = "Same workspace, with a working assistant and nothing to configure. "
-      + "It also has a Workshop tab, where you can describe a change and watch the app "
-      + "rewrite itself \u2014 with a restore, so nothing you try is permanent.";
-    const ad = document.createElement("a");
-    ad.className = "btn"; ad.href = LIVE_DEMO; ad.target = "_blank"; ad.rel = "noopener";
-    ad.textContent = "Open the live demo";
-    ad.style.cssText = "display:inline-block;text-decoration:none;margin-top:6px";
-    cd.append(pd, ad); w.append(cd);
-  }
-
-  const c0 = document.createElement("div"); c0.className = "card";
-  c0.innerHTML = '<p class="eyebrow">Status</p>';
-  const h = document.createElement("p");
-  h.style.cssText = "font-weight:600;margin:0 0 4px";
-  h.textContent = head;
-  const bl = document.createElement("p"); bl.textContent = blurb;
-  c0.append(h, bl); w.append(c0);
-
-  const mk = (labelText, id, val, ph, type) => {
-    const f = document.createElement("div"); f.className = "fields";
-    f.style.marginTop = "12px";
-    const cell = document.createElement("div"); cell.className = "full";
-    const l = document.createElement("label"); l.className = "lbl";
-    l.textContent = labelText; l.htmlFor = id;
-    const i = document.createElement("input");
-    i.id = id; i.value = val || ""; i.placeholder = ph || ""; i.type = type || "text";
-    i.autocomplete = "off"; i.spellcheck = false;
-    cell.append(l, i); f.append(cell); return f;
-  };
-
-  const c1 = document.createElement("div"); c1.className = "card";
-  c1.innerHTML = hostedRelay
-    ? '<p class="eyebrow">Optional — use your own Anthropic key instead</p>'
-    : '<p class="eyebrow">Option A — your own Anthropic key</p>';
-  const p1 = document.createElement("p");
-  p1.textContent = (hostedRelay
-      ? "You do not need this — the chat already works. Fill it in only if you would rather your "
-        + "messages went to Anthropic on your own account. "
-      : "Get one at console.anthropic.com. ")
-    + "A key here is kept in this browser's storage and sent only to api.anthropic.com. "
-    + "Anyone with access to this computer could read it, so use one you can revoke.";
-  c1.append(p1,
-    mk("API key", "aKey", ASSIST.key, "sk-ant-…", "password"),
-    mk("Model", "aModel", ASSIST.model, "claude-sonnet-5"));
-
-  const c2 = document.createElement("div"); c2.className = "card";
-  c2.innerHTML = '<p class="eyebrow">Option B — a relay you host</p>';
-  const p2 = document.createElement("p");
-  p2.textContent = "A URL that accepts {system, messages, model} as JSON and answers with either "
-    + "an Anthropic-style event stream or {text}. Use this when you want visitors to chat without "
-    + "a key of their own. It takes precedence over the key above.";
-  const pc = document.createElement("p");
-  pc.textContent = "The relay this page ships with runs on one person's Claude subscription, so it "
-    + "asks for the access code before it will answer. Put the code you were sent here. It is not "
-    + "needed for your own key or your own relay.";
-  c2.append(p2, mk("Relay endpoint", "aRelay", ASSIST.relay, "https://…/chat", "url"),
-            pc, mk("Access code", "aCode", store.get("code", ""), "the code you were sent", "password"));
-
-  const row = document.createElement("div");
-  row.style.cssText = "display:flex;gap:9px;flex-wrap:wrap;margin-top:14px";
-  const save = document.createElement("button"); save.className = "btn"; save.textContent = "Save and connect";
-  const off  = document.createElement("button"); off.className = "btn ghost"; off.textContent = "Disconnect";
-  const note = document.createElement("span");
-  note.style.cssText = "align-self:center;font-size:13px;color:var(--faint)";
-
-  save.onclick = async () => {
-    ASSIST.key   = $("#aKey").value.trim();
-    ASSIST.relay = $("#aRelay").value.trim();
-    ASSIST.model = $("#aModel").value.trim() || "claude-sonnet-5";
-    store.set("apiKey", ASSIST.key);
-    store.set("relay", ASSIST.relay);
-    store.set("model", ASSIST.model);
-    const code = $("#aCode").value.trim();
-    store.set("code", code);
-    applyRoute(sample ? "claude" : relayUrl() ? "relay" : ASSIST.key ? "key" : "none");
-    // Check the code here rather than letting the relay be the one to say no
-    // three seconds later. A wrong code is a typo far more often than a lie.
-    const codeNote = code && !(await codeOk(code)) ? " That code is not right." : "";
-    // No go(current) here. Re-rendering the panel throws away the note that
-    // was just written into it, which is why saving has always looked like it
-    // did nothing. The fields already show what was typed, and applyRoute has
-    // updated the status light, so there is nothing left to redraw.
-    note.textContent = (route === "none" ? "Nothing entered." : "Connected.") + codeNote;
-  };
-  off.onclick = () => {
-    ASSIST.key = ""; ASSIST.relay = "";
-    store.set("apiKey", ""); store.set("relay", "");
-    applyRoute(sample ? "claude" : hostedRelay ? "relay" : "none");
-    go(current);
-  };
-  row.append(save, off, note);
-  c2.append(row);
-  w.append(c1, c2);
-
-  const c3 = document.createElement("div"); c3.className = "card";
-  c3.innerHTML = '<p class="eyebrow">What leaves this page</p>';
-  const p3 = document.createElement("p");
-  p3.textContent = "When you send a chat message, your profile details and the number of applications "
-    + "logged go with it, so the assistant does not ask for what you have already filled in. Your resume "
-    + "file does not — it stays in this browser for the extension to attach. Nothing is sent unless you "
-    + "press Send.";
-  c3.append(p3); w.append(c3);
-}
-
 /* ---------- theme + chat visibility ---------- */
 const savedTheme = store.get("theme", null);
 if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
@@ -872,8 +710,7 @@ const CHIPS = {
   dash:    ["What should I do next?", "How is my search going?"],
   profile: ["Write my availability line", "What is missing from my profile?"],
   apps:    ["Draft a follow-up for a quiet application", "Which of these should I chase?"],
-  connect: ["What does the extension actually do?"],
-  assistant: ["What can you help me with?"]
+  connect: ["What does the extension actually do?"]
 };
 function renderChips() {
   const c = $("#chips"); c.innerHTML = "";
@@ -1205,32 +1042,6 @@ async function readSSE(res, onText) {
   return out;
 }
 
-async function askAnthropic(sys, msgs, opts) {
-  let res;
-  try {
-    res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", signal: opts.signal,
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": ASSIST.key,
-        "anthropic-version": "2023-06-01",
-        // Without this the browser's preflight is refused. It is the documented
-        // opt-in for calling the API from a page rather than a server.
-        "anthropic-dangerous-direct-browser-access": "true"
-      },
-      body: JSON.stringify({
-        model: ASSIST.model, max_tokens: 1600, stream: true,
-        system: sys, messages: msgs
-      })
-    });
-  } catch (e) {
-    if (e && e.name === "AbortError") throw mkErr("cancelled");
-    throw mkErr("blocked", String(e && e.message || e));
-  }
-  if (!res.ok) throw await httpErr(res);
-  return readSSE(res, opts.onText);
-}
-
 /* A relay — the hosted one, or your own. It may stream SSE in Anthropic's
  * shape, or simply answer with JSON ({text} or a Messages-API content array);
  * both are accepted so a backend can be the simplest thing that works.
@@ -1279,7 +1090,6 @@ async function ask(msgs, opts) {
     return r.text;
   }
   if (route === "relay") return askRelay(sys, msgs, opts);
-  if (route === "key")   return askAnthropic(sys, msgs, opts);
   throw mkErr("no_route");
 }
 
@@ -1335,7 +1145,7 @@ async function send() {
  * configured rather than going dark. */
 function lock() {
   sample = null;
-  applyRoute(relayUrl() ? "relay" : ASSIST.key ? "key" : "none");
+  applyRoute(relayUrl() ? "relay" : "none");
 }
 
 $("#send").onclick = send;
@@ -1352,36 +1162,20 @@ function applyRoute(r) {
   if (r === "none") {
     mode = "preview";
     input.disabled = true;
+    btn.disabled = true;
+    btn.textContent = "Send";
+    input.placeholder = "Offline\u2026";
+    setStatus("off", "offline");
     log.innerHTML = "";
-    // On the demo itself, pointing at the demo is a loop. There the honest
-    // answer is that the desk it talks to is not up yet, and the page is
-    // watching for it.
-    if (onDemo()) {
-      setStatus("off", "waiting for the desk");
-      input.placeholder = "Waiting for the assistant to come up\u2026";
-      btn.disabled = true;
-      btn.textContent = "Send";
-      bubble("", "Assistant",
-        "The assistant is not up yet. It runs on the owner's machine, and this "
-        + "page connects by itself the moment it comes online \u2014 leave the tab open. "
-        + "Or open the Assistant tab and put in your own key.");
-      return;
-    }
-    setStatus("off", "chat runs on the live demo");
-    input.placeholder = "The chat lives on the live demo \u2014 open it to talk.";
-    btn.disabled = false;
-    btn.textContent = "Open chat";
-    btn.onclick = () => window.open(LIVE_DEMO, "_blank", "noopener");
-    bubble("", "Assistant",
-      "The chat for this workspace runs on the live demo, where Claude is "
-      + "already present \u2014 nothing to set up and no key needed. Press Open chat, "
-      + "or use the Assistant tab if you would rather run it on your own key.");
+    // One line. Somebody looking at a chat box that is not answering needs to
+    // know it is not answering and that it will start on its own. They do not
+    // need to be taught how the thing is wired.
+    bubble("", "Assistant", "Offline just now. This connects by itself when it comes back \u2014 "
+      + "leave the tab open.");
     return;
   }
   mode = "live";
-  setStatus("on", r === "claude" ? "assistant live"
-                : r === "relay"  ? (ASSIST.relay ? "assistant via your relay" : "assistant ready")
-                :                  "assistant on your key");
+  setStatus("on", "ready");
   input.disabled = false;
   input.placeholder = "Ask, or paste a job posting…";
   btn.disabled = false;
@@ -1398,7 +1192,7 @@ async function recheck() {
   if (found === hostedRelay) return false;
   const was = route;
   hostedRelay = found;
-  applyRoute(sample ? "claude" : relayUrl() ? "relay" : ASSIST.key ? "key" : "none");
+  applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
   // Say it however it happened - on the timer, or because a dropped call sent
   // us looking. Somebody watching a dead page should see it come alive.
   if (was === "none" && route === "relay") bubble("", "Assistant", "Connected. Ask away.");
@@ -1419,7 +1213,6 @@ async function detectRoute() {
   if (ASSIST.relay) return "relay";          // one this visitor set themselves
   hostedRelay = await findHostedRelay();     // the one this deployment ships
   if (hostedRelay) return "relay";
-  if (ASSIST.key) return "key";
   return "none";
 }
 
