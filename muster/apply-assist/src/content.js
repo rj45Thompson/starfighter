@@ -136,6 +136,11 @@
 
   function run(profile, opts = {}) {
     const found = ApplyFields.scan();
+    // Every radio in a group carries the same question, so scan() returns them
+    // all. Answer the group once: a second pass re-clicks what is already
+    // chosen, counts it twice, and leaves an undo record whose "before" is the
+    // answer we just gave.
+    const answered = new Set();
     const report = { filled: 0, skipped: 0, fields: [], wall: ApplyFields.authWall().wall };
     // A multi-step application fills across several passes; undo should still
     // reach back over all of them rather than only the most recent step.
@@ -154,6 +159,11 @@
         report.filled++;
         report.fields.push(key);
         continue;
+      }
+
+      if (el.type === "radio" && el.name) {
+        if (answered.has(el.name)) continue;
+        answered.add(el.name);
       }
 
       const value = valueFor(profile, key);
@@ -182,7 +192,13 @@
   }
 
   function undo() {
-    for (const rec of lastFill) {
+    /* Backwards. A field can be recorded more than once in a pass - every
+     * radio in a group classifies to the same answer - and each record's
+     * "before" was captured at the moment it was written. Replaying forwards
+     * lets a later record's before, which is the earlier record's after, win,
+     * and the undo puts the value back rather than taking it away. */
+    for (let i = lastFill.length - 1; i >= 0; i--) {
+      const rec = lastFill[i];
       try {
         if (rec.type === "file") {
           rec.el.value = "";           // permitted: clearing a file input is allowed

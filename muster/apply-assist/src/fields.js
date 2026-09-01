@@ -23,7 +23,14 @@ const ApplyFields = (() => {
    * `strong` are phrases that are decisive on their own.
    * `weak` are hints that only count alongside something else.
    * `not` vetoes the match outright — this is what keeps "first name" out of
-   * "company name" and keeps us away from anything password-shaped. */
+   * "company name" and keeps us away from anything password-shaped.
+   *
+   * /referen/ appears in most of these lists on purpose. An application that
+   * asks for two referees asks for their name, employer, title, city and
+   * email in exactly the words it used for the applicant's own, and filling
+   * those with the applicant's details is the quiet kind of wrong: it looks
+   * complete and it is false. Nothing whose label mentions a reference is
+   * ours to answer. */
   const RULES = [
     { key: "firstName", auto: ["given-name"],
       strong: [/\bfirst\s*name\b/, /\bgiven\s*name\b/, /\bforename\b/],
@@ -54,17 +61,18 @@ const ApplyFields = (() => {
     { key: "address", auto: ["street-address", "address-line1"],
       strong: [/\bstreet\s*address\b/, /\baddress\s*line\s*1\b/, /^address$/],
       weak: [/\baddress\b/],
-      not: [/email/, /line\s*2/, /city/, /state/, /zip/, /postal/, /country/] },
+      not: [/email/, /line\s*2/, /city/, /state/, /zip/, /postal/, /country/,
+            /referen/] },
 
     { key: "city", auto: ["address-level2"],
       strong: [/\bcity\b/, /\btown\b/],
       weak: [/\blocality\b/],
-      not: [/state/, /country/] },
+      not: [/state/, /country/, /referen/] },
 
     { key: "region", auto: ["address-level1"],
       strong: [/\bprovince\b/, /\bstate\b/, /\bregion\b/],
       weak: [],
-      not: [/country/, /united\s*states/] },
+      not: [/country/, /united\s*states/, /referen/] },
 
     { key: "postal", auto: ["postal-code"],
       strong: [/\bpostal\s*code\b/, /\bzip\s*code\b/, /\bpostcode\b/],
@@ -79,7 +87,7 @@ const ApplyFields = (() => {
     { key: "linkedin", auto: [],
       strong: [/\blinked\s*in\b/],
       weak: [],
-      not: [] },
+      not: [/referen/] },
 
     { key: "github", auto: [],
       strong: [/\bgit\s*hub\b/],
@@ -94,12 +102,12 @@ const ApplyFields = (() => {
     { key: "currentTitle", auto: ["organization-title"],
       strong: [/\bcurrent\s*(job\s*)?title\b/, /\bjob\s*title\b/, /\bposition\s*title\b/],
       weak: [/\btitle\b/],
-      not: [/mr|mrs|ms\b/, /job\s*you/, /applying/] },
+      not: [/mr|mrs|ms\b/, /job\s*you/, /applying/, /referen/] },
 
     { key: "currentCompany", auto: ["organization"],
       strong: [/\bcurrent\s*(employer|company)\b/, /\bemployer\b/, /\bcompany\s*name\b/],
       weak: [/\bcompany\b/],
-      not: [/why|reason/, /our\s*company/] },
+      not: [/why|reason/, /our\s*company/, /referen/] },
 
     { key: "yearsExperience", auto: [],
       strong: [/\byears?\s*of\s*(relevant\s*)?experience\b/, /\bhow\s*many\s*years\b/],
@@ -150,7 +158,7 @@ const ApplyFields = (() => {
    * wrong document to an application is worse than attaching nothing. */
   const FILE_RULES = [
     { key: "resumeFile",
-      strong: [/\bresume\b/, /\bresumé\b/, /\bcv\b/, /curriculum\s*vitae/],
+      strong: [/\bresume\b/, /\bresum\u00e9\b/, /\bcv\b/, /curriculum\s*vitae/],
       weak: [],
       not: [/cover/, /letter/, /transcript/, /portfolio/, /photo/, /certificat/] },
 
@@ -257,7 +265,7 @@ const ApplyFields = (() => {
   const norm = (s) => (s || "")
     .toLowerCase()
     .replace(/[_\-]+/g, " ")
-    .replace(/[\s ]+/g, " ")
+    .replace(/[\s\u00a0]+/g, " ")
     .trim();
 
   /** Everything the page tells us about this input, as one lowercase string. */
