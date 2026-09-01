@@ -1,0 +1,27 @@
+name = "muster-relay"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Comma-separated. Only these origins may call the relay. Add your own if you
+# host Muster somewhere else too.
+ALLOWED_ORIGINS = "https://rj45thompson.github.io"
+
+# Model and cost dials. Changing these needs no code edit.
+#   claude-opus-5   $5/$25 per Mtok   best answers
+#   claude-sonnet-5 $2/$10 per Mtok   ~2.5x cheaper, still strong for this
+MODEL      = "claude-opus-5"
+EFFORT     = "low"       # low/medium/high/xhigh/max — chat rarely needs above low
+MAX_TOKENS = "1200"
+
+# The API key is NOT here. Set it as a secret so it never enters this file
+# or your git history:
+#     wrangler secret put ANTHROPIC_API_KEY
+
+# Optional per-IP rate limit. Uncomment to switch it on; the Worker picks it
+# up automatically and keeps working without it.
+# [[unsafe.bindings]]
+# name = "RATE_LIMITER"
+# type = "ratelimit"
+# namespace_id = "1001"
+# simple = { limit = 20, period = 60 }
