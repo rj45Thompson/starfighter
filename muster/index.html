@@ -1208,26 +1208,55 @@ function mkErr(code, message, text) {
   return Object.assign(new Error(message || code), text ? { code, text } : { code });
 }
 
+/* Read the reason out of whatever shape it arrived in.
+ *
+ * This used to look only for {"error":{"message":...}}, the relay's shape. The
+ * desk answers {"error":"..."} - a plain string - and so a refusal that said
+ * "bad token", which names the problem exactly, arrived as an empty detail and
+ * fell through to the status line. What a person saw was the word
+ * "Unauthorized" and nothing else, for a fault that had already described
+ * itself. A reader of errors that only understands one dialect is worse than
+ * no reader at all, because it discards the answer and looks confident. */
 async function httpErr(res) {
   let detail = "";
-  try { const j = await res.json(); detail = (j && j.error && j.error.message) || ""; } catch { /* not JSON */ }
+  try {
+    const j = await res.json();
+    const e = j && j.error;
+    detail = (typeof e === "string" ? e : (e && e.message)) ||
+             (typeof j?.message === "string" ? j.message : "") || "";
+  } catch { /* not JSON */ }
   let code = "upstream_error";
   if (res.status === 403 && /access code/i.test(detail)) code = "bad_code";
   else if (res.status === 401 || res.status === 403) code = "refused";
   else if (res.status === 429) code = "rate_limited";
   else if (res.status === 400 || res.status === 422) code = "invalid_request";
-  return mkErr(code, detail || res.statusText);
+  const err = mkErr(code, detail || res.statusText);
+  // Mark whether the DESK explained itself, as opposed to us naming its status
+  // code. Only this path can tell the difference: everywhere else e.message is
+  // a browser exception or one of our own codes, and neither is for reading
+  // aloud to somebody.
+  if (detail) err.said = detail;
+  return err;
 }
 
-/* A refusal that came with a reason should show the reason. The desk knows
- * exactly why it said no - a missing code, an origin it has not been told to
- * serve - and repeating that beats a generic line every time. This page used
- * to answer a 403 with "that key was rejected, check console.anthropic.com",
- * which was wrong twice over: there is no key in this product, and it sent
- * whoever read it looking in the wrong place entirely. */
-function refusalText(e) {
-  const said = (e && e.message || "").trim();
-  return said && said !== "Forbidden" ? said : ERRS.refused;
+/* A problem that came with a reason should show the reason. The desk knows
+ * exactly what went wrong - a missing code, an origin it has not been told to
+ * serve, a CLI that is not signed in - and repeating that beats a generic line
+ * every time. This page used to answer a 403 with "that key was rejected,
+ * check console.anthropic.com", which was wrong twice over: there is no key in
+ * this product, and it sent whoever read it looking in the wrong place.
+ *
+ * This applied only to refusals until 2026-09-02, and the gap was worse than
+ * the bug it was written for. The desk answered a question with "Failed to
+ * authenticate: OAuth session expired" - the whole problem, and what to do
+ * about it, in one sentence - and the page printed "The connection dropped.
+ * Try again." Nothing had dropped, and trying again could never have worked.
+ * A canned line is for a failure that arrived without an explanation. When one
+ * arrived, it is the answer. */
+function problemText(e, code) {
+  const said = (e && e.said || "").trim();
+  if (said && said !== "Forbidden") return said;
+  return ERRS[code] || ERRS.upstream_error;
 }
 
 /* Anthropic streams server-sent events. We want the text deltas and nothing else. */
@@ -1351,8 +1380,7 @@ async function send() {
     } else {
       if (e && e.text) { holder.textContent = e.text; holder.parentElement.className = "msg"; }
       else holder.parentElement.remove();
-      bubble("err","Problem",
-        code === "refused" ? refusalText(e) : (ERRS[code] || ERRS.upstream_error));
+      bubble("err","Problem", problemText(e, code));
       // A relay that stopped answering has usually moved rather than died.
       if (route === "relay" && (code === "blocked" || code === "upstream_error")) recheck();
       if (turns[turns.length-1] && turns[turns.length-1].role === "user") turns.pop();
