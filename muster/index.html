@@ -844,10 +844,10 @@ const ERRS = {
   invalid_request:"The page asked wrongly — that is a bug in the page.",
   bad_code:"That access code was refused. Put the code you were sent in the Assistant tab, "
     + "or ask whoever sent you the link for the current one.",
-  bad_key:"That key was rejected. Check it on console.anthropic.com and paste it again.",
-  no_credit:"That Anthropic account is out of credit. Top it up and try again.",
-  no_route:"The assistant is not connected yet. Open the Assistant tab to set it up.",
-  blocked:"The browser could not reach the API. An ad blocker or a strict network will do this.",
+  refused:"The desk refused that. Its reason is above if it gave one — usually the "
+    + "access code, or an origin it has not been told to serve.",
+  no_route:"Nothing is answering yet. This connects by itself when the desk comes up.",
+  blocked:"The browser could not reach the desk. An ad blocker or a strict network will do this.",
   upstream_error:"The connection dropped. Try again."
 };
 const FATAL = new Set(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"]);
@@ -1090,11 +1090,21 @@ async function httpErr(res) {
   try { const j = await res.json(); detail = (j && j.error && j.error.message) || ""; } catch { /* not JSON */ }
   let code = "upstream_error";
   if (res.status === 403 && /access code/i.test(detail)) code = "bad_code";
-  else if (res.status === 401 || res.status === 403) code = "bad_key";
+  else if (res.status === 401 || res.status === 403) code = "refused";
   else if (res.status === 429) code = "rate_limited";
-  else if (res.status === 400 && /credit|balance/i.test(detail)) code = "no_credit";
   else if (res.status === 400 || res.status === 422) code = "invalid_request";
   return mkErr(code, detail || res.statusText);
+}
+
+/* A refusal that came with a reason should show the reason. The desk knows
+ * exactly why it said no - a missing code, an origin it has not been told to
+ * serve - and repeating that beats a generic line every time. This page used
+ * to answer a 403 with "that key was rejected, check console.anthropic.com",
+ * which was wrong twice over: there is no key in this product, and it sent
+ * whoever read it looking in the wrong place entirely. */
+function refusalText(e) {
+  const said = (e && e.message || "").trim();
+  return said && said !== "Forbidden" ? said : ERRS.refused;
 }
 
 /* Anthropic streams server-sent events. We want the text deltas and nothing else. */
@@ -1120,8 +1130,7 @@ async function readSSE(res, onText) {
         if (onText) onText({ text: out, delta: ev.delta.text });
       } else if (ev.type === "error") {
         const m = (ev.error && ev.error.message) || "";
-        throw mkErr(/credit|balance/i.test(m) ? "no_credit"
-                  : /rate/i.test(m) ? "rate_limited" : "upstream_error", m);
+        throw mkErr(/rate/i.test(m) ? "rate_limited" : "upstream_error", m);
       }
     }
   }
@@ -1218,7 +1227,8 @@ async function send() {
     } else {
       if (e && e.text) { holder.textContent = e.text; holder.parentElement.className = "msg"; }
       else holder.parentElement.remove();
-      bubble("err","Problem", ERRS[code] || ERRS.upstream_error);
+      bubble("err","Problem",
+        code === "refused" ? refusalText(e) : (ERRS[code] || ERRS.upstream_error));
       // A relay that stopped answering has usually moved rather than died.
       if (route === "relay" && (code === "blocked" || code === "upstream_error")) recheck();
       if (turns[turns.length-1] && turns[turns.length-1].role === "user") turns.pop();
