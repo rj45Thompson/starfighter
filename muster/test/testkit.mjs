@@ -33,6 +33,19 @@ export function testPage() {
 export const enterCode = (page, code = CODE) =>
   page.addInitScript((c) => localStorage.setItem("muster:code", JSON.stringify(c)), code);
 
+/* Nothing on 127.0.0.1, unless a test says otherwise.
+ *
+ * The page looks for a desk on this machine, which means a test that never
+ * mentions loopback will happily find a real one if the developer happens to
+ * have theirs running - and then pass or fail on what is on their desk rather
+ * than on what the page does. That is not a test. Seal it first; a test that
+ * wants a desk routes one afterwards, and the later route wins.
+ *
+ * Refused, not held: a refused port is what a machine with nothing listening
+ * actually does, and it is the case nearly every test means. */
+export const sealLocal = (page) =>
+  page.route("http://127.0.0.1:*/**", (route) => route.abort());
+
 export function tally() {
   let pass = 0, fail = 0;
   return {

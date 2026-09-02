@@ -7,7 +7,7 @@
  * anywhere.
  */
 import { chromium } from "playwright";
-import { CHROME, CODE, testPage, tally, enterCode } from "./testkit.mjs";
+import { CHROME, CODE, testPage, tally, enterCode, sealLocal } from "./testkit.mjs";
 
 const t = tally(), ok = t.ok;
 const HTML = testPage();
@@ -20,6 +20,7 @@ const browser = await chromium.launch({ executablePath: CHROME, args: ["--no-san
 async function open(seed) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  await sealLocal(page);
   page.setDefaultTimeout(8000);
   page.on("pageerror", (e) => { t.bad(); console.log("  FAIL page error: " + e.message); });
   // No web fonts in a test: a real network round trip for nothing, and the
@@ -37,6 +38,11 @@ async function open(seed) {
     await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
   });
   await page.route("https://desk.example/**", async (route) => {
+    // A desk answers /health before any gate it has - that is how the page
+    // tells a live address from a hostname somebody else has since been given.
+    if (new URL(route.request().url()).pathname === "/health")
+      return route.fulfill({ status: 200, contentType: "application/json",
+                             body: JSON.stringify({ ok: true, version: "test" }) });
     await route.fulfill({ status: 200, contentType: "application/json",
                           body: JSON.stringify({ text: "Lead with the ops work." }) });
   });
@@ -145,7 +151,12 @@ console.log("\nthe code comes with the link");
   const asks = [];
   await page.unroute("https://desk.example/**");
   await page.route("https://desk.example/**", async (route) => {
-    asks.push(JSON.parse(route.request().postData()));
+    // A desk answers /health before any gate it has - that is how the page
+    // tells a live address from a hostname somebody else has since been given.
+    if (new URL(route.request().url()).pathname === "/health")
+      return route.fulfill({ status: 200, contentType: "application/json",
+                             body: JSON.stringify({ ok: true, version: "test" }) });
+    asks.push(JSON.parse(route.request().postData() || "{}"));
     await route.fulfill({ status: 200, contentType: "application/json",
                           body: JSON.stringify({ text: "Lead with the ops work." }) });
   });

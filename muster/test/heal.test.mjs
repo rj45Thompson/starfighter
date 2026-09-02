@@ -1,6 +1,6 @@
 /* The public page finding the desk on its own: no address to carry, no reload. */
 import { chromium } from "playwright";
-import { CHROME, CODE, testPage, tally, enterCode } from "./testkit.mjs";
+import { CHROME, CODE, testPage, tally, enterCode, sealLocal } from "./testkit.mjs";
 
 const t = tally(), ok = t.ok;
 const HTML = testPage();
@@ -10,6 +10,7 @@ const asks = [];
 const browser = await chromium.launch({ executablePath: CHROME, args: ["--no-sandbox"] });
 const ctx = await browser.newContext();
 const page = await ctx.newPage();
+await sealLocal(page);
 page.on("pageerror", e => { t.bad(); console.log("  FAIL page error: " + e.message); });
 
 // Serve the page from the real hosted hostname, so the code that keys off it
@@ -23,7 +24,10 @@ await page.route("https://rj45thompson.github.io/**", async (route) => {
   return route.fulfill({ status: 200, contentType: "text/html", body: HTML });
 });
 await page.route("https://desk.example/**", async (route) => {
-  asks.push(JSON.parse(route.request().postData()));
+  if (new URL(route.request().url()).pathname === "/health")
+    return route.fulfill({ status: 200, contentType: "application/json",
+                           body: JSON.stringify({ ok: true, version: "test" }) });
+  asks.push(JSON.parse(route.request().postData() || "{}"));
   await route.fulfill({ status: 200, contentType: "application/json",
                         body: JSON.stringify({ text: "Lead with the ops work." }) });
 });
