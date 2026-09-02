@@ -388,7 +388,51 @@ addEventListener("hashchange", async () => {
   applyRoute(await detectRoute());
 });
 
-const relayUrl = () => ASSIST.relay || hostedRelay;
+/* ---------- a desk on this machine ----------
+ *
+ * Offline is a bug, not a state to explain. On the computer that runs the desk
+ * there is nothing to look up: it answers at a fixed local address that never
+ * changes, so the page can simply go and find it. No tunnel, no link to carry,
+ * no address to publish, nothing to restart.
+ *
+ * An https page is allowed to reach 127.0.0.1 - localhost counts as a
+ * trustworthy origin - provided the server opts in with
+ * Access-Control-Allow-Private-Network, which the desk already sends.
+ *
+ * Both are probed at once and given a short deadline, because a visitor with
+ * no desk of their own must not wait on it. */
+let localDesk = "";
+let localMisses = 0;                 // consecutive probes that found nothing
+const LOCAL_PORTS = [8770, 8771];
+const LOCAL_GIVE_UP = 2;             // how many in a row before believing it
+
+function tryLocal(port) {
+  return new Promise((resolve) => {
+    const base = "http://127.0.0.1:" + port;
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); resolve(""); }, 900);
+    fetch(base + "/health", { signal: c.signal, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { clearTimeout(t); resolve(j && j.ok ? base + "/bridge/chat" : ""); })
+      .catch(() => { clearTimeout(t); resolve(""); });
+  });
+}
+
+/* A desk that has answered once is believed until it has failed to answer
+ * twice running. A single missed probe is not evidence that it has gone: the
+ * server keeps one connection per browser, so a health check sent while an
+ * answer is still coming back queues behind it and gets abandoned at the
+ * deadline. Dropping the desk on that one miss is what made a working page say
+ * offline in the middle of a conversation. */
+async function findLocalDesk() {
+  const found = (await Promise.all(LOCAL_PORTS.map(tryLocal))).find(Boolean) || "";
+  if (found) { localMisses = 0; return found; }
+  if (!localDesk) return "";                       // never had one
+  localMisses += 1;
+  return localMisses < LOCAL_GIVE_UP ? localDesk : "";
+}
+
+const relayUrl = () => ASSIST.relay || hostedRelay || localDesk;
 
 /* ---------- profile fields: exactly what the extension fills ---------- */
 const FIELDS = [
@@ -1234,8 +1278,9 @@ function applyRoute(r) {
  * anywhere, the desktop writes it into relay.json beside this page and the
  * page keeps looking. Start the desktop and an open page connects by itself. */
 async function recheck() {
-  const found = await findHostedRelay();
-  if (found === hostedRelay) return false;
+  const [found, local] = await Promise.all([findHostedRelay(), findLocalDesk()]);
+  if (found === hostedRelay && local === localDesk) return false;
+  localDesk = local;
   const was = route;
   hostedRelay = found;
   applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
@@ -1247,8 +1292,11 @@ async function recheck() {
 
 let watching = null;
 function watch() {
-  if (watching || ASSIST.relay) return;      // a relay they set themselves stays put
+  if (watching || ASSIST.relay) return;      // a relay handed over in a link stays put
   watching = setInterval(() => {
+    // Never probe while an answer is in flight. The check would queue behind
+    // it, time out, and be read as the desk having gone.
+    if (ctl) return;
     if (route === "none" || route === "relay") recheck();
   }, 20000);
 }
@@ -1256,9 +1304,11 @@ function watch() {
 async function detectRoute() {
   try { sample = window.claude ? await window.claude.use("sample") : null; } catch { sample = null; }
   if (sample) return "claude";
-  if (ASSIST.relay) return "relay";          // one this visitor set themselves
+  if (ASSIST.relay) return "relay";          // one handed over in a link
   hostedRelay = await findHostedRelay();     // the one this deployment ships
   if (hostedRelay) return "relay";
+  localDesk = await findLocalDesk();         // one running on this very machine
+  if (localDesk) return "relay";
   return "none";
 }
 
