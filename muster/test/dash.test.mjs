@@ -1,7 +1,7 @@
 /* The chat is the dashboard: one instance, in the right place, still working. */
 import { chromium } from "playwright";
 import { createServer } from "node:http";
-import { CHROME, testPage } from "./testkit.mjs";
+import { CHROME, testPage, sealLocal } from "./testkit.mjs";
 const HTML = testPage();
 const srv = createServer((q, r) => {
   if (q.url.split("?")[0].endsWith(".json")) { r.writeHead(200,{"content-type":"application/json"}); return r.end('{"url":""}'); }
@@ -13,6 +13,7 @@ const ok = (n, c, x) => { if (c) { pass++; console.log("  ok   " + n); } else { 
 
 const b = await chromium.launch({ executablePath: CHROME, args:["--no-sandbox"] });
 const page = await b.newPage(); page.setDefaultTimeout(20000);
+await sealLocal(page);
 page.on("pageerror", e => { fail++; console.log("  FAIL page error: " + e.message); });
 await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
 await page.route("https://desk.example/**", r => r.fulfill({ status:200, contentType:"application/json", body:'{"text":"Noted."}' }));

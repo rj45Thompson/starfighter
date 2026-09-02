@@ -348,6 +348,15 @@ export default {
         ? new Response(null, { status: 204, headers: corsHeaders(origin) })
         : new Response(null, { status: 403 });
     }
+    // The page checks an address before it trusts it, because an address it
+    // was handed once may since have become somebody else's. Answering this
+    // is how a relay says it is still the thing that was pointed at.
+    if (request.method === "GET" && new URL(request.url).pathname === "/health") {
+      return new Response(JSON.stringify({ ok: true, relay: true }), {
+        status: 200,
+        headers: { "content-type": "application/json",
+                   ...(origin ? corsHeaders(origin) : {}) } });
+    }
     if (request.method !== "POST") return bad(405, "POST only.", origin);
     if (!origin) {
       const claimed = request.headers.get("origin");

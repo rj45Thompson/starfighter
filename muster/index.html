@@ -377,6 +377,7 @@ function adoptDesk() {
   }
   ASSIST.relay = linked;
   store.set("relay", linked);
+  linkedEver = false; linkMisses = 0;   // a new address proves itself from scratch
   // Take it out of the address bar. It has been read, and a link left lying in
   // the bar gets copied and pasted long after that desk has gone.
   history.replaceState(null, "", location.pathname + location.search);
@@ -406,16 +407,58 @@ let localMisses = 0;                 // consecutive probes that found nothing
 const LOCAL_PORTS = [8770, 8771];
 const LOCAL_GIVE_UP = 2;             // how many in a row before believing it
 
+/* Chrome 138 and later will not let a public page open a connection to
+ * 127.0.0.1 until the person at the keyboard says it may. What it does while
+ * it waits is the part that matters here: it holds the request. Silently, with
+ * no error and no timeout of its own.
+ *
+ * Measured on Chromium 141, from an https page:
+ *   nothing listening  ->  refused in about 4ms
+ *   the desk listening ->  held, indefinitely, until the prompt is answered
+ *
+ * Read those two lines together and the old probe was exactly backwards. It
+ * gave up after 900ms, which costs a visitor with no desk nothing at all -
+ * they were already refused - and cancels the request in the one case where it
+ * was about to work, before its owner could answer. Give up early and the
+ * answer never arrives, so the page reports offline while the desk sits there
+ * running.
+ *
+ * The deadline now governs the PAGE, not the request. We stop waiting so the
+ * page can say something; the request is left running, and if it lands later -
+ * a second later, or a minute later when somebody clicks Allow - the desk is
+ * picked up then. Which is the promise this page already makes: leave the tab
+ * open and it connects by itself. */
+const held = new Set();   // ports whose request the browser has not answered yet
+
 function tryLocal(port) {
+  const base = "http://127.0.0.1:" + port;
+  if (held.has(port)) return Promise.resolve("");   // one question at a time
   return new Promise((resolve) => {
-    const base = "http://127.0.0.1:" + port;
-    const c = new AbortController();
-    const t = setTimeout(() => { c.abort(); resolve(""); }, 900);
-    fetch(base + "/health", { signal: c.signal, cache: "no-store" })
+    let waited = false;
+    const t = setTimeout(() => { waited = true; held.add(port); resolve(""); }, 900);
+    fetch(base + "/health", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { clearTimeout(t); resolve(j && j.ok ? base + "/bridge/chat" : ""); })
-      .catch(() => { clearTimeout(t); resolve(""); });
+      .then((j) => {
+        clearTimeout(t); held.delete(port);
+        const url = j && j.ok ? base + "/bridge/chat" : "";
+        if (waited) { if (url) adoptLate(url); }    // it landed after we gave up
+        else resolve(url);
+      })
+      .catch(() => {
+        clearTimeout(t); held.delete(port);
+        if (!waited) resolve("");
+      });
   });
+}
+
+/* A desk that answered after the page had stopped waiting for it. */
+function adoptLate(url) {
+  if (localDesk === url) return;
+  const was = route;
+  localDesk = url;
+  localMisses = 0;
+  applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
+  if (was === "none" && route === "relay") bubble("", "Assistant", "Connected. Ask away.");
 }
 
 /* A desk that has answered once is believed until it has failed to answer
@@ -432,7 +475,59 @@ async function findLocalDesk() {
   return localMisses < LOCAL_GIVE_UP ? localDesk : "";
 }
 
-const relayUrl = () => ASSIST.relay || hostedRelay || localDesk;
+/* ---------- an address we were handed once ----------
+ *
+ * The launcher writes the desk into the link and the page remembers it, so a
+ * reload without the fragment still works. That is the useful half. The other
+ * half is that a quick tunnel takes a new hostname every run and the old one
+ * does not go quiet - it is handed to somebody else, and it answers. What it
+ * answers is a refusal.
+ *
+ * So the page said ready, because it had an address, and every question came
+ * back Unauthorized, because the address had become a stranger's. The desk on
+ * this very machine was up the whole time and was never asked, because a
+ * remembered address outranked it and nothing ever checked it was still real.
+ *
+ * Every desk answers /health on its own origin, ahead of every gate it has, so
+ * one cheap GET settles it. */
+function probeDesk(url) {
+  return new Promise((resolve) => {
+    let health;
+    try { health = new URL("/health", url).href; } catch { return resolve(false); }
+    const c = new AbortController();
+    const t = setTimeout(() => { c.abort(); resolve(false); }, 2500);
+    fetch(health, { signal: c.signal, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { clearTimeout(t); resolve(!!(j && j.ok)); })
+      .catch(() => { clearTimeout(t); resolve(false); });
+  });
+}
+
+let linkedDesk = "";          // the remembered address, while it is answering
+let linkMisses = 0;
+let linkedEver = false;       // has this particular address ever answered us?
+const LINK_GIVE_UP = 2;
+
+/* Same two-strikes rule the local desk gets, and for the same reason: one
+ * missed probe is a busy server, not a dead one. With one difference - an
+ * address that has never answered gets no benefit of the doubt. Two strikes
+ * protects something that was working. It is not a licence to trust a
+ * hostname purely because it is written down. */
+async function findLinkedDesk() {
+  if (!ASSIST.relay) { linkedEver = false; linkMisses = 0; return ""; }
+  if (await probeDesk(ASSIST.relay)) { linkMisses = 0; linkedEver = true; return ASSIST.relay; }
+  if (!linkedEver) return "";
+  linkMisses += 1;
+  return linkMisses < LINK_GIVE_UP ? ASSIST.relay : "";
+}
+
+/* First the addresses that answered, in the order we would prefer them; then,
+ * only if nothing did, the one we were handed. That last fallback is what
+ * keeps this from being a downgrade: a relay that serves chat but not /health
+ * is still reachable, and a page with one address left is better off trying it
+ * and showing whatever it says than going dark on a probe it may have failed
+ * for a reason of its own. */
+const relayUrl = () => linkedDesk || hostedRelay || localDesk || ASSIST.relay;
 
 /* ---------- profile fields: exactly what the extension fills ---------- */
 const FIELDS = [
@@ -838,12 +933,11 @@ const ERRS = {
   capability_removed:"This viewer is too old to run the assistant.",
   rate_limited:"Too many messages too quickly. Give it a minute.",
   session_expired:"Your session expired — sign in again and reload.",
-  refused:"Claude declined that one. Try asking it differently.",
   empty_completion:"Nothing came back. Ask for less at once.",
   prompt_too_large:"This conversation got too long. Clear it and start again.",
   invalid_request:"The page asked wrongly — that is a bug in the page.",
-  bad_code:"That access code was refused. Put the code you were sent in the Assistant tab, "
-    + "or ask whoever sent you the link for the current one.",
+  bad_code:"That access code was refused. Open the most recent link you were sent - "
+    + "the code travels in it - or ask for a fresh one.",
   refused:"The desk refused that. Its reason is above if it gave one — usually the "
     + "access code, or an origin it has not been told to serve.",
   no_route:"Nothing is answering yet. This connects by itself when the desk comes up.",
@@ -1269,9 +1363,18 @@ function applyRoute(r) {
     // why and tells the person who owns the desk nothing about what to do. The
     // fix for a chat box that is not answering should not be a card about API
     // keys, but it does have to name the thing that restores it.
-    bubble("", "Assistant", "Offline just now \u2014 the assistant runs on the owner's "
-      + "machine, and that machine is not up. It connects by itself the moment it is; "
-      + "leave the tab open.");
+    //
+    // And there are two ways to be offline, which want different sentences. A
+    // desk that is answering but that the browser is still holding a request to
+    // is not a machine that is down - it is a permission nobody has been asked
+    // to give yet, and telling that person to go and start a computer that is
+    // already running is worse than saying nothing.
+    bubble("", "Assistant", held.size
+      ? "Your browser is asking whether this page may reach the desk on this "
+        + "machine. Allow it \u2014 look for the local network prompt, or the icon at "
+        + "the left of the address bar \u2014 and the chat opens by itself."
+      : "Offline just now \u2014 the assistant runs on the owner's machine, and that "
+        + "machine is not up. It connects by itself the moment it is; leave the tab open.");
     return;
   }
   mode = "live";
@@ -1288,11 +1391,11 @@ function applyRoute(r) {
  * anywhere, the desktop writes it into relay.json beside this page and the
  * page keeps looking. Start the desktop and an open page connects by itself. */
 async function recheck() {
-  const [found, local] = await Promise.all([findHostedRelay(), findLocalDesk()]);
-  if (found === hostedRelay && local === localDesk) return false;
-  localDesk = local;
+  const [linked, found, local] = await Promise.all(
+    [findLinkedDesk(), findHostedRelay(), findLocalDesk()]);
+  if (linked === linkedDesk && found === hostedRelay && local === localDesk) return false;
   const was = route;
-  hostedRelay = found;
+  linkedDesk = linked; hostedRelay = found; localDesk = local;
   applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
   // Say it however it happened - on the timer, or because a dropped call sent
   // us looking. Somebody watching a dead page should see it come alive.
@@ -1302,7 +1405,10 @@ async function recheck() {
 
 let watching = null;
 function watch() {
-  if (watching || ASSIST.relay) return;      // a relay handed over in a link stays put
+  // This used to stand down when a link had named a desk, on the grounds that
+  // an address given on purpose should not be second-guessed. That is exactly
+  // the page that cannot recover: the one address it has is the one that died.
+  if (watching) return;
   watching = setInterval(() => {
     // Never probe while an answer is in flight. The check would queue behind
     // it, time out, and be read as the desk having gone.
@@ -1314,12 +1420,11 @@ function watch() {
 async function detectRoute() {
   try { sample = window.claude ? await window.claude.use("sample") : null; } catch { sample = null; }
   if (sample) return "claude";
-  if (ASSIST.relay) return "relay";          // one handed over in a link
-  hostedRelay = await findHostedRelay();     // the one this deployment ships
-  if (hostedRelay) return "relay";
-  localDesk = await findLocalDesk();         // one running on this very machine
-  if (localDesk) return "relay";
-  return "none";
+  // All three at once, and none of them on trust. Serially would mean a
+  // visitor with no desk waits out every probe in turn before being told so.
+  [linkedDesk, hostedRelay, localDesk] = await Promise.all(
+    [findLinkedDesk(), findHostedRelay(), findLocalDesk()]);
+  return relayUrl() ? "relay" : "none";
 }
 
 /* ---------- boot ---------- */

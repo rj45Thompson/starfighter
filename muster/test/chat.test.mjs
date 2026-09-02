@@ -1,7 +1,7 @@
 /* The chat box: what it sends, what it refuses, and where a file ends up. */
 import { chromium } from "playwright";
 import { createServer } from "node:http";
-import { CHROME, CODE, testPage, tally } from "./testkit.mjs";
+import { CHROME, CODE, testPage, tally, sealLocal } from "./testkit.mjs";
 import { makePdf, PNG } from "./fixtures.mjs";
 
 const HTML = testPage();
@@ -23,6 +23,7 @@ const browser = await chromium.launch({ executablePath: CHROME, args: ["--no-san
 async function open(seed) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  await sealLocal(page);
   page.on("pageerror", e => { t.bad(); console.log("  FAIL page error: " + e.message); });
   await page.addInitScript(seed);
   await page.goto("http://localhost:8099/");
@@ -92,6 +93,11 @@ console.log("\nrelay route (the desk)");
   });
   let body = null;
   await page.route("https://desk.example/**", async (route) => {
+    // A desk answers /health ahead of every gate it has; that is how the page
+    // tells a live address from one that has since been given to somebody else.
+    if (new URL(route.request().url()).pathname === "/health")
+      return route.fulfill({ status: 200, contentType: "application/json",
+                             body: JSON.stringify({ ok: true, version: "test" }) });
     body = JSON.parse(route.request().postData());
     await route.fulfill({ status: 200, contentType: "application/json",
                           body: JSON.stringify({ text: "Seen." }) });
