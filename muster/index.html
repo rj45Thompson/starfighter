@@ -1210,10 +1210,13 @@ function applyRoute(r) {
     input.placeholder = "Offline\u2026";
     setStatus("off", "offline");
     log.innerHTML = "";
-    // One line. Somebody looking at a chat box that is not answering needs to
-    // know it is not answering and that it will start on its own. They do not
-    // need to be taught how the thing is wired.
-    bubble("", "Assistant", "Offline just now. This connects by itself when it comes back \u2014 "
+    // Two sentences, because one was not enough. The first version said only
+    // that it would come back on its own, which tells a visitor nothing about
+    // why and tells the person who owns the desk nothing about what to do. The
+    // fix for a chat box that is not answering should not be a card about API
+    // keys, but it does have to name the thing that restores it.
+    bubble("", "Assistant", "Offline just now \u2014 the assistant runs on the owner's "
+      + "machine, and that machine is not up. It connects by itself the moment it is; "
       + "leave the tab open.");
     return;
   }

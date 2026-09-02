@@ -41,6 +41,10 @@ ok("it does not offer to send you to itself",
    !/Open chat/.test(await page.textContent("#send")), await page.textContent("#send"));
 ok("the composer is off", !(await page.isEnabled("#input")));
 ok("it says the page will connect itself", /connects by itself/.test(await page.textContent("#log")));
+// And says what restores it. A chat box that only reports being offline
+// leaves the one person who can fix it with nothing to act on.
+ok("and names what has to come up", /owner's machine/.test(await page.textContent("#log")),
+   await page.textContent("#log"));
 ok("it is watching", await page.evaluate(() => watching !== null));
 
 console.log("\nthe desk comes up");
