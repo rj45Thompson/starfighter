@@ -33,14 +33,43 @@ function findChrome() {
   return null;                     // let playwright resolve its own default
 }
 
-/** playwright-core plus a launchable browser, or null with a reason printed. */
+/* The driver, wherever it happens to be installed.
+ *
+ * This asked for playwright-core and nothing else, so on a machine with the
+ * full playwright installed - which is most of them, and is what the page
+ * tests here use - both browser suites reported "skipped" and moved on. A
+ * skip is meant to mean there is no browser. It came to mean the module was
+ * spelled differently, and 86 assertions sat dark behind a line that read like
+ * everything was fine. Try the names it could have, and the places a global
+ * install puts them, before believing that. */
+function driver() {
+  const names = ["playwright-core", "playwright"];
+  for (const n of names) {
+    try { return require(n); } catch { /* try the next one */ }
+  }
+  // A global install is not on this file's resolution path. Look where node
+  // itself would have looked if NODE_PATH had been set.
+  const roots = [process.env.NODE_PATH, "/opt/node22/lib/node_modules",
+                 "/usr/lib/node_modules", "/usr/local/lib/node_modules",
+                 path.join(__dirname, "..", "..", "test", "node_modules")];
+  for (const root of roots) {
+    if (!root) continue;
+    for (const n of names) {
+      const p = path.join(root, n);
+      try { if (fs.existsSync(p)) return require(p); } catch { /* keep looking */ }
+    }
+  }
+  return null;
+}
+
+/** A driver plus a launchable browser, or null with a reason printed. */
 function browser(label) {
-  let chromium;
-  try { ({ chromium } = require("playwright-core")); }
-  catch {
-    console.log(`\n${label}: skipped (npm i playwright-core to run it)\n`);
+  const mod = driver();
+  if (!mod) {
+    console.log(`\n${label}: skipped (no playwright here - npm i playwright-core)\n`);
     return null;
   }
+  const { chromium } = mod;
   const executablePath = findChrome();
   return { chromium, executablePath: executablePath || undefined, label };
 }
@@ -57,4 +86,4 @@ async function launch(env) {
   }
 }
 
-module.exports = { findChrome, browser, launch };
+module.exports = { findChrome, driver, browser, launch };
