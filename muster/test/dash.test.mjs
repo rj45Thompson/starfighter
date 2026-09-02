@@ -16,7 +16,12 @@ const page = await b.newPage(); page.setDefaultTimeout(20000);
 await sealLocal(page);
 page.on("pageerror", e => { fail++; console.log("  FAIL page error: " + e.message); });
 await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-await page.route("https://desk.example/**", r => r.fulfill({ status:200, contentType:"application/json", body:'{"text":"Noted."}' }));
+// A real desk answers /health ahead of every gate it has - that is how the
+// page tells a live address from one handed to somebody else since.
+await page.route("https://desk.example/**", r =>
+  new URL(r.request().url()).pathname === "/health"
+    ? r.fulfill({ status:200, contentType:"application/json", body:'{"ok":true}' })
+    : r.fulfill({ status:200, contentType:"application/json", body:'{"text":"Noted."}' }));
 await page.setViewportSize({ width: 1280, height: 900 });
 await page.goto("http://localhost:8124/#desk=" + encodeURIComponent("https://desk.example/c") + "&code=x");
 await page.waitForFunction(() => document.querySelector("#statusText").textContent === "ready");

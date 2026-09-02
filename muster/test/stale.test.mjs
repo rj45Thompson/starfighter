@@ -195,5 +195,48 @@ await ctx.close();
   await ctx3.close();
 }
 
+/* ---- the case on the screenshot: a dead address and NO desk at all ---- */
+{
+  console.log("\nthe remembered desk is gone and there is no desk on this machine");
+  const ctx4 = await browser.newContext();
+  const page4 = await ctx4.newPage();
+  await sealLocal(page4);                       // nothing on loopback, refused fast
+  page4.on("pageerror", e => { t.bad(); console.log("  FAIL page error: " + e.message); });
+  await page4.route("https://rj45thompson.github.io/**", (route) => {
+    const u = new URL(route.request().url());
+    if (/relay\.json|notify\.json/.test(u.pathname))
+      return route.fulfill({ status: 200, contentType: "application/json", body: '{"url":""}' });
+    return route.fulfill({ status: 200, contentType: "text/html", body: HTML });
+  });
+  let hits = 0;
+  await page4.route("https://gone.trycloudflare.example/**", (route) => {
+    hits++;
+    return route.fulfill({ status: 401, contentType: "application/json",
+                           body: JSON.stringify({ error: "Unauthorized" }) });
+  });
+  await enterCode(page4);
+  await page4.addInitScript((u) => localStorage.setItem("muster:relay", JSON.stringify(u)), DEAD);
+  await page4.goto("https://rj45thompson.github.io/starfighter/muster/index.html");
+  await page4.waitForFunction(
+    () => document.querySelector("#statusText").textContent !== "connecting…");
+
+  // The whole bug in one assertion: an address it has never heard from is not
+  // a reason to tell somebody the assistant is ready.
+  ok("it does not claim to be ready on an address that never answered",
+     (await page4.textContent("#statusText")) === "offline",
+     await page4.textContent("#statusText"));
+  ok("and does not route to it", !(await page4.evaluate(() => relayUrl())),
+     await page4.evaluate(() => relayUrl()));
+  ok("the composer is locked rather than sending into a refusal",
+     !(await page4.isEnabled("#input")));
+
+  const said4 = await page4.textContent("#log");
+  ok("it says the link has gone stale, which is the useful thing to know",
+     /link|no longer answering|fresh/i.test(said4), said4.slice(0, 220));
+  ok("no 'Unauthorized' on screen", !/Unauthorized/i.test(said4), said4.slice(0, 220));
+  ok("nothing was ever POSTed to the stranger", hits <= 1, "requests: " + hits);
+  await ctx4.close();
+}
+
 await browser.close();
 process.exit(t.done() ? 1 : 0);

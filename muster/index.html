@@ -506,6 +506,7 @@ function probeDesk(url) {
 let linkedDesk = "";          // the remembered address, while it is answering
 let linkMisses = 0;
 let linkedEver = false;       // has this particular address ever answered us?
+let linkedGone = false;       // we have one written down and it will not answer
 const LINK_GIVE_UP = 2;
 
 /* Same two-strikes rule the local desk gets, and for the same reason: one
@@ -514,20 +515,29 @@ const LINK_GIVE_UP = 2;
  * protects something that was working. It is not a licence to trust a
  * hostname purely because it is written down. */
 async function findLinkedDesk() {
-  if (!ASSIST.relay) { linkedEver = false; linkMisses = 0; return ""; }
-  if (await probeDesk(ASSIST.relay)) { linkMisses = 0; linkedEver = true; return ASSIST.relay; }
-  if (!linkedEver) return "";
+  if (!ASSIST.relay) { linkedEver = false; linkMisses = 0; linkedGone = false; return ""; }
+  if (await probeDesk(ASSIST.relay)) {
+    linkMisses = 0; linkedEver = true; linkedGone = false;
+    return ASSIST.relay;
+  }
+  if (!linkedEver) { linkedGone = true; return ""; }
   linkMisses += 1;
-  return linkMisses < LINK_GIVE_UP ? ASSIST.relay : "";
+  if (linkMisses < LINK_GIVE_UP) return ASSIST.relay;
+  linkedGone = true;
+  return "";
 }
 
-/* First the addresses that answered, in the order we would prefer them; then,
- * only if nothing did, the one we were handed. That last fallback is what
- * keeps this from being a downgrade: a relay that serves chat but not /health
- * is still reachable, and a page with one address left is better off trying it
- * and showing whatever it says than going dark on a probe it may have failed
- * for a reason of its own. */
-const relayUrl = () => linkedDesk || hostedRelay || localDesk || ASSIST.relay;
+/* Only addresses that have answered. There was a fallback here to the
+ * remembered one when nothing else was found, on the theory that a page with
+ * one address left is better off trying it than going dark. It is not. Trying
+ * it is how the chat came to say "ready" and then answer every question
+ * "Unauthorized": the address had been handed to a stranger, the stranger
+ * refused, and the page had promised an assistant on the strength of having a
+ * string rather than having a desk.
+ *
+ * A hostname we have never heard from is not a route. Saying so is worth more
+ * than a hopeful request to somebody else's server. */
+const relayUrl = () => linkedDesk || hostedRelay || localDesk;
 
 /* ---------- profile fields: exactly what the extension fills ---------- */
 const FIELDS = [
@@ -1373,8 +1383,15 @@ function applyRoute(r) {
       ? "Your browser is asking whether this page may reach the desk on this "
         + "machine. Allow it \u2014 look for the local network prompt, or the icon at "
         + "the left of the address bar \u2014 and the chat opens by itself."
-      : "Offline just now \u2014 the assistant runs on the owner's machine, and that "
-        + "machine is not up. It connects by itself the moment it is; leave the tab open.");
+      : linkedGone
+        // Worth its own sentence: nothing is broken here, the link is simply
+        // out of date, and the person reading this can act on that.
+        ? "The link that opened this page points at a desk that is no longer "
+          + "answering. A tunnel takes a new address every time it starts, so an "
+          + "old link stops working \u2014 ask whoever sent it for a fresh one. If it "
+          + "is your own desk, start it and this connects by itself."
+        : "Offline just now \u2014 the assistant runs on the owner's machine, and that "
+          + "machine is not up. It connects by itself the moment it is; leave the tab open.");
     return;
   }
   mode = "live";
