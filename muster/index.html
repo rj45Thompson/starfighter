@@ -179,6 +179,13 @@ pre.code{background:var(--sunk);border:1px solid var(--line);border-radius:8px;p
 }
 </style>
 
+<!-- A model for people who have neither a desk of their own nor a Claude
+     account: Puter serves the call and the visitor's own free Puter account
+     pays for it, so there is still no key in this page, on the wire, or in
+     the repository. It is the LAST route tried - a desk is private and this
+     is not - and the page works without it, so a blocked or failed load is
+     an absent route rather than a broken page. -->
+<script src="https://js.puter.com/v2/" async></script>
 </head>
 <body>
 <div class="shell" id="shell">
@@ -457,7 +464,7 @@ function adoptLate(url) {
   const was = route;
   localDesk = url;
   localMisses = 0;
-  applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
+  applyRoute(pickRoute());
   if (was === "none" && route === "relay") bubble("", "Assistant", "Connected. Ask away.");
 }
 
@@ -538,6 +545,14 @@ async function findLinkedDesk() {
  * A hostname we have never heard from is not a route. Saying so is worth more
  * than a hopeful request to somebody else's server. */
 const relayUrl = () => linkedDesk || hostedRelay || localDesk;
+
+/* The one answer to "what is answering right now", so a route cannot be
+ * forgotten in one place and remembered in another. Best first, and Puter
+ * last: a desk is private and Puter is a third party, so it is what a visitor
+ * with neither a desk nor a Claude account falls back to rather than a thing
+ * anyone is steered to. */
+const pickRoute = () =>
+  sample ? "claude" : relayUrl() ? "relay" : puterReady() ? "puter" : "none";
 
 /* ---------- profile fields: exactly what the extension fills ---------- */
 const FIELDS = [
@@ -935,6 +950,8 @@ function charter() {
     + `\nApplications logged: ${apps.length}.`;
 }
 
+const PUTER_MODEL = "claude-sonnet-4-6";
+
 const ERRS = {
   not_granted:"You did not allow this page to use Claude, so the assistant is off for this visit.",
   sampling_disabled:"Claude is not available on this account.",
@@ -951,6 +968,8 @@ const ERRS = {
   refused:"The desk refused that. Its reason is above if it gave one — usually the "
     + "access code, or an origin it has not been told to serve.",
   no_route:"Nothing is answering yet. This connects by itself when the desk comes up.",
+  puter_declined:"You did not finish signing in, so the assistant has nothing to answer with. "
+    + "Send again and complete the sign-in window \u2014 it is free and takes a moment.",
   blocked:"The browser could not reach the desk. An ad blocker or a strict network will do this.",
   upstream_error:"The connection dropped. Try again."
 };
@@ -1185,8 +1204,8 @@ function relayProfile() {
   return out;
 }
 
-function mkErr(code, message) {
-  return Object.assign(new Error(message || code), { code });
+function mkErr(code, message, text) {
+  return Object.assign(new Error(message || code), text ? { code, text } : { code });
 }
 
 async function httpErr(res) {
@@ -1290,6 +1309,7 @@ async function ask(msgs, opts) {
     return r.text;
   }
   if (route === "relay") return askRelay(sys, msgs, opts);
+  if (route === "puter") return askPuter(sys, msgs, opts);
   throw mkErr("no_route");
 }
 
@@ -1346,7 +1366,7 @@ async function send() {
  * configured rather than going dark. */
 function lock() {
   sample = null;
-  applyRoute(relayUrl() ? "relay" : "none");
+  applyRoute(pickRoute());
 }
 
 $("#send").onclick = send;
@@ -1413,7 +1433,7 @@ async function recheck() {
   if (linked === linkedDesk && found === hostedRelay && local === localDesk) return false;
   const was = route;
   linkedDesk = linked; hostedRelay = found; localDesk = local;
-  applyRoute(sample ? "claude" : relayUrl() ? "relay" : "none");
+  applyRoute(pickRoute());
   // Say it however it happened - on the timer, or because a dropped call sent
   // us looking. Somebody watching a dead page should see it come alive.
   if (was === "none" && route === "relay") bubble("", "Assistant", "Connected. Ask away.");
@@ -1441,7 +1461,72 @@ async function detectRoute() {
   // visitor with no desk waits out every probe in turn before being told so.
   [linkedDesk, hostedRelay, localDesk] = await Promise.all(
     [findLinkedDesk(), findHostedRelay(), findLocalDesk()]);
-  return relayUrl() ? "relay" : "none";
+  if (relayUrl()) return "relay";
+  return puterReady() ? "puter" : "none";
+}
+
+/* Puter, if it loaded. The script is async and may still be in flight when
+ * this first runs, may be blocked by an extension, or may not be there at
+ * all - so this is asked every time rather than answered once, and every
+ * answer but a callable chat() is simply "no route". */
+function puterReady() {
+  try { return typeof window.puter?.ai?.chat === "function"; }
+  catch { return false; }
+}
+
+/* The stream is an async iterable of parts; a part may carry no text. Puter
+ * can also answer without streaming, in which case what comes back is the
+ * whole message, and it has been seen shaped three ways - a string, {text},
+ * or a content array like the Messages API. Accept all of them: guessing one
+ * and being wrong costs the answer. */
+function puterText(r) {
+  if (typeof r === "string") return r;
+  if (!r) return "";
+  if (typeof r.text === "string") return r.text;
+  const m = r.message ?? r;
+  if (typeof m?.content === "string") return m.content;
+  if (Array.isArray(m?.content))
+    return m.content.filter(b => b && (b.type === "text" || typeof b.text === "string"))
+                    .map(b => b.text || "").join("");
+  return "";
+}
+
+async function askPuter(sys, msgs, opts) {
+  const turns = [{ role: "system", content: sys }, ...flatTurns(msgs)];
+  let res;
+  try {
+    res = await window.puter.ai.chat(turns, { model: PUTER_MODEL, stream: true });
+  } catch (e) {
+    // A refused sign-in lands here, and it is the one failure worth naming:
+    // nothing is broken, the person simply has not said yes yet.
+    throw mkErr(/cancel|denied|auth|sign|login/i.test(String(e && e.message || e))
+      ? "puter_declined" : "upstream_error", String(e && e.message || e));
+  }
+
+  if (res && typeof res[Symbol.asyncIterator] === "function") {
+    let text = "";
+    try {
+      for await (const part of res) {
+        if (opts.signal && opts.signal.aborted) throw mkErr("cancelled", "", text);
+        const delta = puterText(part);
+        if (!delta) continue;
+        text += delta;
+        if (opts.onText) opts.onText({ text, delta });
+      }
+    } catch (e) {
+      if (e && e.code) throw e;
+      if (text) throw mkErr("upstream_error", String(e && e.message || e), text);
+      throw mkErr("upstream_error", String(e && e.message || e));
+    }
+    if (!text) throw mkErr("empty_completion");
+    return text;
+  }
+
+  // Not a stream: it answered all at once.
+  const text = puterText(res);
+  if (!text) throw mkErr("empty_completion");
+  if (opts.onText) opts.onText({ text, delta: text });
+  return text;
 }
 
 /* ---------- boot ---------- */
