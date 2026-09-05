@@ -297,6 +297,8 @@ const CFG = {
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
   AIM_BASE_ERR:2.6, AIM_COMP_ERR:0.4, AIM_JAM_ERR:8.0, AIM_ERR_RANGE:110, AIM_JITTER_HZ:1.7,   // FIRE-CONTROL fidelity (user 2026-07-14 "box ... depending on your computer and the other agent's jammer"): lead-box error in world units - BASIC fire control is loose, the Targeting Computer gizmo tightens it (AIM_COMP_ERR), the target's ECM jammer widens + wobbles it (AIM_JAM_ERR); error grows with range; the GUN aims at the SAME shown box, so a jammed solution honestly misses
   LOCKON_RANGE:95, LOCKON_ARC:0.72,                // an enemy within LOCKON_RANGE and facing you within LOCKON_ARC (cos) has a firing solution ON you -> lock-on warning; your own ECM jammer flickers/denies their lock
+  ROCK_TEX_GAIN:[3.6,2.8],                         // LIGHTING (2026-09-05): MEASURED - assets/asteroid_dark.png averages 30/255 (12%) and asteroid_light.png 51/255 (20%). map x color = albedo, so with color 0xa8a196 the rocks reflected ~8% of any light; that is why raising the lights twice (2026-07-14) never made them visible. Pixels are multiplied by this at load (dark -> ~42%, light -> ~56%), grain kept.
+  HEADLAMP_INT:1.6, HEADLAMP_RANGE:420,            // LIGHTING (user 2026-09-05 "the lighting is dark, I can't see the asteroids"): a point light that rides with the chase camera, so the rocks the player is looking at are lit from the player's side whatever the sun's direction. Range in world units (a rock at AST_SCALE_MAX is ~6 units; the field is ~7,700 rocks across the arena).
   REAR_GUNNER_WINDOW:false,                        // DEPRECATED (user 2026-09-05 "deprecate rear gunner window ... I can't see what's going on"): the manned aft view took half the screen over the main 3D view. The turret, its AI (AI_REAR_*) and the external ball stay; only the window and manning it are gone. Flip to true to bring the window back.
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
   REAR_CAM_FOV:74,                                 // turret field of view
@@ -527,6 +529,12 @@ scene.add(new T.HemisphereLight(0xbcd4ff,0x1a2030,1.35));   // user 2026-07-14 "
 const sun=new T.DirectionalLight(0xfff0d8,1.6); sun.position.set(80,120,40); scene.add(sun);
 const rim=new T.DirectionalLight(0x8fb8ff,0.8); rim.position.set(-60,40,-80); scene.add(rim);
 scene.add(new T.AmbientLight(0x384156,0.55));   // gentle fill so back-facing rock/ship faces aren't crushed to black
+// HEADLAMP (user 2026-09-05 "the lighting is dark, I can't see the asteroids"): the sun is ONE fixed direction, so every
+// rock between the player and the sun shows the player its unlit side, and the hemisphere/ambient terms above were
+// raised twice (2026-07-14) without curing that. A point light that rides with the chase camera (updated in the frame
+// loop, next to updateCamera) lights whatever the player is looking at from the player's side. Linear decay (1), so it
+// reaches CFG.HEADLAMP_RANGE rather than dying a few units out.
+const headlamp=new T.PointLight(0xdfe9ff,CFG.HEADLAMP_INT,CFG.HEADLAMP_RANGE,1); scene.add(headlamp);
 
 const chaseCam=new T.PerspectiveCamera(60,1,0.5,6000); chaseCam.position.set(0,CFG.CAM_UP,CFG.CAM_BACK);
 chaseCam.layers.enable(2); chaseCam.layers.enable(3);       // chase/main view shows SPEECH (layer 2) + the EXTERNAL rear-gun turret indicator (layer 3) sitting on the ship's back
@@ -650,8 +658,16 @@ const sky=new T.CubeTextureLoader().setPath('assets/').load(
   ()=>{ const b=document.getElementById('boot'); if(b){ b.style.opacity=0; setTimeout(()=>b.remove(),550);} });
 sky.encoding=T.sRGBEncoding; scene.background=sky;
 const texLoader=new T.TextureLoader();
-const rockTex=[ texLoader.load('assets/asteroid_dark.png'), texLoader.load('assets/asteroid_light.png') ];
-rockTex.forEach(t=>{ t.wrapS=t.wrapT=T.RepeatWrapping; t.encoding=T.sRGBEncoding; });
+// ROCK TEXTURES ARE NEARLY BLACK (see CFG.ROCK_TEX_GAIN for the measurement): loaded through a canvas so each pixel
+// can be multiplied by the gain before it becomes a texture. Same-origin images, so the readback is allowed on the
+// hosted page as well as locally. Until the image arrives the texture is empty and the rock shows its material colour.
+function loadRockTex(url,gain){ const tex=new T.Texture(); tex.wrapS=tex.wrapT=T.RepeatWrapping; tex.encoding=T.sRGBEncoding;
+  const img=new Image(); img.onload=()=>{ const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; const x=c.getContext('2d'); x.drawImage(img,0,0);
+    const d=x.getImageData(0,0,c.width,c.height); for(let i=0;i<d.data.length;i+=4){ d.data[i]=Math.min(255,d.data[i]*gain); d.data[i+1]=Math.min(255,d.data[i+1]*gain); d.data[i+2]=Math.min(255,d.data[i+2]*gain); }
+    x.putImageData(d,0,0); tex.image=c; tex.needsUpdate=true; };
+  img.onerror=()=>{ console.error('[rocks] texture failed to load: '+url+' - rocks show their flat material colour'); };
+  img.src=url; return tex; }
+const rockTex=[ loadRockTex('assets/asteroid_dark.png',CFG.ROCK_TEX_GAIN[0]), loadRockTex('assets/asteroid_light.png',CFG.ROCK_TEX_GAIN[1]) ];
 const PLANET_TEX=texLoader.load('assets/planet_skin.jpg'); PLANET_TEX.wrapS=T.RepeatWrapping; PLANET_TEX.encoding=T.sRGBEncoding;   // the real Starfighter2 planet skin, tinted per economy type via material.color
 const FLAME_TEX=texLoader.load('assets/flame1.png');   // the real Starfighter2 (Cartoon FX) fire sprite - the Incinerator's stream
 
@@ -6560,7 +6576,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
