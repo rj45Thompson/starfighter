@@ -346,7 +346,20 @@ function powerAdvice(t){
 }
 
 // ---- the routing entry the game calls when its parser fails ---------------------------------------------------
+// ADVICE INTENT (user 2026-09-05 "make sure the talking part of the game is working fully"): "what should I do
+// next" used to fall through to the fact composer, which answered with the origin story because no lore fact
+// overlapped the question. A request for guidance now goes to advise() - the same telemetry-grounded function the
+// unprompted advice ticker uses - so the answer is about THIS flight (threat, hull, fuel, hold, credits, or the
+// quiet), never a recitation. Word list lives here because it is the passenger's, not the game's.
+const ADVICE_RE = /\b(what (should|do|can|shall|must) (i|we) do|what next|what now|(any|some|your) (advice|suggestions?|thoughts?)|advise me|advice|where (should|do|shall) (i|we) go|what('s| is) the plan|what would you do|orders|next move|recommend)\b/i;
 async function route(text){
+  if(ADVICE_RE.test(text)){
+    let t = null; try{ t = hooks.telemetry ? hooks.telemetry() : null; }catch(e){ t = null; }
+    const a = advise(t);
+    const reply = a ? a.text : 'Nothing is pressing. Fly, mine, trade or dock - I will speak the moment that changes.';
+    conv.push({q:text, a:reply}); if(conv.length>CFG.CONV_CAP*2) conv.shift(); S.counts.asks++; save();
+    return { kind:'advice', reply, tier:'advise' };
+  }
   const h = helpMatch(text);
   if(h){
     const usage = h.usage? ` Usage: ${h.usage}.` : '';

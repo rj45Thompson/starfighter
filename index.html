@@ -224,7 +224,7 @@
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
 <script src="speech_tier.js?v=20260714c"></script>
 <script src="inhabitant.js?v=20260714c"></script>
-<script src="passenger.js?v=20260714c"></script>
+<script src="passenger.js?v=20260905a"></script>
 <script src="gamemod.js?v=20260714c"></script>
 <script src="chatter.js?v=20260714c"></script>
 <script src="speech_gen.js?v=20260714c"></script>
@@ -297,8 +297,12 @@ const CFG = {
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
   AIM_BASE_ERR:2.6, AIM_COMP_ERR:0.4, AIM_JAM_ERR:8.0, AIM_ERR_RANGE:110, AIM_JITTER_HZ:1.7,   // FIRE-CONTROL fidelity (user 2026-07-14 "box ... depending on your computer and the other agent's jammer"): lead-box error in world units - BASIC fire control is loose, the Targeting Computer gizmo tightens it (AIM_COMP_ERR), the target's ECM jammer widens + wobbles it (AIM_JAM_ERR); error grows with range; the GUN aims at the SAME shown box, so a jammed solution honestly misses
   LOCKON_RANGE:95, LOCKON_ARC:0.72,                // an enemy within LOCKON_RANGE and facing you within LOCKON_ARC (cos) has a firing solution ON you -> lock-on warning; your own ECM jammer flickers/denies their lock
-  ROCK_TEX_GAIN:[3.6,2.8],                         // LIGHTING (2026-09-05): MEASURED - assets/asteroid_dark.png averages 30/255 (12%) and asteroid_light.png 51/255 (20%). map x color = albedo, so with color 0xa8a196 the rocks reflected ~8% of any light; that is why raising the lights twice (2026-07-14) never made them visible. Pixels are multiplied by this at load (dark -> ~42%, light -> ~56%), grain kept.
-  HEADLAMP_INT:1.6, HEADLAMP_RANGE:420,            // LIGHTING (user 2026-09-05 "the lighting is dark, I can't see the asteroids"): a point light that rides with the chase camera, so the rocks the player is looking at are lit from the player's side whatever the sun's direction. Range in world units (a rock at AST_SCALE_MAX is ~6 units; the field is ~7,700 rocks across the arena).
+  EXPOSURE:1.15,                                   // GRAPHICS PASS 2026-09-05: ACES filmic tone mapping exposure (renderer.toneMappingExposure). 1.0 = neutral; the sky faces average 12-20% brightness, so a little lift.
+  ARENA_WIRE:false,                                // GRAPHICS PASS 2026-09-05 (user "fix the background"): the 2100-unit wireframe sphere that marked the arena edge drew polygon lines across the whole sky at every zoom. Off; the edge still bounces you (step) and EDGE_STEER turns the AI back.
+  REAR_GUN:false,                                  // user 2026-09-05 "remove rear gun for now": no ball turret on the hull, no aft camera, no manual or AI rear beam, no rear shield. REAR_GUNNER_WINDOW below is moot while this is false. Flip to bring the whole mechanic back.
+  FBX_HULLS:true,                                  // GRAPHICS PASS 2026-09-05 ("make the ship look better"): every ship renders the real Starfighter2 Spaceship.fbx with its palette + emissive maps, tinted per side, instead of the 6-vertex hullmodels.js darts. false = the old procedural silhouettes.
+  ROCK_TEX_GAIN:[3.0,2.4],                         // LIGHTING (2026-09-05): MEASURED - assets/asteroid_dark.png averages 30/255 (12%) and asteroid_light.png 51/255 (20%). map x color = albedo, so with color 0xa8a196 the rocks reflected ~8% of any light; that is why raising the lights twice (2026-07-14) never made them visible. Pixels are multiplied by this at load (dark -> ~35%, light -> ~48%), grain kept. 3.6/2.8 read chalk-white in a dense belt with the headlamp on.
+  HEADLAMP_INT:1.3, HEADLAMP_RANGE:420,            // LIGHTING (user 2026-09-05 "the lighting is dark, I can't see the asteroids"): a point light that rides with the chase camera, so the rocks the player is looking at are lit from the player's side whatever the sun's direction. Range in world units (a rock at AST_SCALE_MAX is ~6 units; the field is ~7,700 rocks across the arena).
   REAR_GUNNER_WINDOW:false,                        // DEPRECATED (user 2026-09-05 "deprecate rear gunner window ... I can't see what's going on"): the manned aft view took half the screen over the main 3D view. The turret, its AI (AI_REAR_*) and the external ball stay; only the window and manning it are gone. Flip to true to bring the window back.
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
   REAR_CAM_FOV:74,                                 // turret field of view
@@ -327,7 +331,8 @@ const CFG = {
   TRADER_GUN_MULT:0.6,     // balance: merchants mount light guns (traders were too powerful in fights)
   HUNT_R:44,               // a pilot may opportunistically hunt a rival within this range
   HUNT_RATE:0.3,           // base per-second chance to start a hunt (× the pilot's aggression)
-  HUNT_FIRE:0.85,          // wider fire cone when dogfighting a maneuvering ship
+  HUNT_FIRE:0.98,          // fire cone when dogfighting: cos 0.98 = 11 degrees. Was 0.85 (32 degrees): at 40 units a shot 30 degrees off misses by 20 units, and the measured hit rate was 2% (see HEG_TIERS, 2026-09-05)
+  AI_LEAD:true,            // AI aims at the first-order intercept point (target.pos + target.vel * time-of-flight), the same solution the player's lead box uses - off = the old aim-at-where-it-is
   AGGR_MIN:0.25, AGGR_MAX:1.0,   // per-pilot aggression trait
   KILL_BOUNTY:3,           // score to the killer; victim's credits drop as gems
   // ---- collision fixes (user report "no collision"): player friendly-fire lands + ship-body contact ----
@@ -522,6 +527,10 @@ const innerW=()=>window.innerWidth||1280, innerH=()=>window.innerHeight||760;
 const stage=document.getElementById('stage');
 const renderer=new T.WebGLRenderer({ antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true });
 renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.outputEncoding=T.sRGBEncoding;
+// GRAPHICS PASS 2026-09-05 (user "upgrade the graphics of the game on everything you can"): filmic tone mapping
+// instead of raw clipping - the sun, engine plumes and bolts roll off into white instead of flattening to a
+// disc, and the exposure lifts the mid-tones the sky and rocks live in. Both are CFG so they can be tuned.
+renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=CFG.EXPOSURE;
 stage.appendChild(renderer.domElement);
 
 const scene=new T.Scene();
@@ -673,6 +682,7 @@ const FLAME_TEX=texLoader.load('assets/flame1.png');   // the real Starfighter2 
 
 const ring=new T.Mesh(new T.SphereGeometry(CFG.ARENA_R,32,24),
   new T.MeshBasicMaterial({ color:0x2a557a, wireframe:true, transparent:true, opacity:0.08 })); scene.add(ring);
+ring.visible=CFG.ARENA_WIRE;   // GRAPHICS PASS 2026-09-05: see CFG.ARENA_WIRE - the wire sphere was the "grid" drawn over the whole sky
 (function stars(){ const N=1100,g=new T.BufferGeometry(),p=new Float32Array(N*3);
   for(let i=0;i<N;i++){ const r=rand(600,2200),u=rand(-1,1),th=rand(0,TAU),s=Math.sqrt(1-u*u);
     p[i*3]=r*s*Math.cos(th); p[i*3+1]=r*u; p[i*3+2]=r*s*Math.sin(th); }
@@ -756,7 +766,25 @@ function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
 const SHIP_TEX_LOADER=new T.TextureLoader();
 function shipTex(file){ const t=SHIP_TEX_LOADER.load(ASSET_CFG.DIR+file); t.flipY=false; t.encoding=T.sRGBEncoding; t.wrapS=t.wrapT=T.RepeatWrapping; return t; }
 const SHIP_TEX={ player:shipTex('playerShip_dff.png'), playerNrm:shipTex('playerShip_nrm.png'),
-  enemyRed:shipTex('enemyShip_red_dff.png'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png') };
+  enemyRed:shipTex('enemyShip_red_dff.png'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png'),
+  hull:shipTex('spaceship_dff.png'), hullEmm:shipTex('spaceship_emm.png') };   // Spaceship.fbx's OWN maps: a 4-colour palette albedo (32x32, orange/white/dark) + a 128x512 emissive strip for the lights and vents
+// FBX HULL FOR EVERYONE (GRAPHICS PASS 2026-09-05, CFG.FBX_HULLS): vehicle_playerShip.FBX / vehicle_enemyShip.FBX are
+// NOT in assets/ (they 404 and shipDone counts them as settled), so the player and squad were rendering hullmodels.js
+// primitives - the scout is a 6-vertex flat dart - and pirates the box-and-cone fallback. Spaceship.fbx IS present (234
+// vertices, the trader's model) with both of its maps. One real hull, tinted per side and scaled per class/tier,
+// beats three silhouettes made of boxes. Returns null while the FBX has not loaded; shipDone retrofits later.
+function fbxHullFor(s, visKey){
+  if(!CFG.FBX_HULLS || !ASSETS.ships.trader) return null;
+  const isPirate=s.team==='pirate', HT=isPirate?HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)]:null;
+  const tint=isPirate?new T.Color(HT.col):(s.role==='trader'?new T.Color(0x9fb0c0):new T.Color(s.color));
+  const grp=ASSETS.ships.trader.clone(true);
+  grp.traverse(o=>{ if(!o.isMesh) return;
+    o.material=new T.MeshStandardMaterial({ map:SHIP_TEX.hull, emissiveMap:SHIP_TEX.hullEmm, emissive:isPirate?new T.Color(0xff6a4a):new T.Color(0xffffff), emissiveIntensity:isPirate?1.4:1.1,
+      roughness:0.5, metalness:0.32, color:new T.Color(0xffffff).lerp(tint,isPirate?0.55:0.28) }); });
+  if(isPirate) grp.scale.setScalar(HT.scale);
+  else if(visKey && ASSET_CFG.VIS_SCALE[visKey]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[visKey]);
+  const eng=makeEngPlume(s.hue); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;
+  return grp; }
 function fixShipMaterial(o, map, nrm, tintHex){
   const ms=Array.isArray(o.material)?o.material:[o.material];
   for(let i=0;i<ms.length;i++){ const m=ms[i]=ms[i].clone();
@@ -817,7 +845,8 @@ function applyShipModel(s){
   // which of the 7 hand-authored archetypes to render as via HULLS[key].visualClass. Original 7 hulls have no
   // such field, so `visKey` naturally falls back to the hull's own key - zero behavior change for them.
   const visKey=(HULLS[s.hullClass]&&HULLS[s.hullClass].visualClass)||s.hullClass;
-  if(!isPirate && window.HULLMODELS && typeof HULLMODELS.build==='function'){
+  grp=fbxHullFor(s, visKey);   // GRAPHICS PASS 2026-09-05: the real FBX hull first (null until it has loaded, or with CFG.FBX_HULLS off)
+  if(!grp && !isPirate && window.HULLMODELS && typeof HULLMODELS.build==='function'){
     try{ grp=HULLMODELS.build(visKey||'fighter', T, {color:s.color}); }catch(e){ grp=null; }
     if(grp) toEngPlume(grp, s.hue);   // swap HULLMODELS' round glow-sprite exhaust for a tapered plume (user 2026-07-13: it read too much like the bolt)
   }
@@ -846,9 +875,19 @@ const HEG_TIERS=[   // user 2026-07-08 "i easily won against them so we need to 
   // session's new 20-min-match/boss-endgame structure (a short, high-intensity run needs a Hegemon that can credibly
   // threaten the player fast, not one that's merely annoying). bounty/scale deliberately left untouched - if kills
   // stop feeling worth it at this difficulty, bounty is the next knob, not hp/dmg again.
-  {n:'Drone',   hp:545,  dmg:75,  col:0xd85555, scale:1.0,  bounty:14},
-  {n:'Cruiser', hp:1150, dmg:130, col:0xc23838, scale:1.35, bounty:36},
-  {n:'Warlord', hp:1955, dmg:185, col:0x8a1818, scale:1.75, bounty:72} ];
+  // COMBAT PASS 2026-09-05 (user: "the damage seems busted. I seem to be invincible and others are invincible
+  // too"). MEASURED in a 30 s deterministic battle (3 pirates vs player + 3 squad, 60 Hz, hand-stepped): pirates
+  // fired 234 shots and landed 4, the squad fired 911 and landed 19 - a ~2% hit rate both ways, because every AI
+  // fired down its own nose at the target's CURRENT position inside a 32-degree cone. A Drone at 545 hull and
+  // 2.2 hull/s regen out-healed 19 hits of 18 (its hull ROSE from 336 to 374 while under fire), so nothing on
+  // their side ever died; the rare 75-damage hit one-shot a 70-hull scout, so the player popped and respawned
+  // instead of ever trading blows. Two fixes, both here and in think(): the AI now aims at the intercept point
+  // and fires only inside HUNT_FIRE, and the tiers come down from pass 5's flat 5x to numbers with a time-to-kill:
+  // a scout's 66 dps kills a Drone in ~4 s of connected fire; a Drone's 22-damage hits take ~6 hits (shields + hull)
+  // to kill a scout. Bounties untouched.
+  {n:'Drone',   hp:260,  dmg:22,  col:0xd85555, scale:1.0,  bounty:14},
+  {n:'Cruiser', hp:520,  dmg:38,  col:0xc23838, scale:1.35, bounty:36},
+  {n:'Warlord', hp:900,  dmg:60,  col:0x8a1818, scale:1.75, bounty:72} ];
 function hegTier(){ return Math.min(HEG_TIERS.length-1, Math.max(0, Math.floor(escalation/CFG.ESC_PER_TIER)||0)); }
 function enemyCap(){ return CFG.PIRATE_MAX + Math.floor(escalation/CFG.ESC_PER_TIER)*2; }
 function makeShip(i){
@@ -1884,6 +1923,7 @@ function rollAIGear(s){ if(!window.ITEMVAR||!s||s.role==='player') return;
   s.weaponInst={powerMul:wi.powerMul,condition:wi.condition,weight:wi.weight,quality:wi.quality};
   var et=s.engineType||'standard', E=ENGINES[et];
   if(E){ var ei=bestOf2('ai|'+s.id+'|e|'+et, (E.cost||80)+80, 10); s.engineInst={powerMul:ei.powerMul,condition:ei.condition,weight:ei.weight,quality:ei.quality}; } }
+const _vLead=new T.Vector3();   // scratch for the AI intercept lead (COMBAT PASS 2026-09-05) - aimDir is usually the shared _v, so the lead is built in its own vector
 function think(s,dt){
   if(s.wRay){ const val=(s.credits||0)+(s.score||0)*CFG.SCORE_W, gain=val-(s._prevVal||val);   // NET reward since last tick
     if(s._prevMode && s.rAcc[s._prevMode]!=null){ s.rAcc[s._prevMode]+=gain; s.rT[s._prevMode]+=dt; }   // A9: attribute to the mode
@@ -1955,6 +1995,12 @@ function think(s,dt){
     }
   }
   if(CFG.GROUNDED && target && target.id!=null && (mode==='HUNT'||mode==='EVADE')){ const bp=senseTarget(s,target); aimDir = (mode==='EVADE') ? _v.copy(s.pos).sub(bp) : _v.copy(bp).sub(s.pos); }   // A4: aim at the BELIEF, not ground truth
+  // COMBAT PASS 2026-09-05: when hunting, aim at the INTERCEPT point - where the target will be when a shot
+  // fired now arrives (first-order lead, the same solution computePlayerSolution gives the player's box) - applied
+  // on top of whatever aimDir already points at (ground truth, or the A4 belief position), so GROUNDED still holds.
+  // Bullets do not inherit the shooter's velocity (spawnBullet), so no shooter term. Measured before this: a 2% hit rate.
+  if(CFG.AI_LEAD && mode==='HUNT' && target && target.vel && aimDir){ const Wl=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
+    const tof=aimDir.length()/(Wl.speed||CFG.BULLET_SPEED); aimDir=_vLead.copy(aimDir).addScaledVector(target.vel,tof); }
   const aim=aimAt(s,aimDir);
   // CH7 fix: throttle is now situation-aware - thrust to reach a target's standoff range, then COAST/STOP (was: always ≥0.55, "full throttle never stop")
   let thr;
@@ -5465,6 +5511,11 @@ function updateRearCam(dt){ const s=ships[0]; if(!s) return;
   rearBarrel.position.copy(mount);   // group ORIGIN sits at the ball centre; the barrel is offset outward from it, so it traverses around the ball as you aim
   rearMuzzle.copy(mount).addScaledVector(aim,CFG.REAR_BALL_R+CFG.REAR_BARREL_LEN);   // muzzle tip (ball radius + barrel length out along aim) = where the bolt is born
   rearEdgeGlow(); }   // update the "about to go out of bounds" edge glow from the turret's actual deflection
+// REAR GUN OFF (user 2026-09-05 "remove rear gun for now", CFG.REAR_GUN=false): called from the frame loop in place of
+// the five rear-gun updaters, so the hull turret, the aft beam, the rear shield and the aft view all stay hidden and
+// VIEW.rear stays 0x0 (renderView skips it). Idempotent and cheap - four visibility flags per frame.
+function rearGunOff(){ rearBall.visible=false; rearBarrel.visible=false; if(typeof rearShield!=='undefined') rearShield.visible=false; if(typeof rearBeam!=='undefined') rearBeam.visible=false; VIEW.rear.w=0; VIEW.rear.h=0; }   // MAN (a const declared further down) is deliberately NOT touched here: the load-time call below runs inside its temporal dead zone, where even typeof throws - that error once killed the whole script before makeShip ran. The frame loop resets MAN.rearActive itself.
+if(!CFG.REAR_GUN) rearGunOff();   // once at load too, so the turret never shows in the first frame before the loop runs
 function updateRearView(){ const el=document.getElementById('rearWin');
   if(!el || el.style.display==='none'){ VIEW.rear.w=0; VIEW.rear.h=0; return; }
   const r=el.getBoundingClientRect(), H=innerH(), TITLE=20;
@@ -6576,7 +6627,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
