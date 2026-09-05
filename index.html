@@ -57,7 +57,7 @@
   .pill{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.1em; color:#8fb0cc;
     border:1px solid #29405a; background:#0c1623aa; border-radius:5px; padding:4px 7px; }
   .pill b{ color:var(--cyan); }
-  #rosterWrap{ left:14px; top:44px; pointer-events:auto; }   /* OUTER persistent box (registered w/ PANELS) - buildRoster() wipes the INNER #roster's innerHTML on every rebuild, so the panel chrome lives one level up, same wrapper pattern as #market/#marketBody and #ticker/#logbody */
+  #rosterWrap{ left:14px; top:44px; pointer-events:auto; max-height:calc(70vh - 130px); overflow-y:auto; }   /* LAYOUT 2026-09-05: the full squadron list ran to the bottom of the screen and the terminal sat on top of its lower half; capped so the terminal (30vh, bottom:54px) fits below it with a gap. Scrolls past the cap. */   /* OUTER persistent box (registered w/ PANELS) - buildRoster() wipes the INNER #roster's innerHTML on every rebuild, so the panel chrome lives one level up, same wrapper pattern as #market/#marketBody and #ticker/#logbody */
   #roster{ display:flex; flex-direction:column; gap:4px; }
   #missionlog{ left:14px; top:340px; max-width:min(90vw,420px); max-height:46vh; overflow-y:auto; pointer-events:auto;
     background:#0a1420dd; border:1px solid #22344a; border-radius:9px; padding:8px 10px; }   /* task #66 - defaults closed, same left edge as roster/ticker; the new drag-to-redock lets a player move it if this default collides with their layout */
@@ -72,7 +72,7 @@
   .rs .nm{ flex:1 1 auto; } .rs .cr{ color:var(--gold); font-size:10px; }
   .rs .hp{ width:30px; height:5px; border-radius:3px; background:#21304a; overflow:hidden; flex:0 0 auto; }
   .rs .hp i{ display:block; height:100%; background:linear-gradient(90deg,#ff5a6e,#ffd05a); }
-  #ticker{ left:14px; bottom:54px; width:46%; max-width:600px; max-height:40vh; overflow-y:auto;
+  #ticker{ left:14px; bottom:54px; width:46%; max-width:600px; max-height:30vh; overflow-y:auto;   /* LAYOUT 2026-09-05: 40vh -> 30vh - it covered the player's own ship in the chase view */
     font:600 11.5px/1.55 ui-monospace,monospace; background:#08101ae8; border:1px solid #1b2a3c; border-radius:8px; pointer-events:auto; }
   #logtabs{ position:sticky; top:0; z-index:2; display:flex; gap:3px; padding:5px 6px 4px; background:#0a1220f5; border-bottom:1px solid #17263a; border-radius:8px 8px 0 0; }
   .logtab{ font:700 9.5px/1 ui-monospace,monospace; letter-spacing:.07em; color:#6f88a4; background:#111c2b; border:1px solid #23344a; border-radius:5px; padding:4px 8px; cursor:pointer; }
@@ -251,7 +251,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260714c"></script>
 <script src="power_panel.js?v=20260714c"></script>
-<script src="panels.js?v=20260714c"></script>
+<script src="panels.js?v=20260905a"></script>
 <script src="item_icons.js?v=20260714c"></script>
 <script src="engbay.js?v=20260714c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
@@ -297,6 +297,7 @@ const CFG = {
   AUTOAIM_ARC:-0.1,                                // player auto-aim assist: fire snaps to the target's 3D lead only when it's within this cos-arc of forward (-0.1 ~ front + a bit past the sides); user 2026-07-13
   AIM_BASE_ERR:2.6, AIM_COMP_ERR:0.4, AIM_JAM_ERR:8.0, AIM_ERR_RANGE:110, AIM_JITTER_HZ:1.7,   // FIRE-CONTROL fidelity (user 2026-07-14 "box ... depending on your computer and the other agent's jammer"): lead-box error in world units - BASIC fire control is loose, the Targeting Computer gizmo tightens it (AIM_COMP_ERR), the target's ECM jammer widens + wobbles it (AIM_JAM_ERR); error grows with range; the GUN aims at the SAME shown box, so a jammed solution honestly misses
   LOCKON_RANGE:95, LOCKON_ARC:0.72,                // an enemy within LOCKON_RANGE and facing you within LOCKON_ARC (cos) has a firing solution ON you -> lock-on warning; your own ECM jammer flickers/denies their lock
+  REAR_GUNNER_WINDOW:false,                        // DEPRECATED (user 2026-09-05 "deprecate rear gunner window ... I can't see what's going on"): the manned aft view took half the screen over the main 3D view. The turret, its AI (AI_REAR_*) and the external ball stay; only the window and manning it are gone. Flip to true to bring the window back.
   REAR_GUN_CD:0.16,                                // rear-gunner fire cooldown (s) - the aft mouse-turret; user 2026-07-13
   REAR_CAM_FOV:74,                                 // turret field of view
   REAR_YAW_MAX:Math.PI, REAR_PITCH_MAX:1.5, REAR_SLEW_LERP:9,   // turret traverse (user 2026-07-13 "swivel around all the way"): FULL 360 yaw (in locked mode yaw accumulates with no clamp at all - point anywhere incl. straight ahead), pitch to ~86deg (near straight up/down); REAR_YAW_MAX is the absolute-mode cursor-to-edge span
@@ -5173,6 +5174,7 @@ let marketOn=true;
 if(window.PANELS){
   PANELS.register('market', document.getElementById('market'), { title:'MARKET', edge:'top', centerX:true, rgb:[10,20,32],
     defaultOpacity:0.86, hotkeyLabel:'M', resizable:true,   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+    defaultOpen:false,   // LAYOUT 2026-09-05 (user "make sure all windows are sized nicely I can't see what's going on"): the 16-planet price grid opened across the top third of the 3D view on every load. Kept ("keep the market menu", 2026-07-07) - its top edge tab or M opens it; a player who opens it once keeps it (saved state wins).
     onOpenChange:(open)=>{ marketOn=open; if(open) updateMarket(); } });
   PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
     defaultOpacity:0.91, hotkeyLabel:'`', resizable:true,   // user 2026-07-08: "make the terminal sizable and it should not change size unless I size it" - drag the corner grip
@@ -5215,6 +5217,7 @@ if(window.PANELS){
   // slews the camera; a FIXED centre crosshair is the aim point; click/hold fires fireRearGun() straight down the view
   // centre. The reticle art and the laser sound are OURS (the game's own SOUND.play), not any third-party asset.
   (function(){
+    if(!CFG.REAR_GUNNER_WINDOW) return;   // DEPRECATED 2026-09-05 - see CFG.REAR_GUNNER_WINDOW. No element => updateRearView() keeps VIEW.rear at 0x0 and renderView() skips it.
     if(document.getElementById('rearWin')) return;
     var w=document.createElement('div'); w.id='rearWin';
     w.style.cssText='position:fixed;left:20px;top:60px;width:400px;height:300px;z-index:41;border:1px solid #7e4646;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';

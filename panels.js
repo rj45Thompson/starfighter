@@ -24,7 +24,7 @@
 // in it. Same IS_TOUCH formula index.html already uses (kept independent - this file stays self-contained).
 const IS_TOUCH = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window);
 const CFG = {
-  STORE_KEY:'SF_PANELS_v2',   // bumped v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
+  STORE_KEY:'SF_PANELS_v3',   // bumped v2->v3 (2026-09-05 layout review: market now defaultOpen:false and the roster/terminal sizes changed; a v2 save would keep the old open market and the old panel sizes forever). Earlier: v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
   SLIDE_MS:320,                // slide transition duration
   GAP:8,                       // px between stacked panels on the same edge
