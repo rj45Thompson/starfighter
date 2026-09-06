@@ -1031,9 +1031,10 @@
     }
    },
    "ours": {
-    "v": "unknown",
+    "v": "yes",
     "uc": "UC-202",
-    "note": "UC-202's own numbers are linear (5 ore = -115c, +1 = -23c) so nothing shows player trades moving the price"
+    "note": "priceOf (index.html:1701) is base*clamp((eq/stock)^PRICE_ELAST,MIN,MAX) - price is inverse to p.stock[gk]. buy() depletes that stock (:1752-1753 p.stock[gk]-=qty) so the NEXT price rises; sell() floods it (:1755 p.stock[gk]+=qty) so the next price falls - author's own comment :1750 'buy/sell MOVE stock -> MOVE price ... no cheating'. Player path is P=ships[0] via the buy/sell commands (:4909/:4910). The old 'linear' reading was within ONE transaction: price is snapshotted once (:1751 let price=priceOf...) and the whole qty charged at it, so the move shows on the NEXT read, not mid-lot. Observable (verbatim formula + real CFG EQ_STOCK 120 / PRICE_ELAST 0.9, ore base 14): ore 14.00c @stock120 -> 22.74c after buying 50 (stock 70) -> 10.23c after selling 50 (stock 170). PASS.",
+    "settledFrom": "code read + numeric replay of priceOf 2026-09-06"
    }
   },
   {
