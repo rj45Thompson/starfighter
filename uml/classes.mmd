@@ -22,11 +22,54 @@ classDiagram
     +ask()
     +choice()
   }
+  class confidence (module) {
+    <<brain/engine/confidence.js>>
+    +popcount()
+    +familiesOf()
+    +sourceNames()
+    +edgeConfidence()
+    +chainConfidence()
+  }
   class Overlay {
     <<brain/engine/learn.js>>
   }
   class Learner {
     <<brain/engine/learn.js>>
+  }
+  class learn (module) {
+    <<brain/engine/learn.js>>
+    +CFG()
+    +questionFor()
+  }
+  class lexicon (module) {
+    <<brain/engine/lexicon.js>>
+    +FRAMING()
+    +VERB_RELATIONS()
+    +WHEN_RELATIONS()
+    +GRAMMAR_ALIASES()
+    +ALT_HOPS()
+    +KIND_BY_RELATION()
+    +SYMMETRIC()
+    +TYPE_WORDS()
+    +WHERE_LADDER()
+    +ISA_RELS()
+    +COUNT_RE()
+    +COUNT_FILTER_RE()
+    +MEMBER_RELS()
+    +PRONOUNS()
+    +SRC_LIVE()
+    +LIVE_SOURCES()
+    +LIVE_FAMILIES()
+    +DERIVE_RULES()
+    +... 3 more
+  }
+  class norm (module) {
+    <<brain/engine/norm.js>>
+    +normKey()
+    +fnv1a()
+    +shardOfKey()
+    +shardOfQid()
+    +bloomPositions()
   }
   class Planner {
     <<brain/engine/plan.js>>
@@ -36,6 +79,10 @@ classDiagram
   }
   class Store {
     <<brain/engine/store.js>>
+  }
+  class store (module) {
+    <<brain/engine/store.js>>
+    +nodeLoaders()
   }
   class CENTROID {
     <<centroid_mind.js>>
@@ -64,6 +111,30 @@ classDiagram
     +voiceParams()
     +status()
     +_queue()
+  }
+  class CONQUEST {
+    <<conquest.js>>
+    +CFG()
+    +init()
+    +tick()
+    +onAwayVictory()
+    +addDefense()
+    +describe()
+    +damageInfra()
+    +infraMult()
+    +ownerOf()
+    +defenseOf()
+  }
+  class HOST {
+    <<conquest.js>>
+    +planets()
+    +P()
+    +T0()
+    +campaign()
+    +CFG()
+    +notify()
+    +term()
+    +sound()
   }
   class CONTRA {
     <<contradiction_ledger.js>>
@@ -242,6 +313,23 @@ classDiagram
     +summary()
     +CFG()
   }
+  class MISSIONS {
+    <<missions.js>>
+    +CFG()
+    +init()
+    +tick()
+    +board()
+    +boardHtml()
+    +header()
+    +accept()
+    +postings()
+    +playerRank()
+    +rank()
+    +onKill()
+    +onAwayVictory()
+    +onStrongholdDown()
+    +onDock()
+  }
   class PANELS {
     <<panels.js>>
     +register()
@@ -323,6 +411,13 @@ classDiagram
     +tabs()
     +model()
     +CFG()
+  }
+  class SIM {
+    <<sim_harness.js>>
+    +census()
+    +run()
+    +profile()
+    +rockReport()
   }
   class SOBER {
     <<sober_gate.js>>
@@ -430,9 +525,11 @@ classDiagram
   }
   BRAIN ..> HOST : reads live state
   CHATTER ..> HOST : reads live state
+  CONQUEST ..> HOST : reads live state
   ENGBAY ..> HOST : reads live state
   GAMEMOD ..> HOST : reads live state
   KHUD ..> HOST : reads live state
+  MISSIONS ..> HOST : reads live state
   PANELS ..> HOST : reads live state
   PASSENGER ..> HOST : reads live state
   PLANETMENU ..> HOST : reads live state

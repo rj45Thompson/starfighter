@@ -56,7 +56,28 @@ def extract_module(path):
     src = open(os.path.join(ROOT, path), encoding="utf-8", errors="replace").read()
     lines = src.count("\n")
     classes = []
-    for m in re.finditer(r"window\.([A-Z][A-Za-z0-9_]*)\s*=\s*(\{|([A-Za-z_$][\w$]*))", src):
+    # WINDOW ALIASES (2026-09-06). The reader only knew `window.NAME = ...`, so six modules - two
+    # of them large (missions.js 565 lines, coop_proof.js 482) - were absent from the class diagram
+    # with nothing to say anything was missing. The idioms it could not see:
+    #     var W = window;  ...  W.MISSIONS = {...}
+    #     (function(root){ ... root.SIM = {...} })(typeof window !== "undefined" ? window : null)
+    # Both are ordinary ways to write a browser module that also parses under node. Collect the
+    # local names that stand for `window` in THIS file, then read `<alias>.NAME =` the same way.
+    # A diagram that silently omits a module is worse than one that says nothing: it looks complete.
+    aliases = {"window", "globalThis", "self"}
+    # `= window` directly, and the node-safe ternary form the modules here actually use:
+    #   var W = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : {});
+    # so the alias is any declaration whose right-hand side is about window/globalThis.
+    for a in re.finditer(r"(?:const|var|let)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]{0,200})", src):
+        rhs = a.group(2)
+        if re.match(r"^\s*(?:window|globalThis|self)\b", rhs) or (
+                "window" in rhs and "typeof" in rhs and "?" in rhs):
+            aliases.add(a.group(1))
+    m_iife = re.search(r"^\(function\s*\(\s*([A-Za-z_$][\w$]*)\s*\)", src, re.M)
+    if m_iife and re.search(r"\)\s*\(\s*[^)]{0,140}window[^)]{0,140}\)\s*;?\s*$", src, re.M):
+        aliases.add(m_iife.group(1))   # single-param IIFE invoked with a window expression
+    alias_re = "|".join(sorted((re.escape(x) for x in aliases), key=len, reverse=True))
+    for m in re.finditer(r"\b(?:" + alias_re + r")\.([A-Z][A-Za-z0-9_]*)\s*=\s*(\{|([A-Za-z_$][\w$]*))", src):
         name, brace, ident = m.group(1), m.group(2), m.group(3)
         keys = []
         if brace == "{":
@@ -67,6 +88,13 @@ def extract_module(path):
         classes.append({"name": name, "members": keys[:40], "memberTotal": len(keys)})
     for m in re.finditer(r"^export\s+class\s+([A-Za-z_]\w*)", src, re.M):
         classes.append({"name": m.group(1), "members": [], "memberTotal": 0, "kind": "export class"})
+    # ES-module files (brain/engine/*) expose `export const` / `export function`, which the reader
+    # also could not see - lexicon.js and confidence.js were blank rows for exactly that reason.
+    # Grouped as one synthetic class per file so the diagram shows the module's real surface.
+    ex = re.findall(r"^export\s+(?:const|let|var|function|async\s+function)\s+([A-Za-z_$][\w$]*)", src, re.M)
+    if ex:
+        classes.append({"name": os.path.basename(path).rsplit(".", 1)[0] + " (module)",
+                        "members": ex[:40], "memberTotal": len(ex), "kind": "es exports"})
     # one file can assign the same global twice (a doc line and the real assignment); keep the richer record so the
     # diagram shows one class per name per file instead of two, one of them thin
     best = {}

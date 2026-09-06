@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T13:14:33",
+ "generated": "2026-09-06T14:59:59",
  "modules": [
   {
    "file": "acquire.js",
@@ -79,7 +79,20 @@
   {
    "file": "brain/engine/confidence.js",
    "lines": 75,
-   "classes": [],
+   "classes": [
+    {
+     "name": "confidence (module)",
+     "members": [
+      "popcount",
+      "familiesOf",
+      "sourceNames",
+      "edgeConfidence",
+      "chainConfidence"
+     ],
+     "memberTotal": 5,
+     "kind": "es exports"
+    }
+   ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [],
@@ -100,6 +113,15 @@
      "members": [],
      "memberTotal": 0,
      "kind": "export class"
+    },
+    {
+     "name": "learn (module)",
+     "members": [
+      "CFG",
+      "questionFor"
+     ],
+     "memberTotal": 2,
+     "kind": "es exports"
     }
    ],
    "functions": [],
@@ -123,7 +145,36 @@
   {
    "file": "brain/engine/lexicon.js",
    "lines": 119,
-   "classes": [],
+   "classes": [
+    {
+     "name": "lexicon (module)",
+     "members": [
+      "FRAMING",
+      "VERB_RELATIONS",
+      "WHEN_RELATIONS",
+      "GRAMMAR_ALIASES",
+      "ALT_HOPS",
+      "KIND_BY_RELATION",
+      "SYMMETRIC",
+      "TYPE_WORDS",
+      "WHERE_LADDER",
+      "ISA_RELS",
+      "COUNT_RE",
+      "COUNT_FILTER_RE",
+      "MEMBER_RELS",
+      "PRONOUNS",
+      "SRC_LIVE",
+      "LIVE_SOURCES",
+      "LIVE_FAMILIES",
+      "DERIVE_RULES",
+      "ASK_WHO",
+      "ASK_WHEN",
+      "ASK_WHERE"
+     ],
+     "memberTotal": 21,
+     "kind": "es exports"
+    }
+   ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [],
@@ -132,7 +183,20 @@
   {
    "file": "brain/engine/norm.js",
    "lines": 33,
-   "classes": [],
+   "classes": [
+    {
+     "name": "norm (module)",
+     "members": [
+      "normKey",
+      "fnv1a",
+      "shardOfKey",
+      "shardOfQid",
+      "bloomPositions"
+     ],
+     "memberTotal": 5,
+     "kind": "es exports"
+    }
+   ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [],
@@ -205,6 +269,14 @@
      "members": [],
      "memberTotal": 0,
      "kind": "export class"
+    },
+    {
+     "name": "store (module)",
+     "members": [
+      "nodeLoaders"
+     ],
+     "memberTotal": 1,
+     "kind": "es exports"
     }
    ],
    "functions": [],
@@ -325,7 +397,38 @@
   {
    "file": "conquest.js",
    "lines": 442,
-   "classes": [],
+   "classes": [
+    {
+     "name": "CONQUEST",
+     "members": [
+      "CFG",
+      "init",
+      "tick",
+      "onAwayVictory",
+      "addDefense",
+      "describe",
+      "damageInfra",
+      "infraMult",
+      "ownerOf",
+      "defenseOf"
+     ],
+     "memberTotal": 10
+    },
+    {
+     "name": "HOST",
+     "members": [
+      "planets",
+      "P",
+      "T0",
+      "campaign",
+      "CFG",
+      "notify",
+      "term",
+      "sound"
+     ],
+     "memberTotal": 8
+    }
+   ],
    "functions": [
     "host",
     "num",
@@ -1319,7 +1422,28 @@
   {
    "file": "missions.js",
    "lines": 565,
-   "classes": [],
+   "classes": [
+    {
+     "name": "MISSIONS",
+     "members": [
+      "CFG",
+      "init",
+      "tick",
+      "board",
+      "boardHtml",
+      "header",
+      "accept",
+      "postings",
+      "playerRank",
+      "rank",
+      "onKill",
+      "onAwayVictory",
+      "onStrongholdDown",
+      "onDock"
+     ],
+     "memberTotal": 14
+    }
+   ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [
@@ -1883,6 +2007,26 @@
     "BAR_H"
    ],
    "cfgTotal": 3
+  },
+  {
+   "file": "sim_harness.js",
+   "lines": 125,
+   "classes": [
+    {
+     "name": "SIM",
+     "members": [
+      "census",
+      "run",
+      "profile",
+      "rockReport"
+     ],
+     "memberTotal": 4
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
   },
   {
    "file": "sober_gate.js",
