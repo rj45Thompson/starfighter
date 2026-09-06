@@ -140,6 +140,16 @@ class GameTier {
       this.F(you, this.put("credits", ["money", "wealth"]), this.E(Math.round(P.credits || 0) + " credits"), CFG.SRC_GAME, how);
       this.F(you, this.put("hull integrity", ["health", "hp", "damage"]), this.E(Math.round(P.hp) + " of " + Math.round(P.maxHp) + " hull"), CFG.SRC_GAME, how);
       if (P.docked && P.docked.name) this.F(you, this.put("docked at", ["docked", "landed"]), this.E(P.docked.name), CFG.SRC_GAME, how); }
+    if (H.mining) {   // the mining drones (2026-09-06): what we are doing right now, so "what are we doing" / "how is the mining going" answer from the live state
+      const m = H.mining, pDoing = this.put("doing", ["activity", "doing now", "up to", "what we are doing", "busy with"]), pTake = this.put("mined so far", ["take", "haul", "mined", "earned mining"]);
+      const drones = this.E("the mining drones", `${m.bots} drones launched from the ship`, ["drones", "mining bots", "bots", "the bots", "helpers", "miners"]);
+      this.F(you, pDoing, this.E(m.cutting > 0 ? "mining" : (m.fetching > 0 ? "collecting gems" : "flying")), CFG.SRC_GAME, how);
+      this.F(drones, pInst, this.E("mining drone", "a helper that cuts seams into rocks and fetches gems"), CFG.SRC_GAME, how);
+      this.F(drones, pStatus, this.E(m.cutting > 0 ? `cutting a size-${m.rockScale} rock ${m.rockDist} units out, seam ${Math.round((m.seam || 0) * 100)}%` : (m.fetching > 0 ? "fetching gems" : "station-keeping beside the ship")), CFG.SRC_GAME, how);
+      const take = this.E(`${m.rocksMined} rocks, ${m.gemsFetched} gems, ${m.creditsMined} credits`);
+      this.F(drones, pTake, take, CFG.SRC_GAME, how);
+      this.F(drones, this.put("mine", ["mines", "mined", "mining"]), take, CFG.SRC_GAME, how);   // the novel's own verb, so "what have the drones mined" lands on the tally
+    }
     if (extra && extra.mission) { const m = extra.mission; const q = this.E("the current mission", `${m.type}: ${m.title}`, ["mission", "our mission", "the mission", "current contract"]);
       this.F(you, pMission, q, CFG.SRC_GAME, how); this.F(q, pInst, this.E(m.type), CFG.SRC_GAME, how); if (m.targetName) this.F(q, pTarget, this.E(m.targetName), CFG.SRC_GAME, how);
       this.F(q, pReward, this.E(m.reward + " credits"), CFG.SRC_GAME, how); if (m.why) for (const w of m.why) this.F(q, this.put("chosen because", ["why", "reason", "because"]), this.E(w), CFG.SRC_GAME, how); }

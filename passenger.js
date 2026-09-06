@@ -341,6 +341,13 @@ function advise(t){
   if(hp<ADV.HULL_LOW){
     return { key:'hull', urgency:1, text:`Hull ${Math.round(hp*100)}%. ${t.docked?'You are docked - say repair.':(safe?('Limp to '+safe.name+' and repair'):'Get to a berth')} before the next fight finds the crack.` };
   }
+  // 2b) THE MINING (user 2026-09-06 "the parasite should say we are mining and know what's going on"): while the drones
+  // cut, the advice names the rock, the seam and the take - every number from the drones' own snapshot
+  if(t.mining && t.mining.cutting>0 && !threat){
+    const m=t.mining; const seamPct=Math.round((m.seam||0)*100);
+    return { key:'mining:'+m.rocksMined, urgency:0,
+      text:`We are mining. ${m.cutting} drone${m.cutting===1?'':'s'} on a size-${m.rockScale} rock ${m.rockDist} out, seam ${seamPct}%${m.rockHp!=null?`, ${m.rockHp} hull left`:''} - your guns split a seamed rock in a third of the shots. Take so far: ${m.rocksMined} rock${m.rocksMined===1?'':'s'}, ${m.gemsFetched} gem${m.gemsFetched===1?'':'s'}, ${m.creditsMined}c${m.lastMinuteCredits?` (${m.lastMinuteCredits}c this minute)`:''}.` };
+  }
   // 3) OPPORTUNITY - full hold, wealth to spend
   if(t.holdCap && t.cargoCount/t.holdCap>=ADV.HOLD_FULL){
     return { key:'sell', urgency:0, text:`Your hold is full - ${t.cargoCount}/${t.holdCap}. ${t.docked?'Sell here':'Dock and sell'}; the price will not be kinder where we are drifting.` };
@@ -417,7 +424,8 @@ async function route(text){
     let asked=text;
     if(/\b(what|who)\s+are\s+you\b|\byour\s+(story|origin|past|kind)\b|\bwho\s+am\s+i\s+talking\s+to\b/i.test(text)) asked='who is the Passenger';
     else if(/\bwho\s+am\s+i\b|\bmy\s+(story|past|backstory|history)\b|\bwhere\s+(am\s+i|do\s+i\s+come)\s+from\b|\babout\s+me\b/i.test(text)) asked='who is the pilot';
-    else asked=text.replace(/\byourself\b/ig,'the Passenger').replace(/\byou\b/ig,'the Passenger').replace(/\bmyself\b/ig,'the pilot').replace(/\bme\b/ig,'the pilot').replace(/\bmy ship\b/ig,'the pilot').replace(/\bI\b/g,'the pilot');
+    else asked=text.replace(/\byourself\b/ig,'the Passenger').replace(/\byou\b/ig,'the Passenger').replace(/\bmyself\b/ig,'the pilot').replace(/\bme\b/ig,'the pilot').replace(/\bmy ship\b/ig,'the pilot').replace(/\bI\b/g,'the pilot')
+      .replace(/\bwe\b/ig,'the pilot').replace(/\bus\b/ig,'the pilot').replace(/\bour\b/ig,'the').replace(/\bourselves\b/ig,'the pilot');   // "we" is the pilot and the Passenger together; the pilot carries the live facts
     let r=null; try{ r=await brain.ask(asked,{ grow:true }); }catch(e){ r={ answered:false, steps:[], refuse:'the engine threw: '+(e&&e.message||e) }; }
     if(r.answered){ const reply=voicePrefix('answered', r.tier)+r.reply; conv.push({q:text,a:reply}); if(conv.length>CFG.CONV_CAP*2) conv.shift(); S.counts.asks++; save(); return { kind:'brain', reply, tier:r.tier, steps:r.steps, ms:r.ms }; }
     if(r.ask){ const reply=voicePrefix('answered','game')+r.ask.text; return { kind:'brain-ask', reply, tier:'ask', steps:r.steps, options:r.ask.options||null, ms:r.ms }; }
