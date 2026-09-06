@@ -135,9 +135,9 @@
 {
 "id": "UC-205",
 "epic": "E2",
-"status": "PARTLY",
+"status": "WORKS",
 "story": "Pilot compares a weapon against the fitted one before buying",
-"test": "burn-down 4"
+"test": "20 comparison rows in the SHOP tab: dps, damage, rate, reach, barrels, homing, splash, damage type"
 },
 {
 "id": "UC-206",
@@ -386,8 +386,8 @@
 }
 ],
 "tally": {
-"WORKS": 32,
-"PARTLY": 8,
+"WORKS": 33,
+"PARTLY": 7,
 "MISSING": 9,
 "DEPRECATED": 2
 }

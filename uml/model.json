@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T11:55:15",
+ "generated": "2026-09-06T12:08:49",
  "modules": [
   {
    "file": "acquire.js",
@@ -488,7 +488,7 @@
   },
   {
    "file": "engbay.js",
-   "lines": 695,
+   "lines": 696,
    "classes": [
     {
      "name": "ENGBAY",
@@ -1256,7 +1256,7 @@
   },
   {
    "file": "panels.js",
-   "lines": 504,
+   "lines": 533,
    "classes": [
     {
      "name": "PANELS",
@@ -1302,6 +1302,7 @@
     "hideEdgeHighlight",
     "setSide",
     "applyDockPosition",
+    "freezeCenterX",
     "redock",
     "makeMoveDrag",
     "register",
@@ -1313,7 +1314,7 @@
     "reflowAll",
     "list"
    ],
-   "functionTotal": 36,
+   "functionTotal": 37,
    "cfg": [
     "STORE_KEY",
     "review",
@@ -1346,10 +1347,12 @@
     "DRAG_THRESHOLD",
     "click",
     "EDGE_OFFSET",
+    "TOP_RESERVE",
+    "it",
     "at",
     "EDGE_HL_THICK"
    ],
-   "cfgTotal": 33
+   "cfgTotal": 35
   },
   {
    "file": "passenger.js",
@@ -1488,7 +1491,7 @@
   },
   {
    "file": "planetmenu.js",
-   "lines": 1241,
+   "lines": 1000,
    "classes": [
     {
      "name": "PLANETMENU",
@@ -1501,13 +1504,12 @@
       "pushEvent",
       "getLog",
       "setLog",
-      "hangarHtml",
       "onClick",
       "GEAR_SLOTS",
       "_rumors",
       "_patrons"
      ],
-     "memberTotal": 13
+     "memberTotal": 12
     }
    ],
    "functions": [
@@ -1566,13 +1568,13 @@
     "terraformHtml",
     "upCostEst",
     "shopIcon",
-    "shopRow",
-    "shopHdr",
-    "shopHtml",
-    "atBase",
-    "hullSectionHtml"
+    "wStats",
+    "deltaChip",
+    "weaponCompareHtml",
+    "hullCompareHtml",
+    "compareForCmd"
    ],
-   "functionTotal": 89,
+   "functionTotal": 82,
    "cfg": [
     "Z_INDEX",
     "overlay",
@@ -1589,7 +1591,7 @@
     "DEF_PIPS_MAX",
     "tab",
     "EQUIP_BAY_VISUAL_MAX",
-    "presentational",
+    "returns",
     "cap",
     "header",
     "click",
@@ -1748,6 +1750,32 @@
     "DEFAULT_OPACITY"
    ],
    "cfgTotal": 5
+  },
+  {
+   "file": "shell.js",
+   "lines": 114,
+   "classes": [
+    {
+     "name": "SHELL",
+     "members": [
+      "build",
+      "open",
+      "close",
+      "tabs",
+      "model",
+      "CFG"
+     ],
+     "memberTotal": 6
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "STATUS_URL",
+    "KEY",
+    "BAR_H"
+   ],
+   "cfgTotal": 3
   },
   {
    "file": "sober_gate.js",
@@ -2393,9 +2421,9 @@
   {
    "id": "UC-205",
    "epic": "E2",
-   "status": "PARTLY",
+   "status": "WORKS",
    "story": "Pilot compares a weapon against the fitted one before buying",
-   "test": "burn-down 4"
+   "test": "20 comparison rows in the SHOP tab: dps, damage, rate, reach, barrels, homing, splash, damage type"
   },
   {
    "id": "UC-206",
@@ -2644,8 +2672,8 @@
   }
  ],
  "tally": {
-  "WORKS": 32,
-  "PARTLY": 8,
+  "WORKS": 33,
+  "PARTLY": 7,
   "MISSING": 9,
   "DEPRECATED": 2
  }

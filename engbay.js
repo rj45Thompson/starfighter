@@ -259,8 +259,9 @@ function onGridPick(kind, key) {
 // FULLSCREEN SHOP ATTACH (user 2026-07-08 "make the item shop a fullscreen window that attaches to the engineering
 // bay... the items would be showing what's at the nearest ranger station perhaps. same menu for now... or it will
 // just open the nearest stores to you. but still you need to travel to the planet or something"): when genuinely
-// docked, the RIGHT column embeds PLANETMENU's own hangarHtml() output verbatim - the identical shop/loadout UI the
-// docked menu already shows, not a rebuild. When not docked, it shows a READ-ONLY nearest-station name/distance
+// docked, the RIGHT column was MEANT to embed PLANETMENU's hangarHtml() output verbatim. It never did: no call to
+// it was ever written here, and on 2026-09-06 that whole unreachable screen was deleted from planetmenu.js. Buying
+// lives in the docked SHOP tab; this bay is the LAYOUT board. When not docked, it shows a READ-ONLY station hint
 // hint instead of any buy UI - deliberately no price list or mutate path here, since that would let a player shop
 // from anywhere; the existing dock-gated commands (hardpoint/gizmo mount, hull, upgrade, ...) remain the only way
 // to actually transact, same as always. "Still need to travel" is preserved by construction, not by a new check.

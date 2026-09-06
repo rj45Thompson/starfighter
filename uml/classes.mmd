@@ -267,7 +267,6 @@ classDiagram
     +pushEvent()
     +getLog()
     +setLog()
-    +hangarHtml()
     +onClick()
     +GEAR_SLOTS()
     +_rumors()
@@ -297,6 +296,15 @@ classDiagram
     +refresh()
     +flash()
     +offerTier()
+    +CFG()
+  }
+  class SHELL {
+    <<shell.js>>
+    +build()
+    +open()
+    +close()
+    +tabs()
+    +model()
     +CFG()
   }
   class SOBER {

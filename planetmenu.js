@@ -16,7 +16,7 @@ var CFG = {
   LOG_MAX: 80,                   // ring-buffer length for pushEvent (SR-M10: a real browsable news timeline, not a 12-line scratchpad)
   QTY_STEPS: [1, 10],           // per-click trade quantities
   DEF_PIPS_MAX: 5,              // defense pips shown in header + ground tab
-  EQUIP_BAY_VISUAL_MAX: 8,      // HANGAR loadout equipment-bay grid box count - purely presentational
+  EQUIP_BAY_VISUAL_MAX: 8,      // read by nothing since the loadout grid was deleted 2026-09-06 - kept as the declared box count if a bay grid returns
                                  //   cap (the host's P.equip is an uncapped stacking count, not real slots)
   INFRA_PCT_PER_DEV: 10,        // derived infra% per planet dev level when no explicit infra field
   PROFIT_RATIO: 1.0,            // sell price > base*ratio -> highlighted green (profitable sell)
@@ -57,9 +57,7 @@ var COL = { HEAD:'#8fd0ff', GOOD:'#7fd0b0', BAD:'#ff8a8a', AMBER:'#ffd27a', VIOL
 /* ------------------------------------------------ STATE */
 var S = { built:false, keysBound:false, open:false, planet:null, isBase:false,
           tab:'market', tHead:0, tBody:0, log:[], el:{},
-          slotOpen:{ hull:false, weapon:false, equip:false, engine:false, gizmo:false,
-            tank:false, radar:false, scanner:false, shieldgen:false, droid:false, hook:false,
-            series:false, hardpoint:false } };   /* HANGAR loadout-slot expand/collapse (presentation only) */
+          slotOpen:{} };   /* empty on purpose: the expand/collapse loadout screen this drove was deleted 2026-09-06 (unreachable since the flat SHOP replaced it); toggleSlot still answers a stray slot click without throwing */
 
 /* ------------------------------------------------ SAFE HOST ACCESS */
 function H(){ return window.HOST || null; }
@@ -161,6 +159,15 @@ function cssText(){
   '.pm-t td{border-bottom:1px solid #16233a;padding:5px 8px;vertical-align:middle;white-space:nowrap}',
   '.pm-t tr:hover td{background:rgba(143,208,255,.045)}',
   '.pm-tag{display:inline-block;border-radius:3px;padding:0 5px;font-size:10px;letter-spacing:.06em;margin-left:6px}',
+  /* WEAPON SHOP COMPARISON (2026-09-06): one chip per number, coloured by whether the swap helps or hurts */
+  '.pm-cmpRow{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}',
+  '.pm-cmp{font-size:11px;border:1px solid #2b3d52;border-radius:3px;padding:1px 6px;color:'+COL.DIM+';white-space:nowrap}',
+  '.pm-cmp b{color:#dbe7f1;font-weight:600;font-variant-numeric:tabular-nums}',
+  '.pm-cmp i{font-style:normal;font-variant-numeric:tabular-nums}',
+  '.pm-cmp.up{border-color:#2c5a4a}', '.pm-cmp.up i{color:'+COL.GOOD+'}',
+  '.pm-cmp.dn{border-color:#5a2c34}', '.pm-cmp.dn i{color:'+COL.BAD+'}',
+  '.pm-cmp.eq{opacity:.55}', '.pm-cmp.neu{border-color:#4a4a2c;color:'+COL.AMBER+'}', '.pm-cmp.none{opacity:.45}',
+  '.pm-row.pm-fitted{background:rgba(94,230,168,.06);border-radius:5px}',
   '.pm-tag.mk{color:'+COL.GOOD+';border:1px solid #2c5a4a}',
   '.pm-tag.nd{color:'+COL.AMBER+';border:1px solid #5a4a2c}',
   '.pm-pip{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid '+COL.BORDER+';margin-right:3px;vertical-align:middle}',
@@ -620,6 +627,56 @@ function shopIcon(cmd){
   var table=h[tp], item=table&&table[key]; if(!item) return '';
   try{ return w.ICONS.img(kind, key, item, table, { size:22, style:'margin-right:7px' }); }catch(e){ return ''; }
 }
+/* -- WHAT THE SWAP DOES (RJ 2026-09-06: "the biggest broken parts are the weapon shop, and ship building").
+   A shop row that replaces something you already carry now states the change to the numbers you fly on, as a
+   signed delta against the fitted item. Every number is read from the registry the game itself flies on - weapons
+   from WEAPONS (dps = dmg/cd, reach = speed x life), hulls from HULLS - and a field the registry does not carry
+   prints "n/a" rather than a plausible-looking guess. Rows that ADD rather than replace (equipment, an empty
+   hardpoint) get no comparison, because there is nothing to compare against. */
+function wStats(w){
+  if(!w) return null;
+  var dmg=num(w.dmg,NaN), cd=num(w.cd,NaN);
+  return { dmg:dmg, cd:cd, rate:(cd>0?1/cd:NaN), dps:(cd>0?dmg/cd:NaN), reach:num(w.speed,NaN)*num(w.life,NaN),
+           twin:!!w.twin, homing:num(w.homing,0), splash:num(w.splash,0), type:w.dmgType||'' }; }
+function deltaChip(label, mine, theirs, unit, digits, higherIsBetter){
+  if(!(isFinite(mine)&&isFinite(theirs)))
+    return '<span class="pm-cmp none" title="the registry does not carry this number for one of the two">'+esc(label)+' n/a</span>';
+  var d=mine-theirs, pct=(theirs!==0)?(100*d/Math.abs(theirs)):0;
+  var better = (higherIsBetter===false) ? (d<0) : (d>0);
+  var k = (Math.abs(d)<1e-4) ? 'eq' : (better ? 'up' : 'dn');
+  var fmt=function(v){ return (digits===0)?String(Math.round(v)):v.toFixed(digits==null?1:digits); };
+  return '<span class="pm-cmp '+k+'" title="'+esc(label)+': '+fmt(mine)+(unit||'')+' against the fitted '+fmt(theirs)+(unit||'')+'">'
+    + esc(label)+' <b>'+fmt(mine)+(unit||'')+'</b>'
+    + (k==='eq'?'':' <i>'+(d>0?'+':'')+fmt(d)+(Math.abs(pct)>=1?' · '+(pct>0?'+':'')+Math.round(pct)+'%':'')+'</i>')+'</span>'; }
+function weaponCompareHtml(key){
+  var h=H(), P=player(); var W=h&&h.WEAPONS; if(!W||!P) return '';
+  var a=wStats(W[key]), b=wStats(W[P.weaponType||'energy']);
+  if(!a||!b) return '';
+  return '<div class="pm-cmpRow">'
+    + deltaChip('dps', a.dps, b.dps, '', 1)
+    + deltaChip('dmg', a.dmg, b.dmg, '', 0)
+    + deltaChip('rate', a.rate, b.rate, '/s', 2)
+    + deltaChip('reach', a.reach, b.reach, '', 0)
+    + (a.twin!==b.twin ? '<span class="pm-cmp '+(a.twin?'up':'dn')+'">'+(a.twin?'twin barrels':'single barrel')+'</span>' : '')
+    + (a.homing!==b.homing ? '<span class="pm-cmp '+(a.homing>b.homing?'up':'dn')+'">'+(a.homing?'homing':'no homing')+'</span>' : '')
+    + (a.splash!==b.splash ? '<span class="pm-cmp '+(a.splash>b.splash?'up':'dn')+'">'+(a.splash?'splash '+a.splash:'no splash')+'</span>' : '')
+    + (a.type!==b.type ? '<span class="pm-cmp neu" title="hulls resist the three damage types differently">'+esc(a.type)+' not '+esc(b.type)+'</span>' : '')
+    + '</div>'; }
+function hullCompareHtml(key){
+  var h=H(), P=player(); var HU=h&&h.HULLS; if(!HU||!P) return '';
+  var a=HU[key], b=HU[P.hullClass||'fighter']; if(!a||!b||key===(P.hullClass||'fighter')) return '';
+  return '<div class="pm-cmpRow">'
+    + deltaChip('hull', num(a.hp,NaN), num(b.hp,NaN), '', 0)
+    + deltaChip('hold', num(a.hold,NaN), num(b.hold,NaN), '', 0)
+    + deltaChip('speed', num(a.speed,NaN), num(b.speed,NaN), 'x', 2)
+    + ((h.HULL_MOUNTS&&h.HULL_MOUNTS[key]&&h.HULL_MOUNTS[P.hullClass])
+        ? deltaChip('mounts', h.HULL_MOUNTS[key].weaponPoints.length, h.HULL_MOUNTS[P.hullClass].weaponPoints.length, '', 0)
+          + deltaChip('gizmos', h.HULL_MOUNTS[key].gizmoPoints.length, h.HULL_MOUNTS[P.hullClass].gizmoPoints.length, '', 0) : '')
+    + '</div>'; }
+function compareForCmd(cmd){
+  if(!cmd) return '';
+  var m=/^(weapon|hull)\s+(\S+)$/.exec(String(cmd)); if(!m) return '';
+  return m[1]==='weapon' ? weaponCompareHtml(m[2]) : hullCompareHtml(m[2]); }
 function shopRow(name, stat, cost, cmd, tag){
   var P=player(); var afford = cost==null || num(P&&P.credits,0)>=cost;
   /* SR:AWA parity slice (2026-07-09): every row carries a hover tooltip with the full item card - name, stats,
@@ -629,7 +686,8 @@ function shopRow(name, stat, cost, cmd, tag){
     + ' | ' + (cost? (cost + 'c' + (afford? '' : ' (you hold ' + Math.round(num(P&&P.credits,0)) + 'c - short ' + Math.round(cost-num(P&&P.credits,0)) + 'c)')) : 'free')
     + (tag==='fitted' ? ' | currently fitted' : (cmd? (' | buys via: ' + cmd) : ''));
   return '<div class="pm-row" title="'+esc(tip)+'">'+shopIcon(cmd)+'<div class="pm-grow"><b>'+esc(name)+'</b>'
-    + (stat?(' <span class="pm-sub">'+stat+'</span>'):'') + '</div>'
+    + (stat?(' <span class="pm-sub">'+stat+'</span>'):'')
+    + (tag==='fitted' ? '' : compareForCmd(cmd)) + '</div>'
     + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+';min-width:56px;text-align:right">'+(cost?fmtC(cost):'free')+'</div>'
     + (tag==='fitted' ? '<span class="pm-tag mk" style="min-width:52px;text-align:center">FITTED</span>'
        : '<button class="pm-b" data-act="cmd" data-cmd="'+esc(cmd)+'" style="min-width:52px">BUY</button>')
@@ -671,6 +729,12 @@ function shopHtml(){
     html+=shopRow(QW.n+' (hardpoint)', 'dmg '+QW.dmg, QW.cost||0, 'hardpoint mount '+qk, null); }
   /* UPGRADES - same three rows the old hangar had, flat */
   var upCap=(h.CFG&&h.CFG.UP_LVL_CAP)||Infinity;
+  /* EQUIPMENT (2026-09-06): these stacking fittings were listed ONLY on the loadout screen nobody could open,
+     so the flat shop never sold them and the `install` command was the only route. One flat section, same row
+     shape as everything else here; the count shown is what the ship already carries. */
+  html+=shopHdr('EQUIPMENT','stacking fittings - buy as many as you like, no slot limit');
+  for(var ei=0;ei<EQUIP_SHOP.length;ei++){ var eq=EQUIP_SHOP[ei], own=num(P&&P.equip&&P.equip[eq.k],0);
+    html+=shopRow(eq.n, eq.desc+(own>0?' <span style="color:'+COL.GOOD+'">x'+own+' owned</span>':''), eq.cost, 'install '+eq.k, null); }
   html+=shopHdr('UPGRADES','level up what\'s already fitted');
   for(var u2=0;u2<CFG.UP_KINDS.length;u2++){ var u=CFG.UP_KINDS[u2];
     var lvl=(P.lvl&&typeof P.lvl[u.k]==='number')?P.lvl[u.k]:1, atCap=lvl>=upCap, cost=upCostEst(P,u.k);
@@ -704,109 +768,6 @@ var EQUIP_SHOP = [
 
 function atBase(P){ var h=H(); if(h && typeof h.atBase==='function' && P){ try{ return !!h.atBase(P); }catch(e){} } return false; }
 
-/* -- HULLS: swap chassis, Ranger Command only -- */
-function hullSectionHtml(P){
-  var h=H(); var HULLS=h&&h.HULLS;
-  // PROCEDURAL HULL ROSTER: h.HULL_ORDER is now 57 long (7 standard + 50 generated) - a raw dump would bury this
-  // section under 57 button-rows and push every OTHER hangar section out of easy reach. shopHullKeys() is the
-  // same curated (7 + rotating 8) list the `hull` terminal command shows, falling back to the full list only if
-  // an older deploy hasn't shipped shopHullKeys() yet (never actually reachable once source/deploy are in sync).
-  var ORDER=h&&(typeof h.shopHullKeys==='function'?h.shopHullKeys():h.HULL_ORDER);
-  if(!HULLS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(hull registry offline)</div>';
-  var canRefit = atBase(P);
-  var rows='', i;
-  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], hu=HULLS[key]; if(!hu) continue;
-    var isCurrent = P && P.hullClass===key;
-    var afford = num(P&&P.credits,0) >= num(hu.cost,0);
-    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.VIOLET+'">'+esc(hu.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">CURRENT</span>':'')
-      + '<div class="pm-sub">hull '+num(hu.hp,0)+' - hold '+num(hu.hold,0)+' - speed x'+num(hu.speed,1)+'</div>'
-      + '<div class="pm-sub">'+esc(hu.desc||'')+'</div></div>'
-      + '<div style="color:'+costCol+'">'+(num(hu.cost,0)>0?fmtC(hu.cost):'free')+'</div>'
-      + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="hull '+key+'"'
-      + ((!canRefit||isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'CURRENT':'EQUIP')+'</button></div>'; }
-  var hint = canRefit
-    ? '<div class="pm-note">Hull swaps take effect immediately - hold and hull points come from the new chassis.</div>'
-    : '<div class="pm-note"><span style="color:'+COL.AMBER+'">Dock at Ranger Command to refit</span> - hull swaps are base-only. '
-      + 'Current: <b style="color:'+COL.VIOLET+'">'+esc((P&&HULLS[P.hullClass]&&HULLS[P.hullClass].n)||'Fighter')+'</b>'
-      + ' - hull '+Math.round(num(P&&P.maxHp,0))+' - hold '+Math.round(num(P&&P.holdCap,0))+'.</div>';
-  return rows+hint; }
-
-/* -- WEAPONS: buy at any dock, rank-gated -- */
-function weaponSectionHtml(P){
-  var h=H(); var WEAPONS=h&&h.WEAPONS, ORDER=h&&h.WEAPON_ORDER, RANKS=h&&h.RANKS;
-  if(!WEAPONS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(weapon registry offline)</div>';
-  var rows='', i;
-  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], w=WEAPONS[key]; if(!w) continue;
-    var isCurrent = P && (P.weaponType||'energy')===key;
-    var afford = num(P&&P.credits,0) >= num(w.cost,0);
-    var reqRank = (Array.isArray(RANKS) && RANKS[i] && RANKS[i].n) ? RANKS[i].n : '';
-    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.HEAD+'">'+esc(w.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">FITTED</span>':'')
-      + '<div class="pm-sub">dmg '+num(w.dmg,0)+(w.homing?' - homing':'')+(w.splash?' - splash '+num(w.splash,0):'')
-      +   ' - range '+Math.round(num(w.range,0)*100)+'%'+(reqRank?' - requires <b>'+esc(reqRank)+'</b> rank':'')+'</div></div>'
-      + '<div style="color:'+costCol+'">'+(num(w.cost,0)>0?fmtC(w.cost):'free')+'</div>'
-      + '<button class="pm-b" data-act="cmd" data-cmd="weapon '+key+'"'
-      + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
-  return rows; }
-
-/* -- EQUIPMENT: buy at any dock, cumulative (never disabled for "already owned") -- */
-function equipSectionHtml(P){
-  var rows='', i;
-  for(i=0;i<EQUIP_SHOP.length;i++){ var eq=EQUIP_SHOP[i];
-    var owned = num(P && P.equip && P.equip[eq.k], 0);
-    var afford = num(P&&P.credits,0) >= eq.cost;
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.GOOD+'">'+esc(eq.n)+'</b>'+(owned>0?' <span class="pm-sub">x'+owned+'</span>':'')
-      + '<div class="pm-sub">'+esc(eq.desc)+'</div></div>'
-      + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+'">'+fmtC(eq.cost)+'</div>'
-      + '<button class="pm-b pm-go" data-act="cmd" data-cmd="install '+eq.k+'"'+(afford?'':' disabled')+'>BUY</button></div>'; }
-  return rows; }
-
-/* -- ENGINE: single-slot fit, exactly like WEAPON above (real tradeoff between drive TYPES, distinct
-   from the engine LEVEL upgrade in the UP_KINDS list) -- */
-function engineSectionHtml(P){
-  var h=H(); var ENGINES=h&&h.ENGINES, ORDER=h&&h.ENGINE_KEYS;
-  if(!ENGINES || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(engine registry offline)</div>';
-  var rows='', i;
-  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], en=ENGINES[key]; if(!en) continue;
-    var isCurrent = P && (P.engineType||'standard')===key;
-    var afford = num(P&&P.credits,0) >= num(en.cost,0);
-    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.HEAD+'">'+esc(en.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">FITTED</span>':'')
-      + '<div class="pm-sub">'+esc(en.desc||'')+'</div></div>'
-      + '<div style="color:'+costCol+'">'+(num(en.cost,0)>0?fmtC(en.cost):'free')+'</div>'
-      + '<button class="pm-b" data-act="cmd" data-cmd="engine '+key+'"'
-      + ((isCurrent||!afford)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
-  return rows; }
-
-/* -- STANDARD GEAR SLOTS (user 2026-07-08): Fuel Tank/Radar/Scanner/Shield Generator/Repair Droid/Cargo Hook -
-   six more single-slot fits, all structurally identical to ENGINE above (list-or-fitted row, BUY button) - one
-   generic renderer instead of six near-duplicate functions; each reads its table straight off HOST (H().FUEL_TANKS
-   etc, exposed the same live way as HULLS/WEAPONS/ENGINES/GIZMOS) so this file never hardcodes a second copy. -- */
-function simpleSlotSectionHtml(P, tableProp, keysProp, field, defKey, cmdVerb, lockField){
-  var h=H(); var TABLE=h&&h[tableProp], KEYS=h&&h[keysProp];
-  if(!TABLE || !Array.isArray(KEYS) || !KEYS.length) return '<div class="pm-note">(registry offline)</div>';
-  // PERMANENT SLOTS (user 2026-07-08, SR2-style): lockField is only set for HULL SERIES today - once P[lockField]
-  // is true, every other option in this slot is permanently un-pickable until the next real hull swap resets it
-  // (see applyHull's seriesLocked reset). Every other GEAR_SLOTS entry omits lockField and renders exactly as before.
-  var locked = !!(lockField && P && P[lockField]);
-  var rows = locked ? '<div class="pm-note" style="border:1px solid #ff9a9a55;background:#ff9a9a14;padding:6px 10px;margin-bottom:6px"><b style="color:#ff9a9a">🔒 PERMANENTLY FITTED</b> - buy a new hull to pick a different one.</div>' : '';
-  var i;
-  for(i=0;i<KEYS.length;i++){ var key=KEYS[i], it=TABLE[key]; if(!it) continue;
-    var isCurrent = P && (P[field]||defKey)===key;
-    var afford = num(P&&P.credits,0) >= num(it.cost,0);
-    var costCol = isCurrent ? COL.DIM : (afford ? COL.AMBER : COL.BAD);
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.HEAD+'">'+esc(it.n||key)+'</b>'+(isCurrent?' <span class="pm-tag mk">FITTED</span>':'')
-      + '<div class="pm-sub">'+esc(it.desc||'')+'</div></div>'
-      + '<div style="color:'+costCol+'">'+(num(it.cost,0)>0?fmtC(it.cost):'free')+'</div>'
-      + '<button class="pm-b" data-act="cmd" data-cmd="'+cmdVerb+' '+key+'"'
-      + ((isCurrent||!afford||locked)?' disabled':'')+'>'+(isCurrent?'FITTED':'BUY')+'</button></div>'; }
-  return rows; }
 var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cmdVerb, lockField(optional)]
   ['tank',      'FUEL TANK',        'FUEL_TANKS',    'FUEL_TANK_KEYS',    'fuelTankType', 'standard', 'tank'],
   ['radar',     'RADAR',            'RADARS',        'RADAR_KEYS',        'radarType',    'basic',    'radar'],
@@ -815,208 +776,6 @@ var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cm
   ['droid',     'REPAIR DROID',     'REPAIR_DROIDS', 'REPAIR_DROID_KEYS', 'droidType',    'none',     'droid'],
   ['hook',      'CARGO HOOK',       'CARGO_HOOKS',   'CARGO_HOOK_KEYS',   'cargoHookType','none',     'hook'],
   ['series',    'HULL SERIES',      'HULL_SERIES',   'HULL_SERIES_KEYS',  'hullSeries',   'standard', 'series', 'seriesLocked'] ];   // SR "Acrynic" specialization - the one GEAR_SLOTS entry with a lockField (PERMANENT SLOTS, 2026-07-08): every other slot type omits index 7 and stays freely swappable
-
-/* -- WEAPON HARDPOINTS: extra weapon slots BEYOND the primary (weaponSectionHtml above still fits that one) -
-   a real n-slot bay, mount/unmount/sell, same shape as GIZMOS just against the WEAPONS table. -- */
-function hardpointSectionHtml(P){
-  var h=H(); var WEAPONS=h&&h.WEAPONS, ORDER=h&&h.WEAPON_ORDER, slots=(P&&P.weaponSlots)||[];
-  if(!WEAPONS || !Array.isArray(ORDER) || !ORDER.length) return '<div class="pm-note">(weapon registry offline)</div>';
-  var rows='', i;
-  var mounted='';
-  for(i=0;i<slots.length;i++){ var k=slots[i], w=k&&WEAPONS[k];
-    mounted += '<div class="pm-row"><div class="pm-grow">'
-      + (w ? ('<b style="color:'+COL.GOOD+'">'+esc(w.n)+'</b><div class="pm-sub">dmg '+num(w.dmg,0)+(w.homing?' - homing':'')+(w.splash?' - splash '+num(w.splash,0):'')+'</div>')
-           : '<span class="pm-sub">hardpoint '+(i+1)+' - empty</span>')
-      + '</div>'
-      + (w ? ('<button class="pm-b pm-warn" data-act="cmd" data-cmd="hardpoint unmount '+(i+1)+'">UNMOUNT (+'
-             + Math.round(w.cost*(h.HARDPOINT_SELL_FRAC||0.5)) + 'c)</button>') : '') + '</div>'; }
-  rows += '<div class="pm-panel" style="margin-bottom:8px"><h4 style="margin-bottom:4px">MOUNTED</h4>'+mounted+'</div>';
-  rows += '<h4 style="margin-bottom:4px">SHOP</h4>';
-  var freeSlot = slots.indexOf(null) >= 0;
-  for(i=0;i<ORDER.length;i++){ var key=ORDER[i], w2=WEAPONS[key]; if(!w2) continue;
-    var already = typeof h.hasHardpoint==='function' ? h.hasHardpoint(P,key) : (slots.indexOf(key)>=0);
-    var afford = num(P&&P.credits,0) >= num(w2.cost,0);
-    var canBuy = freeSlot && afford;
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.HEAD+'">'+esc(w2.n)+'</b>'+(already?' <span class="pm-tag mk">MOUNTED</span>':'')
-      + '<div class="pm-sub">dmg '+num(w2.dmg,0)+(w2.homing?' - homing':'')+(w2.splash?' - splash '+num(w2.splash,0):'')+'</div></div>'
-      + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+'">'+fmtC(w2.cost)+'</div>'
-      + '<button class="pm-b pm-go" data-act="cmd" data-cmd="hardpoint mount '+key+'"'+(canBuy?'':' disabled')+'>BUY</button></div>'; }
-  if(!freeSlot) rows += '<div class="pm-note">All weapon hardpoints full - unmount one above to buy something else.</div>';
-  return rows; }
-function gearSlotHeaderRow(P, def){
-  var h=H(); var TABLE=h&&h[def[2]]; if(!TABLE) return '';
-  var it=TABLE[(P&&P[def[4]])||def[5]]; if(!it) return '';
-  var locked = !!(def[7] && P && P[def[7]]);
-  return loadoutSlotHtml(def[0], def[1]+' (1 fitted)'+(locked?' 🔒':''), '<b style="color:'+COL.HEAD+'">'+esc(it.n)+'</b>', esc(it.desc||''), S.slotOpen[def[0]]); }
-
-/* -- GIZMOS: the REAL slot-based bay (mount/unmount/sell) - unlike EQUIPMENT above, a gizmo already
-   mounted in every slot blocks buying another until you free one. -- */
-function gizmoSectionHtml(P){
-  var h=H(); var GIZMOS=h&&h.GIZMOS, KEYS=h&&h.GIZMO_KEYS, slots=(P&&P.gizmoSlots)||[];
-  if(!GIZMOS || !Array.isArray(KEYS) || !KEYS.length) return '<div class="pm-note">(gizmo registry offline)</div>';
-  var rows='', i;
-  var mounted='';
-  for(i=0;i<slots.length;i++){ var k=slots[i], g=k&&GIZMOS[k];
-    mounted += '<div class="pm-row"><div class="pm-grow">'
-      + (g ? ('<b style="color:'+COL.GOOD+'">'+esc(g.n)+'</b><div class="pm-sub">'+esc(g.desc)+'</div>')
-           : '<span class="pm-sub">slot '+(i+1)+' - empty</span>')
-      + '</div>'
-      + (g ? ('<button class="pm-b pm-warn" data-act="cmd" data-cmd="gizmo unmount '+(i+1)+'">UNMOUNT (+'
-             + Math.round(g.cost*(h.GIZMO_SELL_FRAC||0.5)) + 'c)</button>') : '') + '</div>'; }
-  rows += '<div class="pm-panel" style="margin-bottom:8px"><h4 style="margin-bottom:4px">MOUNTED</h4>'+mounted+'</div>';
-  rows += '<h4 style="margin-bottom:4px">SHOP</h4>';
-  var freeSlot = slots.indexOf(null) >= 0;
-  for(i=0;i<KEYS.length;i++){ var key=KEYS[i], gz=GIZMOS[key]; if(!gz) continue;
-    var already = typeof h.hasGizmo==='function' ? h.hasGizmo(P,key) : (slots.indexOf(key)>=0);
-    var afford = num(P&&P.credits,0) >= num(gz.cost,0);
-    var canBuy = freeSlot && !already && afford;
-    rows += '<div class="pm-row"><div class="pm-grow">'
-      + '<b style="color:'+COL.HEAD+'">'+esc(gz.n)+'</b>'+(already?' <span class="pm-tag mk">MOUNTED</span>':'')
-      + '<div class="pm-sub">'+esc(gz.desc)+'</div></div>'
-      + '<div style="color:'+(afford?COL.AMBER:COL.BAD)+'">'+fmtC(gz.cost)+'</div>'
-      + '<button class="pm-b pm-go" data-act="cmd" data-cmd="gizmo mount '+key+'"'+(canBuy?'':' disabled')+'>BUY</button></div>'; }
-  if(!freeSlot) rows += '<div class="pm-note">All gizmo slots full - unmount one above to buy something else.</div>';
-  return rows; }
-
-/* -- LOADOUT: Star-Control-2/Space-Rangers style slot header over the buy sections above. HULL and
-   WEAPON are genuinely single-slot in the host model (P.hullClass / P.weaponType are scalars), so
-   those two render as real 1-slot fittings. Equipment is NOT slot-based in the host model (P.equip
-   is a stacking count-bag, install() just increments it) - the bay below is a PRESENTATIONAL grid
-   only: it fills however many boxes are actually owned and caps the visual grid at
-   CFG.EQUIP_BAY_VISUAL_MAX purely so the row doesn't run unbounded, it does not mean the game
-   enforces that many slots. */
-function loadoutSlotHtml(kind, label, filledLabel, filledSub, isOpen){
-  var arrow = isOpen ? '&#9660;' : '&#9654;';
-  return '<button class="pm-row pm-slot" data-act="slot" data-slot="'+kind+'" style="width:100%;text-align:left;cursor:pointer;background:'
-    + (isOpen?'rgba(143,208,255,.07)':'rgba(11,18,30,.85)') + ';border-color:'+(isOpen?COL.HEAD:COL.BORDER)+'">'
-    + '<div class="pm-grow"><b style="color:'+COL.HEAD+';letter-spacing:.08em;font-size:11px">'+esc(label)+'</b>'
-    + '<div style="margin-top:2px">'+filledLabel+'</div>'
-    + (filledSub?('<div class="pm-sub">'+filledSub+'</div>'):'')
-    + '</div><div style="color:'+COL.DIM+';font-size:13px">'+arrow+'</div></button>'; }
-
-function equipBayHtml(P){
-  var owned=[], i, total=0;
-  for(i=0;i<EQUIP_SHOP.length;i++){ var eq=EQUIP_SHOP[i], n=num(P&&P.equip&&P.equip[eq.k],0);
-    if(n>0){ owned.push(eq.n+' x'+n); total+=n; } }
-  var boxes='', shown=Math.min(total, CFG.EQUIP_BAY_VISUAL_MAX);
-  for(i=0;i<shown;i++) boxes += '<span class="pm-eqbox on" title="installed">&#9642;</span>';
-  for(i=shown;i<CFG.EQUIP_BAY_VISUAL_MAX;i++) boxes += '<span class="pm-eqbox" title="empty"></span>';
-  var overflow = total>CFG.EQUIP_BAY_VISUAL_MAX ? (' <span class="pm-sub">(+'+(total-CFG.EQUIP_BAY_VISUAL_MAX)+' more)</span>') : '';
-  var listLine = owned.length ? esc(owned.join(', ')) : '<span class="pm-sub">bay empty - nothing installed</span>';
-  return loadoutSlotHtml('equip', 'EQUIPMENT BAY',
-    '<div style="letter-spacing:.12em">'+boxes+'</div>'+overflow,
-    listLine + (owned.length?' <span class="pm-sub">- installed count, not a slot limit</span>':''),
-    S.slotOpen.equip); }
-
-function loadoutHeaderHtml(P){
-  var h=H(); var HULLS=h&&h.HULLS, WEAPONS=h&&h.WEAPONS, ENGINES=h&&h.ENGINES, GIZMOS=h&&h.GIZMOS, MANU=h&&h.MANUFACTURERS;
-  var hu = (HULLS && P) ? HULLS[P.hullClass||'fighter'] : null;
-  var mu = (MANU && P) ? MANU[P.manufacturer||'human'] : null;
-  var w  = (WEAPONS && P) ? WEAPONS[P.weaponType||'energy'] : null;
-  var en = (ENGINES && P) ? ENGINES[P.engineType||'standard'] : null;
-  var hullFilled = hu
-    ? '<b style="color:'+COL.VIOLET+'">'+(mu?esc(mu.n)+' ':'')+esc(hu.n)+'</b>'
-    : '<span class="pm-sub">(hull registry offline)</span>';
-  var hullSub = hu ? ('hull '+Math.round(num(P&&P.maxHp,0))+' - hold '+Math.round(num(P&&P.holdCap,0))+' - speed x'+num(hu.speed,1)+' - role '+esc(hu.role||'')) : '';
-  var wpnFilled = w
-    ? '<b style="color:'+COL.HEAD+'">'+esc(w.n)+'</b>'
-    : '<span class="pm-sub">(weapon registry offline)</span>';
-  var wpnSub = w ? ('dmg '+num(w.dmg,0)+(w.homing?' - homing':'')+(w.splash?' - splash '+num(w.splash,0):'')) : '';
-  var engFilled = en
-    ? '<b style="color:'+COL.HEAD+'">'+esc(en.n)+'</b>'
-    : '<span class="pm-sub">(engine registry offline)</span>';
-  var engSub = en ? esc(en.desc||'') : '';
-  var slots=(P&&P.gizmoSlots)||[], gzUsed=0, gzNames=[], i;
-  for(i=0;i<slots.length;i++){ if(slots[i]){ gzUsed++; if(GIZMOS&&GIZMOS[slots[i]]) gzNames.push(GIZMOS[slots[i]].n); } }
-  var gzFilled = '<b style="color:'+COL.GOOD+'">'+gzUsed+'/'+slots.length+' mounted</b>';
-  var gzSub = gzNames.length ? esc(gzNames.join(', ')) : '<span class="pm-sub">bay empty</span>';
-  var hpSlots=(P&&P.weaponSlots)||[], hpUsed=0, hpNames=[];
-  for(i=0;i<hpSlots.length;i++){ if(hpSlots[i]){ hpUsed++; if(WEAPONS&&WEAPONS[hpSlots[i]]) hpNames.push(WEAPONS[hpSlots[i]].n); } }
-  var hpFilled = '<b style="color:'+COL.GOOD+'">'+hpUsed+'/'+hpSlots.length+' mounted</b>';
-  var hpSub = hpNames.length ? esc(hpNames.join(', ')) : '<span class="pm-sub">no extra hardpoints mounted</span>';
-  return '<div class="pm-panel"><h4>SHIP LOADOUT</h4>'
-    + loadoutSlotHtml('hull',   'HULL (1 fitted)',   hullFilled, hullSub, S.slotOpen.hull)
-    + loadoutSlotHtml('weapon', 'WEAPON (1 fitted)', wpnFilled,  wpnSub,  S.slotOpen.weapon)
-    + loadoutSlotHtml('hardpoint', 'WEAPON HARDPOINTS (' + hpSlots.length + ' extra)', hpFilled, hpSub, S.slotOpen.hardpoint)
-    + loadoutSlotHtml('engine', 'ENGINE (1 fitted)', engFilled, engSub,  S.slotOpen.engine)
-    + loadoutSlotHtml('gizmo',  'ELECTRONICS BAY (' + slots.length + ' slots)', gzFilled, gzSub, S.slotOpen.gizmo)
-    + GEAR_SLOTS.map(function(def){ return gearSlotHeaderRow(P, def); }).join('')
-    + equipBayHtml(P)
-    + '<div class="pm-note" style="margin-top:2px">click a slot to open its buy list below - HULL, WEAPON, ENGINE and the seven single-slot fittings each hold exactly one, '
-    +   'the ELECTRONICS BAY holds exactly ' + slots.length + ' gizmos and WEAPON HARDPOINTS ' + hpSlots.length + ' extra weapons (both mount/unmount/sell); '
-    +   'the EQUIPMENT BAY grid below that is presentational (fills to how many you own), the game itself has no fixed equipment-slot count.</div>'
-    + '</div>'; }
-
-function hangarHtml(){
-  var p=S.planet, P=player();
-  if(!P) return '<div class="pm-note">(no ship telemetry)</div>';
-  var h='';
-  var hegemonHere = !S.isBase && p && p.hegemon;
-  /* SHIP LAYOUT: opens the visual Engineering Bay (engbay.js) - a top-down click-to-mount schematic of the real
-     per-hull weapon/gizmo mount points, same gizmo/hardpoint bays this tab already lists below just laid out
-     spatially. Same data-act="cmd" dispatch every other button on this tab already uses - no new click-handler
-     branch needed in the dispatcher. */
-  h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.HEAD+'">SHIP LAYOUT</b>'
-    + '<div class="pm-sub">lay out weapons and gizmos on your hull\'s real mount points</div></div>'
-    + '<button class="pm-b pm-go" data-act="cmd" data-cmd="engbay">OPEN ENGINEERING BAY</button></div>';
-  /* repair */
-  var missing=Math.max(0, num(P.maxHp,0)-num(P.hp,0));
-  var rcost=Math.round(missing*(S.isBase?CFG.REPAIR_RATE_BASE:CFG.REPAIR_RATE_PLANET));
-  h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.HEAD+'">REPAIR</b>'
-    + '<div class="pm-sub">hull '+Math.round(num(P.hp,0))+'/'+Math.round(num(P.maxHp,0))
-    + (hegemonHere?' - <span style="color:'+COL.BAD+'">Synod control: repair refused here</span>':'')+'</div></div>'
-    + '<div style="color:'+COL.AMBER+'">'+(missing>0?('~'+rcost+'c'):'full')+'</div>'
-    + '<button class="pm-b pm-go" data-act="cmd" data-cmd="repair"'+((missing<1||hegemonHere)?' disabled':'')+'>FIX HULL</button></div>';
-  /* refuel */
-  var fneed=Math.max(0, num(P.fuelCap,0)-num(P.fuel,0));
-  var gasP=price(p,'gas',true);
-  var fcost=isFinite(gasP)?Math.round(Math.ceil(fneed)*gasP):NaN;
-  h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.HEAD+'">REFUEL</b>'
-    + '<div class="pm-sub">fuel '+Math.round(num(P.fuel,0))+'/'+Math.round(num(P.fuelCap,0))
-    + (S.isBase?' - <span style="color:'+COL.DIM+'">gas is a planetside commodity</span>':'')+'</div></div>'
-    + '<div style="color:'+COL.AMBER+'">'+(fneed>=1?('~'+fmtC(fcost)):'full')+'</div>'
-    + '<button class="pm-b pm-go" data-act="cmd" data-cmd="refuel"'+((fneed<1||S.isBase)?' disabled':'')+'>TOP OFF</button></div>';
-  /* upgrades */
-  var i;
-  // BALANCE 2026-07-08: reflect the new per-stat level cap here too - was showing an always-clickable UPGRADE
-  // button with no ceiling. NOTE: must call H() here, not reference the bare `h` - this function's own local `h`
-  // (line ~650) is the HTML STRING ACCUMULATOR, not the host accessor - a real bug caught by live-verifying the
-  // rendered button (showed no MAX state at all) rather than trusting the diff looked right.
-  var hostCfg = H(); var upCap = (hostCfg&&hostCfg.CFG&&hostCfg.CFG.UP_LVL_CAP)||Infinity;
-  for(i=0;i<CFG.UP_KINDS.length;i++){ var u=CFG.UP_KINDS[i];
-    var lvl=(P.lvl&&typeof P.lvl[u.k]==='number')?P.lvl[u.k]:1;
-    var atCap = lvl>=upCap;
-    var cost=upCostEst(P,u.k);
-    var afford=isFinite(cost)&&num(P.credits,0)>=cost;
-    h += '<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.VIOLET+'">'+u.n+'</b> <span class="pm-sub">Lv'+lvl+(atCap?' (MAX)':'')+'</span>'
-      + '<div class="pm-sub">'+u.d+'</div></div>'
-      + '<div style="color:'+COL.AMBER+'">'+(atCap?'-':fmtC(cost))+'</div>'
-      + '<button class="pm-b pm-vio" data-act="cmd" data-cmd="upgrade '+u.k+'"'+((S.isBase||!afford||atCap)?' disabled':'')+'>'+(atCap?'MAX':'UPGRADE')+'</button></div>'; }
-  h += '<div class="pm-note">'+(S.isBase
-      ? 'Hull, weapons and equipment fit through the LOADOUT slots below. Upgrades are planetside; terraforming is on the MARKET tab.'
-      : 'Weapons and equipment fit through the LOADOUT slots below.')
-    + '</div>';
-  h += blackmarketFenceHtml(p);
-  // user 2026-07-08: "its not clear you can only upgrade hull at ranger command" - the old hint was a small note
-  // buried below the hull rows themselves (only visible once you'd already clicked in expecting to buy). A
-  // banner ABOVE the loadout header instead, visible the instant this tab opens, before you've gone looking.
-  if(!S.isBase) h += '<div class="pm-note" style="border:1px solid '+COL.AMBER+'55;background:'+COL.AMBER+'14;padding:8px 10px;margin-bottom:8px">'
-    + '<b style="color:'+COL.AMBER+'">⌂ HULL SWAPS ARE RANGER-COMMAND-ONLY</b> - this world can fit your WEAPON and EQUIPMENT, '
-    + 'but changing HULL CLASS needs a dock at Ranger Command specifically (<b style="color:'+COL.AMBER+'">go base</b>).</div>';
-  /* -- Star-Control-2/Space-Rangers-style loadout screen: slot header, then the (unchanged) buy
-     lists for whichever slot is expanded. hullSectionHtml/weaponSectionHtml/equipSectionHtml and
-     the HOST.runCmd('hull '+key) / ('weapon '+key) / ('install '+key) calls inside them are
-     untouched - this only reframes how the player reaches them. -- */
-  h += loadoutHeaderHtml(P);
-  if(S.slotOpen.hull)   h += '<div class="pm-panel"><h4>HULL - CHOOSE REPLACEMENT</h4>'+hullSectionHtml(P)+'</div>';
-  if(S.slotOpen.weapon) h += '<div class="pm-panel"><h4>WEAPON - CHOOSE REPLACEMENT</h4>'+weaponSectionHtml(P)+'</div>';
-  if(S.slotOpen.engine) h += '<div class="pm-panel"><h4>ENGINE - CHOOSE DRIVE</h4>'+engineSectionHtml(P)+'</div>';
-  GEAR_SLOTS.forEach(function(def){ if(S.slotOpen[def[0]]) h += '<div class="pm-panel"><h4>'+def[1]+' - CHOOSE FITTING</h4>'+simpleSlotSectionHtml(P,def[2],def[3],def[4],def[5],def[6],def[7])+'</div>'; });
-  if(S.slotOpen.hardpoint) h += '<div class="pm-panel"><h4>WEAPON HARDPOINTS</h4>'+hardpointSectionHtml(P)+'</div>';
-  if(S.slotOpen.gizmo)  h += '<div class="pm-panel"><h4>ELECTRONICS BAY</h4>'+gizmoSectionHtml(P)+'</div>';
-  if(S.slotOpen.equip)  h += '<div class="pm-panel"><h4>EQUIPMENT - INSTALL MORE</h4>'+equipSectionHtml(P)+'</div>';
-  return h; }
 
 /* SR-M4 gap fix (REQUIREMENTS_SR.md): blackmarket/fence were terminal-only, the hangar tab's own hint text used
    to say so explicitly. Same data-cmd->HOST.runCmd path as everything else here. Buy is available at Ranger
@@ -1157,7 +916,7 @@ function renderBody(){
   if(!S.el.body) return;
   var h='';
   if(S.tab==='market') h=marketHtml();
-  else if(S.tab==='hangar') h=shopHtml();   /* 2026-07-09: the flat SHOP replaced the 13-section hangar as the buying surface (hangarHtml stays defined for reference, no longer rendered) */
+  else if(S.tab==='hangar') h=shopHtml();   /* the flat SHOP is the buying surface; the 13-section hangar it replaced on 2026-07-09 sat unreachable in this file until 2026-09-06, when it was deleted (RJ: "there is a lot of AI slop here... half built pieces") */
   else if(S.tab==='missions') h=missionsHtml();
   else if(S.tab==='quests') h=questsHtml();
   else if(S.tab==='ground') h=groundHtml();
@@ -1236,6 +995,6 @@ function tick(dt){
 // 2... make a matrix and document it"): GEAR_SLOTS is the single source of truth for which single-slot equipment
 // categories exist and how to fit them - exposed so engbay.js's icon grid reads the SAME list rather than keeping
 // its own copy that could drift out of sync with this file's own tab.
-window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, hangarHtml:hangarHtml, onClick:onClick, GEAR_SLOTS:GEAR_SLOTS,
+window.PLANETMENU = { init:init, tick:tick, open:openMenu, close:closeMenu, isOpen:isOpen, pushEvent:pushEvent, getLog:getLog, setLog:setLog, onClick:onClick, GEAR_SLOTS:GEAR_SLOTS,
   _rumors:barRumors, _patrons:barPatrons };   /* SR-M18: exposed so the accept-bar "N/N rumors verify against live state" check can call each rumor's own check() */
 })();
