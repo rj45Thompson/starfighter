@@ -49,6 +49,28 @@ Where the claims are audited:
 - `REQUIREMENTS_SR.md`: the Space Rangers systems mapped onto the game, with status.
 - `bench_results.json`: the headless bench run (78/78 suite, 581 claims at the last generation stamp in the file).
 
+## 2026-09-06 pass (generated art, HUD)
+
+Every piece of art that could be generated was generated with the tools already on this machine, at the highest
+size the free FLUX endpoint accepts, and each file's prompt, seed and size are recorded next to it:
+- `assets/gen_art.py` (uses the Tami sprite tool's `call_pollinations`): six planet maps at 2048x1024 (one per
+  economy type), asteroid albedos at 1024, sun corona, three nebula clouds, station hull, engine flame, gem glow,
+  explosion and muzzle flash; normal maps derived from every surface (`assets/gen/manifest.json`,
+  `assets/planets/manifest.json`).
+- `assets/fix_planets.py`: a text-to-image model paints a flat picture, not an equirectangular projection; this
+  pass blends the wrap seam and eases the poles into caps so the maps wrap a sphere (`wrap_report.json` measures
+  the seam after the fix), then re-derives the normal maps.
+- `starnest_sky.js`: the Star Nest skybox from the Starfighter2 Unity project (MIT, Pablo Roman Andrioli), ported
+  and baked once at load into a cube map. Seamless, no image files, no per-frame cost. `CFG.SKY_MODE` picks it
+  or the old JPG faces.
+- Ships render their original Starfighter2 hulls with their own diffuse and normal maps (the player had been a
+  6-vertex procedural dart while its real hull sat loaded and unused).
+HUD: the throttle is a labelled bar in the POWER panel; every window shares one opacity range (0.25 to 1.0) and
+the slider really darkens the box (a forced-transparent CSS rule used to override it); the POWER panel has a
+SEE-THRU slider; a WINDOWS button top-right lists every window and every screen; a fullscreen button sits next
+to it; the SHOP panel opens itself when an upgrade is affordable and buys without docking; the mission tracker
+at the top always points at the active contract and accepts the first posting your rank allows when you hold none.
+
 ## 2026-09-05 pass (combat, look, talk)
 
 - Combat was measured broken: in a 30 s hand-stepped battle both sides landed about 2% of their shots (the AI
@@ -56,7 +78,8 @@ Where the claims are audited:
   hits while its rare 75-damage shot one-shot a 70-hull scout. The AI now aims at the intercept point and fires
   inside an 11-degree cone; pirate tiers are 260/520/900 hull and 22/38/60 damage. Re-measured: the squad lands
   26% of its shots, pirates die, the player can die.
-- Rear gun removed for now (`CFG.REAR_GUN`), every ship renders the real Spaceship.fbx with its palette and
-  emissive maps (`CFG.FBX_HULLS`), the arena wireframe that drew lines across the sky is off (`CFG.ARENA_WIRE`),
+- Rear gun removed for now (`CFG.REAR_GUN`), every ship renders its original Starfighter2 FBX hull with its own
+  maps (`CFG.FBX_HULLS`; the player had been drawn as a 6-vertex procedural dart while its real hull sat loaded and
+  unused), the arena wireframe that drew lines across the sky is off (`CFG.ARENA_WIRE`),
   ACES filmic tone mapping (`CFG.EXPOSURE`), rock textures brightened at load (`CFG.ROCK_TEX_GAIN`) and a camera
   headlamp (`CFG.HEADLAMP_INT`), because the asteroid maps averaged 12-20% brightness.

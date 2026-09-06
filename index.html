@@ -19,6 +19,21 @@
     background:#0c1623cc; border:1px solid #3a3020; border-radius:7px; padding:6px 12px; }   /* user 2026-07-08: "I can't see my credits on the main screen" - always-visible, not buried inside the market panel */
   /* BACKLOG 2026-07-08 "gear-icon options menu with Reset Layout button": mirrors #rosterWrap's left:14px;top:44px
      placement on the right side, one row below #creditsHud so the two never collide. */
+  #fsBtn{ position:fixed; right:50px; top:44px; z-index:20; width:30px; height:30px; pointer-events:auto; cursor:pointer; font:700 15px/1 ui-monospace,monospace; color:#cfe6ff;
+    background:#0c1623cc; border:1px solid #29405a; border-radius:7px; }   /* fullscreen toggle, next to the gear (2026-09-06) */
+  #fsBtn:hover{ border-color:#46d6ff; color:#fff; }
+  #winMenu{ position:fixed; right:86px; top:44px; z-index:21; pointer-events:auto; }
+  #winBtn{ height:30px; padding:0 10px; cursor:pointer; font:700 10px/1 ui-monospace,monospace; letter-spacing:.08em; color:#cfe6ff; background:#0c1623cc; border:1px solid #29405a; border-radius:7px; }
+  #winBtn:hover, #winBtn.on{ border-color:#46d6ff; color:#fff; }
+  #shop{ position:fixed; right:14px; top:254px; z-index:7; border:1px solid #22344a; border-radius:9px; }   /* right column, under the ship-controls inset, above the power dock (2026-09-06) */
+  #winList{ position:absolute; right:0; top:34px; width:250px; max-height:min(70vh,560px); overflow-y:auto; background:#0a1420f2; border:1px solid #29405a; border-radius:9px; padding:8px 10px; box-shadow:0 8px 28px #000a;
+    font:600 11px/1.5 ui-monospace,monospace; color:#cfe2f5; }
+  #winList h4{ margin:6px 0 3px; font:800 9.5px/1 ui-monospace,monospace; letter-spacing:.12em; color:#8fb0cc; }
+  #winList label{ display:flex; align-items:center; gap:8px; padding:2px 0; cursor:pointer; }
+  #winList label:hover{ color:#fff; }
+  #winList .key{ margin-left:auto; color:#5f7a98; font-size:9.5px; }
+  #winList button{ font:700 10px/1 ui-monospace,monospace; padding:4px 8px; margin:2px 4px 2px 0; border-radius:5px; border:1px solid #2a4a66; background:#10243a; color:#cfe9ff; cursor:pointer; }
+  #winList button:hover{ border-color:#46d6ff; }
   #gearBtn{ position:fixed; right:14px; top:44px; z-index:20; width:30px; height:30px; pointer-events:auto; cursor:pointer;
     background:#0c1623cc; border:1px solid #29405a; border-radius:7px; color:#8fb0cc; font-size:15px;
     display:flex; align-items:center; justify-content:center; }
@@ -31,6 +46,14 @@
   #throttleFill{ position:absolute; left:2px; right:2px; bottom:2px; height:0%; border-radius:13px; background:linear-gradient(to top,#1e6fff,#9fe0ff); opacity:.9; pointer-events:none; }
   #throttleKnob{ position:absolute; left:-4px; right:-4px; height:16px; bottom:0; margin-bottom:-8px; background:#e6f2ff; border:1px solid #4a6f92; border-radius:7px; box-shadow:0 1px 5px #000b; pointer-events:none; }
   #throttleLabel{ font:800 13px/1 ui-monospace,monospace; color:#9fe0ff; min-width:34px; text-align:center; }
+  /* THROTTLE IN THE POWER SECTION (user 2026-09-06, CFG.THROTTLE_IN_POWER): the same element, moved into #powerdock and
+     laid out as a labelled horizontal bar; the drag code reads the orientation from this class. */
+  #throttle.inpower{ position:static; transform:none; width:auto; flex-direction:row; gap:8px; padding:7px 12px 9px; border-bottom:1px solid rgba(70,214,255,0.14); }
+  #throttle.inpower #throttleTag{ font-size:9.5px; color:#9fd0e8; white-space:nowrap; }
+  #throttle.inpower #throttleTag small{ display:block; font:500 7.5px/1.2 ui-monospace,monospace; letter-spacing:.04em; color:#6f88a4; margin-top:2px; }
+  #throttle.inpower #throttleTrack{ flex:1 1 auto; width:auto; height:16px; border-radius:8px; }
+  #throttle.inpower #throttleFill{ left:2px; top:2px; bottom:2px; right:auto; height:auto; width:0%; border-radius:6px; background:linear-gradient(to right,#1e6fff,#9fe0ff); }
+  #throttle.inpower #throttleKnob{ top:-4px; bottom:-4px; left:0; right:auto; width:16px; height:auto; margin:0 0 0 -8px; }
   #fwdReticle{ position:fixed; left:0; top:0; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:16; pointer-events:none; display:none; }   /* FORWARD-GUN BORESIGHT crosshair: parked at the view centre by updateTargetingReticle when no lead box is up (centre is warp-invariant, so straight fire lands there) */
   #gearMenu{ position:fixed; right:14px; top:80px; z-index:20; display:none; pointer-events:auto;
     background:#0c1623ee; border:1px solid #29405a; border-radius:8px; padding:8px; min-width:170px;
@@ -129,7 +152,12 @@
   #vdiv,#hdiv,#hdiv2{ position:fixed; z-index:6; background:#1b2a3c; }
   #powerdock{ position:fixed; z-index:6; background:rgba(9,15,26,0.30); border:1px solid rgba(70,214,255,0.18); border-radius:10px; overflow:hidden; pointer-events:auto; }
   /* ALL PANELS TRANSPARENT (user 2026-07-13 "have all panels transparent") - the fullscreen top-down shows through every HUD panel */
-  #market,#marketBody,#ticker,#rosterWrap,#roster,#missionlog,#khud{ background:rgba(9,15,26,0.34) !important; }
+  /* 2026-09-06 (user "make the terminal background able to shade darker with the slider"): this rule used to force
+     rgba(9,15,26,0.34) !important on every registered panel, which beat panels.js's inline backgroundColor - so the
+     opacity slider only ever faded the TEXT and the box could not be made darker. The forced alpha is gone; the
+     transparent look is now each panel's DEFAULT opacity (0.34-0.5, set at PANELS.register), and the slider runs the
+     full 0.16-0.97 range. The inner containers keep a clear background so the outer panel's alpha is the only one. */
+  #marketBody,#roster{ background:transparent !important; }
   #chat{ background:rgba(9,15,26,0.45) !important; }
   #boot{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50;
     background:var(--ink); font:600 14px/1 ui-monospace,monospace; color:#86a0bd; transition:opacity .5s; }
@@ -164,16 +192,25 @@
 <div id="stage"></div>
 <div id="hitfx" style="position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .05s linear"></div>
 <div id="missionArrow" style="position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:8;pointer-events:none;text-align:center;opacity:0;transition:opacity .25s">
-  <div id="missionArrowGlyph" style="font-size:22px;color:#ffd27a;text-shadow:0 0 8px #000,0 0 3px #000;transition:transform .12s linear">▲</div>
-  <div id="missionArrowLabel" style="font:600 10px/1.2 ui-monospace,monospace;color:#ffd27a;text-shadow:0 1px 3px #000;margin-top:1px;white-space:nowrap"></div>
+  <div id="missionArrowGlyph" style="font-size:30px;color:#ffd27a;text-shadow:0 0 10px #000,0 0 4px #000;transition:transform .12s linear">▲</div>
+  <div id="missionArrowLabel" style="font:700 12px/1.25 ui-monospace,monospace;color:#ffd27a;text-shadow:0 1px 3px #000;margin-top:1px;white-space:nowrap;background:rgba(9,15,26,0.55);padding:2px 8px;border-radius:6px"></div>
+
 </div>
+  <!-- MISSION TRACKER (user 2026-09-06 "a mission tracker that shows me where to go based on the currently selected mission"): the arrow always points at the ACTIVE contract's target; missionAutoTick accepts the first posting you qualify for when you hold none, so there is always something to fly toward -->
+  <div id="shop" style="width:236px;padding:10px 12px;font:600 11px/1.45 ui-monospace,monospace;color:#cfe2f5;pointer-events:auto"></div>
+  <!-- THE SHOP (user 2026-09-06 "when you have enough to upgrade the shop window will just appear, you don't need to land anymore, just mine"): a PANELS panel that opens itself the moment an upgrade is affordable and closes when none is; buying no longer needs a dock -->
 <div class="hud" id="creditsHud">0c</div>
 <div id="throttle" title="THROTTLE - drag to set a cruise level, then release (the ship holds it); Space / right-mouse still boost">
-  <div id="throttleTag">THR</div>
+  <div id="throttleTag">THROTTLE<small>cruise speed · drag or mouse wheel · Space boosts</small></div>
   <div id="throttleTrack"><div id="throttleFill"></div><div id="throttleKnob"></div></div>
   <div id="throttleLabel">0%</div></div>
 <div id="fwdReticle"><svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="15" fill="none" stroke="#66ffcc" stroke-width="1.4" opacity="0.85"/><circle cx="23" cy="23" r="2.4" fill="#66ffcc"/><path d="M23 2v10M23 34v10M2 23h10M34 23h10" stroke="#66ffcc" stroke-width="1.4"/></svg></div>
 <button id="gearBtn" type="button" title="options">⚙</button>
+<button id="fsBtn" type="button" title="Fullscreen (click again or Esc to leave)">⛶</button><!-- user 2026-09-06 "have the button for fullscreen somewhere in the top right with the expand symbol" -->
+<!-- WINDOWS (user 2026-09-06 "have an all-windows tab to hide and show all the windows, always visible ... a way to see every menu available"):
+     one always-visible button; the list is built from PANELS.list() (every registered window) + the two GL insets + the power dock,
+     and a SCREENS section that opens each fullscreen screen the game has. -->
+<div id="winMenu"><button id="winBtn" type="button" title="Show or hide any window · open any screen">▤ WINDOWS</button><div id="winList" hidden></div></div>
 <div id="gearMenu"><div class="gm-hdr">OPTIONS</div>
   <div class="gm-sec">GENERAL</div>
   <label class="gm-opt"><input type="checkbox" id="optMouseSteer"><span>Mouse steering (forward view)</span></label>
@@ -216,6 +253,7 @@
 <div id="boot">loading squadron…</div>
 
 <script src="three.min.js?v=20260714c"></script>
+<script src="starnest_sky.js?v=20260906a"></script>
 <script src="fflate.min.js?v=20260714c"></script>
 <script src="fbxloader.js?v=20260714c"></script>
 <!-- Contention module-split (SCORECARD_SPEC §"Contention reduction"): self-contained AGI subsystems extracted to
@@ -250,8 +288,8 @@
 <script src="tom_test.js?v=20260714c"></script>
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260714c"></script>
-<script src="power_panel.js?v=20260714c"></script>
-<script src="panels.js?v=20260905a"></script>
+<script src="power_panel.js?v=20260906b"></script>
+<script src="panels.js?v=20260906b"></script>
 <script src="item_icons.js?v=20260714c"></script>
 <script src="engbay.js?v=20260714c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
@@ -298,9 +336,18 @@ const CFG = {
   AIM_BASE_ERR:2.6, AIM_COMP_ERR:0.4, AIM_JAM_ERR:8.0, AIM_ERR_RANGE:110, AIM_JITTER_HZ:1.7,   // FIRE-CONTROL fidelity (user 2026-07-14 "box ... depending on your computer and the other agent's jammer"): lead-box error in world units - BASIC fire control is loose, the Targeting Computer gizmo tightens it (AIM_COMP_ERR), the target's ECM jammer widens + wobbles it (AIM_JAM_ERR); error grows with range; the GUN aims at the SAME shown box, so a jammed solution honestly misses
   LOCKON_RANGE:95, LOCKON_ARC:0.72,                // an enemy within LOCKON_RANGE and facing you within LOCKON_ARC (cos) has a firing solution ON you -> lock-on warning; your own ECM jammer flickers/denies their lock
   EXPOSURE:1.15,                                   // GRAPHICS PASS 2026-09-05: ACES filmic tone mapping exposure (renderer.toneMappingExposure). 1.0 = neutral; the sky faces average 12-20% brightness, so a little lift.
+  SKY_MODE:'starnest',                             // GRAPHICS PASS 2026-09-06 (user "fix the background ... using the generation tools we have on disk for unity"): 'starnest' = the Star Nest procedural skybox from the Starfighter2 Unity project (starnest_sky.js), baked ONCE into a cube map at load; 'jpg' = the six sky_*.jpg faces (mean 12-20% brightness)
+  SKY_BAKE_RES:1024, SKY_SEED:3, SKY_TINT:[0.95,1.0,1.18], SKY_GAIN:0.42,   // gain 1.0 (the Shadertoy default) competed with the HUD, 0.62 still did; a backdrop   // face size, which region of the field, a cool tint, final gain - see STARNEST.CFG for the algorithm's own knobs
+  PLANET_SKINS:true, PLANET_NORMAL_SCALE:0.55,     // + the normal map derived from each skin (assets/planets/<type>_n.jpg) so the terrain catches the sun
+  ROCK_GEN:true, ROCK_NORMAL_SCALE:0.8,            // GRAPHICS PASS 2026-09-06 ("every single thing generated"): asteroid albedo + normal maps generated by assets/gen_art.py (assets/gen/rock_dark.jpg, rock_light.jpg and their _n.jpg) replace the 32x32 near-black originals. false = the originals through ROCK_TEX_GAIN.
+  MISSION_AUTO:true, MISSION_AUTO_S:5,             // user 2026-09-06: with no contract held, accept the first posting the rank allows every MISSION_AUTO_S seconds, so the tracker always points somewhere
+  SHOP_AUTO:true, SHOP_SNOOZE_S:60,                // user 2026-09-06: the SHOP panel opens itself when an upgrade is affordable (no docking); closing it by hand snoozes it this long
+  THROTTLE_IN_POWER:true, THROTTLE_BAR_H:88,       // the dock's height budget for the lever row (measured 2026-09-06: the dials already filled the old budget to within 2 px; 46 clipped the lever by 38)                          // user 2026-09-06 "the throttle bar is not obvious what it does, label it and move it to the power section": the lever becomes a labelled horizontal bar at the foot of the POWER panel. false = the old unlabelled vertical bar on the right edge.                               // GRAPHICS PASS 2026-09-06: per-economy planet surface maps generated with FLUX (assets/planets/*.jpg, provenance in assets/planets/manifest.json) instead of one shared planet_skin.jpg tinted six ways. false = the old single skin.
   ARENA_WIRE:false,                                // GRAPHICS PASS 2026-09-05 (user "fix the background"): the 2100-unit wireframe sphere that marked the arena edge drew polygon lines across the whole sky at every zoom. Off; the edge still bounces you (step) and EDGE_STEER turns the AI back.
   REAR_GUN:false,                                  // user 2026-09-05 "remove rear gun for now": no ball turret on the hull, no aft camera, no manual or AI rear beam, no rear shield. REAR_GUNNER_WINDOW below is moot while this is false. Flip to bring the whole mechanic back.
   FBX_HULLS:true,                                  // GRAPHICS PASS 2026-09-05 ("make the ship look better"): every ship renders the real Starfighter2 Spaceship.fbx with its palette + emissive maps, tinted per side, instead of the 6-vertex hullmodels.js darts. false = the old procedural silhouettes.
+  GEN_DIR:'assets/gen/',
+  GEN_FX:true, NEBULA_PER_SYSTEM:2, NEBULA_OPACITY:0.12, NEBULA_DIST:[3.4,4.6], NEBULA_SIZE:[0.9,1.3],   // opacity 0.42 and 1.6-2.6 x SYSTEM_R read as loud rings over the play space (measured 2026-09-06); now faint and far   // generated sun corona / nebula sprites / gem glow / explosion / muzzle flash / engine flame / station hull (2026-09-06); nebula clouds per star system, far out, additive                           // where assets/gen_art.py writes (manifest.json there records prompt, seed and size of every file)
   ROCK_TEX_GAIN:[3.0,2.4],                         // LIGHTING (2026-09-05): MEASURED - assets/asteroid_dark.png averages 30/255 (12%) and asteroid_light.png 51/255 (20%). map x color = albedo, so with color 0xa8a196 the rocks reflected ~8% of any light; that is why raising the lights twice (2026-07-14) never made them visible. Pixels are multiplied by this at load (dark -> ~35%, light -> ~48%), grain kept. 3.6/2.8 read chalk-white in a dense belt with the headlamp on.
   HEADLAMP_INT:1.3, HEADLAMP_RANGE:420,            // LIGHTING (user 2026-09-05 "the lighting is dark, I can't see the asteroids"): a point light that rides with the chase camera, so the rocks the player is looking at are lit from the player's side whatever the sun's direction. Range in world units (a rock at AST_SCALE_MAX is ~6 units; the field is ~7,700 rocks across the arena).
   REAR_GUNNER_WINDOW:false,                        // DEPRECATED (user 2026-09-05 "deprecate rear gunner window ... I can't see what's going on"): the manned aft view took half the screen over the main 3D view. The turret, its AI (AI_REAR_*) and the external ball stay; only the window and manning it are gone. Flip to true to bring the window back.
@@ -666,6 +713,13 @@ const sky=new T.CubeTextureLoader().setPath('assets/').load(
   ['sky_px.jpg','sky_nx.jpg','sky_py.jpg','sky_ny.jpg','sky_pz.jpg','sky_nz.jpg'],
   ()=>{ const b=document.getElementById('boot'); if(b){ b.style.opacity=0; setTimeout(()=>b.remove(),550);} });
 sky.encoding=T.sRGBEncoding; scene.background=sky;
+// STAR NEST SKY (GRAPHICS PASS 2026-09-06, CFG.SKY_MODE): the procedural skybox shipped in the Starfighter2 Unity
+// project, ported in starnest_sky.js and baked once here into a cube map. The JPG cube above still loads first: its
+// callback is what dismisses the boot overlay, and it stays as the fallback if the bake throws (a WebGL context
+// without float precision, say) - the error is printed, never swallowed.
+if(CFG.SKY_MODE==='starnest' && window.STARNEST){
+  try{ const baked=STARNEST.bake(renderer, T, { size:CFG.SKY_BAKE_RES, seed:CFG.SKY_SEED, tint:CFG.SKY_TINT, gain:CFG.SKY_GAIN }); scene.background=baked; }
+  catch(e){ console.error('[starnest] bake failed - keeping the JPG sky: '+(e&&e.message||e)); } }
 const texLoader=new T.TextureLoader();
 // ROCK TEXTURES ARE NEARLY BLACK (see CFG.ROCK_TEX_GAIN for the measurement): loaded through a canvas so each pixel
 // can be multiplied by the gain before it becomes a texture. Same-origin images, so the readback is allowed on the
@@ -676,8 +730,45 @@ function loadRockTex(url,gain){ const tex=new T.Texture(); tex.wrapS=tex.wrapT=T
     x.putImageData(d,0,0); tex.image=c; tex.needsUpdate=true; };
   img.onerror=()=>{ console.error('[rocks] texture failed to load: '+url+' - rocks show their flat material colour'); };
   img.src=url; return tex; }
-const rockTex=[ loadRockTex('assets/asteroid_dark.png',CFG.ROCK_TEX_GAIN[0]), loadRockTex('assets/asteroid_light.png',CFG.ROCK_TEX_GAIN[1]) ];
-const PLANET_TEX=texLoader.load('assets/planet_skin.jpg'); PLANET_TEX.wrapS=T.RepeatWrapping; PLANET_TEX.encoding=T.sRGBEncoding;   // the real Starfighter2 planet skin, tinted per economy type via material.color
+// GENERATED ROCK SURFACES (CFG.ROCK_GEN, 2026-09-06): 1024x1024 seamless albedo + derived normal map per shade. A
+// missing generated file is REPORTED and that shade shows its material colour; nothing is quietly substituted.
+function genTex(file){ const t=texLoader.load(CFG.GEN_DIR+file, undefined, undefined, ()=>console.error('[gen] missing generated texture '+CFG.GEN_DIR+file+' - run assets/gen_art.py')); t.wrapS=t.wrapT=T.RepeatWrapping; return t; }
+const rockTex=CFG.ROCK_GEN
+  ? [ genTex('rock_dark.jpg'), genTex('rock_light.jpg') ]
+  : [ loadRockTex('assets/asteroid_dark.png',CFG.ROCK_TEX_GAIN[0]), loadRockTex('assets/asteroid_light.png',CFG.ROCK_TEX_GAIN[1]) ];
+if(CFG.ROCK_GEN) rockTex.forEach(t=>{ t.encoding=T.sRGBEncoding; });
+const rockNrm=CFG.ROCK_GEN ? [ genTex('rock_dark_n.jpg'), genTex('rock_light_n.jpg') ] : [null,null];
+// GENERATED FX + STATION ART (CFG.GEN_FX, 2026-09-06, user "every single thing generated"): sun corona, nebula clouds,
+// gem glow, explosion, muzzle flash, engine flame, station hull. All from assets/gen_art.py (manifest.json there).
+const FX_TEX=CFG.GEN_FX ? { sun:genTex('sun_corona.png'), nebula:[genTex('nebula_a.png'),genTex('nebula_b.png'),genTex('nebula_c.png')], gem:genTex('gem_glow.png'),
+  explosion:genTex('explosion.png'), muzzle:genTex('muzzle_flash.png'), engine:genTex('engine_flame.png'), station:genTex('station_hull.jpg'), stationNrm:genTex('station_hull_n.jpg') } : null;
+if(FX_TEX){ [FX_TEX.sun,...FX_TEX.nebula,FX_TEX.gem,FX_TEX.explosion,FX_TEX.muzzle,FX_TEX.engine,FX_TEX.station].forEach(t=>{ t.encoding=T.sRGBEncoding; }); FX_TEX.station.repeat.set(4,1); FX_TEX.stationNrm.repeat.set(4,1); }   // the normal map stays linear
+// one-shot additive sprites (explosions, muzzle flashes): grow from `size` to size*grow while fading over `life` seconds
+const fxSprites=[];
+function fxSprite(tex,pos,size,col,life,grow,opacity){ const m=new T.Sprite(new T.SpriteMaterial({map:tex,color:col||0xffffff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:opacity!=null?opacity:1,rotation:rand(0,TAU)}));
+  m.position.copy(pos); m.scale.set(size,size,1); scene.add(m); fxSprites.push({m,life,max:life,size,grow:grow||1,op:opacity!=null?opacity:1}); return m; }
+function updateFx(dt){ for(let i=fxSprites.length-1;i>=0;i--){ const f=fxSprites[i]; f.life-=dt; const k=Math.max(0,f.life/f.max); f.m.material.opacity=f.op*k; const s=f.size*(1+(1-k)*(f.grow-1)); f.m.scale.set(s,s,1);
+    if(f.life<=0){ scene.remove(f.m); f.m.material.dispose(); fxSprites.splice(i,1); } } }
+const PLANET_TEX=texLoader.load('assets/planet_skin.jpg'); PLANET_TEX.wrapS=T.RepeatWrapping; PLANET_TEX.encoding=T.sRGBEncoding;
+// PER-ECONOMY PLANET SKINS (GRAPHICS PASS 2026-09-06, CFG.PLANET_SKINS): one generated equirectangular map per
+// economy type, keyed by PTYPES[].t (assets/planets/manifest.json records the prompt, seed and source of each).
+// A type with no file falls back to the shared skin ABOVE and says so in the console - a missing map is reported,
+// not hidden behind a tint.
+const PLANET_SKIN_FILE={ 'Mining':'mining.jpg', 'Agri':'agri.jpg', 'Refinery':'refinery.jpg', 'Hi-Tech':'hitech.jpg', 'Luxury':'luxury.jpg', 'Garden':'garden.jpg' };
+const PLANET_SKINS={};
+function planetTexFor(type){
+  if(!CFG.PLANET_SKINS || !type || !PLANET_SKIN_FILE[type.t]) return PLANET_TEX;
+  if(!PLANET_SKINS[type.t]){
+    const t=texLoader.load('assets/planets/'+PLANET_SKIN_FILE[type.t], undefined, undefined,
+      ()=>{ console.error('[planets] no generated skin for '+type.t+' (assets/planets/'+PLANET_SKIN_FILE[type.t]+') - that type shows the shared planet_skin.jpg'); });
+    t.wrapS=T.RepeatWrapping; t.encoding=T.sRGBEncoding; PLANET_SKINS[type.t]=t; }
+  return PLANET_SKINS[type.t]; }
+const PLANET_NORMALS={};
+function planetNormalFor(type){   // the normal map fix_planets.py derives next to each skin (<type>_n.jpg); reported if missing, never faked
+  if(!CFG.PLANET_SKINS || !type || !PLANET_SKIN_FILE[type.t]) return null;
+  if(!PLANET_NORMALS[type.t]){ const f='assets/planets/'+PLANET_SKIN_FILE[type.t].replace(/\.jpg$/,'_n.jpg');
+    const t=texLoader.load(f, undefined, undefined, ()=>console.error('[planets] no normal map '+f+' - run assets/fix_planets.py')); t.wrapS=T.RepeatWrapping; PLANET_NORMALS[type.t]=t; }
+  return PLANET_NORMALS[type.t]; }   // the real Starfighter2 planet skin, tinted per economy type via material.color
 const FLAME_TEX=texLoader.load('assets/flame1.png');   // the real Starfighter2 (Cartoon FX) fire sprite - the Incinerator's stream
 
 const ring=new T.Mesh(new T.SphereGeometry(CFG.ARENA_R,32,24),
@@ -705,8 +796,11 @@ const THRUST_TEX=(function(){ const N=128, cv=document.createElement('canvas'); 
     lg.addColorStop(0,'rgba(234,247,255,0.5)'); lg.addColorStop(1,'rgba(120,180,255,0)');
     g.strokeStyle=lg; g.lineWidth=2.3; g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len); g.stroke(); }
   const t=new T.CanvasTexture(cv); t.needsUpdate=true; return t; })();
-function makeEngPlume(hue){ const spr=new T.Sprite(new T.SpriteMaterial({map:THRUST_TEX,color:new T.Color().setHSL(hue,0.38,0.9),blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.8}));
-  spr.scale.set(1.9,1.9,1); return spr; }   // the plasma-flame sprite; scale.setScalar in step() pulses it with thrust
+function makeEngPlume(hue){ const spr=new T.Sprite(new T.SpriteMaterial({map:FX_TEX?FX_TEX.engine:THRUST_TEX,color:new T.Color().setHSL(hue,0.38,0.9),blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.8}));
+  spr.scale.set(1.9,1.9,1);
+  // the generated flame is a 1:2 (tall) image; step() pulses the plume with scale.setScalar, so this sprite's setScalar keeps the aspect (GEN_FX)
+  if(FX_TEX){ spr.scale.set(1.9,3.8,1); spr.scale.setScalar=function(v){ return T.Vector3.prototype.set.call(this,v,v*2,1); }; }
+  return spr; }   // the plasma-flame sprite; scale.setScalar in step() pulses it with thrust
 function toEngPlume(grp,hue){ if(!grp||!grp.userData) return; const old=grp.userData.eng, pos=old?old.position.clone():new T.Vector3(0,0,2);
   if(old) grp.remove(old); const p=makeEngPlume(hue); p.position.copy(pos); grp.add(p); grp.userData.eng=p; }
 function fighterMesh(hue){
@@ -768,21 +862,30 @@ function shipTex(file){ const t=SHIP_TEX_LOADER.load(ASSET_CFG.DIR+file); t.flip
 const SHIP_TEX={ player:shipTex('playerShip_dff.png'), playerNrm:shipTex('playerShip_nrm.png'),
   enemyRed:shipTex('enemyShip_red_dff.png'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png'),
   hull:shipTex('spaceship_dff.png'), hullEmm:shipTex('spaceship_emm.png') };   // Spaceship.fbx's OWN maps: a 4-colour palette albedo (32x32, orange/white/dark) + a 128x512 emissive strip for the lights and vents
-// FBX HULL FOR EVERYONE (GRAPHICS PASS 2026-09-05, CFG.FBX_HULLS): vehicle_playerShip.FBX / vehicle_enemyShip.FBX are
-// NOT in assets/ (they 404 and shipDone counts them as settled), so the player and squad were rendering hullmodels.js
-// primitives - the scout is a 6-vertex flat dart - and pirates the box-and-cone fallback. Spaceship.fbx IS present (234
-// vertices, the trader's model) with both of its maps. One real hull, tinted per side and scaled per class/tier,
-// beats three silhouettes made of boxes. Returns null while the FBX has not loaded; shipDone retrofits later.
+// FBX HULL FOR EVERYONE (GRAPHICS PASS 2026-09-05/06, CFG.FBX_HULLS). CORRECTION 2026-09-06: the first version of
+// this comment claimed vehicle_playerShip.FBX / vehicle_enemyShip.FBX were missing from assets/. They are NOT missing
+// (528 KB and 512 KB, both load; ASSETS.ships has all three keys) - the listing that "proved" it was cut at 40 entries.
+// What WAS true: applyShipModel preferred hullmodels.js for every non-pirate, so the player flew a 6-vertex dart
+// while its real hull sat loaded and unused. Now the original Starfighter2 models are used per side, with their own
+// maps: the player/squad hull with playerShip_dff + normal map, the Synod hull with the red/purple skins and the
+// tier tint, and Spaceship.fbx (palette + emissive strip) for traders. Returns null until the FBX for that side
+// has loaded; shipDone retrofits every ship then.
 function fbxHullFor(s, visKey){
-  if(!CFG.FBX_HULLS || !ASSETS.ships.trader) return null;
-  const isPirate=s.team==='pirate', HT=isPirate?HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)]:null;
-  const tint=isPirate?new T.Color(HT.col):(s.role==='trader'?new T.Color(0x9fb0c0):new T.Color(s.color));
-  const grp=ASSETS.ships.trader.clone(true);
-  grp.traverse(o=>{ if(!o.isMesh) return;
-    o.material=new T.MeshStandardMaterial({ map:SHIP_TEX.hull, emissiveMap:SHIP_TEX.hullEmm, emissive:isPirate?new T.Color(0xff6a4a):new T.Color(0xffffff), emissiveIntensity:isPirate?1.4:1.1,
-      roughness:0.5, metalness:0.32, color:new T.Color(0xffffff).lerp(tint,isPirate?0.55:0.28) }); });
-  if(isPirate) grp.scale.setScalar(HT.scale);
-  else if(visKey && ASSET_CFG.VIS_SCALE[visKey]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[visKey]);
+  if(!CFG.FBX_HULLS) return null;
+  const isPirate=s.team==='pirate', isTrader=s.role==='trader';
+  const base=ASSETS.ships[isPirate?'enemy':(isTrader?'trader':'player')]; if(!base) return null;
+  const grp=base.clone(true);
+  if(isPirate){ const HT=HEG_TIERS[Math.min(s.tier||0,HEG_TIERS.length-1)];
+    const rMap=(s.id%2===0)?SHIP_TEX.enemyRed:SHIP_TEX.enemyPurple;
+    grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, rMap, SHIP_TEX.enemyNrm, HT.col); });
+    grp.scale.setScalar(HT.scale); }
+  else if(isTrader){
+    grp.traverse(o=>{ if(!o.isMesh) return;
+      o.material=new T.MeshStandardMaterial({ map:SHIP_TEX.hull, emissiveMap:SHIP_TEX.hullEmm, emissive:new T.Color(0xffffff), emissiveIntensity:1.1,
+        roughness:0.5, metalness:0.32, color:new T.Color(0xffffff).lerp(new T.Color(0x9fb0c0),0.3) }); }); }
+  else{
+    grp.traverse(o=>{ if(o.isMesh) fixShipMaterial(o, SHIP_TEX.player, SHIP_TEX.playerNrm, s.role==='player'?null:s.color.getHex()); });   // the player keeps the authored orange skin; squadmates carry their roster tint
+    if(visKey && ASSET_CFG.VIS_SCALE[visKey]) grp.scale.setScalar(ASSET_CFG.VIS_SCALE[visKey]); }
   const eng=makeEngPlume(s.hue); eng.position.set(0,0,ASSET_CFG.SHIP_LEN*ASSET_CFG.ENG_Z); grp.add(eng); grp.userData.eng=eng;
   return grp; }
 function fixShipMaterial(o, map, nrm, tintHex){
@@ -970,8 +1073,9 @@ function _procRockGeo(seed){ const g=new T.IcosahedronGeometry(1,1), p=g.attribu
 function buildRockPools(){ if(ROCK_POOLS) return;
   const CAP=Math.ceil(CFG.AST_MAX/ROCK_GEO_VARIANTS)+80;   // per-pool capacity: total 8*CAP >> AST_MAX, so a lopsided shade/shape split (or a burst of splits) always has room
   _rockProcGeos=[]; for(let i=0;i<ROCK_GEO_VARIANTS;i++) _rockProcGeos.push(_procRockGeo(i*13.7+1));
-  const mats=[ new T.MeshStandardMaterial({map:rockTex[0],color:0xa8a196,emissive:0x22201c,emissiveIntensity:0.6,roughness:0.95,metalness:0.04,flatShading:true}),
-              new T.MeshStandardMaterial({map:rockTex[1],color:0xa8a196,emissive:0x22201c,emissiveIntensity:0.6,roughness:0.95,metalness:0.04,flatShading:true}) ];   // user 2026-07-14: slightly lighter + faint self-glow so rocks aren't murky in the dark
+  const rockMat=i=>new T.MeshStandardMaterial({map:rockTex[i],color:CFG.ROCK_GEN?0x9e9a93:0xa8a196,emissive:0x22201c,emissiveIntensity:CFG.ROCK_GEN?0.22:0.6,   // the generated albedo is bright (regolith photos are); the tint brings it to rock grey under the headlamproughness:0.95,metalness:0.04,flatShading:!CFG.ROCK_GEN,
+    normalMap:rockNrm[i]||null, normalScale:new T.Vector2(CFG.ROCK_NORMAL_SCALE,CFG.ROCK_NORMAL_SCALE)});   // generated skins carry their own shading detail, so smooth normals + the normal map; the originals keep the faceted low-poly read
+  const mats=[ rockMat(0), rockMat(1) ];   // user 2026-07-14: slightly lighter + faint self-glow so rocks aren't murky in the dark
   ROCK_POOLS=[];
   for(let gi=0;gi<ROCK_GEO_VARIANTS;gi++) for(let sh=0;sh<ROCK_SHADES;sh++){
     const inst=new T.InstancedMesh(_rockProcGeos[gi], mats[sh], CAP); inst.count=0; inst.frustumCulled=false; inst.instanceMatrix.setUsage(T.DynamicDrawUsage); scene.add(inst);
@@ -988,8 +1092,8 @@ function spawnGem(pos,scale){ const credits=Math.max(1,Math.round(scale*CFG.GEM_
   const col=new T.Color().setHSL(credits>8?0.42:0.13,0.9,0.6);
   const gemGeo=ASSETS.gemGeos.length?ASSETS.gemGeos[randi(0,ASSETS.gemGeos.length-1)]:new T.OctahedronGeometry(1.5,0);   // Gems Ultimate Pack shapes when loaded
   const m=new T.Mesh(gemGeo,new T.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.9,roughness:0.3,metalness:0.2}));
-  m.position.copy(pos); const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.8}));
-  halo.scale.set(7,7,1); m.add(halo); scene.add(m);
+  m.position.copy(pos); const halo=new T.Sprite(new T.SpriteMaterial({map:FX_TEX?FX_TEX.gem:GLOW,color:col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.8}));
+  halo.scale.set(FX_TEX?9:7,FX_TEX?9:7,1); m.add(halo); scene.add(m);
   gems.push({ pos:pos.clone(), vel:new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(rand(0,2)), credits, mesh:m, age:0, phase:rand(0,TAU) }); }
 // DEATH DROPS ALL YOUR MONEY (user 2026-07-07): scatter a ship's full credits as a salvage STASH that PERSISTS
 // (perm:true - it does not age out) so the next ship that flies through picks it up. Bright gold, unmistakable.
@@ -1044,6 +1148,7 @@ function spawnBullet(pos,dir,owner,spec){ spec=spec||{}; const col=(spec.col!=nu
     m.scale.set(r,r,1); if(spec.shape==='orb') m.scale.multiplyScalar(1.25); } // Seeker: a fat slow orb (its smoke trail is drawn in-flight)
   m.position.copy(pos); scene.add(m);
   if(spec.flash) burst(pos, col, 2, 7, spec.flash);                            // per-weapon muzzle flash
+  if(spec.flash&&FX_TEX) fxSprite(FX_TEX.muzzle,pos,spec.flash*1.7,col,0.1,1.5,0.9);   // + the generated radial flash, a tenth of a second (GEN_FX)
   let dmg=(spec.dmg!=null)?spec.dmg:CFG.SHIP_BULLET_DMG; const ow=shipById[owner];
   if(ow && ow.role==='trader') dmg*=CFG.TRADER_GUN_MULT;                                     // merchants mount light guns
   bullets.push({ pos:pos.clone(), prev:pos.clone(), vel:dir.clone().multiplyScalar(spec.speed||CFG.BULLET_SPEED), life:spec.life||CFG.BULLET_LIFE, mesh:m, owner, col,   // SR-M6: keep the weapon's OWN color on the bullet record so impact FX can match it instead of borrowing the target's tint
@@ -1111,8 +1216,13 @@ function makeSystems(){ for(let i=0;i<CFG.N_SYSTEMS;i++){ const u=(i/CFG.N_SYSTE
   const center=new T.Vector3(Math.cos(u)*r, Math.sin(el)*r*0.3, Math.sin(u)*r);
   const sys={ id:i, name:SYSNAMES[i%SYSNAMES.length], center, planets:[], contested:false, clearT:0 };
   const sun=new T.Mesh(new T.SphereGeometry(CFG.SUN_R,20,16), new T.MeshBasicMaterial({color:0xffe0a0})); sun.position.copy(center); scene.add(sun);
-  const glow=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0xffd070,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.85})); glow.scale.setScalar(CFG.SUN_R*7); sun.add(glow);
-  const lt=new T.PointLight(0xffe0b0,0.75,CFG.SYSTEM_R*2.6); lt.position.copy(center); scene.add(lt); sys.sun=sun; systems.push(sys); } }
+  const glow=new T.Sprite(new T.SpriteMaterial({map:FX_TEX?FX_TEX.sun:GLOW,color:FX_TEX?0xffffff:0xffd070,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:FX_TEX?0.85:0.85})); glow.scale.setScalar(CFG.SUN_R*(FX_TEX?4.6:7)); sun.add(glow);   // generated corona (flares + colour of its own) when GEN_FX; 9x drew the image's ring as a hoop across the system (measured 2026-09-06)
+  const lt=new T.PointLight(0xffe0b0,0.75,CFG.SYSTEM_R*2.6); lt.position.copy(center); scene.add(lt);
+  // NEBULA CLOUDS (GEN_FX): a couple of generated gas clouds far outside each system, additive, no depth so they never cut a ship
+  if(FX_TEX) for(let k=0;k<CFG.NEBULA_PER_SYSTEM;k++){ const dir=new T.Vector3(rand(-1,1),rand(-0.35,0.35),rand(-1,1)).normalize();
+    const nb=new T.Sprite(new T.SpriteMaterial({map:FX_TEX.nebula[(i+k)%FX_TEX.nebula.length],color:0xffffff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,depthTest:false,opacity:CFG.NEBULA_OPACITY,rotation:rand(0,TAU)}));
+    nb.position.copy(center).addScaledVector(dir,CFG.SYSTEM_R*rand(CFG.NEBULA_DIST[0],CFG.NEBULA_DIST[1])); const sz=CFG.SYSTEM_R*rand(CFG.NEBULA_SIZE[0],CFG.NEBULA_SIZE[1]); nb.scale.set(sz,sz,1); nb.renderOrder=-5; scene.add(nb); }
+  sys.sun=sun; systems.push(sys); } }
 function makePlanets(){ makeSystems();
   for(let i=0;i<CFG.N_PLANETS;i++){ const type=PTYPES[i%PTYPES.length], sys=systems[i%systems.length];
   const u=rand(0,TAU), r=CFG.SYSTEM_R*rand(0.35,0.85), el=rand(-0.3,0.3), cs=Math.cos(el);
@@ -1121,7 +1231,9 @@ function makePlanets(){ makeSystems();
   const p={ name:PNAMES[i%PNAMES.length], type, pos, radius, baseRadius:radius, baseType:BASE_TYPES[_baseTypeHash(PNAMES[i%PNAMES.length])%BASE_TYPES.length], stock, system:sys, rep:0,   // SR BASE TYPES: deterministic specialty per planet-name
     wealth:CFG.PLANET_WEALTH0, dev:1, eq:CFG.EQ_STOCK, underThreat:false, defCd:0, boomT:0,   // SR-M13: post-liberation trade boom timer, set by warTick on liberation, consumed by econTick
     hull:CFG.PLANET_HULL, maxHull:CFG.PLANET_HULL, hullT:0, terra:0, terraformable:(type.t==='Mining'||type.t==='Refinery') };
-  const m=new T.Mesh(new T.SphereGeometry(radius,24,18), new T.MeshStandardMaterial({color:type.col,map:PLANET_TEX,emissive:new T.Color(type.col).multiplyScalar(0.22),emissiveMap:PLANET_TEX,roughness:0.85,metalness:0.1})); m.rotation.y=rand(0,TAU); m.position.copy(pos); scene.add(m); p.mesh=m; p.spin=rand(0.01,0.035);   // real Starfighter2 planet skin (user 2026-07-07), tinted per economy TYPE; slow spin sells the sphere as a real world
+  const skin=planetTexFor(type), generated=skin!==PLANET_TEX;   // a generated skin carries its own colour, so the economy tint is only a hint on it; the shared skin keeps the full tint that made the types tell apart
+  const m=new T.Mesh(new T.SphereGeometry(radius,generated?48:24,generated?32:18), new T.MeshStandardMaterial({color:generated?new T.Color(0xffffff).lerp(new T.Color(type.col),0.18):type.col,map:skin,emissive:generated?new T.Color(0xffffff):new T.Color(type.col).multiplyScalar(0.22),emissiveIntensity:generated?0.12:1.0,emissiveMap:skin,roughness:0.85,metalness:0.1,
+    normalMap:generated?planetNormalFor(type):null, normalScale:new T.Vector2(CFG.PLANET_NORMAL_SCALE,CFG.PLANET_NORMAL_SCALE)})); m.rotation.y=rand(0,TAU); m.position.copy(pos); scene.add(m); p.mesh=m; p.spin=rand(0.01,0.035);   // real Starfighter2 planet skin (user 2026-07-07), tinted per economy TYPE; slow spin sells the sphere as a real world
   const rg=new T.Mesh(new T.TorusGeometry(CFG.DOCK_R,0.55,8,52), new T.MeshBasicMaterial({color:type.col,transparent:true,opacity:0.3})); rg.position.copy(pos); rg.rotation.x=Math.PI/2; scene.add(rg); p.ring=rg;
   const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:type.col,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.45})); halo.scale.setScalar(radius*4.2); m.add(halo);
   const lab=spriteText(p.name+' · '+type.t,26,'#eaf2ff',{bg:'rgba(9,16,28,0.66)',pad:8,r:8,align:'center',ws:0.075}); lab.sp.position.copy(pos); lab.sp.position.y+=radius+9; lab.sp.renderOrder=9; scene.add(lab.sp); p.label=lab;
@@ -1130,7 +1242,9 @@ function makePlanets(){ makeSystems();
 let base=null;
 function makeBase(){ if(!systems.length) return; const c=systems[0].center.clone().add(new T.Vector3(CFG.SUN_R*3.4,CFG.SUN_R*0.6,0));
   base={ pos:c, name:'Ranger Command', _base:true };   // BUGFIX 2026-07-08: completeDock's isBase branch now sets s.docked=base (see completeDock) - _base:true is what line ~3849's existing recordObservedPrices guard already checked for (P0.docked&&!P0.docked._base), so this was a pre-anticipated field nothing had ever actually set
-  const m=new T.Mesh(new T.TorusKnotGeometry(6,1.7,72,10), new T.MeshStandardMaterial({color:0x9fd8ff,emissive:0x235a8c,emissiveIntensity:0.55,metalness:0.75,roughness:0.28})); m.position.copy(c); scene.add(m); base.mesh=m;
+  const m=new T.Mesh(new T.TorusKnotGeometry(6,1.7,72,10), FX_TEX
+    ? new T.MeshStandardMaterial({map:FX_TEX.station,normalMap:FX_TEX.stationNrm,normalScale:new T.Vector2(0.7,0.7),color:0xdfeaf5,emissive:0x1a4a7a,emissiveIntensity:0.35,metalness:0.55,roughness:0.45})   // generated hull plating (GEN_FX)
+    : new T.MeshStandardMaterial({color:0x9fd8ff,emissive:0x235a8c,emissiveIntensity:0.55,metalness:0.75,roughness:0.28})); m.position.copy(c); scene.add(m); base.mesh=m;
   const halo=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:0x9fd8ff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:0.7})); halo.scale.setScalar(34); m.add(halo);
   const ring=new T.Mesh(new T.TorusGeometry(CFG.BASE_R,0.5,8,60), new T.MeshBasicMaterial({color:0x9fd8ff,transparent:true,opacity:0.25})); ring.position.copy(c); ring.rotation.x=Math.PI/2; scene.add(ring);
   const lab=spriteText('⌂ RANGER COMMAND',26,'#bfeaff',{bg:'rgba(10,26,44,0.72)',pad:8,r:8,align:'center',ws:0.06}); lab.sp.position.copy(c); lab.sp.position.y+=13; lab.sp.renderOrder=9; scene.add(lab.sp);
@@ -2312,6 +2426,7 @@ function spillGems(s,credits,fromPos){ credits=Math.round(credits); if(credits<=
   if(window.SOUND) SOUND.play('ui'); }
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
+  if(FX_TEX) fxSprite(FX_TEX.explosion,s.pos,CFG.SHIP_R*7,0xffffff,0.85,2.2,1);   // generated fireball on a ship death (GEN_FX)
   dropCargo(s);                                                     // spill the hold as salvage pods
   spawnGem(_v2.copy(s.pos).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))), CFG.SCRAP_GEM);   // ALWAYS drop some loot
   dropCredits(s.pos, s.credits); s.credits=0;                        // DEATH DROPS ALL YOUR MONEY - a persistent stash for the next ship
@@ -2363,6 +2478,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   //
 function destroyAsteroid(i,owner){ const a=asteroids[i]; if(!a) return; a.gone=true; if(owner) owner.score+=a.level;   // gone flag: any stale spatial-hash ref to this rock is skipped by _astNear
   if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
+  if(FX_TEX) fxSprite(FX_TEX.explosion,a.pos,a.scale*4.5,0xffffff,0.55,1.9,0.95);   // generated fireball over the spark burst (GEN_FX)
   if(a.scale>=CFG.AST_NOSPLIT && asteroids.length<CFG.AST_MAX){ const n=randi(CFG.AST_SPLIT_MIN,CFG.AST_SPLIT_MAX),cs=a.scale*CFG.AST_CHILD_FRAC;
     for(let k=0;k<n;k++){ const dir=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.AST_SPLIT_KICK*rand(0.6,1.2)).add(a.vel);
       spawnAsteroid(a.pos.clone().addScaledVector(dir,0.05),cs,dir); } }
@@ -4367,7 +4483,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
-  if(c==='upgrade'||c==='up'){ if(!need(dockedP,'must be docked')) return; const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return; if(!need(canUpgradeLvl(P,k),`${k} is already at the max level (Lv${CFG.UP_LVL_CAP})`)) return; const cost=upCost(P,k); if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.lvl[k]++; if(k==='hull'){P.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(P.lvl.hull-1));P.hp=P.maxHp;} term(`Upgraded ${k} to Lv${P.lvl[k]} (-${cost}c).`,'sys'); return; }
+  if(c==='upgrade'||c==='up'){ const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return;   // 2026-09-06: no dock needed (user "you don't need to land anymore, just mine") - same purchase the SHOP panel makes
+    const r=doUpgrade(k); term(r.msg, r.ok?'sys':'err'); if(r.ok&&window.PANELS&&PANELS.isOpen&&PANELS.isOpen('shop')) renderShop(); return; }
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
     // SR ITEM VARIANCE: a weapon is a TEMPLATE; THIS station's stock is a rolled INSTANCE (quality/condition/weight/
     // power/price) stable per planet+key, so the price you see is the price you pay and the power you get.
@@ -5235,18 +5352,20 @@ let marketOn=true;
 // the M hotkey - that fixes "user don't know to hit M to lose the menu". A slider top-right drives transparency.
 if(window.PANELS){
   PANELS.register('market', document.getElementById('market'), { title:'MARKET', edge:'top', centerX:true, rgb:[10,20,32],
-    defaultOpacity:0.86, hotkeyLabel:'M', resizable:true,   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+    defaultOpacity:0.45, hotkeyLabel:'M', resizable:true,   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel. 2026-09-06: 0.86 -> 0.45, the forced-transparent rule that used to override it is gone
     defaultOpen:false,   // LAYOUT 2026-09-05 (user "make sure all windows are sized nicely I can't see what's going on"): the 16-planet price grid opened across the top third of the 3D view on every load. Kept ("keep the market menu", 2026-07-07) - its top edge tab or M opens it; a player who opens it once keeps it (saved state wins).
     onOpenChange:(open)=>{ marketOn=open; if(open) updateMarket(); } });
   PANELS.register('ticker', document.getElementById('ticker'), { title:'TERMINAL', edge:'left', rgb:[8,16,26],
-    defaultOpacity:0.91, hotkeyLabel:'`', resizable:true,   // user 2026-07-08: "make the terminal sizable and it should not change size unless I size it" - drag the corner grip
+    defaultOpacity:0.40, hotkeyLabel:'`', resizable:true,   // 2026-09-06: the default is the old forced look; the slider now really darkens the box (see the #marketBody rule)   // user 2026-07-08: "make the terminal sizable and it should not change size unless I size it" - drag the corner grip
     keepOpenWhile:()=>document.activeElement && document.activeElement.id==='chat' });   // don't yank it away mid-type
   // user 2026-07-07: "the player list or agi list does not have slider or transparency" - #roster was never
   // registered at all. It gets the SAME wrapper treatment as #market/#marketBody: registering the OUTER
   // #rosterWrap (never touched) instead of #roster itself (which buildRoster() wipes wholesale with
   // innerHTML='' on every rebuild - ship deaths, Tab-cycling focus, etc.) so the pin/opacity chrome survives.
   const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
-    defaultOpacity:0.9, resizable:true });   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+    defaultOpacity:0.40, resizable:true });   // 2026-09-06: was 0.9 behind a forced 0.34 rule; now the real default   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+  { const shopEl=document.getElementById('shop'); if(shopEl) PANELS.register('shop', shopEl, { title:'SHOP', edge:'right', rgb:[12,22,34],
+      defaultOpacity:0.62, defaultOpen:false, defaultPinned:true, resizable:false }); }   // opened/closed by shopTick, see there (2026-09-06)
   PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9, resizable:true, defaultOpen:false,   // closed by default (task #66) - an already-busy screen shouldn't gain a 4th open-by-default left-edge panel; one click on its tab opens it
     onOpenChange:(open)=>{ missionlogOn=open; if(open) updateMissionLog(); } });
@@ -5419,9 +5538,44 @@ function updateMissionArrow(dt){
   const rx=_v.dot(RGT.clone().applyQuaternion(P.quat)), fz=_v.dot(FWD.clone().applyQuaternion(P.quat));
   const angDeg=Math.atan2(rx,fz)*180/Math.PI;   // 0 = straight ahead (glyph's own resting orientation), +90 = due right, matches triggerHitFx's RGT/FWD sign convention
   missionArrowGlyphEl.style.transform='rotate('+angDeg.toFixed(1)+'deg)';
-  missionArrowLabelEl.textContent=(m.title||'MISSION')+' - '+Math.round(dist)+'u';
+  missionArrowLabelEl.textContent='MISSION ▸ '+(m.title||m.type||'contract')+' · '+Math.round(dist)+' u';
   missionArrowEl.style.opacity='1';
 }
+// MISSION AUTO-SELECT (user 2026-09-06 "I should be going towards my mission ... based on the currently selected
+// mission"): with no contract held, the first posting the player's rank allows is accepted, so the tracker above always
+// has a target. accept() itself does the rank/freshness checks and names the contract in the log; this only retries on a
+// cadence so an empty or over-rank board is not hammered. Abandon with `abandon`; the next posting is taken CFG.MISSION_AUTO_S later.
+let _missionAutoT=0;
+function missionAutoTick(dt){ if(!CFG.MISSION_AUTO||!window.MISSIONS||!MISSIONS.accept||!MISSIONS.active) return;
+  _missionAutoT-=dt; if(_missionAutoT>0) return; _missionAutoT=CFG.MISSION_AUTO_S;
+  const P=ships[0]; if(!P||!P.alive||MISSIONS.active()) return;
+  for(let i=1;i<=4;i++){ const r=MISSIONS.accept(i); if(r&&r.ok){ term('★ Tracker locked: '+r.msg+' - follow the arrow at the top of the screen (abandon to drop it).','sys'); return; } if(r&&/no postings|no such posting/.test(r.msg||'')) return; } }
+
+// THE SHOP (user 2026-09-06): appears on its own when an upgrade is affordable, buys without docking, closes when
+// nothing is affordable. One PANELS panel, edge right; closing it by hand snoozes it for CFG.SHOP_SNOOZE_S so it
+// does not pop straight back while you are fighting.
+let _shopT=0, _shopSnoozeUntil=0, _shopWasOpen=false;
+function doUpgrade(k){ const P=ships[0]; if(!P) return {ok:false,msg:'no ship'};
+  if(!canUpgradeLvl(P,k)) return {ok:false,msg:`${k} is already at the max level (Lv${CFG.UP_LVL_CAP})`};
+  const cost=upCost(P,k); if(P.credits<cost) return {ok:false,msg:`need ${cost}c for ${k} (you have ${Math.round(P.credits)}c)`};
+  P.credits-=cost; P.lvl[k]++; if(k==='hull'){ P.maxHp=CFG.HP_BASE*(1+CFG.HP_PER_HULL*(P.lvl.hull-1)); P.hp=P.maxHp; }
+  if(window.SOUND) try{ SOUND.play('levelup'); }catch(e){}
+  return {ok:true,msg:`Upgraded ${k} to Lv${P.lvl[k]} (-${cost}c).`}; }
+function renderShop(){ const el=document.getElementById('shop'), P=ships[0]; if(!el||!P) return;
+  const rows=['weapon','engine','hull'].map(k=>{ const can=canUpgradeLvl(P,k), cost=can?upCost(P,k):null, ok=can&&P.credits>=cost;
+    return `<div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="flex:1"><b style="color:#8fd0ff">${k.toUpperCase()}</b> Lv${P.lvl[k]}${can?' → Lv'+(P.lvl[k]+1):' (max)'}</span>`
+      +(can?`<button data-up="${k}" ${ok?'':'disabled'} style="font:700 10px ui-monospace,monospace;padding:4px 8px;border-radius:5px;border:1px solid ${ok?'#3a8ab0':'#2a3a4a'};background:${ok?'#123a52':'#0c1623'};color:${ok?'#cfe9ff':'#5f7a98'};cursor:${ok?'pointer':'default'}">${cost}c</button>`:'')+`</div>`; }).join('');
+  el.innerHTML=`<div style="color:#8fb0cc;font-size:9.5px;letter-spacing:.08em;margin-bottom:4px">CREDITS <b style="color:#ffd27a">${Math.round(P.credits)}c</b> · no docking needed</div>${rows}<div style="color:#5f7a98;font-size:9px;margin-top:4px">weapons, hull class and gear are still bought docked (<b>weapon</b>, <b>hull</b>, <b>gizmo</b>)</div>`;
+  el.querySelectorAll('button[data-up]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); const r=doUpgrade(b.dataset.up); term(r.msg, r.ok?'sys':'err'); renderShop(); }; }); }
+function shopTick(dt){ if(!CFG.SHOP_AUTO||!window.PANELS||!PANELS.isOpen) return; _shopT-=dt; if(_shopT>0) return; _shopT=1.0;
+  const P=ships[0]; if(!P||!P.alive) return;
+  const affordable=['weapon','engine','hull'].some(k=>canUpgradeLvl(P,k)&&P.credits>=upCost(P,k));
+  const open=PANELS.isOpen('shop');
+  if(_shopWasOpen&&!open&&affordable) _shopSnoozeUntil=T0+CFG.SHOP_SNOOZE_S;   // closed by hand while still affordable = snooze
+  if(affordable&&!open&&T0>=_shopSnoozeUntil){ PANELS.open('shop'); renderShop(); if(window.SOUND) try{ SOUND.play('pickup'); }catch(e){} }
+  else if(!affordable&&open){ PANELS.close('shop'); }
+  else if(open) renderShop();
+  _shopWasOpen=PANELS.isOpen('shop'); }
 
 // -------- NO-CHEAT economy self-check: prove prices are organic (buy raises, sell lowers, isolated drifts) --------
 function economyIsOrganic(){ if(planets.length<1) return true; const p=planets[0], g='ore';
@@ -5443,6 +5597,8 @@ function updateTopCam(){ const c=topCenter||(ships[focus]&&ships[focus].pos)||ne
   topCam.position.set(c.x, CFG.ARENA_R, c.z); topCam.up.set(0,0,-1); topCam.lookAt(c.x,0,c.z); }
 // TOP-DOWN PRIMARY: TOPDOWN_MAIN swaps the big MAIN view to a close top-down follow of the player; the 3D chase view
 // then lives inside the movable/resizable #chaseWin window (VIEW.chase, driven by that element's on-screen rect).
+// WINDOWS menu state for the things that are not PANELS panels (2026-09-06): the two GL insets and the power dock. Read by renderAll and the layout pass.
+const HUD_WIN=(function(){ const d={top:true,brain:true,power:true}; try{ const s=JSON.parse(localStorage.getItem('SF_WINDOWS_v1')||'null'); if(s&&typeof s==='object') for(const k in d) if(typeof s[k]==='boolean') d[k]=s[k]; }catch(e){} return d; })();
 let TOPDOWN_MAIN=false, mainTopZoom=1;   // user 2026-07-13 "the 2d view isn't playable, make the 3d view the background again" - false = fullscreen chase cam main; rear gunner + insets stay
 function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3(); const z=mainTopZoom;
   mainTopCam.aspect=(VIEW.main.w/Math.max(1,VIEW.main.h))||1;
@@ -5594,7 +5750,7 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   // RIGHT COLUMN, top->bottom (user 2026-07-10 "reduce the size of reasoning... add the power controls into that"):
   // SYSTEM MAP (th) / smaller REASONING (bh) / always-on POWER DOCK (ph, DOM - radial hull ring + tick bars).
   const rw=Math.round(clamp(W*CFG.RIGHT_FRAC,CFG.RIGHT_MIN,CFG.RIGHT_MAX)), mw=W-rw;
-  const ph=Math.min(CFG.POWER_DOCK_H, Math.round(H*0.34));
+  const ph=Math.min(CFG.POWER_DOCK_H, Math.round(H*0.34))+(CFG.THROTTLE_IN_POWER?CFG.THROTTLE_BAR_H:0);   // + the throttle lever's row when it lives in the dock (2026-09-06); the dock clips overflow, so the room must be real
   const th=Math.round((H-ph)*CFG.TOP_VIEW_SHARE), bh=H-ph-th;
   // TOP-DOWN fills the whole screen (user 2026-07-13 "2d view top down underneath all"). Minimap + reasoning become
   // small WebGL insets in the top-right corner (WebGL views can't be DOM-transparent, so they stay compact), and the
@@ -5605,10 +5761,10 @@ function resize(){ const W=innerW(), H=innerH(); renderer.setSize(W,H);
   VIEW.brain={x:W-insW-10, y:H-insH*2-20, w:insW, h:insH};   // just below the minimap
   chaseCam.aspect=W/H; chaseCam.updateProjectionMatrix(); sizeTopCam(insW,insH); sizeBrainCam(insW,insH);
   const lt=document.getElementById('lblTop'), lb=document.getElementById('lblBrain'), vd=document.getElementById('vdiv'), hd=document.getElementById('hdiv'), hd2=document.getElementById('hdiv2'), pd=document.getElementById('powerdock');
-  lt.style.display='block'; lb.style.display='block';
+  lt.style.display=HUD_WIN.top?'block':'none'; lb.style.display=HUD_WIN.brain?'block':'none';   // WINDOWS menu state (2026-09-06)
   lt.style.left=(W-insW-6)+'px'; lt.style.top='6px'; lb.style.left=(W-insW-6)+'px'; lb.style.top=(insH+16)+'px';
   if(vd) vd.style.display='none'; if(hd) hd.style.display='none'; if(hd2) hd2.style.display='none';   // no column dividers in fullscreen
-  if(pd){ pd.style.display='block'; pd.style.left=(W-rw-8)+'px'; pd.style.top=(H-ph-8)+'px'; pd.style.width=rw+'px'; pd.style.height=ph+'px'; }
+  if(pd){ pd.style.display=HUD_WIN.power?'block':'none'; pd.style.left=(W-rw-8)+'px'; pd.style.top=(H-ph-8)+'px'; pd.style.width=rw+'px'; pd.style.height=ph+'px'; }
   document.getElementById('chat').style.width=Math.max(240,mw-28-40)+'px';   // -40 reserves room for #micBtn beside it
   if(!(window.PANELS&&PANELS.isManual&&PANELS.isManual('market'))) document.getElementById('market').style.left=(mw*0.5)+'px';   // LIVE-CAUGHT 2026-07-09 ("docking is still weak"): this legacy re-center ran on EVERY viewport pass and silently stomped a manually-docked market - once the player drags it anywhere, PANELS owns its position
   if(soloView){ const full={x:0,y:0,w:W,h:H}, z={x:0,y:0,w:0,h:0};   // MOBILE: render only the active view, full-screen
@@ -5628,7 +5784,7 @@ function renderView(r,sc,cam){ if(r.w<=0||r.h<=0) return; renderer.setViewport(r
 function renderAll(){ renderer.setScissorTest(true);
   if(TOPDOWN_MAIN){ renderView(VIEW.main,scene,mainTopCam); }   // TOP-DOWN primary fills the screen
   else if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
-  renderView(VIEW.top,scene,topCam); renderView(VIEW.brain,brainScene,brainCam);
+  if(HUD_WIN.top) renderView(VIEW.top,scene,topCam); if(HUD_WIN.brain) renderView(VIEW.brain,brainScene,brainCam);   // the WINDOWS menu can hide either inset (2026-09-06)
   if(TOPDOWN_MAIN) renderView(VIEW.chase,scene,chaseCam);   // 3D chase window LAST = always on top (over the minimap/brain insets too); shows through the transparent #chaseWin body
   renderView(VIEW.rear,scene,rearCam);     // REAR GUNNER window (aft view) - renders regardless of TOPDOWN_MAIN so it survives the 3D-main revert; renderView self-guards on w<=0 when #rearWin is hidden
   renderer.setScissorTest(false); }
@@ -5774,7 +5930,12 @@ if(window.KHUD){ KHUD.mount(); if(!KHUD.visible()) KHUD.toggle(); setInterval(fu
 // (#powerdock, sized by resize()), always on - radial techslidercircle hull ring + TechSlider tick bars. Compact
 // bar geometry so the whole panel fits the dock height.
 if(window.POWERPANEL){ POWERPANEL.CFG.BAR_H=92; POWERPANEL.CFG.BAR_GAP=10; POWERPANEL.CFG.TRACK_W=34; POWERPANEL.CFG.RADIAL=96;
-  POWERPANEL.mount(document.getElementById('powerdock')||undefined, {docked:true}); }
+  POWERPANEL.mount(document.getElementById('powerdock')||undefined, {docked:true});
+  // THROTTLE INTO THE POWER SECTION (user 2026-09-06): the lever is appended under the dials and re-laid out by the
+  // .inpower rules; the drag code reads that class, so nothing else changes. The dock grows by the lever's height below.
+  if(CFG.THROTTLE_IN_POWER){ const th=document.getElementById('throttle'), pd=document.getElementById('powerdock'); if(th&&pd){ pd.insertBefore(th,pd.firstChild); th.classList.add('inpower'); if(window.__thrRender) __thrRender();   // at the TOP of the dock: the bottom row sits level with the chat's mic/voice buttons, which covered the lever's label (measured 2026-09-06)
+    // the docked dial panel is height:100% of the dock (power_panel.js mount), so it must yield the lever's row or the lever is clipped - measured 2026-09-06: 38 px over, at any dock height
+    const pp=document.getElementById('powerpanel'); if(pp) pp.style.height='calc(100% - '+Math.max(37,th.offsetHeight)+'px)'; } } }
 if(window.ENGBAY){ ENGBAY.mount(); }   // SHIP LAYOUT: starts unmounted-from-view (defaultOpen:false below) - open via the E key or the HANGAR tab's "Open Engineering Bay" link, same discovery pattern as khud/`agi`
 // user 2026-07-07: "why is the knowledge graph HUD not done... maybe it's here and I can't see it" - it WAS built
 // (the `agi` command), it just had no visible tab/pin like market/terminal do, so nobody found it. Same window
@@ -6037,16 +6198,55 @@ addEventListener('keyup',e=>{ if(AWAY.active()){ AWAY.key(e,false); return; } if
 // to set MAN.throttle (0..1); the ship holds that cruise level continuously (manualControl reads it as the base thrust).
 // Space / right-mouse still momentarily BOOST above it. Setting it activates manual control.
 (function(){ const track=document.getElementById('throttleTrack'), fill=document.getElementById('throttleFill'), knob=document.getElementById('throttleKnob'), lbl=document.getElementById('throttleLabel'); if(!track) return;
-  function render(){ const f=Math.max(0,Math.min(1,MAN.throttle||0)); fill.style.height=(f*100)+'%'; knob.style.bottom=(f*100)+'%'; lbl.textContent=Math.round(f*100)+'%'; }
-  function setY(clientY){ const r=track.getBoundingClientRect(); const f=1-(clientY-r.top)/r.height; MAN.throttle=Math.max(0,Math.min(1,f)); render(); if(typeof manOn==='function') manOn(); }
+  // orientation follows the .inpower class (CFG.THROTTLE_IN_POWER, 2026-09-06): horizontal in the POWER panel, vertical on the edge
+  const horiz=()=>track.closest('#throttle').classList.contains('inpower');
+  function render(){ const f=Math.max(0,Math.min(1,MAN.throttle||0)); const pct=(f*100)+'%';
+    if(horiz()){ fill.style.height=''; fill.style.width=pct; knob.style.bottom=''; knob.style.left=pct; } else { fill.style.width=''; fill.style.height=pct; knob.style.left=''; knob.style.bottom=pct; }
+    lbl.textContent=Math.round(f*100)+'%'; }
+  function setY(clientY,clientX){ const r=track.getBoundingClientRect(); const f=horiz()?(clientX-r.left)/r.width:1-(clientY-r.top)/r.height; MAN.throttle=Math.max(0,Math.min(1,f)); render(); if(typeof manOn==='function') manOn(); }
   let drag=false;
-  track.addEventListener('mousedown',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.clientY); });
-  window.addEventListener('mousemove',e=>{ if(drag) setY(e.clientY); });
+  track.addEventListener('mousedown',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.clientY,e.clientX); });
+  window.addEventListener('mousemove',e=>{ if(drag) setY(e.clientY,e.clientX); });
   window.addEventListener('mouseup',()=>{ drag=false; });
-  track.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.touches[0].clientY); },{passive:false});
-  track.addEventListener('touchmove',e=>{ if(drag){ e.preventDefault(); setY(e.touches[0].clientY); } },{passive:false});
+  track.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); drag=true; setY(e.touches[0].clientY,e.touches[0].clientX); },{passive:false});
+  track.addEventListener('touchmove',e=>{ if(drag){ e.preventDefault(); setY(e.touches[0].clientY,e.touches[0].clientX); } },{passive:false});
   window.addEventListener('touchend',()=>{ drag=false; });
   window.__thrRender=render; render(); })();   // exposed so the mouse-wheel throttle can refresh the slider
+// WINDOWS MENU (user 2026-09-06): every window and every screen in one always-visible place. Windows = PANELS.list()
+// (whatever is registered, never a hand-kept list) + the two GL insets + the power dock; Screens = the fullscreen
+// modals, each opened through the same command or module the keyboard uses. Inset/dock state persists.
+(function(){ const btn=document.getElementById('winBtn'), list=document.getElementById('winList'); if(!btn||!list) return;
+  const SCREENS=[
+    { t:'Engineering Bay', key:'E', go:()=>{ if(window.ENGBAY) ENGBAY.toggle(); else term('engbay.js not loaded','err'); } },
+    { t:'Star Map', key:'G', go:()=>runCmd('starmap') },
+    { t:'Knowledge Observatory', key:'', go:()=>runCmd('observatory') },
+    { t:'Mission Board (terminal)', key:'', go:()=>runCmd('missions') },
+    { t:'Market', key:'M', go:()=>{ if(window.PANELS) PANELS.toggle('market'); } },
+    { t:'Options', key:'', go:()=>{ const g=document.getElementById('gearBtn'); if(g) g.click(); } },
+    { t:'Help (every command)', key:'', go:()=>runCmd('help') } ];
+  const INSETS=[ {id:'top',t:'Top-down map (inset)'}, {id:'brain',t:'Ship controls (inset)'}, {id:'power',t:'Power panel + throttle'} ];
+  function saveWin(){ try{ localStorage.setItem('SF_WINDOWS_v1', JSON.stringify(HUD_WIN)); }catch(e){} }
+  function applyInsets(){ if(typeof resize==='function') resize(); }
+  function build(){
+    let h='<h4>WINDOWS</h4>';
+    (window.PANELS&&PANELS.list?PANELS.list():[]).forEach(p=>{ h+=`<label><input type="checkbox" data-panel="${p.id}" ${p.open?'checked':''}> ${p.title||p.id}</label>`; });
+    INSETS.forEach(i=>{ h+=`<label><input type="checkbox" data-inset="${i.id}" ${HUD_WIN[i.id]?'checked':''}> ${i.t}</label>`; });
+    h+='<div style="margin:6px 0 2px"><button data-all="1">show all</button><button data-all="0">hide all</button></div>';
+    h+='<h4>SCREENS</h4>';
+    SCREENS.forEach((s,i)=>{ h+=`<label><span data-screen="${i}" style="cursor:pointer">▸ ${s.t}</span><span class="key">${s.key}</span></label>`; });
+    list.innerHTML=h;
+    list.querySelectorAll('input[data-panel]').forEach(cb=>{ cb.onchange=()=>{ if(cb.checked) PANELS.open(cb.dataset.panel); else PANELS.close(cb.dataset.panel); }; });
+    list.querySelectorAll('input[data-inset]').forEach(cb=>{ cb.onchange=()=>{ HUD_WIN[cb.dataset.inset]=cb.checked; saveWin(); applyInsets(); }; });
+    list.querySelectorAll('button[data-all]').forEach(b=>{ b.onclick=()=>{ const on=b.dataset.all==='1'; (PANELS.list?PANELS.list():[]).forEach(p=>on?PANELS.open(p.id):PANELS.close(p.id)); INSETS.forEach(i=>HUD_WIN[i.id]=on); saveWin(); applyInsets(); build(); }; });
+    list.querySelectorAll('[data-screen]').forEach(s=>{ s.onclick=()=>{ SCREENS[+s.dataset.screen].go(); list.hidden=true; btn.classList.remove('on'); }; }); }
+  btn.addEventListener('click',e=>{ e.stopPropagation(); if(list.hidden){ build(); list.hidden=false; btn.classList.add('on'); } else { list.hidden=true; btn.classList.remove('on'); } });
+  document.addEventListener('click',e=>{ if(!list.hidden && !list.contains(e.target) && e.target!==btn){ list.hidden=true; btn.classList.remove('on'); } });
+  list.addEventListener('mousedown',e=>e.stopPropagation()); })();
+// FULLSCREEN (user 2026-09-06): the ⛶ button top-right toggles the browser's fullscreen on the page; Esc leaves it as usual
+(function(){ const b=document.getElementById('fsBtn'); if(!b) return;
+  b.addEventListener('click',()=>{ const d=document; if(d.fullscreenElement){ d.exitFullscreen&&d.exitFullscreen(); } else { const el=d.documentElement; const p=el.requestFullscreen?el.requestFullscreen():(el.webkitRequestFullscreen?el.webkitRequestFullscreen():null); if(p&&p.catch) p.catch(e=>term('Fullscreen refused by the browser: '+e.message,'err')); } });
+  const onFs=()=>{ b.textContent=document.fullscreenElement?'⤡':'⛶'; b.title=document.fullscreenElement?'Leave fullscreen':'Fullscreen (click again or Esc to leave)'; };
+  document.addEventListener('fullscreenchange',onFs); })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
@@ -6627,7 +6827,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); shopTick(dt); updateFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }

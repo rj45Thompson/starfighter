@@ -39,7 +39,9 @@ var CFG = {
   COL_WEAPONS: '#ff8a5a',     // amber/red -- reads clearly against dark navy
   COL_ENGINES: '#46d6ff',     // cyan/blue
   COL_SHIELDS: '#9fe6ff',     // violet-leaning blue
-  COL_BG: 'rgba(10,20,32,0.92)',      // ~#0a1420 with alpha, matches the game's panel chrome
+  COL_BG: 'rgba(10,20,32,0.92)',      // ~#0a1420 with alpha, matches the game's panel chrome (the initial value; the SEE-THRU slider replaces it at build)
+  OPACITY_KEY: 'SF_POWER_OPACITY_v1', // localStorage key for the SEE-THRU slider (2026-09-06)
+  OPACITY_DEFAULT: 0.55,              // starting alpha when nothing is saved: enough to read the dials, the 3D still shows through
   COL_BORDER: '#22344a',
   COL_HEADER: '#8fd0ff',
   COL_TRACK_BG: '#0c1c2c',
@@ -475,7 +477,27 @@ function build(parentEl) {
   closeBtn.title = 'hide power panel';
   closeBtn.onclick = function () { hide(); };
   if (PP.docked && closeBtn.style) closeBtn.style.display = 'none';   // a dock can't be closed away
-  head.appendChild(title); head.appendChild(closeBtn);
+  // TRANSPARENCY SLIDER (user 2026-09-06 "the power window could have a slider too to be more transparent"): the
+  // same kind of control the PANELS chrome gives the terminal, but this panel is self-managed, so it is built here.
+  // Drives the alpha of the panel background (and of the #powerdock frame it docks into) and remembers it.
+  var opWrap = el('div', 'display:flex;align-items:center;gap:5px;margin-left:auto;margin-right:6px');
+  var opLbl = el('span', 'font-size:8.5px;color:' + CFG.COL_DIM + ';letter-spacing:.06em', 'SEE-THRU');
+  var op = d.createElement('input'); op.type = 'range'; op.min = '0.25'; op.max = '1'; op.step = '0.01';   // same range as panels.js CFG.OP_MIN..OP_MAX, so every window feels the same
+  op.title = 'panel transparency - left = see through, right = solid';
+  if (op.style) op.style.cssText = 'width:64px;height:10px;cursor:ew-resize;accent-color:' + CFG.COL_HEADER;
+  var saved = null; try { saved = parseFloat(localStorage.getItem(CFG.OPACITY_KEY)); } catch (e) { saved = null; }
+  var alpha = (saved != null && !isNaN(saved)) ? Math.min(1, Math.max(0.25, saved)) : CFG.OPACITY_DEFAULT;
+  function applyAlpha(a) {
+    root.style.background = 'rgba(10,20,32,' + a.toFixed(2) + ')';
+    var dock = d.getElementById && d.getElementById('powerdock');
+    if (dock && dock.style) { dock.style.background = 'rgba(9,15,26,' + (a * 0.9).toFixed(2) + ')'; dock.style.borderColor = 'rgba(70,214,255,' + (0.1 + a * 0.2).toFixed(2) + ')'; }
+  }
+  op.value = String(alpha); applyAlpha(alpha);
+  op.oninput = function () { var a = parseFloat(op.value); applyAlpha(a); try { localStorage.setItem(CFG.OPACITY_KEY, String(a)); } catch (e) {} };
+  op.onmousedown = function (e) { if (e && e.stopPropagation) e.stopPropagation(); };   // never starts a panel drag
+  opWrap.appendChild(opLbl); opWrap.appendChild(op);
+  head.appendChild(title); head.appendChild(opWrap); head.appendChild(closeBtn);
+  PP.applyAlpha = applyAlpha;
   root.appendChild(head);
 
   // ALL-RADIAL GAUGES (user 2026-07-10 "make all the gauges radial"): the big HULL dial on top (its inner arc is

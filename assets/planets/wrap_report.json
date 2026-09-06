@@ -1,0 +1,50 @@
+{
+ "agri.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 6.37,
+  "normal": "agri_n.jpg"
+ },
+ "garden.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 13.16,
+  "normal": "garden_n.jpg"
+ },
+ "hitech.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 28.88,
+  "normal": "hitech_n.jpg"
+ },
+ "luxury.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 14.71,
+  "normal": "luxury_n.jpg"
+ },
+ "mining.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 14.38,
+  "normal": "mining_n.jpg"
+ },
+ "refinery.jpg": {
+  "size": [
+   2048,
+   1024
+  ],
+  "seam_mean_abs_diff": 20.05,
+  "normal": "refinery_n.jpg"
+ }
+}

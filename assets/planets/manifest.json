@@ -1,0 +1,47 @@
+{
+ "generated": "2026-09-06T10:25:41",
+ "source": "Pollinations.ai free endpoint (FLUX-schnell), via .opus-tools/gen_sprite.call_pollinations",
+ "size": [
+  1024,
+  512
+ ],
+ "seed_base": 60906,
+ "items": {
+  "mining": {
+   "file": "mining.jpg",
+   "prompt": "an ochre and rust-brown rocky mining world, deep canyons, cratered highlands, thin dust-storm streaks, no water, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60906,
+   "bytes": 41348
+  },
+  "agri": {
+   "file": "agri.jpg",
+   "prompt": "a lush agrarian world, patchwork green farmland continents, winding rivers, shallow turquoise seas, sparse white cloud bands, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60907,
+   "bytes": 60585
+  },
+  "refinery": {
+   "file": "refinery.jpg",
+   "prompt": "a grey-steel industrial refinery world, smog belts, dark basalt plains, glowing orange foundry cities in a grid, oil-black seas, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60908,
+   "bytes": 37034
+  },
+  "hitech": {
+   "file": "hitech.jpg",
+   "prompt": "a cool blue high-tech world, glassy city sprawl with cyan light grids, silver ice caps, deep navy oceans, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60909,
+   "bytes": 58607
+  },
+  "luxury": {
+   "file": "luxury.jpg",
+   "prompt": "an exotic magenta-and-gold luxury resort world, pink sand continents, violet lagoons, pearly cloud swirls, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60910,
+   "bytes": 43256
+  },
+  "garden": {
+   "file": "garden.jpg",
+   "prompt": "an earth-like garden world, blue oceans, green forested continents, white polar caps, scattered clouds, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60911,
+   "bytes": 38644
+  }
+ }
+}

@@ -28,7 +28,7 @@ const CFG = {
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
   SLIDE_MS:320,                // slide transition duration
   GAP:8,                       // px between stacked panels on the same edge
-  OP_MIN:0.16, OP_MAX:0.97, OP_STEP:0.01, TEXT_OP_FLOOR:0.38,   // TEXT_OP_FLOOR: the text fades with the same slider but never past this, so a panel dragged to minimum still has a way back
+  OP_MIN:0.25, OP_MAX:1.0, OP_STEP:0.01, TEXT_OP_FLOOR:0.72,   // 0.16-0.97 -> 0.25-1.0 (user 2026-09-06 "the market allows too much transparency and not enough opaque"): every registered window shares this range; the POWER panel's own slider uses the same numbers   // 0.38 -> 0.72 (2026-09-06): the slider now really drives the BOX alpha (the forced-transparent CSS rule is gone), so the text no longer needs to fade with it to make a panel feel see-through; at the new 0.4 default the terminal text had dropped to 56%   // TEXT_OP_FLOOR: the text fades with the same slider but never past this, so a panel dragged to minimum still has a way back
   CHROME_RESERVE:24,   // user report "the terminal pinned box seems to overlap the parasite tab": the ctl cluster/tab float AT the panel's own top corner, which collided with the panel's OWN header content (market's title, the ticker's PARASITE/TERMINAL/... row) - reserving this much top padding on every registered panel gives the chrome a real strip instead of sitting on top of the content
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
@@ -496,7 +496,8 @@ function isOpen(id){ const r=PANELS_[id]; return r?r.open:null; }
 function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
 
-const api={ register, open, close, toggle, isOpen, reflow:reflowAll, clearSize, resetLayout,
+function list(){ return Object.keys(PANELS_).map(id=>({ id, title:PANELS_[id].title, open:!!PANELS_[id].open, pinned:!!PANELS_[id].pinned })); }   // 2026-09-06: the WINDOWS menu reads every registered panel from here, so it can never drift from what is registered
+const api={ register, open, close, toggle, isOpen, list, reflow:reflowAll, clearSize, resetLayout,
   isManual:(id)=>!!(store[id]&&store[id].manualDock) };   // 2026-07-09: lets legacy layout code ask "does the player own this panel's position?" before writing to it (the market re-center line was silently stomping manual docks on every viewport pass)
 if(typeof window!=='undefined') window.PANELS=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;

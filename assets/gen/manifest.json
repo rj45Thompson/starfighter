@@ -1,0 +1,235 @@
+{
+ "items": {
+  "rock_dark": {
+   "file": "rock_dark.jpg",
+   "folder": "gen",
+   "prompt": "close-up seamless texture of dark grey asteroid rock, pitted regolith, small craters, matte, even lighting, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60926,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "tile",
+   "bytes": 174369,
+   "when": "2026-09-06T10:39:51",
+   "normal": "rock_dark_n.jpg"
+  },
+  "rock_light": {
+   "file": "rock_light.jpg",
+   "folder": "gen",
+   "prompt": "close-up seamless texture of pale grey-tan asteroid rock, dusty regolith, fine cracks, matte, even lighting, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60927,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "tile",
+   "bytes": 261517,
+   "when": "2026-09-06T10:40:36",
+   "normal": "rock_light_n.jpg"
+  },
+  "sun_corona": {
+   "file": "sun_corona.png",
+   "folder": "gen",
+   "prompt": "a blazing star seen from space, brilliant white-yellow core with orange corona and wispy solar flares, centred, on pure black background, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60929,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "black",
+   "bytes": 411211,
+   "when": "2026-09-06T10:42:06"
+  },
+  "nebula_a": {
+   "file": "nebula_a.png",
+   "folder": "gen",
+   "prompt": "a soft wispy blue and violet nebula cloud, translucent gas, faint stars, centred, fading to pure black at the edges, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60930,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "black",
+   "bytes": 829367,
+   "when": "2026-09-06T10:42:52"
+  },
+  "nebula_b": {
+   "file": "nebula_b.png",
+   "folder": "gen",
+   "prompt": "a soft teal and magenta nebula cloud, translucent gas wisps, centred, fading to pure black at the edges, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60931,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "black",
+   "bytes": 673232,
+   "when": "2026-09-06T10:43:36"
+  },
+  "mining": {
+   "file": "mining.jpg",
+   "folder": "planets",
+   "prompt": "an ochre and rust-brown rocky mining world, deep canyons, cratered highlands, thin dust-storm streaks, no water, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60920,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 149499,
+   "when": "2026-09-06T10:35:21",
+   "normal": "mining_n.jpg"
+  },
+  "agri": {
+   "file": "agri.jpg",
+   "folder": "planets",
+   "prompt": "a lush agrarian world, patchwork green farmland continents, winding rivers, shallow turquoise seas, sparse white cloud bands, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60921,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 261963,
+   "when": "2026-09-06T10:36:08",
+   "normal": "agri_n.jpg"
+  },
+  "refinery": {
+   "file": "refinery.jpg",
+   "folder": "planets",
+   "prompt": "a grey-steel industrial refinery world, smog belts, dark basalt plains, glowing orange foundry cities in a grid, oil-black seas, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60922,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 144639,
+   "when": "2026-09-06T10:36:51",
+   "normal": "refinery_n.jpg"
+  },
+  "hitech": {
+   "file": "hitech.jpg",
+   "folder": "planets",
+   "prompt": "a cool blue high-tech world, glassy city sprawl with cyan light grids, silver ice caps, deep navy oceans, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60923,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 166236,
+   "when": "2026-09-06T10:37:36",
+   "normal": "hitech_n.jpg"
+  },
+  "luxury": {
+   "file": "luxury.jpg",
+   "folder": "planets",
+   "prompt": "an exotic magenta-and-gold luxury resort world, pink sand continents, violet lagoons, pearly cloud swirls, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60924,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 145000,
+   "when": "2026-09-06T10:38:21",
+   "normal": "luxury_n.jpg"
+  },
+  "garden": {
+   "file": "garden.jpg",
+   "folder": "planets",
+   "prompt": "an earth-like garden world, blue oceans, green forested continents, white polar caps, scattered clouds, seamless equirectangular planet surface texture map, 2:1 world map projection, full-bleed, no border, no text, no watermark, viewed flat, photoreal satellite imagery style",
+   "seed": 60925,
+   "size": [
+    2048,
+    1024
+   ],
+   "post": "equi",
+   "bytes": 221595,
+   "when": "2026-09-06T10:39:06",
+   "normal": "garden_n.jpg"
+  },
+  "station_hull": {
+   "file": "station_hull.jpg",
+   "folder": "gen",
+   "prompt": "seamless texture of a space station hull, grey armour plating, panel lines, rivets, small blue running lights, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60928,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "tile",
+   "bytes": 76889,
+   "when": "2026-09-06T10:41:20",
+   "normal": "station_hull_n.jpg"
+  },
+  "nebula_c": {
+   "file": "nebula_c.png",
+   "folder": "gen",
+   "prompt": "a soft orange and rose nebula cloud, translucent gas wisps, centred, fading to pure black at the edges, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60932,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "black",
+   "bytes": 565019,
+   "when": "2026-09-06T10:44:21"
+  },
+  "engine_flame": {
+   "file": "engine_flame.png",
+   "folder": "gen",
+   "prompt": "a single vertical blue-white plasma engine exhaust flame, bright core, centred on pure black background, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60933,
+   "size": [
+    512,
+    1024
+   ],
+   "post": "black",
+   "bytes": 346670,
+   "when": "2026-09-06T10:45:06"
+  },
+  "gem_glow": {
+   "file": "gem_glow.png",
+   "folder": "gen",
+   "prompt": "a glowing faceted crystal gem, cyan and violet light, centred on pure black background, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60934,
+   "size": [
+    512,
+    512
+   ],
+   "post": "black",
+   "bytes": 146704,
+   "when": "2026-09-06T10:45:51"
+  },
+  "explosion": {
+   "file": "explosion.png",
+   "folder": "gen",
+   "prompt": "a fiery explosion fireball in space, orange and white plasma with dark smoke wisps, centred on pure black background, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60935,
+   "size": [
+    1024,
+    1024
+   ],
+   "post": "black",
+   "bytes": 449393,
+   "when": "2026-09-06T10:46:36"
+  },
+  "muzzle_flash": {
+   "file": "muzzle_flash.png",
+   "folder": "gen",
+   "prompt": "a bright cyan energy muzzle flash burst, radial rays, centred on pure black background, flat texture, full-bleed, no border, no frame, no text, no watermark, no logo",
+   "seed": 60936,
+   "size": [
+    512,
+    512
+   ],
+   "post": "black",
+   "bytes": 232537,
+   "when": "2026-09-06T10:47:21"
+  }
+ },
+ "source": "Pollinations.ai free endpoint (FLUX-schnell) via D:/code/Tami/.opus-tools/gen_sprite.call_pollinations; normal maps derived here (Sobel over luminance)"
+}
