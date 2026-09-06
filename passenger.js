@@ -343,6 +343,15 @@ function advise(t){
   }
   // 2b) THE MINING (user 2026-09-06 "the parasite should say we are mining and know what's going on"): while the drones
   // cut, the advice names the rock, the seam and the take - every number from the drones' own snapshot
+  // 2a) THE GEM BAR (STARBLAST_REQ.md SB3/SB5, 2026-09-06): a banked point is idle power - say so once per point; a ready
+  // tier-up outranks it. Numbers come from the drones' snapshot (gemBarPct / upgradePts / tierReady), never guessed.
+  if(t.mining && t.mining.tierReady && !threat){
+    return { key:'tierup', urgency:1, text:`Every stat is maxed and a point is banked - TIER UP. Take the next hull from the UPGRADES window; we do not need a dock for it.` };
+  }
+  if(t.mining && t.mining.upgradePts>0 && !threat){
+    const n=t.mining.upgradePts;
+    return { key:'sbpts:'+n, urgency:0, text:`${n===1?'An upgrade point is':n+' upgrade points are'} banked and doing nothing. Keys 1-8: shields first if we are taking hits, damage if the rocks are slow to split.` };
+  }
   if(t.mining && t.mining.cutting>0 && !threat){
     const m=t.mining; const seamPct=Math.round((m.seam||0)*100);
     return { key:'mining:'+m.rocksMined, urgency:0,

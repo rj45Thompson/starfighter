@@ -25,7 +25,8 @@
   #winMenu{ position:fixed; right:86px; top:44px; z-index:21; pointer-events:auto; }
   #winBtn{ height:30px; padding:0 10px; cursor:pointer; font:700 10px/1 ui-monospace,monospace; letter-spacing:.08em; color:#cfe6ff; background:#0c1623cc; border:1px solid #29405a; border-radius:7px; }
   #winBtn:hover, #winBtn.on{ border-color:#46d6ff; color:#fff; }
-  #shop{ position:fixed; right:14px; top:254px; z-index:7; border:1px solid #22344a; border-radius:9px; }   /* right column, under the ship-controls inset, above the power dock (2026-09-06) */
+  #shop{ position:fixed; right:14px; top:254px; z-index:7; border:1px solid #22344a; border-radius:9px; }
+  #sbhud{ position:fixed; left:222px; bottom:64px; z-index:7; border:1px solid #22344a; border-radius:9px; }   /* STARBLAST strip: bottom-left like the reference game, right of the terminal, above the chat bar (2026-09-06) */   /* right column, under the ship-controls inset, above the power dock (2026-09-06) */
   #winList{ position:absolute; right:0; top:34px; width:250px; max-height:min(70vh,560px); overflow-y:auto; background:#0a1420f2; border:1px solid #29405a; border-radius:9px; padding:8px 10px; box-shadow:0 8px 28px #000a;
     font:600 11px/1.5 ui-monospace,monospace; color:#cfe2f5; }
   #winList h4{ margin:6px 0 3px; font:800 9.5px/1 ui-monospace,monospace; letter-spacing:.12em; color:#8fb0cc; }
@@ -295,6 +296,7 @@
 <script src="tami_battle_ui.js?v=20260714c"></script>
 <script src="power_panel.js?v=20260906b"></script>
 <script src="panels.js?v=20260906b"></script>
+<script src="sbhud.js?v=20260906b"></script>
 <script type="module" src="brain/brain.js?v=20260906e"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
 
 <script src="item_icons.js?v=20260714c"></script>
@@ -380,6 +382,14 @@ const CFG = {
   AST_KEEP:7600, AST_MAX:9200, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // user 2026-07-13 "MAKE 100X MORE ASTEROIDS ... go off and mine and level up without battling" + 2026-07-14 "can't you instance the rocks?": a literal ~100x field (was 76), 75% packed into the peaceful CERES BELT. Rocks are now GPU-INSTANCED (buildRockPools) - a few draw calls for the whole field - and both the collision loops AND the AI rock scans go through the spatial hash (astGrid), so CPU + GPU both scale.
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:3, AST_SPLIT_KICK:12, AST_DMG:20,
   AST_CELL:60, AST_GRID_EVERY:2, MINE_BELT_FRAC:0.75, MINE_BELT_RIN:0.12, MINE_BELT_ROUT:1.3, MINE_BELT_THICK:46, RADAR_ROCK_CAP:24,   // AST_CELL: spatial-hash cell edge (>> ship+rock+one-frame-bullet-step, so a 3x3x3 query is exact). MINE_BELT_*: fraction of rocks that spawn in the peaceful belt + the thick DISC they fill (inner/outer frac of SYSTEM_R, Y half-thickness) so it reads as a ring you fly through. RADAR_ROCK_CAP: cap rock blips so a dense field can't starve enemy/gem blips on the brain radar.
+  // STARBLAST LOOP (STARBLAST_REQ.md SB3-SB5, 2026-09-06): mined gems fill a bar; a full bar banks an upgrade point; keys 1-8 spend a
+  // point on one of eight stats (each level a declared multiplier at the ONE site that already reads the quantity); all eight maxed plus
+  // one banked point = the next hull tier, taken anywhere in space (applyHull's swap rule resets the old Lv1-10 ladder, same as before).
+  KILL_FEED_MAX:60, KILL_CREDIT_S:8, KILL_FEED_SHOWN:5, KILL_FEED_S:22,
+  GEM_BAR:true, GEM_BAR_MAX:48, GEM_BAR_RATE:1.0, GEM_PTS_CAP:64, STAT_MAX:8, TIER_UP:true,
+  STAT_GAIN:{shieldCap:0.10, shieldRegen:0.12, energyCap:0.10, energyRegen:0.12, speed:0.05, agility:0.08, damage:0.07, fireRate:0.06},
+  STAT_ORDER:['shieldCap','shieldRegen','energyCap','energyRegen','speed','agility','damage','fireRate'],
+  STAT_LABEL:{shieldCap:'SHIELD CAP', shieldRegen:'SHIELD REGEN', energyCap:'ENERGY CAP', energyRegen:'ENERGY REGEN', speed:'SPEED', agility:'AGILITY', damage:'DAMAGE', fireRate:'FIRE RATE'},
   GEM_CREDIT_PER_SCALE:2, GEM_FOOD:9, GEM_PICK_R:8.5, GEM_LIFE:26, GEM_MAGNET:26, GEM_GRAB_R:55,
   HP_BASE:100, HP_PER_HULL:0.20, REGEN:2.2, WEAPON_FIRE:0.16, WEAPON_DMG:0.24, ENGINE_GAIN:0.15,
   TECH_RES_PER_LVL:0.04, TECH_RES_FLOOR:0.55,   // TECH LEVEL (user, SR "8 hull materials... higher tech = better resistance profiles"): folded into the EXISTING `upgrade hull` progression (s.lvl.hull) rather than a new parallel currency/slot - each level -4% E/S/M susceptibility, floored so it's never free armor. Lv1 (everyone's default) = ×1.00, zero change to existing balance for anyone who never upgrades.
@@ -823,7 +833,7 @@ function miningBotsTick(dt){ const P=ships[0]; if(!P||!CFG.MINING_BOTS) return; 
     b.pos.addScaledVector(b.vel,dt); b.m.position.copy(b.pos); if(sp>0.5) b.m.lookAt(_bv.copy(b.pos).add(b.vel)); if(b.blip){ b.blip.position.copy(b.pos); b.blip.visible=true; }
     b.m.userData.eng.material.opacity=0.35+0.5*Math.min(1,sp/CFG.BOT_SPEED);
     b.laser.visible=false; b.glow.visible=false;
-    if(b.state==='fetch' && b.target.pos.distanceTo(b.pos)<CFG.BOT_GRAB_R){ const g=b.target; g.taken=true; P.credits+=g.credits; P.hp=Math.min(P.maxHp,P.hp+CFG.GEM_FOOD*0.5);
+    if(b.state==='fetch' && b.target.pos.distanceTo(b.pos)<CFG.BOT_GRAB_R){ const g=b.target; g.taken=true; P.credits+=g.credits; gemBarAdd(P,g.credits); P.hp=Math.min(P.maxHp,P.hp+CFG.GEM_FOOD*0.5);
       miningStats.creditsMined+=g.credits; miningStats.gemsFetched++; miningStats.minuteCredits.push([T0,g.credits]);
       if(window.SOUND) SOUND.play('pickup'); burst(g.pos,g.mesh.material.color.getHex(),7,9,2.0); scene.remove(g.mesh); const gi=gems.indexOf(g); if(gi>=0) gems.splice(gi,1); b.state='idle'; b.target=null; }
     else if(b.state==='mine'){ const a=b.target; if(a.pos.distanceTo(b.pos)<a.scale+CFG.BOT_STANDOFF*2.2){
@@ -840,7 +850,7 @@ function miningBotsTick(dt){ const P=ships[0]; if(!P||!CFG.MINING_BOTS) return; 
   const cutting=miningBots.filter(b=>b.state==='mine'&&b.target&&!b.target.gone);
   const near=cutting.length?cutting.reduce((m,b)=>b.target.pos.distanceTo(P.pos)<m.target.pos.distanceTo(P.pos)?b:m):null;
   miningStats.snapshot={ bots:miningBots.length, cutting:cutting.length, fetching:miningBots.filter(b=>b.state==='fetch').length, rockDist:near?Math.round(near.target.pos.distanceTo(P.pos)):null, rockScale:near?+near.target.scale.toFixed(1):null, seam:near?+(near.target.seam||0).toFixed(2):null, rockHp:near?Math.max(0,Math.round(near.target.hp)):null,
-    rocksMined:miningStats.rocksMined, creditsMined:miningStats.creditsMined, gemsFetched:miningStats.gemsFetched, lastMinuteCredits:miningStats.minuteCredits.reduce((s,x)=>s+x[1],0) };
+    rocksMined:miningStats.rocksMined, creditsMined:miningStats.creditsMined, gemsFetched:miningStats.gemsFetched, gemBarPct:Math.round(100*(P.gemBar||0)/CFG.GEM_BAR_MAX), upgradePts:P.gemPts||0, statsMaxed:statsMaxed(P), tierReady:tierUpReady(P), lastMinuteCredits:miningStats.minuteCredits.reduce((s,x)=>s+x[1],0) };
   if(window.HOST) HOST.mining=miningStats.snapshot; }
 const PLANET_TEX=texLoader.load('assets/planet_skin.jpg'); PLANET_TEX.wrapS=T.RepeatWrapping; PLANET_TEX.encoding=T.sRGBEncoding;
 // PER-ECONOMY PLANET SKINS (GRAPHICS PASS 2026-09-06, CFG.PLANET_SKINS): one generated equirectangular map per
@@ -1404,14 +1414,14 @@ function setPower(s, sys, target){   // reroute: set ONE system, the other two a
   P[sys]=target;
   const sum=P.weapons+P.engines+P.shields; if(Math.abs(sum-CFG.POWER_TOTAL)>0.01) P[sys]=clamp(P[sys]+(CFG.POWER_TOTAL-sum),CFG.POWER_MIN,CFG.POWER_MAX);   // clamp slack -> the pool always stays honest
   return P; }
-function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields)*seriesOf(s).shieldMult; }         // TOTAL across both arcs - unchanged meaning, every existing "shield%" summary display (roster/scan/status) still reads this; HULL SERIES: Dandy/Pygamore run weaker shields, live multiplier
+function shieldMaxFor(s){ return CFG.SHIELD_BASE*powerMult(shipPower(s).shields)*seriesOf(s).shieldMult*statMult(s,'shieldCap'); }         // TOTAL across both arcs - unchanged meaning, every existing "shield%" summary display (roster/scan/status) still reads this; HULL SERIES: Dandy/Pygamore run weaker shields, live multiplier
 function shieldArcMaxFor(s){ return shieldMaxFor(s)/2; }   // SR X-WING SHIELDS: each arc's own cap (fwd+aft sums to the total above)
 function shieldTick(s,dt){ if(!s.alive) return; const amax=shieldArcMaxFor(s);
   if(s.shieldFwd==null) s.shieldFwd=amax; if(s.shieldAft==null) s.shieldAft=amax;
   if(s.shieldFwd>amax) s.shieldFwd=amax; if(s.shieldAft>amax) s.shieldAft=amax;              // power just rerouted AWAY from shields -> ceiling drops immediately, same rule as before
   const canRegen = s.docked || T0-(s.shieldHitT||-999)>CFG.SHIELD_REGEN_DELAY;
   if(canRegen){
-    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1)*(hasGizmo(s,'shieldboost')?CFG.SHIELD_BOOST_MULT:1);   // SR-M17 tech skill; docked = safe harbor, 2x; ENGINEERING BAY: shield booster gizmo
+    const rate=CFG.SHIELD_REGEN_BASE*powerMult(shipPower(s).shields)*statMult(s,'shieldRegen')*(1+CFG.SKILL_TECH_REGEN*skillLvl(s,'tech'))*(s.docked?2:1)*(hasGizmo(s,'shieldboost')?CFG.SHIELD_BOOST_MULT:1);   // SR-M17 tech skill; docked = safe harbor, 2x; ENGINEERING BAY: shield booster gizmo
     // SR X-WING SHIELDS (user 2026-07-08, "same as tie fighter xwing"): real fore/aft POOLS, not one pool with an efficiency
     // weight. Undiverted, BOTH arcs regen at the full base rate independently (given enough time, both reach their own
     // 100%). "shield fwd"/"shield aft" concentrates regen on one arc at SHIELD_DIVERT_MULT and pauses the other entirely -
@@ -1447,9 +1457,9 @@ function drainShield(s,dmg,fromPos){
 // while nitro is held and gates the burst-thrust bonus at 0. Neither capacitor touches the OTHER systems' allocation at
 // all - draining one never changes another's recharge rate (the user's specific correction to the old nitro behavior).
 function capacitorTick(s,dt){ if(!s.alive) return;
-  if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
+  if(s.capLaser==null) s.capLaser=capMaxFor(s);
   if(s.capEngine==null) s.capEngine=CFG.ENGINE_CAP_MAX;
-  s.capLaser=Math.min(CFG.LASER_CAP_MAX,s.capLaser+CFG.LASER_CAP_REGEN*powerMult(shipPower(s).weapons)*dt);
+  s.capLaser=Math.min(capMaxFor(s),s.capLaser+CFG.LASER_CAP_REGEN*powerMult(shipPower(s).weapons)*statMult(s,'energyRegen')*dt);
   if(!s._nitroActive) s.capEngine=Math.min(CFG.ENGINE_CAP_MAX,s.capEngine+CFG.ENGINE_CAP_REGEN*powerMult(shipPower(s).engines)*dt); }
 // SPACE-RANGERS DOCK PROMPT (user 2026-07-07): "Ranger Command should be like Space Rangers - I fly to it and a
 // button appears to dock". Generalized 2026-07-08 ("add button to land on planets or ranger space station or a
@@ -1944,6 +1954,45 @@ const _q=new T.Quaternion(),_v=new T.Vector3(),_v2=new T.Vector3();
 const _vmount=new T.Vector3();   // SHIP LAYOUT: dedicated scratch for per-hardpoint facing math - never reused mid-loop by anything else, same "don't alias a shared scratch" lesson as _vhit
 function upCost(s,k){ return Math.round(CFG.UP_COST_BASE*Math.pow(CFG.UP_COST_GROW,s.lvl[k]-1)); }
 function canUpgradeLvl(s,k){ return (s.lvl[k]||1)<CFG.UP_LVL_CAP; }   // BALANCE 2026-07-08: the real cap - both the AI purchase site and the player `upgrade` command check this before spending anything
+
+// ---- STARBLAST LOOP (STARBLAST_REQ.md, 2026-09-06) ----------------------------------------------------------------
+// statMult is the ONLY place a stat level turns into a number; every consumer site multiplies by it (shieldMaxFor,
+// shieldTick's rate, capMaxFor + the capacitor regen, flyStep's thrust / vmax / pitch / yaw, the three weapon-damage
+// sites and the two fire-cooldown sites). A ship with no stat block (every AI pilot) reads 1.0 everywhere.
+function statMult(s,k){ return 1+(CFG.STAT_GAIN[k]||0)*((s&&s.stat&&s.stat[k])||0); }
+function ensureStat(s){ if(!s.stat){ s.stat={}; CFG.STAT_ORDER.forEach(k=>s.stat[k]=0); } if(s.gemBar==null) s.gemBar=0; if(s.gemPts==null) s.gemPts=0; return s.stat; }
+function capMaxFor(s){ return CFG.LASER_CAP_MAX*statMult(s,'energyCap'); }
+function hullTierIdx(key){ const H=HULLS[key]; let i=HULL_ORDER_ORIGINAL.indexOf(key); if(i<0&&H&&H.visualClass) i=HULL_ORDER_ORIGINAL.indexOf(H.visualClass); return i; }   // generated hulls sit at their size tier's rank
+function nextTierHull(s){ const i=hullTierIdx(s.hullClass); return (i>=0&&i<HULL_ORDER_ORIGINAL.length-1)?HULL_ORDER_ORIGINAL[i+1]:null; }
+function statsMaxed(s){ ensureStat(s); return CFG.STAT_ORDER.every(k=>s.stat[k]>=CFG.STAT_MAX); }
+function tierUpReady(s){ return !!(CFG.TIER_UP && s && s.role==='player' && s.alive && statsMaxed(s) && s.gemPts>=1 && nextTierHull(s)); }
+function gemBarAdd(s,credits){ if(!CFG.GEM_BAR||!s||s.role!=='player'||!(credits>0)) return 0; ensureStat(s); s.gemBar+=credits*CFG.GEM_BAR_RATE; let banked=0;
+  while(s.gemBar>=CFG.GEM_BAR_MAX && s.gemPts<CFG.GEM_PTS_CAP){ s.gemBar-=CFG.GEM_BAR_MAX; s.gemPts++; banked++; }
+  if(s.gemPts>=CFG.GEM_PTS_CAP) s.gemBar=Math.min(s.gemBar,CFG.GEM_BAR_MAX);   // at the cap the bar just sits full - nothing is silently lost into a counter nobody can read
+  if(banked){ term(`◆ GEM BAR full - <b>${banked}</b> upgrade point${banked>1?'s':''} banked (<b>${s.gemPts}</b> ready) - keys <b>1-8</b> spend one`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.flash(); }
+  if(tierUpReady(s)) offerTierUp(s); return banked; }
+function spendStat(s,k){ if(!s) return {ok:false,msg:'no ship'}; ensureStat(s); if(!CFG.STAT_GAIN[k]) return {ok:false,msg:`no such stat - ${CFG.STAT_ORDER.join(' / ')}`};
+  if(s.gemPts<1) return {ok:false,msg:`no upgrade point yet - the gem bar is ${Math.round(100*s.gemBar/CFG.GEM_BAR_MAX)}% full`};
+  if(s.stat[k]>=CFG.STAT_MAX) return {ok:false,msg:`${CFG.STAT_LABEL[k]} is already at the max level (${CFG.STAT_MAX})`};
+  s.gemPts--; s.stat[k]++;
+  term(`▲ <b>${CFG.STAT_LABEL[k]}</b> Lv${s.stat[k]}/${CFG.STAT_MAX} (×${statMult(s,k).toFixed(2)}) · ${s.gemPts} point${s.gemPts===1?'':'s'} left`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.refresh();
+  if(tierUpReady(s)) offerTierUp(s); return {ok:true, lvl:s.stat[k], mult:statMult(s,k)}; }
+function offerTierUp(s){ const n=nextTierHull(s); if(!n) return; if(!s._tierOffered||s._tierOffered!==n){ s._tierOffered=n; term(`⬆ <b>TIER UP READY</b> - every stat maxed and a point banked: take the <b>${HULLS[n].n}</b> from the UPGRADES window (or <b>tierup</b>)`,'sys'); if(window.SOUND) SOUND.play('ui'); }
+  if(window.SBHUD&&SBHUD.offerTier) SBHUD.offerTier(n); }
+function takeTierUp(s,key){ if(!tierUpReady(s)) return {ok:false,msg:'tier-up is not ready - max all eight stats and bank one more point'}; const want=nextTierHull(s); key=key||want;
+  if(!HULLS[key]) return {ok:false,msg:`no hull called ${key}`}; if(hullTierIdx(key)!==hullTierIdx(want)) return {ok:false,msg:`${HULLS[key].n} is not the next tier (${HULLS[want].n})`};
+  const from=HULLS[s.hullClass].n; s.gemPts--; s.gemBar=0; applyHull(s,key); CFG.STAT_ORDER.forEach(k=>s.stat[k]=0); s._tierOffered=null;
+  s.hp=s.maxHp; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s);
+  term(`⬆ <b>TIER UP</b> - ${from} → <b>${HULLS[key].n}</b> (tier ${hullTierIdx(key)+1}) · hull ${HULLS[key].hp} · hold ${HULLS[key].hold} · speed ×${HULLS[key].speed} · the eight stats start over at 0`,'sys');
+  if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.refresh(); if(typeof saveGame==='function') saveGame(); return {ok:true, hull:key}; }
+const KILLS=[];   // STARBLAST LOOP SB13: {t, killer, victim, mine} newest first, capped - read by sbhud.js
+function killFeed(killer,victim){ if(!victim) return; KILLS.unshift({ t:T0, killer:killer?killer.name:null, killerTeam:killer?killer.team:null, victim:victim.name, victimTeam:victim.team, mine:!!(killer&&killer.role==='player'), yours:victim.role==='player' });
+  while(KILLS.length>CFG.KILL_FEED_MAX) KILLS.pop(); if(window.SBHUD) SBHUD.refresh(); }
+function sbSnapshot(s){ s=s||ships[0]; if(!s) return null; ensureStat(s); const n=nextTierHull(s); const H=HULLS[s.hullClass]||{};
+  return { bar:s.gemBar, barMax:CFG.GEM_BAR_MAX, pts:s.gemPts, ptsCap:CFG.GEM_PTS_CAP, stat:{...s.stat}, statMax:CFG.STAT_MAX, order:CFG.STAT_ORDER, label:CFG.STAT_LABEL,
+    mult:Object.fromEntries(CFG.STAT_ORDER.map(k=>[k,statMult(s,k)])), tierReady:tierUpReady(s), maxed:statsMaxed(s), hull:s.hullClass, hullName:H.n||s.hullClass, tier:hullTierIdx(s.hullClass)+1,
+    kills:KILLS.filter(k=>T0-k.t<CFG.KILL_FEED_S).slice(0,CFG.KILL_FEED_SHOWN), killsTotal:KILLS.length,
+    nextHull:n, nextHullName:n?HULLS[n].n:null, nextHullDesc:n?`hull ${HULLS[n].hp} · hold ${HULLS[n].hold} · speed ×${HULLS[n].speed} · ${HULLS[n].desc.split(' (')[0]}`:null }; }
 function cheapestUp(s){ return Math.min(upCost(s,'weapon'),upCost(s,'engine'),upCost(s,'hull')); }
 function chooseUpgrade(s){ if(s.deaths>=CFG.UPGRADE_HULL_DEATHS && s.lvl.hull<=Math.min(s.lvl.weapon,s.lvl.engine)) return 'hull';
   return ['weapon','engine','hull'].sort((a,b)=> s.lvl[a]-s.lvl[b] || (a==='weapon'?-1:1))[0]; }
@@ -2226,10 +2275,10 @@ function think(s,dt){
       && !((s.weaponType||'energy')==='missile' && (s.missileAmmo||0)<=0)){   // IRON LAW: missile ammo gates EVERYONE now (AI + player) - out of ammo silently skips firing the missile weapon this tick; both regenerate ammo in think() so no one is stuck
     const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy;
     if(aim.dot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W.range){
-      s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
-      s.capLaser=Math.max(0,(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser)-CFG.LASER_CAP_PER_SHOT);
+      s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*statMult(s,'fireRate')*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // M6: Hegemon Core artifact boosts fire rate; X-WING POWER: weapons power shortens cooldown
+      s.capLaser=Math.max(0,(s.capLaser==null?capMaxFor(s):s.capLaser)-CFG.LASER_CAP_PER_SHOT);
       if(W.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);   // IRON LAW: consume the magazine for EVERYONE (AI + player), symmetric
-      const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*(s.weaponInst&&s.weaponInst.powerMul||1))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers; SR VARIANCE: the player's rolled weapon-instance power
+      const base=((s.team==='pirate')?(s.tierDmg||CFG.PIRATE_DMG):W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*statMult(s,'damage')*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*(s.weaponInst&&s.weaponInst.powerMul||1))*seriesOf(s).dmgMult*(W.dmgType==='missile'?seriesOf(s).missileDmgMult:1);   // SR-M17; STANDARD GEAR SLOTS: Integrator micro-module; HULL SERIES: Ironclad/Pygamore live multipliers; SR VARIANCE: the player's rolled weapon-instance power
       const spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:(W.homing>0?target:null),
         shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };   // per-weapon visual signature; SR Treton slow-on-hit
       const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
@@ -2253,9 +2302,9 @@ function think(s,dt){
       const mountDot=fwd2.dot(_vmount);
       if(!(mountDot>(mode==='HUNT'?CFG.HUNT_FIRE:CFG.ALIGN_FIRE) && s.pos.distanceTo(target.pos)<CFG.SENSE_R*W2.range)) continue;
       if(W2.dmgType==='missile' && (s.missileAmmo||0)<=0) continue;   // shares the single missileAmmo magazine with the primary slot
-      s.slotFire[wi]=W2.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));
+      s.slotFire[wi]=W2.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*statMult(s,'fireRate')*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));
       if(W2.dmgType==='missile') s.missileAmmo=Math.max(0,(s.missileAmmo||0)-1);
-      const base2=W2.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*seriesOf(s).dmgMult*(W2.dmgType==='missile'?seriesOf(s).missileDmgMult:1);
+      const base2=W2.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*statMult(s,'damage')*(1+CFG.SKILL_GUNNERY_DMG*skillLvl(s,'gunnery'))*(1+(s.dmgMult||0))*seriesOf(s).dmgMult*(W2.dmgType==='missile'?seriesOf(s).missileDmgMult:1);
       const spec2={ dmg:base2, col:W2.col, speed:W2.speed, life:W2.life, r:W2.r, homing:W2.homing, splash:W2.splash, target:(W2.homing>0?target:null),
         shape:W2.shape, boltLen:W2.boltLen, trail:W2.trail, trailCd:W2.trailCd, flash:W2.flash, dmgType:W2.dmgType||'energy' };
       const side2=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF*(1.8+wi*0.9));   // muzzle-position stagger stays ship-relative sideways (visual spacing only) - firing DIRECTION is fwd2 above
@@ -2293,8 +2342,8 @@ function think(s,dt){
 
 // ---------------------------------------------------------------- physics
 function flyStep(s,dt){
-  _q.setFromAxisAngle(RGT,s.ctrl.pitch*CFG.PITCH_RATE*dt); s.quat.multiply(_q);
-  _q.setFromAxisAngle(UPL,-s.ctrl.yaw*CFG.YAW_RATE*dt);    s.quat.multiply(_q); s.quat.normalize();
+  _q.setFromAxisAngle(RGT,s.ctrl.pitch*CFG.PITCH_RATE*statMult(s,'agility')*dt); s.quat.multiply(_q);
+  _q.setFromAxisAngle(UPL,-s.ctrl.yaw*CFG.YAW_RATE*statMult(s,'agility')*dt);    s.quat.multiply(_q); s.quat.normalize();
   s.bank=lerp(s.bank,-s.ctrl.yaw*CFG.BANK_MAX,1-Math.exp(-CFG.BANK_LERP*dt));
   const fwd=FWD.clone().applyQuaternion(s.quat);
   const engMult=powerMult(shipPower(s).engines);                                                     // X-WING POWER: reroute into engines for a real speed boost
@@ -2302,14 +2351,14 @@ function flyStep(s,dt){
   const nitroMult=nitroActive?CFG.NITRO_BOOST_MULT:1;                                                // NITRO BURST: instant thrust/vmax layer - doesn't wait on the power-stat ramp above to feel like a boost
   if(nitroActive&&!s._nitroWasActive) s.vel.addScaledVector(fwd,CFG.NITRO_KICK);                      // rising-edge snap the instant Shift is pressed, even without W held
   s._nitroWasActive=nitroActive;
-  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*(s.engineInst&&s.engineInst.powerMul||1)*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1)*s.ctrl.thr*dt);   // M9: hull class speed; SR-M17: handling; ENGINEERING BAY: engine type; SR VARIANCE: rolled engine-instance power; HULL SERIES/MANUFACTURER; SR TRETON slow
+  s.vel.addScaledVector(fwd,CFG.THRUST*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*statMult(s,'speed')*(1+CFG.SKILL_HANDLING_THRUST*skillLvl(s,'handling'))*(s.hullSpeed||1)*engineOf(s).speedMult*(s.engineInst&&s.engineInst.powerMul||1)*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1)*s.ctrl.thr*dt);   // M9: hull class speed; SR-M17: handling; ENGINEERING BAY: engine type; SR VARIANCE: rolled engine-instance power; HULL SERIES/MANUFACTURER; SR TRETON slow
   // user 2026-07-08 ("when I hold shift I want to have burst mode"): the line above only fires while W is ALSO
   // held (multiplies s.ctrl.thr, which is 0 otherwise) - so Shift alone gave one kick then coasted to a stop under
   // drag, never reading as a sustained "burst". A real afterburner propels you on its own, no second key needed -
   // this term is independent of s.ctrl.thr, active for exactly as long as Shift is held.
   if(nitroActive) s.vel.addScaledVector(fwd,CFG.NITRO_AUTOTHRUST*engMult*dt);
   s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt));
-  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*engineOf(s).speedMult*(s.engineInst&&s.engineInst.powerMul||1)*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1); if(s.vel.length()>vmax) s.vel.setLength(vmax);
+  const vmax=CFG.VMAX*(1+CFG.ENGINE_GAIN*(s.lvl.engine-1))*statMult(s,'speed')*engineOf(s).speedMult*(s.engineInst&&s.engineInst.powerMul||1)*seriesOf(s).speedMult*manuOf(s).speedMult*engMult*nitroMult*(s.slowT>T0?(s.slowMul||1):1); if(s.vel.length()>vmax) s.vel.setLength(vmax);
   s.pos.addScaledVector(s.vel,dt);
   if(s.pos.length()>CFG.ARENA_R-CFG.SHIP_R){ s.pos.setLength(CFG.ARENA_R-CFG.SHIP_R); const n=s.pos.clone().normalize(); s.vel.addScaledVector(n,-1.5*s.vel.dot(n)); }
   for(let pi=0;pi<planets.length;pi++){ const p=planets[pi], effR=p.radius*(p.mesh.scale.x||1)+CFG.SHIP_R, dd=s.pos.distanceTo(p.pos);   // don't fly through planets
@@ -2380,7 +2429,7 @@ function step(dt){
         s._thinkAcc=(s._thinkAcc||0)+dt;
         if((s.id+FRAME_N)%CFG.THINK_STRIDE===0 || s===ships[focus]){ think(s,s._thinkAcc); s._thinkAcc=0; } }
       flyStep(s,dt); }
-    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s); s.shield=s.shieldFwd+s.shieldAft; s.capLaser=CFG.LASER_CAP_MAX; s.capEngine=CFG.ENGINE_CAP_MAX;   // X-WING POWER: a fresh hull gets full shields + capacitors too
+    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s); s.shield=s.shieldFwd+s.shieldAft; s.capLaser=capMaxFor(s); s.capEngine=CFG.ENGINE_CAP_MAX;   // X-WING POWER: a fresh hull gets full shields + capacitors too
       // RETREAT TO TERRITORY (user): the destroyed come back inside COALITION space - a held planet (via the
       // starmap's territory model when loaded), else the Ranger Base - never dumped into a random (possibly lost) system.
       let anchor=null;
@@ -2437,7 +2486,7 @@ function step(dt){
   flushRockPools();   // one needsUpdate per instanced pool after all rock matrices are written this frame
   if(FRAME_N%CFG.AST_GRID_EVERY===0) rebuildAstGrid();   // dense-field broad phase; the grid holds live rock REFS (queries read current a.pos + gone-flag + incremental insert on spawn), so re-binning every 2nd frame is exact - drift is <0.1u vs a 60u cell
   for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const a=astHitBullet(b); if(!a) continue; const owner=shipById[b.owner];
-    a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1))*(1+CFG.SEAM_DMG_MULT*(a.seam||0)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color; a bot-cut SEAM multiplies the hit (2026-09-06)
+    a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1))*(owner?statMult(owner,'damage'):1)*(1+CFG.SEAM_DMG_MULT*(a.seam||0)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color; a bot-cut SEAM multiplies the hit (2026-09-06)
     if(a.hp<=0) destroyAsteroidObj(a,owner); }
   while(asteroids.length<CFG.AST_KEEP) spawnAtShell();
   for(const s of ships){ if(!s.alive||s.iframe>0||s.warping) continue; const a=astHitShip(s); if(a){
@@ -2457,7 +2506,7 @@ function step(dt){
           (s.artifactsUnid=s.artifactsUnid||[]).push(g.artifact);
           notify(`Recovered an <b>UNIDENTIFIED ARTIFACT</b> - its function is unknown. Analyze it at ⚗ Athenaeum Station (${CFG.ANALYZE_COST_CORES} cores).`,'flag'); }
         else if(g.cores){ if(s.role!=='player') continue; s.cores=(s.cores||0)+g.cores; notify(`Salvaged <b>${g.cores} CORE${g.cores>1?'S':''}</b> from the wreck (${s.cores} held) - spend them at ⚗ Athenaeum Station.`,'flag'); }
-        else { s.credits+=g.credits; s.hp=Math.min(s.maxHp,s.hp+CFG.GEM_FOOD); if(s.role==='player'&&window.SOUND) SOUND.play('pickup'); }
+        else { s.credits+=g.credits; gemBarAdd(s,g.credits); s.hp=Math.min(s.maxHp,s.hp+CFG.GEM_FOOD); if(s.role==='player'&&window.SOUND) SOUND.play('pickup'); }
         burst(g.pos,g.mesh.material.color.getHex(),9,11,2.6); scene.remove(g.mesh); gems.splice(i,1); taken=true; break; } }
     if(taken) continue;
     g.vel.multiplyScalar(Math.exp(-1.2*dt)); g.pos.addScaledVector(g.vel,dt); if(g.pos.length()>CFG.ARENA_R-1.5) g.pos.setLength(CFG.ARENA_R-1.5);
@@ -2518,6 +2567,7 @@ function spillGems(s,credits,fromPos){ credits=Math.round(credits); if(credits<=
   for(let i=before;i<gems.length;i++){ gems[i].credits=Math.max(1,Math.round(per)); gems[i].vel.copy(away).multiplyScalar(rand(6,12)).add(new T.Vector3(rand(-2,2),rand(-2,2),rand(-2,2))); }
   if(window.SOUND) SOUND.play('ui'); }
 function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its own destruction = a fatal 'damaged' episode
+  killFeed((s.lastHitBy&&T0-(s.lastHitT||0)<CFG.KILL_CREDIT_S)?s.lastHitBy:null, s);   // STARBLAST LOOP SB13: the live kill strip - one entry per death, from the ONE site a ship dies
   s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.mesh.visible=false; s.deaths++;
   if(FX_TEX) fxSprite(FX_TEX.explosion,s.pos,CFG.SHIP_R*7,0xffffff,0.85,2.2,1);   // generated fireball on a ship death (GEN_FX)
   dropCargo(s);                                                     // spill the hold as salvage pods
@@ -2544,7 +2594,7 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
   if(s.role==='defender'||s.role==='pirate') s.despawn=true;        // defenders/pirates don't respawn; they're removed
 }
 // killed by another pilot -> victim's credits scatter as bounty gems; killer earns score
-function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';   // victim's FULL credits are dropped by killShip -> dropCredits (a persistent stash)
+function killByShip(victim,killer){ const wasPirate=victim.team==='pirate'; if(killer&&killer!==victim){ victim.lastHitBy=killer; victim.lastHitT=T0; }   // a ram names its rammer   // victim's FULL credits are dropped by killShip -> dropCredits (a persistent stash)
   if(window.PASSENGER&&ships[0]&&ships[0].alive&&victim.pos.distanceTo(ships[0].pos)<=ships[0].senseR){ PASSENGER.onEvent('kill_seen'); if(window.GAMEMOD) GAMEMOD.emit('kill_seen'); if(window.CHATTER) CHATTER.onEvent('kill_seen',{victim,killer}); }   // the symbiont witnesses only what YOUR sensors touch
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
@@ -2684,7 +2734,8 @@ function synodRankOf(s){ if(!s||s.team!=='pirate') return '';
   const sc=s.score||0; let hon=''; if(sc>=CFG.SYNOD_HON_NIGHTMARE) hon='Nightmare'; else if(sc>=CFG.SYNOD_HON_DREAD) hon='Dread'; else if(sc>=CFG.SYNOD_HON_BLOODED) hon='Blooded';
   return hon?hon+' '+base:base; }
 function noteLog(s, text, val){ if(!s) return; s.log=s.log||[]; s.log.push({t:text, val}); if(s.log.length>40) s.log.shift(); }   // per-pilot interaction ledger
-function noteHarm(v, atk){ if(!atk||atk===v||!v||!v.alive) return; v.rel=v.rel||{}; v.hitBy=v.hitBy||{};
+function noteHarm(v, atk){ if(!atk||atk===v||!v||!v.alive) return; v.lastHitBy=atk; v.lastHitT=T0;   // STARBLAST LOOP SB13: the kill feed names the real attacker - recorded where the game already knows it
+  v.rel=v.rel||{}; v.hitBy=v.hitBy||{};
   const first=!v.hitBy[atk.name]; v.hitBy[atk.name]=(v.hitBy[atk.name]||0)+1; v.rel[atk.name]=(v.rel[atk.name]||0)-0.03;      // accumulated grudge (cheap per-hit)
   if(first) noteLog(v, `⚔ ${atk.name} (${facLabel(atk)}) opened fire on me`, -1); }                                          // a readable note only on first contact
 function renderChronicle(){ const s=ships[focus]; let h='';
@@ -4212,9 +4263,9 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       term('<b style="color:#8fd0ff">⚡ POWER PLANT</b> <span style="opacity:.55">(one shared pool - routing more into one system pulls from the other two, like an X-Wing)</span>','sys');
       for(const k of POWER_SYS) term(`&nbsp;&nbsp;${k.toUpperCase().padEnd(8,' ').replace(/ /g,'&nbsp;')} ${'█'.repeat(Math.round(p0[k]/5))}${'░'.repeat(20-Math.round(p0[k]/5))} ${Math.round(p0[k])}% <span style="opacity:.6">(×${powerMult(p0[k]).toFixed(2)})</span>`,'sys');
       const amax=shieldArcMaxFor(P), fwd=P.shieldFwd==null?amax:P.shieldFwd, aft=P.shieldAft==null?amax:P.shieldAft;
-      const capL=P.capLaser==null?CFG.LASER_CAP_MAX:P.capLaser, capE=P.capEngine==null?CFG.ENGINE_CAP_MAX:P.capEngine;
+      const capL=P.capLaser==null?capMaxFor(P):P.capLaser, capE=P.capEngine==null?CFG.ENGINE_CAP_MAX:P.capEngine;
       term(`&nbsp;&nbsp;shield fore <b>${Math.round(fwd)}</b>/${Math.round(amax)} · aft <b>${Math.round(aft)}</b>/${Math.round(amax)} <span style="opacity:.55">(divert: ${P.shieldDivert==='fwd'?'FWD':P.shieldDivert==='aft'?'AFT':'even'} - try: shield fwd)</span>`,'sys');
-      term(`&nbsp;&nbsp;<span style="color:#ffb454">⚡ LASER CAP</span> ${Math.round(capL)}/${CFG.LASER_CAP_MAX} <span style="opacity:.55">·</span> <span style="color:#46d6ff">⚡ ENGINE CAP</span> ${Math.round(capE)}/${CFG.ENGINE_CAP_MAX} <span style="opacity:.55">(nitro drains this, not the power plant above)</span>`,'sys'); return; }
+      term(`&nbsp;&nbsp;<span style="color:#ffb454">⚡ LASER CAP</span> ${Math.round(capL)}/${capMaxFor(P)} <span style="opacity:.55">·</span> <span style="color:#46d6ff">⚡ ENGINE CAP</span> ${Math.round(capE)}/${CFG.ENGINE_CAP_MAX} <span style="opacity:.55">(nitro drains this, not the power plant above)</span>`,'sys'); return; }
     const sys=POWER_SYS.find(k=>k.startsWith(a[1].toLowerCase())); if(!need(sys,'power weapons|engines|shields &lt;0-100&gt;')) return;
     const lvl=parseFloat(a[2]); if(!need(isFinite(lvl),'give a level 0-100, e.g. power shields 70')) return;
     setPower(P,sys,lvl); const p1=shipPower(P);
@@ -4598,6 +4649,14 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
+  if(c==='stat'||c==='stats'||c==='spend'){ const d=sbSnapshot(P); if(!a[1]){ term(`◆ GEM BAR ${Math.round(100*d.bar/d.barMax)}% · <b>${d.pts}</b> point${d.pts===1?'':'s'} banked · ${d.hullName} (tier ${d.tier})`,'sys');
+      CFG.STAT_ORDER.forEach((k,i)=>term(`&nbsp;&nbsp;<b>${i+1}</b> ${CFG.STAT_LABEL[k].padEnd(12,' ').replace(/ /g,'&nbsp;')} ${'▮'.repeat(d.stat[k])}${'▯'.repeat(CFG.STAT_MAX-d.stat[k])} ×${d.mult[k].toFixed(2)}`,'sys'));
+      term(`&nbsp;&nbsp;<span style="opacity:.6">stat &lt;name|1-8&gt; spends a point · tierup takes the next hull when all eight are maxed${d.tierReady?' - <b>READY NOW</b>':''}</span>`,'sys'); return; }
+    const q=(a[1]||'').toLowerCase(); const k=/^[1-8]$/.test(q)?CFG.STAT_ORDER[+q-1]:CFG.STAT_ORDER.find(x=>x.toLowerCase().startsWith(q)||CFG.STAT_LABEL[x].toLowerCase().replace(' ','').startsWith(q));
+    const r=spendStat(P,k||q); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }
+  if(c==='tierup'||c==='tier'){ const d=sbSnapshot(P); if(!d.tierReady){ term(`◆ tier-up not ready - ${d.maxed?'bank one more point':'max all eight stats first'} (${CFG.STAT_ORDER.filter(k=>d.stat[k]<CFG.STAT_MAX).length} still below ${CFG.STAT_MAX}); next hull would be <b>${d.nextHullName||'none - top tier'}</b>`,'sys'); return; }
+    const want=(a[1]||'').toLowerCase(); const key=want?Object.keys(HULLS).find(x=>x.toLowerCase()===want||HULLS[x].n.toLowerCase()===want||x.toLowerCase().startsWith(want)):null;
+    const r=takeTierUp(P,key||undefined); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }
   if(c==='upgrade'||c==='up'){ const k=(a[1]||'').startsWith('w')?'weapon':(a[1]||'').startsWith('e')?'engine':(a[1]||'').startsWith('h')?'hull':null; if(!need(k,'upgrade weapon|engine|hull')) return;   // 2026-09-06: no dock needed (user "you don't need to land anymore, just mine") - same purchase the SHOP panel makes
     const r=doUpgrade(k); term(r.msg, r.ok?'sys':'err'); if(r.ok&&window.PANELS&&PANELS.isOpen&&PANELS.isOpen('shop')) renderShop(); return; }
   if(c==='weapon'||c==='wpn'||c==='arm'){ if(!need(dockedP,'must be docked')) return; const wt=(a[1]||'').toLowerCase();
@@ -5984,6 +6043,7 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       shieldDivert:P.shieldDivert||null, shieldFwd:P.shieldFwd, shieldAft:P.shieldAft, capLaser:P.capLaser, capEngine:P.capEngine,
       rankShown:P.rankShown, engineType:P.engineType||'standard', gizmoSlots:[...(P.gizmoSlots||[])],
       skills:{...(P.skills||{})}, skillPts:P.skillPts||0,
+      gemBar:P.gemBar||0, gemPts:P.gemPts||0, stat:{...(P.stat||{})},   // STARBLAST LOOP: the bar, the banked points, the eight stat levels
       stim:(P.stim&&P.stim.until>T0)?{n:P.stim.n,buffs:{...P.stim.buffs},left:Math.round(P.stim.until-T0)}:null,   // SR STIMULATORS: save REMAINING seconds (T0 resets on reload) - re-anchored in applySaveState
       weaponInst:P.weaponInst||null, engineInst:P.engineInst||null,   // SR ITEM VARIANCE: fitted weapon/engine instance rolls
 
@@ -6008,6 +6068,7 @@ function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; co
     capLaser:num2(sp.capLaser,P.capLaser), capEngine:num2(sp.capEngine,P.capEngine), rankShown:sp.rankShown,
     engineType:sp.engineType||'standard', gizmoSlots:sp.gizmoSlots||new Array(CFG.GIZMO_SLOTS).fill(null),
     skills:sp.skills||P.skills||{}, skillPts:num2(sp.skillPts,P.skillPts||0),
+    gemBar:num2(sp.gemBar,P.gemBar||0), gemPts:num2(sp.gemPts,P.gemPts||0), stat:(sp.stat&&Object.keys(sp.stat).length)?sp.stat:null,   // STARBLAST LOOP
     stim:(sp.stim&&sp.stim.left>0)?{n:sp.stim.n,buffs:sp.stim.buffs,until:T0+sp.stim.left}:null,   // SR STIMULATORS: re-anchor the timer to the fresh T0
     weaponInst:sp.weaponInst||null, engineInst:sp.engineInst||null,   // SR ITEM VARIANCE: restore fitted weapon/engine instances
     fuelTankType:sp.fuelTankType||'standard', radarType:sp.radarType||'basic', scannerType:sp.scannerType||'none',
@@ -6123,6 +6184,7 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 //  mutate goes through commands or their own per-planet state. Defensive on both sides.
 // =================================================================================================
 window.HOST={
+  sb:(s)=>sbSnapshot(s), spendStat:(k)=>spendStat(ships[0],k), takeTierUp:(k)=>takeTierUp(ships[0],k), term:(h,c)=>term(h,c),   // STARBLAST LOOP (sbhud.js reads / spends through these)
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },
   get contracts(){ return contracts; },   // SR:AWA 2026-07-09: the MISSIONS tab renders coalition contracts as clickable rows (they were terminal-only - the tab's own fallback note admitted it)
@@ -6151,7 +6213,7 @@ window.HOST={
   shieldDivertOf:(s)=>{ s=s||ships[0]; return s.shieldDivert||null; },
   setShieldDivert:(s,mode)=>{ s=s||ships[0]; s.shieldDivert=(mode==='fwd'||mode==='aft')?mode:null; return s.shieldDivert; },
   shieldArcsOf:(s)=>{ s=s||ships[0]; const max=shieldArcMaxFor(s); return { fwd:(s.shieldFwd==null?max:s.shieldFwd), aft:(s.shieldAft==null?max:s.shieldAft), max }; },
-  capLaserOf:(s)=>{ s=s||ships[0]; return { cur:(s.capLaser==null?CFG.LASER_CAP_MAX:s.capLaser), max:CFG.LASER_CAP_MAX }; },
+  capLaserOf:(s)=>{ s=s||ships[0]; return { cur:(s.capLaser==null?capMaxFor(s):s.capLaser), max:capMaxFor(s) }; },
   capEngineOf:(s)=>{ s=s||ships[0]; return { cur:(s.capEngine==null?CFG.ENGINE_CAP_MAX:s.capEngine), max:CFG.ENGINE_CAP_MAX }; },
   skillLvl:(s,k)=>skillLvl(s||ships[0],k),   // SR-M17: pilot skill career - lets missions.js price leadership into contract rewards
   priceOf:(p,k,buying)=>buying?priceOf(p,k)*repBuyFactor(p):priceOf(p,k),
@@ -6175,7 +6237,7 @@ window.HOST={
       // a total restart, not a respawn. ONLY the minds' KNOWLEDGE (GAME_KNOW) and the cross-generation LEADERBOARD
       // persist - the run mattered (it is recorded), the ship starts over.
       P.credits=500; P.score=0; P.skills={}; P.skillPts=0;
-      P.lvl={weapon:1,engine:1,hull:1}; P.weaponType='energy'; P.equip={}; P.contraband={}; P.cargo={};
+      P.lvl={weapon:1,engine:1,hull:1}; P.stat=null; P.gemBar=0; P.gemPts=0; P._tierOffered=null; ensureStat(P);   // STARBLAST LOOP: death restarts the ladder (SB10) P.weaponType='energy'; P.equip={}; P.contraband={}; P.cargo={};
       P.artifacts=[]; P.artEquipped=[]; P.artifactsUnid=[]; P.cores=0; P.probesOwned=0;
       P.fuelCap=CFG.FUEL_CAP; P.senseR=CFG.SENSE_R; P.warpEff=1; P.regenBonus=0;
       P.engineType='standard'; P.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);
@@ -6266,11 +6328,11 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
       burst(tail, 0xfff2d0, 1, CFG.NITRO_TRAIL_SPD*0.6, CFG.NITRO_TRAIL_SZ*0.7); } }
   else if(!nitroWanted) s._nitroSounded=false;
   s.fire-=dt;
-  if(s.capLaser==null) s.capLaser=CFG.LASER_CAP_MAX;
+  if(s.capLaser==null) s.capLaser=capMaxFor(s);
   if(MAN.fire && !MAN.rearActive && s.fire<=0 && s.capLaser>0){ const W=WEAPONS[s.weaponType||'energy']||WEAPONS.energy; if(window.SOUND) SOUND.play('shoot');   // !rearActive: manning the rear turret disables the forward gun (user 2026-07-13)
-    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
+    s.fire=W.cd/((1+CFG.WEAPON_FIRE*(s.lvl.weapon-1))*statMult(s,'fireRate')*(1+(s.artFire||0))*powerMult(shipPower(s).weapons));   // X-WING POWER: weapons power shortens cooldown
     s.capLaser=Math.max(0,s.capLaser-CFG.LASER_CAP_PER_SHOT);   // SR X-WING CAPACITORS: hits 0 -> next fire attempt is blocked until it regens
-    const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1)), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
+    const base=W.dmg*(1+CFG.WEAPON_DMG*(s.lvl.weapon-1))*statMult(s,'damage'), spec={ dmg:base, col:W.col, speed:W.speed, life:W.life, r:W.r, homing:W.homing, splash:W.splash, target:null,
       shape:W.shape, boltLen:W.boltLen, trail:W.trail, trailCd:W.trailCd, flash:W.flash, dmgType:W.dmgType||'energy', slow:W.slow };
     const fwd=FWD.clone().applyQuaternion(s.quat), side=RGT.clone().applyQuaternion(s.quat).multiplyScalar(CFG.MUZZLE_OFF);
     // FORWARD GUN (user 2026-07-14 "shoot where the reticle goes"): fire at the fire-control lead box - the SAME
@@ -6310,6 +6372,7 @@ addEventListener('keydown',e=>{ if(window._rebindCapture){ window._rebindCapture
   if(e.code==='KeyG'){ if(window.STARMAP&&STARMAP.toggle){ STARMAP.toggle(); if(window.SOUND) SOUND.play('ui'); } return; }   // GALAXY map - the primary way to cross systems (user: "easier to access")
   if(e.code==='KeyE'){ if(window.ENGBAY) ENGBAY.toggle(); return; }   // SHIP LAYOUT: open/close the fullscreen Engineering Bay (self-managed, not a PANELS edge panel - see registration comment above)
   if(e.code==='Backquote'){ if(window.PANELS) PANELS.clearSize('ticker'); document.getElementById('ticker').classList.toggle('big'); return; }   // BUGFIX 2026-07-08: clear any manual grip-resize first, or .big's max-width/height rules are silently outranked by the leftover inline width/height
+  if(CFG.GEM_BAR && /^Digit[1-8]$/.test(e.code) && !e.ctrlKey && !e.altKey && !e.metaKey){ const k=CFG.STAT_ORDER[+e.code.slice(5)-1]; const r=spendStat(ships[0],k); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }   // STARBLAST LOOP: 1-8 spend a banked point on that stat
   if(e.code==='KeyP'){ const on=PERIPH.toggle(); term(`🐟 peripheral lens <b>${on?'ON':'OFF'}</b> - the outer strips curve so you see the sides when you turn hard`,'sys'); if(window.SOUND) SOUND.play('ui'); return; }   // PERIPHERAL wide-angle lens (user 2026-07-10) - flip mid-turn to feel the difference
   // ROOT CAUSE of user 2026-07-07 "holding shift does not boost speed": ShiftLeft/ShiftRight were missing from
   // this whitelist, so keysDown never actually recorded Shift during real flight - MAN.nitro could never turn

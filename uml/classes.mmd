@@ -1,0 +1,404 @@
+classDiagram
+  direction LR
+  class ACQUIRE {
+    <<acquire.js>>
+    +acquire()
+    +STRATEGIES()
+    +DEFAULT_ORDER()
+    +verify()
+  }
+  class BRAIN {
+    <<brain/brain.js>>
+    +ready()
+    +status()
+    +ask()
+    +chooseMission()
+    +learnedCount()
+  }
+  class BRAIN {
+    <<brain/brain.js>>
+    +ready()
+    +game()
+    +world()
+    +events()
+    +lastLive()
+    +buildError()
+    +init()
+    +refreshLive()
+    +status()
+    +learnedCount()
+    +ask()
+    +choice()
+  }
+  class Overlay {
+    <<brain/engine/learn.js>>
+  }
+  class Learner {
+    <<brain/engine/learn.js>>
+  }
+  class Planner {
+    <<brain/engine/plan.js>>
+  }
+  class Reasoner {
+    <<brain/engine/reason.js>>
+  }
+  class Store {
+    <<brain/engine/store.js>>
+  }
+  class CENTROID {
+    <<centroid_mind.js>>
+    +evalHoldout()
+    +classify()
+    +learn()
+    +CFG()
+    +_prep()
+    +prep()
+    +_gate()
+    +proposeAndGate()
+    +_split()
+    +splitMembers()
+  }
+  class CHATTER {
+    <<chatter.js>>
+    +CHATTER_CFG()
+    +VOICE_CFG()
+    +tick()
+    +onEvent()
+    +setVoices()
+    +voicesOn()
+    +voiceSay()
+    +voiceWorm()
+    +voiceTest()
+    +voiceParams()
+    +status()
+    +_queue()
+  }
+  class CONTRA {
+    <<contradiction_ledger.js>>
+    +note()
+    +quarantine()
+    +isQuarantined()
+    +status()
+    +value()
+    +reason()
+    +tainted()
+    +quarantinedKeys()
+    +clear()
+    +snapshot()
+    +restore()
+    +attach()
+    +auditStore()
+    +FUNCTIONAL_RELS()
+    +ACTUAL()
+  }
+  class DELIBERATE {
+    <<deliberate.js>>
+    +CFG()
+    +deliberate()
+    +transcript()
+    +buildIndex()
+    +shortestPath()
+    +betweenness()
+    +verifyChain()
+    +gapDescription()
+    +seek()
+  }
+  class ENGBAY {
+    <<engbay.js>>
+    +mount()
+    +build()
+    +show()
+    +hide()
+    +toggle()
+    +visible()
+    +setShown()
+    +CFG()
+    +_EB()
+    +EB()
+  }
+  class GAMEMOD {
+    <<gamemod.js>>
+    +MODCFG()
+    +set()
+    +rule()
+    +js()
+    +tint()
+    +emit()
+    +tick()
+    +revert()
+    +revertAll()
+    +intent()
+    +runProgram()
+    +validateProgram()
+    +list()
+    +log()
+    +tunables()
+  }
+  class HULLMODELS {
+    <<hullmodels.js>>
+    +build()
+    +T()
+    +tintable()
+    +metal()
+    +classes()
+    +keys()
+    +scanBadge()
+    +overlay()
+  }
+  class HULLMODELS {
+    <<hullmodels.js>>
+    +build()
+    +classes()
+    +scanBadge()
+  }
+  class ICONS {
+    <<item_icons.js>>
+    +dataURL()
+    +img()
+    +draw()
+    +qualityOf()
+    +KIND_ALIAS()
+    +QUALITY()
+    +CFG()
+    +clearCache()
+    +_setCanvasFactory()
+  }
+  class ITEMVAR {
+    <<item_variance.js>>
+    +roll()
+    +describe()
+    +QUALITY()
+  }
+  class ITEMVAR {
+    <<item_variance.js>>
+    +roll()
+    +describe()
+    +QUALITY()
+    +_hash()
+    +hashStr()
+  }
+  class KNOWLEDGE {
+    <<knowledge.js>>
+    +createStore()
+    +VERSION()
+  }
+  class KHUD {
+    <<knowledge_hud.js>>
+    +mount()
+    +update()
+    +toggle()
+    +visible()
+    +setShown()
+    +CFG()
+    +_H()
+    +H()
+  }
+  class KOBS {
+    <<knowledge_screen.js>>
+    +open()
+    +close()
+    +toggle()
+    +visible()
+    +ask()
+    +mount()
+    +build()
+    +CFG()
+    +_KO()
+    +KO()
+    +_buildGraph()
+    +buildGraph()
+    +_ground()
+    +groundEntities()
+    +_fitToCanvas()
+    +fitToCanvas()
+    +_layout()
+    +layout()
+  }
+  class KRIPKE {
+    <<kripke_mind.js>>
+    +verdict()
+    +worlds()
+    +holders()
+    +summary()
+    +CFG()
+  }
+  class PANELS {
+    <<panels.js>>
+    +register()
+    +open()
+    +close()
+    +toggle()
+    +isOpen()
+    +list()
+    +reflow()
+    +clearSize()
+    +resetLayout()
+    +isManual()
+  }
+  class PASSENGER {
+    <<passenger.js>>
+    +init()
+    +route()
+    +onEvent()
+    +powers()
+    +ponder()
+    +advise()
+    +powerAdvice()
+    +voice()
+    +canon()
+    +choice()
+    +posting()
+    +the()
+    +describe()
+    +refusal()
+    +preference()
+    +missionTaken()
+    +mood()
+    +setPonder()
+    +... 14 more
+  }
+  class PLANETMENU {
+    <<planetmenu.js>>
+    +init()
+    +tick()
+    +open()
+    +close()
+    +isOpen()
+    +pushEvent()
+    +getLog()
+    +setLog()
+    +hangarHtml()
+    +onClick()
+    +GEAR_SLOTS()
+    +_rumors()
+    +_patrons()
+  }
+  class POWERPANEL {
+    <<power_panel.js>>
+    +mount()
+    +show()
+    +hide()
+    +toggle()
+    +visible()
+    +setShown()
+    +CFG()
+    +_PP()
+    +PP()
+  }
+  class HOST {
+    <<power_panel.js>>
+  }
+  class HOST {
+    <<power_panel.js>>
+  }
+  class SBHUD {
+    <<sbhud.js>>
+    +init()
+    +refresh()
+    +flash()
+    +offerTier()
+    +CFG()
+  }
+  class SOBER {
+    <<sober_gate.js>>
+    +check()
+    +CFG()
+    +_contentWords()
+    +contentWords()
+    +_identifiers()
+    +identifiers()
+  }
+  class SOUND {
+    <<sound.js>>
+    +CFG()
+    +init()
+    +play()
+    +setMute()
+    +muted()
+    +toggleMute()
+    +setVolume()
+    +volume()
+    +names()
+    +aliases()
+    +ready()
+    +_voices()
+  }
+  class SPEECHGEN {
+    <<speech_gen.js>>
+    +line()
+    +registerOf()
+    +voiceOf()
+    +CFG()
+    +_frames()
+  }
+  class SPEECH_IN {
+    <<speech_input.js>>
+    +supported()
+    +listening()
+    +continuous()
+    +start()
+    +stop()
+    +toggle()
+    +setContinuous()
+    +wormDone()
+  }
+  class STARNEST {
+    <<starnest_sky.js>>
+    +bake()
+    +CFG()
+  }
+  class TAMIBATTLEUI {
+    <<tami_battle_ui.js>>
+    +render()
+    +iconFor()
+    +categoryIconFor()
+  }
+  class TEXTQUESTS {
+    <<textquests.js>>
+    +tryOffer()
+    +active()
+    +activeView()
+    +choose()
+    +CFG()
+    +_TEMPLATES()
+    +TEMPLATES()
+  }
+  class THOUGHTS {
+    <<thoughts.js>>
+    +CFG()
+    +init()
+    +load()
+    +tick()
+    +chainFor()
+    +scoreChain()
+    +commitChain()
+    +buildChain()
+    +verifyChain()
+    +fitness()
+    +pilots()
+    +wipe()
+    +advisorLawHolds()
+    +mentionGrounded()
+    +earned()
+    +groundedPoolFor()
+    +poolFor()
+    +attachFog()
+    +... 4 more
+  }
+  class VISION {
+    <<vision.js>>
+    +VCFG()
+    +create()
+  }
+  BRAIN ..> HOST : reads live state
+  BRAIN ..> HOST : reads live state
+  CHATTER ..> HOST : reads live state
+  ENGBAY ..> HOST : reads live state
+  GAMEMOD ..> HOST : reads live state
+  KHUD ..> HOST : reads live state
+  PANELS ..> HOST : reads live state
+  PASSENGER ..> HOST : reads live state
+  PLANETMENU ..> HOST : reads live state
+  POWERPANEL ..> HOST : reads live state
+  TEXTQUESTS ..> HOST : reads live state
+  PASSENGER --> BRAIN : ask / chooseMission

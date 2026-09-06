@@ -1,0 +1,169 @@
+flowchart LR
+  Pilot((Pilot))
+  Passenger((Passenger))
+  AIpilot((AI pilot))
+  subgraph E1["E1 STARBLAST"]
+    UC_101["UC-101 WORKS\nPilot shoots a rock; it splits and spills gems"]
+    UC_102["UC-102 WORKS\nPilot flies over a gem and collects it"]
+    UC_103["UC-103 WORKS\nDrone fetches loose gems and cuts seams into rocks"]
+    UC_104["UC-104 WORKS\nMined gems fill a gem bar; a full bar banks an upgrade point"]
+    UC_105["UC-105 WORKS\nPilot spends a point on one of eight stats with keys 1-8, in flight"]
+    UC_106["UC-106 PARTLY\nPilot buys weapon / engine / hull levels with credits in flight"]
+    UC_107["UC-107 WORKS\nA maxed ship offers the next tier; Pilot chooses a hull anywhere"]
+    UC_108["UC-108 WORKS\nPilot dies; gems and credits spill; Pilot respawns as a Scout in the belt"]
+    UC_109["UC-109 WORKS\nPilot reads rocks, gems, ships and drones on the radar"]
+    UC_110["UC-110 WORKS\nShooting drains energy; it regenerates"]
+    UC_111["UC-111 WORKS\nThe HUD shows stat rows, the bar, points and a kill feed on one screen"]
+  end
+  subgraph E2["E2 RANGERS"]
+    UC_201["UC-201 WORKS\nPilot docks at a planet and sees its screen"]
+    UC_202["UC-202 WORKS\nPilot buys and sells goods at organic prices"]
+    UC_203["UC-203 PARTLY\nPilot sees where to sell what is held, from prices already seen"]
+    UC_204["UC-204 WORKS\nPilot buys a weapon with condition, weight and power"]
+    UC_205["UC-205 PARTLY\nPilot compares a weapon against the fitted one before buying"]
+    UC_206["UC-206 PARTLY\nPilot fits gear into hardpoints and gizmo slots on a ship board"]
+    UC_207["UC-207 WORKS\nPilot takes a rank-gated contract from the board"]
+    UC_208["UC-208 PARTLY\nPilot reads a contract as a card: target, distance, danger, reward"]
+    UC_209["UC-209 WORKS\nPassenger chooses the contract and says why"]
+    UC_210["UC-210 WORKS\nPilot follows the tracker and the on-screen marker to the target"]
+    UC_211["UC-211 WORKS\nPilot jumps between systems on the star map, paying fuel"]
+    UC_212["UC-212 WORKS\nSynod escalates; Pilot liberates, defends, assaults the stronghold"]
+    UC_213["UC-213 WORKS\nReputation, customs, contraband, fence"]
+    UC_214["UC-214 WORKS\nPilot ranks up and spends skill points"]
+    UC_215["UC-215 WORKS\nPilot plays a text quest at a planet"]
+    UC_216["UC-216 PARTLY\nPilot hears rumours and hires a wingman at the bar"]
+    UC_217["UC-217 PARTLY\nPilot analyzes artifacts and deploys probes at the science station"]
+    UC_218["UC-218 WORKS\nThe galaxy persists across reloads and generations"]
+  end
+  subgraph E3["E3 EGOSOFT"]
+    UC_301["UC-301 MISSING\nPilot builds a station on a held world and it produces goods"]
+    UC_302["UC-302 MISSING\nPilot assigns AI ships to a trade route between two markets"]
+    UC_303["UC-303 MISSING\nPilot commands a wing: follow, attack, dock"]
+    UC_304["UC-304 MISSING\nSystems are separate bubbles joined by lanes; a contested system infects its neighbours"]
+    UC_305["UC-305 MISSING\nSynod adapts its loadouts across generations"]
+  end
+  subgraph E4["E4 GROUND"]
+    UC_401["UC-401 DEPRECATED\nPilot lands and walks the surface"]
+    UC_402["UC-402 DEPRECATED\nPilot fights a turn-based battle on the Tami rules"]
+    UC_403["UC-403 MISSING\nPilot walks a first-person surface (three.js FPS view)"]
+    UC_404["UC-404 MISSING\nGround battle shows turn order, technique detail, matchup preview, terrain, deployment"]
+  end
+  subgraph E5["E5 MINDS"]
+    UC_501["UC-501 WORKS\nPilot asks the Passenger anything; it answers with a reasoning transcript from the novel, the live game or the shards, or refuses"]
+    UC_502["UC-502 WORKS\nPassenger advises on threat, hull, fuel, hold, mining"]
+    UC_503["UC-503 WORKS\nPassenger gets angry when ignored and shocks the screen; calms when obeyed"]
+    UC_504["UC-504 WORKS\nAI pilots trade, hunt, learn steering and targets"]
+    UC_505["UC-505 WORKS\nPilot inspects the minds: knowledge store, Kripke frame, coop proof, growth, ToM"]
+    UC_506["UC-506 PARTLY\nPilots talk aloud and the Pilot can speak back"]
+    UC_507["UC-507 WORKS\nThe minds write validated rules into the game"]
+  end
+  subgraph E6["E6 SHELL"]
+    UC_601["UC-601 WORKS\nPilot shows or hides any window and opens any screen from one place"]
+    UC_602["UC-602 WORKS\nPilot sets any panel's transparency; the box really darkens"]
+    UC_603["UC-603 MISSING\nPilot sees one top bar: FLY · MAP · SHIP · MARKET · CONTRACTS · PASSENGER · DEPRECATED"]
+    UC_604["UC-604 MISSING\nWhat is broken sits behind DEPRECATED and is not advertised"]
+    UC_605["UC-605 WORKS\nPilot goes fullscreen"]
+    UC_606["UC-606 WORKS\nPilot finds every generated art file with its prompt"]
+  end
+  Pilot --> UC_101
+  style UC_101 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_102
+  style UC_102 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_103
+  style UC_103 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_104
+  style UC_104 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_105
+  style UC_105 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_106
+  style UC_106 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_107
+  style UC_107 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_108
+  style UC_108 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_109
+  style UC_109 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_110
+  style UC_110 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_111
+  style UC_111 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_201
+  style UC_201 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_202
+  style UC_202 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_203
+  style UC_203 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_204
+  style UC_204 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_205
+  style UC_205 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_206
+  style UC_206 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_207
+  style UC_207 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_208
+  style UC_208 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Passenger --> UC_209
+  style UC_209 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_210
+  style UC_210 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_211
+  style UC_211 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_212
+  style UC_212 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_213
+  style UC_213 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_214
+  style UC_214 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_215
+  style UC_215 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_216
+  style UC_216 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_217
+  style UC_217 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_218
+  style UC_218 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_301
+  style UC_301 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_302
+  style UC_302 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_303
+  style UC_303 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_304
+  style UC_304 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_305
+  style UC_305 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_401
+  style UC_401 fill:#2a2040,stroke:#b48cff,color:#e3ebf3
+  Pilot --> UC_402
+  style UC_402 fill:#2a2040,stroke:#b48cff,color:#e3ebf3
+  Pilot --> UC_403
+  style UC_403 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_404
+  style UC_404 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_501
+  style UC_501 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Passenger --> UC_502
+  style UC_502 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Passenger --> UC_503
+  style UC_503 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  AIpilot --> UC_504
+  style UC_504 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_505
+  style UC_505 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_506
+  style UC_506 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  Pilot --> UC_507
+  style UC_507 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_601
+  style UC_601 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_602
+  style UC_602 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_603
+  style UC_603 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_604
+  style UC_604 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  Pilot --> UC_605
+  style UC_605 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
+  Pilot --> UC_606
+  style UC_606 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3

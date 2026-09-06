@@ -1,0 +1,2652 @@
+{
+ "generated": "2026-09-06T11:54:39",
+ "modules": [
+  {
+   "file": "acquire.js",
+   "lines": 100,
+   "classes": [
+    {
+     "name": "ACQUIRE",
+     "members": [
+      "acquire",
+      "STRATEGIES",
+      "DEFAULT_ORDER",
+      "verify"
+     ],
+     "memberTotal": 4
+    }
+   ],
+   "functions": [
+    "proposeLatent",
+    "proposeModal",
+    "proposeGeometric",
+    "proposeReveal",
+    "verify",
+    "acquire"
+   ],
+   "functionTotal": 6,
+   "cfg": [
+    "ROUNDS"
+   ],
+   "cfgTotal": 1
+  },
+  {
+   "file": "brain/brain.js",
+   "lines": 255,
+   "classes": [
+    {
+     "name": "BRAIN",
+     "members": [
+      "ready",
+      "status",
+      "ask",
+      "chooseMission",
+      "learnedCount"
+     ],
+     "memberTotal": 5
+    },
+    {
+     "name": "BRAIN",
+     "members": [
+      "ready",
+      "game",
+      "world",
+      "events",
+      "lastLive",
+      "buildError",
+      "init",
+      "refreshLive",
+      "status",
+      "learnedCount",
+      "ask",
+      "choice"
+     ],
+     "memberTotal": 12
+    }
+   ],
+   "functions": [
+    "makeGameIndex",
+    "loadJson",
+    "loadGz"
+   ],
+   "functionTotal": 3,
+   "cfg": [
+    "WORLD_URL",
+    "WORLD_PROBE_MS",
+    "boot",
+    "PID_BASE",
+    "id",
+    "SRC_NOVEL",
+    "SRC_LORE",
+    "SRC_GAME",
+    "tier",
+    "shapes",
+    "location",
+    "star",
+    "aliases"
+   ],
+   "cfgTotal": 13
+  },
+  {
+   "file": "brain/engine/confidence.js",
+   "lines": 75,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "brain/engine/learn.js",
+   "lines": 231,
+   "classes": [
+    {
+     "name": "Overlay",
+     "members": [],
+     "memberTotal": 0,
+     "kind": "export class"
+    },
+    {
+     "name": "Learner",
+     "members": [],
+     "memberTotal": 0,
+     "kind": "export class"
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "MAX_ROUNDS",
+    "so",
+    "DERIVE_DEPTH",
+    "walk",
+    "FETCH_CLAIMS",
+    "entity",
+    "bound",
+    "FETCH_SEARCH",
+    "search",
+    "LABEL_OBJECTS",
+    "up",
+    "WD_API"
+   ],
+   "cfgTotal": 12
+  },
+  {
+   "file": "brain/engine/lexicon.js",
+   "lines": 119,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "brain/engine/norm.js",
+   "lines": 33,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "brain/engine/plan.js",
+   "lines": 342,
+   "classes": [
+    {
+     "name": "Planner",
+     "members": [],
+     "memberTotal": 0,
+     "kind": "export class"
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "brain/engine/reason.js",
+   "lines": 589,
+   "classes": [
+    {
+     "name": "Reasoner",
+     "members": [],
+     "memberTotal": 0,
+     "kind": "export class"
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "LINK_TRY",
+    "viability",
+    "BRANCH",
+    "back",
+    "OBJ_PER_HOP",
+    "branches",
+    "RIVALS_SHOWN",
+    "DEFINE_EDGES",
+    "COUNT_READ",
+    "tested",
+    "COUNT_EXPAND",
+    "count",
+    "ISA_DEPTH",
+    "deep",
+    "Mammalia",
+    "PATH_FANOUT",
+    "PATH_READINGS",
+    "connection",
+    "WHERE_EDGES",
+    "ladder",
+    "KIND_DEPTH",
+    "NAME_SCAN",
+    "through",
+    "learner",
+    "LINK"
+   ],
+   "cfgTotal": 25
+  },
+  {
+   "file": "brain/engine/store.js",
+   "lines": 137,
+   "classes": [
+    {
+     "name": "Store",
+     "members": [],
+     "memberTotal": 0,
+     "kind": "export class"
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "CACHE_SHARDS"
+   ],
+   "cfgTotal": 1
+  },
+  {
+   "file": "centroid_mind.js",
+   "lines": 258,
+   "classes": [
+    {
+     "name": "CENTROID",
+     "members": [
+      "evalHoldout",
+      "classify",
+      "learn",
+      "CFG",
+      "_prep",
+      "prep",
+      "_gate",
+      "proposeAndGate",
+      "_split",
+      "splitMembers"
+     ],
+     "memberTotal": 10
+    }
+   ],
+   "functions": [
+    "win",
+    "store",
+    "allEdges",
+    "hash32",
+    "buildFactSpace",
+    "cosSparse",
+    "centroidOf",
+    "cosToCentroid",
+    "labelMap",
+    "splitMembers",
+    "proposeAndGate",
+    "prep",
+    "evalHoldout",
+    "classify",
+    "learn"
+   ],
+   "functionTotal": 15,
+   "cfg": [
+    "MARGIN",
+    "gate",
+    "considered",
+    "MIN_EVIDENCE",
+    "RULE",
+    "category",
+    "TRAIN_FRAC",
+    "in",
+    "CRITICAL",
+    "offers_tool",
+    "and",
+    "got",
+    "symbols",
+    "EXPANSION",
+    "own",
+    "sets"
+   ],
+   "cfgTotal": 16
+  },
+  {
+   "file": "chatter.js",
+   "lines": 232,
+   "classes": [
+    {
+     "name": "CHATTER",
+     "members": [
+      "CHATTER_CFG",
+      "VOICE_CFG",
+      "tick",
+      "onEvent",
+      "setVoices",
+      "voicesOn",
+      "voiceSay",
+      "voiceWorm",
+      "voiceTest",
+      "voiceParams",
+      "status",
+      "_queue"
+     ],
+     "memberTotal": 12
+    }
+   ],
+   "functions": [
+    "segOf",
+    "eligible",
+    "nearestTo",
+    "pickSegDocs",
+    "liveLine",
+    "stateQuery",
+    "makeAmbient",
+    "onEvent",
+    "runJob",
+    "tick",
+    "hash32",
+    "clampR",
+    "voiceParams",
+    "speakText",
+    "pump",
+    "setVoices",
+    "voiceSay",
+    "voiceWorm",
+    "voiceTest",
+    "status"
+   ],
+   "functionTotal": 20,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "conquest.js",
+   "lines": 442,
+   "classes": [],
+   "functions": [
+    "host",
+    "num",
+    "clamp",
+    "nameOf",
+    "notify",
+    "sound",
+    "cq",
+    "ownerKind",
+    "playerNear",
+    "infraCross",
+    "hurtInfra",
+    "regenInfra",
+    "maybeLaunch",
+    "progressInvasion",
+    "slowTick"
+   ],
+   "functionTotal": 15,
+   "cfg": [
+    "cadence",
+    "SLOW_TICK_S",
+    "updates",
+    "DT_MAX_S",
+    "destroyed",
+    "it",
+    "DEFENSES",
+    "first",
+    "maximum",
+    "battery",
+    "capture",
+    "idempotent",
+    "notify",
+    "resolves",
+    "paywall",
+    "describe"
+   ],
+   "cfgTotal": 16
+  },
+  {
+   "file": "contradiction_ledger.js",
+   "lines": 154,
+   "classes": [
+    {
+     "name": "CONTRA",
+     "members": [
+      "note",
+      "quarantine",
+      "isQuarantined",
+      "status",
+      "value",
+      "reason",
+      "tainted",
+      "quarantinedKeys",
+      "clear",
+      "snapshot",
+      "restore",
+      "attach",
+      "auditStore",
+      "FUNCTIONAL_RELS",
+      "ACTUAL"
+     ],
+     "memberTotal": 15
+    }
+   ],
+   "functions": [
+    "win",
+    "vkey",
+    "kkey",
+    "note",
+    "quarantine",
+    "isQuarantined",
+    "status",
+    "value",
+    "reason",
+    "tainted",
+    "quarantinedKeys",
+    "clear",
+    "snapshot",
+    "restore",
+    "auditStore",
+    "attach"
+   ],
+   "functionTotal": 16,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "coop_proof.js",
+   "lines": 482,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "deliberate.js",
+   "lines": 254,
+   "classes": [
+    {
+     "name": "DELIBERATE",
+     "members": [
+      "CFG",
+      "deliberate",
+      "transcript",
+      "buildIndex",
+      "shortestPath",
+      "betweenness",
+      "verifyChain",
+      "gapDescription",
+      "seek"
+     ],
+     "memberTotal": 9
+    }
+   ],
+   "functions": [
+    "buildIndex",
+    "bfsDist",
+    "shortestPath",
+    "betweenness",
+    "axisWHAT",
+    "axisHOW",
+    "axisWHY",
+    "axisWHEN",
+    "edgeExists",
+    "verifyChain",
+    "deliberate",
+    "transcript",
+    "gapDescription",
+    "seek"
+   ],
+   "functionTotal": 14,
+   "cfg": [
+    "W_PULL",
+    "weight",
+    "reduction",
+    "W_CENT",
+    "betweenness",
+    "W_NOV",
+    "frontier",
+    "MAX_NODES",
+    "ceiling",
+    "BEAM",
+    "layer",
+    "MAX_DEPTH",
+    "chains"
+   ],
+   "cfgTotal": 13
+  },
+  {
+   "file": "engbay.js",
+   "lines": 695,
+   "classes": [
+    {
+     "name": "ENGBAY",
+     "members": [
+      "mount",
+      "build",
+      "show",
+      "hide",
+      "toggle",
+      "visible",
+      "setShown",
+      "CFG",
+      "_EB",
+      "EB"
+     ],
+     "memberTotal": 10
+    }
+   ],
+   "functions": [
+    "win",
+    "doc",
+    "HOST",
+    "el",
+    "esc",
+    "iconImg",
+    "shipOr",
+    "mountSchema",
+    "hullPolygon",
+    "tickEnd",
+    "pointSvg",
+    "refPointSvg",
+    "shieldArcPaths",
+    "shieldArcSvg",
+    "shieldReadoutHtml",
+    "schematicSvg",
+    "pickerHtml",
+    "gridSlotDefs",
+    "gridBoxHtml",
+    "micromoduleGridHtml",
+    "slotGridHtml",
+    "onGridClick",
+    "onGridPick",
+    "skillsHtml",
+    "nearestStationHtml",
+    "attrEsc",
+    "instForKind",
+    "instLine",
+    "tipAttr",
+    "holdHtml",
+    "render",
+    "onMountClick",
+    "onPick",
+    "wireClicks",
+    "wireTips",
+    "dropAccepts",
+    "clearDropHl",
+    "dropTargetOf",
+    "wireDrag",
+    "build",
+    "show",
+    "hide",
+    "toggle",
+    "visible",
+    "setShown"
+   ],
+   "functionTotal": 45,
+   "cfg": [
+    "VIEWBOX",
+    "Z",
+    "embedding",
+    "DOT_R",
+    "radius",
+    "DOT_R_REF",
+    "TICK_LEN",
+    "mount",
+    "COL_HULL_FILL",
+    "COL_HULL_STROKE",
+    "COL_EMPTY",
+    "COL_EMPTY_STROKE",
+    "COL_WEAPON",
+    "COL_WEAPON_DIM",
+    "COL_GIZMO",
+    "COL_GIZMO_DIM",
+    "COL_REF",
+    "COL_TEXT",
+    "COL_DIM",
+    "POLL_MS",
+    "open",
+    "state",
+    "ARCS",
+    "the",
+    "silhouette",
+    "extents",
+    "every",
+    "convention"
+   ],
+   "cfgTotal": 28
+  },
+  {
+   "file": "gamemod.js",
+   "lines": 269,
+   "classes": [
+    {
+     "name": "GAMEMOD",
+     "members": [
+      "MODCFG",
+      "set",
+      "rule",
+      "js",
+      "tint",
+      "emit",
+      "tick",
+      "revert",
+      "revertAll",
+      "intent",
+      "runProgram",
+      "validateProgram",
+      "list",
+      "log",
+      "tunables"
+     ],
+     "memberTotal": 15
+    }
+   ],
+   "functions": [
+    "logmod",
+    "roots",
+    "resolve",
+    "listTunables",
+    "setPath",
+    "fmt",
+    "tint",
+    "checkCond",
+    "runActions",
+    "defineRule",
+    "emit",
+    "shieldObj",
+    "shieldArr",
+    "guardCode",
+    "runJS",
+    "revert",
+    "revertAll",
+    "trim",
+    "finiteSweep",
+    "tick",
+    "isImperative",
+    "intent",
+    "validateProgram",
+    "runProgram",
+    "mutSay",
+    "pilotTurn"
+   ],
+   "functionTotal": 26,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "gravity_well.js",
+   "lines": 320,
+   "classes": [],
+   "functions": [
+    "win",
+    "store",
+    "contra",
+    "hash32",
+    "rngOf",
+    "storeEdges",
+    "build",
+    "relVecs",
+    "residualOf",
+    "scaleOf",
+    "repair",
+    "chainEval",
+    "report",
+    "positions",
+    "relations"
+   ],
+   "functionTotal": 15,
+   "cfg": [
+    "D",
+    "dims",
+    "W_ANCHOR",
+    "translation",
+    "REPAIR_TRIGGER",
+    "ported",
+    "scale",
+    "RELAX_SWEEPS",
+    "cap",
+    "RELAX_EPS",
+    "sweep",
+    "MIN_EDGES_PER_REL",
+    "constraint",
+    "EVAL_MAX_PAIRS",
+    "depth",
+    "slice",
+    "SEED",
+    "seeded"
+   ],
+   "cfgTotal": 18
+  },
+  {
+   "file": "growth_loop.js",
+   "lines": 615,
+   "classes": [],
+   "functions": [
+    "win",
+    "host",
+    "know",
+    "contra",
+    "hash32",
+    "rngOf",
+    "fs2",
+    "MainGraph",
+    "propSources",
+    "resolve",
+    "memberClass",
+    "excludersOf",
+    "excluderOf",
+    "exclusionCluster",
+    "AuditLedger",
+    "HoldingPen",
+    "RuleSynthesizer",
+    "GrowthEngine",
+    "GameOracle",
+    "gameColdBuilder",
+    "grow",
+    "report",
+    "answer",
+    "presumeRole",
+    "measurePresumption"
+   ],
+   "functionTotal": 25,
+   "cfg": [
+    "CONF_FLOOR",
+    "ported",
+    "consider",
+    "K_EXC",
+    "cluster",
+    "SUPPORT_RULE",
+    "universal",
+    "ROUNDS",
+    "rounds",
+    "NOISE_AT_EDGE",
+    "range",
+    "channel",
+    "CONF_NEAR",
+    "CONF_FAR",
+    "weaker",
+    "FIELDS",
+    "MAX_MEMBERS",
+    "call",
+    "SEED",
+    "PRNG"
+   ],
+   "cfgTotal": 20
+  },
+  {
+   "file": "hullmodels.js",
+   "lines": 739,
+   "classes": [
+    {
+     "name": "HULLMODELS",
+     "members": [
+      "build",
+      "T",
+      "tintable",
+      "metal",
+      "classes",
+      "keys",
+      "scanBadge",
+      "overlay"
+     ],
+     "memberTotal": 8
+    },
+    {
+     "name": "HULLMODELS",
+     "members": [
+      "build",
+      "classes",
+      "scanBadge"
+     ],
+     "memberTotal": 3
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "size",
+    "UNIT",
+    "color",
+    "DEFAULT_HUE",
+    "DEFAULT_SAT",
+    "DEFAULT_LIGHT",
+    "feel",
+    "metal",
+    "METAL",
+    "ROUGH",
+    "EMISSIVE_MUL",
+    "texture",
+    "bumped",
+    "armor",
+    "TEX_SIZE",
+    "scale",
+    "ENG_SCALE",
+    "accent",
+    "COCKPIT_COL",
+    "COCKPIT_EMIT",
+    "canvas",
+    "BADGE_W",
+    "BADGE_H",
+    "BADGE_WORLD",
+    "aspect",
+    "BADGE_LIFT",
+    "floats",
+    "SHIELD_COL",
+    "HULL_HI",
+    "full",
+    "HULL_LO",
+    "empty",
+    "BAR_BG"
+   ],
+   "cfgTotal": 33
+  },
+  {
+   "file": "inhabitant.js",
+   "lines": 176,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "item_icons.js",
+   "lines": 347,
+   "classes": [
+    {
+     "name": "ICONS",
+     "members": [
+      "dataURL",
+      "img",
+      "draw",
+      "qualityOf",
+      "KIND_ALIAS",
+      "QUALITY",
+      "CFG",
+      "clearCache",
+      "_setCanvasFactory"
+     ],
+     "memberTotal": 9
+    }
+   ],
+   "functions": [
+    "hash32",
+    "rngOf",
+    "hsl",
+    "cssCol",
+    "qualityOf",
+    "P",
+    "rr",
+    "C",
+    "glow",
+    "unglow",
+    "accentOf",
+    "draw",
+    "makeCanvas",
+    "dataURL",
+    "img",
+    "clearCache"
+   ],
+   "functionTotal": 16,
+   "cfg": [
+    "BASE",
+    "draw",
+    "size",
+    "DPR",
+    "dataURLs",
+    "Q_CUTS",
+    "legendary",
+    "FRAME_R",
+    "radius",
+    "CACHE_MAX"
+   ],
+   "cfgTotal": 10
+  },
+  {
+   "file": "item_variance.js",
+   "lines": 100,
+   "classes": [
+    {
+     "name": "ITEMVAR",
+     "members": [
+      "roll",
+      "describe",
+      "QUALITY"
+     ],
+     "memberTotal": 3
+    },
+    {
+     "name": "ITEMVAR",
+     "members": [
+      "roll",
+      "describe",
+      "QUALITY",
+      "_hash",
+      "hashStr"
+     ],
+     "memberTotal": 5
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "knowledge.js",
+   "lines": 78,
+   "classes": [
+    {
+     "name": "KNOWLEDGE",
+     "members": [
+      "createStore",
+      "VERSION"
+     ],
+     "memberTotal": 2
+    }
+   ],
+   "functions": [
+    "edgeKey",
+    "createStore"
+   ],
+   "functionTotal": 2,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "knowledge_hud.js",
+   "lines": 455,
+   "classes": [
+    {
+     "name": "KHUD",
+     "members": [
+      "mount",
+      "update",
+      "toggle",
+      "visible",
+      "setShown",
+      "CFG",
+      "_H",
+      "H"
+     ],
+     "memberTotal": 8
+    }
+   ],
+   "functions": [
+    "doc",
+    "win",
+    "el",
+    "esc",
+    "clip",
+    "readStore",
+    "readPillars",
+    "readFitness",
+    "buildGraph",
+    "layout",
+    "drawGraph",
+    "statusLine",
+    "renderText",
+    "build",
+    "show",
+    "hide",
+    "mount",
+    "update",
+    "toggle",
+    "visible",
+    "setShown"
+   ],
+   "functionTotal": 21,
+   "cfg": [
+    "MAX_SHARED_FACTS",
+    "viz",
+    "MAX_PRIV_FACTS",
+    "facts",
+    "alongside",
+    "split",
+    "MAX_NODES",
+    "rendered",
+    "CANVAS_W",
+    "width",
+    "CANVAS_H",
+    "NODE_R",
+    "radius",
+    "PANEL_W",
+    "too",
+    "COL_SHARED",
+    "knowledge",
+    "COL_SHARED_DIM",
+    "edges",
+    "COL_PRIV",
+    "committed",
+    "shortly",
+    "order",
+    "buildGraph",
+    "required",
+    "web",
+    "Menlo",
+    "Consolas",
+    "online",
+    "it"
+   ],
+   "cfgTotal": 30
+  },
+  {
+   "file": "knowledge_screen.js",
+   "lines": 651,
+   "classes": [
+    {
+     "name": "KOBS",
+     "members": [
+      "open",
+      "close",
+      "toggle",
+      "visible",
+      "ask",
+      "mount",
+      "build",
+      "CFG",
+      "_KO",
+      "KO",
+      "_buildGraph",
+      "buildGraph",
+      "_ground",
+      "groundEntities",
+      "_fitToCanvas",
+      "fitToCanvas",
+      "_layout",
+      "layout"
+     ],
+     "memberTotal": 18
+    }
+   ],
+   "functions": [
+    "win",
+    "doc",
+    "el",
+    "esc",
+    "clip",
+    "store",
+    "storeState",
+    "storeStats",
+    "allEdges",
+    "buildGraph",
+    "layoutSpiral",
+    "fitToCanvas",
+    "layoutGravity",
+    "layout",
+    "edgeKey",
+    "draw",
+    "feedLog",
+    "renderFeed",
+    "wrapCommit",
+    "novelData",
+    "renderNovelHead",
+    "renderNovelChars",
+    "renderNovelBody",
+    "clearHl",
+    "stopSteps",
+    "askLine",
+    "groundEntities",
+    "ask",
+    "playSteps",
+    "renderStats",
+    "build",
+    "hitNode",
+    "sizeCanvas",
+    "open",
+    "close",
+    "toggle",
+    "visible"
+   ],
+   "functionTotal": 37,
+   "cfg": [
+    "Z",
+    "engbay",
+    "pmRoot",
+    "opened",
+    "STEP_MS",
+    "cadence",
+    "read",
+    "POLL_MS",
+    "open",
+    "MAX_SHARED",
+    "drawn",
+    "MAX_PRIV",
+    "agents",
+    "MAX_NODES",
+    "cap",
+    "NODE_R",
+    "radius",
+    "HL_NODE_R",
+    "LABEL_MAX",
+    "clip",
+    "FEED_MAX",
+    "size",
+    "ASK_EDGE_STEPS",
+    "ask",
+    "ASK_CHAIN_STEPS",
+    "replayed",
+    "KNOWN_SAMPLE",
+    "abstain",
+    "COL_SHARED",
+    "COL_SHARED_DIM",
+    "COL_PRIV",
+    "COL_PRIV_DIM",
+    "COL_HL",
+    "COL_FOCUS",
+    "COL_TXT",
+    "COL_DIM",
+    "COL_OK",
+    "COL_WARN",
+    "COL_BG",
+    "COL_PANEL"
+   ],
+   "cfgTotal": 41
+  },
+  {
+   "file": "kripke_mind.js",
+   "lines": 122,
+   "classes": [
+    {
+     "name": "KRIPKE",
+     "members": [
+      "verdict",
+      "worlds",
+      "holders",
+      "summary",
+      "CFG"
+     ],
+     "memberTotal": 5
+    }
+   ],
+   "functions": [
+    "win",
+    "store",
+    "edgeKey",
+    "worlds",
+    "holders",
+    "verdict",
+    "summary"
+   ],
+   "functionTotal": 7,
+   "cfg": [
+    "MAX_HOLDERS_LISTED",
+    "verdict",
+    "cap"
+   ],
+   "cfgTotal": 3
+  },
+  {
+   "file": "kripke_planner.js",
+   "lines": 387,
+   "classes": [],
+   "functions": [
+    "win",
+    "host",
+    "KFrame",
+    "band",
+    "reading",
+    "fpOf",
+    "propsOf",
+    "stamp",
+    "arm",
+    "_capSkip",
+    "observe",
+    "driftTick",
+    "entityOf",
+    "taintCheck",
+    "supportOf",
+    "anyWorldModels",
+    "routeTo",
+    "plan",
+    "ensuresHere",
+    "knownProps",
+    "snapshot",
+    "restore",
+    "saveNow",
+    "save",
+    "load",
+    "clearAll"
+   ],
+   "functionTotal": 26,
+   "cfg": [
+    "CREDIT_BANDS",
+    "credits",
+    "HULL_BANDS",
+    "hull",
+    "DRIFT_POLL_S",
+    "cadence",
+    "MIN_SUPPORT_PROVEN",
+    "rule",
+    "of",
+    "PROVEN",
+    "ROUTE_MAX_DEPTH",
+    "plan",
+    "cap",
+    "MAX_WORLDS",
+    "guard",
+    "this",
+    "PERSIST_KEY",
+    "PERSIST_THROTTLE_MS",
+    "DRIFT_LABEL"
+   ],
+   "cfgTotal": 19
+  },
+  {
+   "file": "missions.js",
+   "lines": 561,
+   "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "BOARD_N",
+    "board",
+    "REFRESH_S",
+    "HEAVY_TICK_S",
+    "tick",
+    "MAX_DT_S",
+    "clamp",
+    "MISSION_BASE_REWARD",
+    "SCORE_BASE",
+    "REP_BASE",
+    "planet",
+    "multipliers",
+    "MULT_PATROL",
+    "MULT_ESCORT",
+    "MULT_BOUNTY",
+    "MULT_LIBERATE",
+    "MULT_SUPPLY",
+    "MULT_ASSAULT",
+    "gates",
+    "RANK_PATROL",
+    "RANK_ESCORT",
+    "RANK_BOUNTY",
+    "RANK_LIBERATE",
+    "RANK_SUPPLY",
+    "RANK_ASSAULT",
+    "PATROL",
+    "PATROL_MIN_PLANETS",
+    "worlds",
+    "PATROL_MAX_PLANETS",
+    "patrol",
+    "PATROL_VISIT_PAD_U",
+    "pad",
+    "ESCORT",
+    "ESCORT_RADIUS_U",
+    "trader",
+    "ESCORT_DOCKS_NEEDED",
+    "completes",
+    "SUPPLY",
+    "SUPPLY_N_MIN",
+    "SUPPLY_N_MAX"
+   ],
+   "cfgTotal": 61
+  },
+  {
+   "file": "panels.js",
+   "lines": 504,
+   "classes": [
+    {
+     "name": "PANELS",
+     "members": [
+      "register",
+      "open",
+      "close",
+      "toggle",
+      "isOpen",
+      "list",
+      "reflow",
+      "clearSize",
+      "resetLayout",
+      "isManual"
+     ],
+     "memberTotal": 10
+    }
+   ],
+   "functions": [
+    "load",
+    "save",
+    "clamp01",
+    "rgba",
+    "applyStoredSize",
+    "clearSize",
+    "resetLayout",
+    "closedTransform",
+    "openTransform",
+    "tabPosition",
+    "ctlPosition",
+    "textOpacityFor",
+    "applyVisual",
+    "anchorOf",
+    "positionGrip",
+    "persist",
+    "armAutoHide",
+    "setOpen",
+    "setPinned",
+    "setOpacity",
+    "reflowEdge",
+    "nearestEdge",
+    "showEdgeHighlight",
+    "hideEdgeHighlight",
+    "setSide",
+    "applyDockPosition",
+    "redock",
+    "makeMoveDrag",
+    "register",
+    "retickTabs",
+    "open",
+    "close",
+    "toggle",
+    "isOpen",
+    "reflowAll",
+    "list"
+   ],
+   "functionTotal": 36,
+   "cfg": [
+    "STORE_KEY",
+    "review",
+    "defaultOpen",
+    "Earlier",
+    "open",
+    "story",
+    "AUTO_HIDE_MS",
+    "unpinned",
+    "away",
+    "SLIDE_MS",
+    "duration",
+    "GAP",
+    "edge",
+    "OP_MIN",
+    "OP_MAX",
+    "OP_STEP",
+    "TEXT_OP_FLOOR",
+    "corner",
+    "title",
+    "RESIZE_GRIP",
+    "footprint",
+    "bold",
+    "handle",
+    "RESIZE_MIN_W",
+    "RESIZE_MIN_H",
+    "RESIZE_EDGE",
+    "strips",
+    "positionGrip",
+    "DRAG_THRESHOLD",
+    "click",
+    "EDGE_OFFSET",
+    "at",
+    "EDGE_HL_THICK"
+   ],
+   "cfgTotal": 33
+  },
+  {
+   "file": "passenger.js",
+   "lines": 490,
+   "classes": [
+    {
+     "name": "PASSENGER",
+     "members": [
+      "init",
+      "route",
+      "onEvent",
+      "powers",
+      "ponder",
+      "advise",
+      "powerAdvice",
+      "voice",
+      "canon",
+      "choice",
+      "posting",
+      "the",
+      "describe",
+      "refusal",
+      "preference",
+      "missionTaken",
+      "mood",
+      "setPonder",
+      "setAdvice",
+      "adviceOn",
+      "wipe",
+      "test",
+      "contract",
+      "introLines",
+      "symbiont",
+      "short",
+      "markIntroShown",
+      "_state",
+      "LORE",
+      "PLAYER_STORY",
+      "INTRO",
+      "CFG"
+     ],
+     "memberTotal": 32
+    }
+   ],
+   "functions": [
+    "blankState",
+    "moodTier",
+    "pickLine",
+    "fill",
+    "voicePrefix",
+    "noteAdvice",
+    "chooseMission",
+    "save",
+    "onEvent",
+    "toks",
+    "helpMatch",
+    "stateFacts",
+    "telemetryFacts",
+    "composerAnswer",
+    "learnedFacts",
+    "bestOverlap",
+    "latentStudy",
+    "speakAnswer",
+    "hostModelUpdate",
+    "hostModelSummary",
+    "ponder",
+    "advise",
+    "powerAdvice",
+    "route",
+    "powers"
+   ],
+   "functionTotal": 25,
+   "cfg": [
+    "STATE_KEY",
+    "contract",
+    "who",
+    "again",
+    "report",
+    "stale",
+    "intro_shown",
+    "visit",
+    "EV_CAP",
+    "ring",
+    "CONV_CAP",
+    "HELP_MIN_SCORE",
+    "match",
+    "PRICE_EWMA",
+    "blend",
+    "SUMMARY_EVENTS",
+    "facts",
+    "LATENT_KEEP",
+    "topic",
+    "LEARNED_TOPICS_IN_FACTS",
+    "turn",
+    "LEARNED_FACTS_CAP",
+    "list"
+   ],
+   "cfgTotal": 23
+  },
+  {
+   "file": "pillar_router.js",
+   "lines": 391,
+   "classes": [],
+   "functions": [
+    "win",
+    "store",
+    "contra",
+    "pairs",
+    "intersects",
+    "polarityContradiction",
+    "route",
+    "primaryDomain",
+    "edges",
+    "norm",
+    "ground",
+    "relOf",
+    "fact",
+    "taintOf",
+    "solveInheritance",
+    "solveConstraint",
+    "solveComposition",
+    "solveCentric",
+    "solve"
+   ],
+   "functionTotal": 19,
+   "cfg": [
+    "W_DEFINING",
+    "threshold",
+    "MAX_ISA_HOPS",
+    "depth",
+    "MAX_PATH_HOPS",
+    "MAX_FACTS_QUOTED",
+    "answer"
+   ],
+   "cfgTotal": 7
+  },
+  {
+   "file": "planetmenu.js",
+   "lines": 1241,
+   "classes": [
+    {
+     "name": "PLANETMENU",
+     "members": [
+      "init",
+      "tick",
+      "open",
+      "close",
+      "isOpen",
+      "pushEvent",
+      "getLog",
+      "setLog",
+      "hangarHtml",
+      "onClick",
+      "GEAR_SLOTS",
+      "_rumors",
+      "_patrons"
+     ],
+     "memberTotal": 13
+    }
+   ],
+   "functions": [
+    "H",
+    "player",
+    "runCmd",
+    "sfx",
+    "notifyHost",
+    "goods",
+    "price",
+    "gameT",
+    "esc",
+    "num",
+    "keysOf",
+    "fmtC",
+    "clampN",
+    "hex6",
+    "shade",
+    "tstr",
+    "holdOf",
+    "holdTotal",
+    "rankName",
+    "ownerOf",
+    "defenseOf",
+    "infraPct",
+    "conquestLine",
+    "cssText",
+    "frameHtml",
+    "ensureDom",
+    "onKey",
+    "onClick",
+    "toggleSlot",
+    "tryAccept",
+    "tryAddDefense",
+    "doDepart",
+    "pipsHtml",
+    "renderHead",
+    "portraitHtml",
+    "statusFallback",
+    "intelRow",
+    "economyLabel",
+    "standingLabel",
+    "planetIntelHtml",
+    "renderSide",
+    "renderTabs",
+    "setTab",
+    "hash32pm",
+    "barPatrons",
+    "barLineFor",
+    "barRumors",
+    "barHtml",
+    "scienceHtml",
+    "contrabandHtml",
+    "marketHtml",
+    "probeHtml",
+    "terraformHtml",
+    "upCostEst",
+    "shopIcon",
+    "shopRow",
+    "shopHdr",
+    "shopHtml",
+    "atBase",
+    "hullSectionHtml"
+   ],
+   "functionTotal": 89,
+   "cfg": [
+    "Z_INDEX",
+    "overlay",
+    "banner",
+    "REFRESH_HEADER_S",
+    "open",
+    "REFRESH_CONTENT_S",
+    "tabs",
+    "LOG_MAX",
+    "pushEvent",
+    "timeline",
+    "QTY_STEPS",
+    "quantities",
+    "DEF_PIPS_MAX",
+    "tab",
+    "EQUIP_BAY_VISUAL_MAX",
+    "presentational",
+    "cap",
+    "header",
+    "click",
+    "visible",
+    "BAR_RADIUS_MULT",
+    "BAR_MAX_PATRONS",
+    "BAR_MAX_RUMORS",
+    "BAR_LINE_MAX",
+    "UP_KINDS",
+    "OWNER"
+   ],
+   "cfgTotal": 26
+  },
+  {
+   "file": "power_panel.js",
+   "lines": 779,
+   "classes": [
+    {
+     "name": "POWERPANEL",
+     "members": [
+      "mount",
+      "show",
+      "hide",
+      "toggle",
+      "visible",
+      "setShown",
+      "CFG",
+      "_PP",
+      "PP"
+     ],
+     "memberTotal": 9
+    },
+    {
+     "name": "HOST",
+     "members": [],
+     "memberTotal": 0
+    },
+    {
+     "name": "HOST",
+     "members": [],
+     "memberTotal": 0
+    }
+   ],
+   "functions": [
+    "tickMask",
+    "doc",
+    "win",
+    "el",
+    "clamp",
+    "round",
+    "getHost",
+    "readPower",
+    "readMult",
+    "readShield",
+    "readHull",
+    "setPower",
+    "readShieldArcs",
+    "readDivert",
+    "setDivert",
+    "readCapLaser",
+    "readCapEngine",
+    "playSound",
+    "applyBarVisual",
+    "renderStatus",
+    "drawTinted",
+    "tickRing",
+    "drawDial",
+    "renderRadial",
+    "renderBars",
+    "renderBalance",
+    "renderCapacitors",
+    "renderAll",
+    "levelFromPointer",
+    "wireDrag",
+    "makeDialCanvas",
+    "buildBar",
+    "buildDialSlot",
+    "buildInstrumentRow",
+    "build",
+    "ensureTimer",
+    "show",
+    "hide",
+    "mount",
+    "toggle",
+    "visible",
+    "setShown"
+   ],
+   "functionTotal": 42,
+   "cfg": [
+    "UPDATE_MS",
+    "PANEL_W",
+    "width",
+    "gauges",
+    "BAR_H",
+    "bar",
+    "bars",
+    "BAR_GAP",
+    "tracks",
+    "TRACK_W",
+    "POS_BOTTOM",
+    "host",
+    "POS_RIGHT",
+    "Z",
+    "LEVEL_MIN",
+    "LEVEL_MAX",
+    "COL_WEAPONS",
+    "navy",
+    "COL_ENGINES",
+    "COL_SHIELDS",
+    "blue",
+    "COL_BG",
+    "alpha",
+    "doc",
+    "win",
+    "el",
+    "css",
+    "clamp",
+    "lo",
+    "round",
+    "getHost",
+    "readPower",
+    "readMult",
+    "readShield",
+    "readHull",
+    "setPower",
+    "SHIELDS",
+    "POOLS",
+    "divert",
+    "readShieldArcs"
+   ],
+   "cfgTotal": 78
+  },
+  {
+   "file": "sbhud.js",
+   "lines": 60,
+   "classes": [
+    {
+     "name": "SBHUD",
+     "members": [
+      "init",
+      "refresh",
+      "flash",
+      "offerTier",
+      "CFG"
+     ],
+     "memberTotal": 5
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "TICK_MS",
+    "FLASH_MS",
+    "EDGE",
+    "RGB",
+    "DEFAULT_OPACITY"
+   ],
+   "cfgTotal": 5
+  },
+  {
+   "file": "sober_gate.js",
+   "lines": 155,
+   "classes": [
+    {
+     "name": "SOBER",
+     "members": [
+      "check",
+      "CFG",
+      "_contentWords",
+      "contentWords",
+      "_identifiers",
+      "identifiers"
+     ],
+     "memberTotal": 6
+    }
+   ],
+   "functions": [
+    "win",
+    "store",
+    "edges",
+    "contentWords",
+    "prefix",
+    "identifiers",
+    "groundToken",
+    "check"
+   ],
+   "functionTotal": 8,
+   "cfg": [
+    "PREFIX_N",
+    "length",
+    "prefix",
+    "MAX_UNCOVERED",
+    "ported",
+    "commits",
+    "SUB_MIN",
+    "floor",
+    "MAX_LISTED",
+    "refusal"
+   ],
+   "cfgTotal": 10
+  },
+  {
+   "file": "sound.js",
+   "lines": 555,
+   "classes": [
+    {
+     "name": "SOUND",
+     "members": [
+      "CFG",
+      "init",
+      "play",
+      "setMute",
+      "muted",
+      "toggleMute",
+      "setVolume",
+      "volume",
+      "names",
+      "aliases",
+      "ready",
+      "_voices"
+     ],
+     "memberTotal": 12
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "MASTER_VOL",
+    "MUTED",
+    "state",
+    "MAX_VOICES",
+    "dropped",
+    "RAMP",
+    "floor",
+    "NOISE_SECONDS",
+    "buffer",
+    "COMPRESS",
+    "bus",
+    "COMPRESS_THRESH",
+    "dB",
+    "COMPRESS_RATIO",
+    "COMPRESS_ATTACK",
+    "s",
+    "COMPRESS_RELEASE",
+    "SAMPLE_DIR",
+    "audio",
+    "once",
+    "played",
+    "SAMPLE_GAIN",
+    "buzz"
+   ],
+   "cfgTotal": 23
+  },
+  {
+   "file": "speech_gen.js",
+   "lines": 274,
+   "classes": [
+    {
+     "name": "SPEECHGEN",
+     "members": [
+      "line",
+      "registerOf",
+      "voiceOf",
+      "CFG",
+      "_frames"
+     ],
+     "memberTotal": 5
+    }
+   ],
+   "functions": [
+    "win",
+    "R",
+    "pick",
+    "chance",
+    "registerOf",
+    "voiceOf",
+    "scrub",
+    "assemble",
+    "line"
+   ],
+   "functionTotal": 9,
+   "cfg": [
+    "RECENT_RING",
+    "memory",
+    "REROLL_TRIES",
+    "duplicate",
+    "P_EXCLAIM",
+    "exclaim",
+    "P_TAIL",
+    "tail",
+    "P_MUTTER",
+    "mutter",
+    "MUTTER_MAX_WORDS",
+    "clip",
+    "VOICE_WORDS",
+    "pilot"
+   ],
+   "cfgTotal": 14
+  },
+  {
+   "file": "speech_input.js",
+   "lines": 41,
+   "classes": [
+    {
+     "name": "SPEECH_IN",
+     "members": [
+      "supported",
+      "listening",
+      "continuous",
+      "start",
+      "stop",
+      "toggle",
+      "setContinuous",
+      "wormDone"
+     ],
+     "memberTotal": 8
+    }
+   ],
+   "functions": [
+    "chatEl",
+    "micEl",
+    "paintMic",
+    "ensureRec",
+    "start",
+    "stop",
+    "setContinuous",
+    "wormDone"
+   ],
+   "functionTotal": 8,
+   "cfg": [
+    "LANG"
+   ],
+   "cfgTotal": 1
+  },
+  {
+   "file": "speech_tier.js",
+   "lines": 102,
+   "classes": [],
+   "functions": [
+    "lorePersona",
+    "loreExtremity",
+    "speakGroundOk",
+    "loreSpeak"
+   ],
+   "functionTotal": 4,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "starmap.js",
+   "lines": 719,
+   "classes": [],
+   "functions": [
+    "W",
+    "DOC",
+    "H",
+    "nowMs",
+    "num",
+    "esc",
+    "posOf",
+    "dist2XZ",
+    "dist2XYZ",
+    "lsGetGen",
+    "lsSetGen",
+    "ownerOf",
+    "territory",
+    "safePlanet",
+    "galaxySig",
+    "centroidOf",
+    "rebuildLayout",
+    "nearestNeighborLinks",
+    "neighborsOf",
+    "playerNodeIndex",
+    "nearestPlanetOfSystem",
+    "panelCss",
+    "ensureUI",
+    "resizeCanvas",
+    "ensureBgStars",
+    "hitTest",
+    "onMove",
+    "updateTip",
+    "positionTip",
+    "currentSystemId",
+    "onClick",
+    "onKey",
+    "tallyText",
+    "refreshHeader",
+    "paint",
+    "maybePaint",
+    "knowCounts",
+    "ensureGameOverUI",
+    "fireGameOver",
+    "beginNextGeneration",
+    "slowCheck"
+   ],
+   "functionTotal": 41,
+   "cfg": [
+    "chrome",
+    "Z_OVERLAY",
+    "Z_GAMEOVER",
+    "HEADER_H",
+    "bar",
+    "FOOTER_H",
+    "line",
+    "MARGIN_PX",
+    "layout",
+    "cadence",
+    "CHECK_EVERY_S",
+    "period",
+    "LAYOUT_EVERY_S",
+    "open",
+    "REDRAW_MS",
+    "repaints",
+    "DT_MAX_S",
+    "Consolas",
+    "Menlo",
+    "neighborsOf",
+    "same",
+    "coords",
+    "world",
+    "transform",
+    "here",
+    "currentSystemId",
+    "String"
+   ],
+   "cfgTotal": 27
+  },
+  {
+   "file": "starnest_sky.js",
+   "lines": 116,
+   "classes": [
+    {
+     "name": "STARNEST",
+     "members": [
+      "bake",
+      "CFG"
+     ],
+     "memberTotal": 2
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "SIZE",
+    "GPUs",
+    "ITERATIONS",
+    "loop",
+    "detail",
+    "brighter",
+    "VOLSTEPS",
+    "steps",
+    "FORMUPARAM",
+    "STEPSIZE",
+    "ZOOM",
+    "TILE",
+    "BRIGHTNESS",
+    "DARKMATTER",
+    "DISTFADING",
+    "SATURATION",
+    "sits",
+    "FROM",
+    "SEED_STEP",
+    "unit",
+    "GAIN",
+    "face",
+    "uFormuparam",
+    "uStepsize",
+    "uZoom",
+    "uTile",
+    "uBrightness",
+    "uDarkmatter",
+    "uDistfading",
+    "main",
+    "twice",
+    "raw",
+    "screen"
+   ],
+   "cfgTotal": 33
+  },
+  {
+   "file": "tami_battle_ui.js",
+   "lines": 550,
+   "classes": [
+    {
+     "name": "TAMIBATTLEUI",
+     "members": [
+      "render",
+      "iconFor",
+      "categoryIconFor"
+     ],
+     "memberTotal": 3
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "textquests.js",
+   "lines": 346,
+   "classes": [
+    {
+     "name": "TEXTQUESTS",
+     "members": [
+      "tryOffer",
+      "active",
+      "activeView",
+      "choose",
+      "CFG",
+      "_TEMPLATES",
+      "TEMPLATES"
+     ],
+     "memberTotal": 7
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "OFFER_CHANCE",
+    "offer",
+    "COOLDOWN_S",
+    "offers",
+    "MIN_NODES",
+    "template"
+   ],
+   "cfgTotal": 6
+  },
+  {
+   "file": "thoughts.js",
+   "lines": 376,
+   "classes": [
+    {
+     "name": "THOUGHTS",
+     "members": [
+      "CFG",
+      "init",
+      "load",
+      "tick",
+      "chainFor",
+      "scoreChain",
+      "commitChain",
+      "buildChain",
+      "verifyChain",
+      "fitness",
+      "pilots",
+      "wipe",
+      "advisorLawHolds",
+      "mentionGrounded",
+      "earned",
+      "groundedPoolFor",
+      "poolFor",
+      "attachFog",
+      "detachFog",
+      "_ledger",
+      "L",
+      "_grounded"
+     ],
+     "memberTotal": 22
+    }
+   ],
+   "functions": [
+    "mulberry32",
+    "theVariant",
+    "placeSpans",
+    "mentionGrounded",
+    "setGraph",
+    "ensureGraph",
+    "poolFor",
+    "blankLedger",
+    "persist",
+    "pilotLedger",
+    "earned",
+    "verifyChain",
+    "scoreChain",
+    "commitChain",
+    "buildChain",
+    "chainFor",
+    "tick",
+    "fitness",
+    "pilots",
+    "wipe",
+    "advisorLawHolds",
+    "attachFog",
+    "detachFog",
+    "init",
+    "load"
+   ],
+   "functionTotal": 25,
+   "cfg": [
+    "STORE_KEY",
+    "key",
+    "LEDGER_VERSION",
+    "ledgers",
+    "SEED",
+    "seed",
+    "init",
+    "MAX_HOPS",
+    "length",
+    "W_BASE",
+    "hop",
+    "W_NOVEL",
+    "edge",
+    "mark",
+    "CONSTRUCTION",
+    "advisorLawHolds",
+    "MIN_VARIANT_LEN",
+    "known",
+    "span",
+    "optional",
+    "possessive"
+   ],
+   "cfgTotal": 21
+  },
+  {
+   "file": "tom_test.js",
+   "lines": 233,
+   "classes": [],
+   "functions": [
+    "win",
+    "host",
+    "basisOf",
+    "_mkTable",
+    "trainPair",
+    "argmax",
+    "predict",
+    "_score",
+    "verdictOf",
+    "r3",
+    "sampleNow",
+    "finish",
+    "start"
+   ],
+   "functionTotal": 13,
+   "cfg": [
+    "SAMPLE_DT_MS",
+    "mode",
+    "WINDOW_S",
+    "length",
+    "HP_BANDS",
+    "THREAT_R_MULT",
+    "only",
+    "MIN_SAMPLES",
+    "abstains"
+   ],
+   "cfgTotal": 9
+  },
+  {
+   "file": "vision.js",
+   "lines": 136,
+   "classes": [
+    {
+     "name": "VISION",
+     "members": [
+      "VCFG",
+      "create"
+     ],
+     "memberTotal": 2
+    }
+   ],
+   "functions": [
+    "create"
+   ],
+   "functionTotal": 1,
+   "cfg": [],
+   "cfgTotal": 0
+  }
+ ],
+ "epics": {
+  "E1": {
+   "name": "STARBLAST",
+   "desc": "the small loop: mine, fill the bar, upgrade, tier up, die and spill. (STARBLAST_REQ.md)"
+  },
+  "E2": {
+   "name": "RANGERS",
+   "desc": "the Space Rangers 2 layer: trade, fit, contracts, the war, rank. (REQUIREMENTS_SR.md)"
+  },
+  "E3": {
+   "name": "EGOSOFT",
+   "desc": "the X layer: stations, fleets, trade automation, jump lanes."
+  },
+  "E4": {
+   "name": "GROUND",
+   "desc": "landing and tactics on the Tami rules (first-person surface, then the grid)."
+  },
+  "E5": {
+   "name": "MINDS",
+   "desc": "the Passenger and the AI pilots as an honest AGI test."
+  },
+  "E6": {
+   "name": "SHELL",
+   "desc": "the presentation: one clean HUD, only what works, DEPRECATED behind a tab."
+  }
+ },
+ "useCases": [
+  {
+   "id": "UC-101",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Pilot shoots a rock; it splits and spills gems",
+   "test": "destroyAsteroid + spawnGem, hand-stepped"
+  },
+  {
+   "id": "UC-102",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Pilot flies over a gem and collects it",
+   "test": "GEM_PICK_R path, credits move"
+  },
+  {
+   "id": "UC-103",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Drone fetches loose gems and cuts seams into rocks",
+   "test": "30 s hand-stepped: 8 rocks, 6 gems, 43c"
+  },
+  {
+   "id": "UC-104",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Mined gems fill a gem bar; a full bar banks an upgrade point",
+   "test": "60 s hand-stepped drone run: 22 rocks, 102c, bar 13%, 2 points"
+  },
+  {
+   "id": "UC-105",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Pilot spends a point on one of eight stats with keys 1-8, in flight",
+   "test": "8 spends read back Lv1 each; shield max 40 to 44, capacitor 100 to 110"
+  },
+  {
+   "id": "UC-106",
+   "epic": "E1",
+   "status": "PARTLY",
+   "story": "Pilot buys weapon / engine / hull levels with credits in flight",
+   "test": "SHOP panel, doUpgrade (2026-09-06)"
+  },
+  {
+   "id": "UC-107",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "A maxed ship offers the next tier; Pilot chooses a hull anywhere",
+   "test": "card offered at 8/8 + 1 point; Scout to Fighter in flight, hull 70 to 100, stats reset"
+  },
+  {
+   "id": "UC-108",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Pilot dies; gems and credits spill; Pilot respawns as a Scout in the belt",
+   "test": "killShip, respawn branch"
+  },
+  {
+   "id": "UC-109",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Pilot reads rocks, gems, ships and drones on the radar",
+   "test": "top-down inset blips"
+  },
+  {
+   "id": "UC-110",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "Shooting drains energy; it regenerates",
+   "test": "capLaser"
+  },
+  {
+   "id": "UC-111",
+   "epic": "E1",
+   "status": "WORKS",
+   "story": "The HUD shows stat rows, the bar, points and a kill feed on one screen",
+   "test": "UPGRADES strip bottom-left; 3 test kills render as 3 feed lines"
+  },
+  {
+   "id": "UC-201",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot docks at a planet and sees its screen",
+   "test": "PLANETMENU.open, 7 tabs"
+  },
+  {
+   "id": "UC-202",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot buys and sells goods at organic prices",
+   "test": "buy ore 5 \u2212115c, sell +118c, +1 button \u221223c"
+  },
+  {
+   "id": "UC-203",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot sees where to sell what is held, from prices already seen",
+   "test": "FEATURE ATLAS burn-down 3"
+  },
+  {
+   "id": "UC-204",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot buys a weapon with condition, weight and power",
+   "test": "weapon ballistic \u2212193c"
+  },
+  {
+   "id": "UC-205",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot compares a weapon against the fitted one before buying",
+   "test": "burn-down 4"
+  },
+  {
+   "id": "UC-206",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot fits gear into hardpoints and gizmo slots on a ship board",
+   "test": "ENGBAY shows; burn-down 5"
+  },
+  {
+   "id": "UC-207",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot takes a rank-gated contract from the board",
+   "test": "MISSIONS.accept via the UI"
+  },
+  {
+   "id": "UC-208",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot reads a contract as a card: target, distance, danger, reward",
+   "test": "burn-down 2"
+  },
+  {
+   "id": "UC-209",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Passenger chooses the contract and says why",
+   "test": "chooseMission + spoken reasons"
+  },
+  {
+   "id": "UC-210",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot follows the tracker and the on-screen marker to the target",
+   "test": "updateMissionArrow / Marker"
+  },
+  {
+   "id": "UC-211",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot jumps between systems on the star map, paying fuel",
+   "test": "starmap.js"
+  },
+  {
+   "id": "UC-212",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Synod escalates; Pilot liberates, defends, assaults the stronghold",
+   "test": "HEG_TIERS, M12"
+  },
+  {
+   "id": "UC-213",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Reputation, customs, contraband, fence",
+   "test": "SR-M4 verified"
+  },
+  {
+   "id": "UC-214",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot ranks up and spends skill points",
+   "test": "SR-M17"
+  },
+  {
+   "id": "UC-215",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "Pilot plays a text quest at a planet",
+   "test": "textquests self-test 16/16"
+  },
+  {
+   "id": "UC-216",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot hears rumours and hires a wingman at the bar",
+   "test": "SR-M18, not re-measured"
+  },
+  {
+   "id": "UC-217",
+   "epic": "E2",
+   "status": "PARTLY",
+   "story": "Pilot analyzes artifacts and deploys probes at the science station",
+   "test": "SR-M19 commands"
+  },
+  {
+   "id": "UC-218",
+   "epic": "E2",
+   "status": "WORKS",
+   "story": "The galaxy persists across reloads and generations",
+   "test": "SR-M1, SR-M14"
+  },
+  {
+   "id": "UC-301",
+   "epic": "E3",
+   "status": "MISSING",
+   "story": "Pilot builds a station on a held world and it produces goods",
+   "test": "not built"
+  },
+  {
+   "id": "UC-302",
+   "epic": "E3",
+   "status": "MISSING",
+   "story": "Pilot assigns AI ships to a trade route between two markets",
+   "test": "not built"
+  },
+  {
+   "id": "UC-303",
+   "epic": "E3",
+   "status": "MISSING",
+   "story": "Pilot commands a wing: follow, attack, dock",
+   "test": "plain-English orders exist for the squad; no wing model"
+  },
+  {
+   "id": "UC-304",
+   "epic": "E3",
+   "status": "MISSING",
+   "story": "Systems are separate bubbles joined by lanes; a contested system infects its neighbours",
+   "test": "SR-M16"
+  },
+  {
+   "id": "UC-305",
+   "epic": "E3",
+   "status": "MISSING",
+   "story": "Synod adapts its loadouts across generations",
+   "test": "SR-M15"
+  },
+  {
+   "id": "UC-401",
+   "epic": "E4",
+   "status": "DEPRECATED",
+   "story": "Pilot lands and walks the surface",
+   "test": "boxes on a checkerboard - a toy (RJ 2026-09-06)"
+  },
+  {
+   "id": "UC-402",
+   "epic": "E4",
+   "status": "DEPRECATED",
+   "story": "Pilot fights a turn-based battle on the Tami rules",
+   "test": "8x8, 3 fixed units, no terrain / preview / deployment"
+  },
+  {
+   "id": "UC-403",
+   "epic": "E4",
+   "status": "MISSING",
+   "story": "Pilot walks a first-person surface (three.js FPS view)",
+   "test": "not built (RJ: copy an FPS repo)"
+  },
+  {
+   "id": "UC-404",
+   "epic": "E4",
+   "status": "MISSING",
+   "story": "Ground battle shows turn order, technique detail, matchup preview, terrain, deployment",
+   "test": "bring-over list, 10 rows"
+  },
+  {
+   "id": "UC-501",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "Pilot asks the Passenger anything; it answers with a reasoning transcript from the novel, the live game or the shards, or refuses",
+   "test": "brain.ask, verified 2026-09-06"
+  },
+  {
+   "id": "UC-502",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "Passenger advises on threat, hull, fuel, hold, mining",
+   "test": "advise()"
+  },
+  {
+   "id": "UC-503",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "Passenger gets angry when ignored and shocks the screen; calms when obeyed",
+   "test": "noteAdvice, 4 tiers"
+  },
+  {
+   "id": "UC-504",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "AI pilots trade, hunt, learn steering and targets",
+   "test": "think(), IRON_LAW_AUDIT"
+  },
+  {
+   "id": "UC-505",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "Pilot inspects the minds: knowledge store, Kripke frame, coop proof, growth, ToM",
+   "test": "12 commands run in-page"
+  },
+  {
+   "id": "UC-506",
+   "epic": "E5",
+   "status": "PARTLY",
+   "story": "Pilots talk aloud and the Pilot can speak back",
+   "test": "browser voices"
+  },
+  {
+   "id": "UC-507",
+   "epic": "E5",
+   "status": "WORKS",
+   "story": "The minds write validated rules into the game",
+   "test": "gamemod ledger"
+  },
+  {
+   "id": "UC-601",
+   "epic": "E6",
+   "status": "WORKS",
+   "story": "Pilot shows or hides any window and opens any screen from one place",
+   "test": "WINDOWS menu"
+  },
+  {
+   "id": "UC-602",
+   "epic": "E6",
+   "status": "WORKS",
+   "story": "Pilot sets any panel's transparency; the box really darkens",
+   "test": "panels.js 0.25-1.0"
+  },
+  {
+   "id": "UC-603",
+   "epic": "E6",
+   "status": "MISSING",
+   "story": "Pilot sees one top bar: FLY \u00b7 MAP \u00b7 SHIP \u00b7 MARKET \u00b7 CONTRACTS \u00b7 PASSENGER \u00b7 DEPRECATED",
+   "test": "burn-down 6"
+  },
+  {
+   "id": "UC-604",
+   "epic": "E6",
+   "status": "MISSING",
+   "story": "What is broken sits behind DEPRECATED and is not advertised",
+   "test": "burn-down 1"
+  },
+  {
+   "id": "UC-605",
+   "epic": "E6",
+   "status": "WORKS",
+   "story": "Pilot goes fullscreen",
+   "test": "\u26f6 button"
+  },
+  {
+   "id": "UC-606",
+   "epic": "E6",
+   "status": "WORKS",
+   "story": "Pilot finds every generated art file with its prompt",
+   "test": "Generated art screen"
+  }
+ ],
+ "tally": {
+  "WORKS": 32,
+  "PARTLY": 8,
+  "MISSING": 9,
+  "DEPRECATED": 2
+ }
+}

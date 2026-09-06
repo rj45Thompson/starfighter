@@ -149,6 +149,11 @@ class GameTier {
       const take = this.E(`${m.rocksMined} rocks, ${m.gemsFetched} gems, ${m.creditsMined} credits`);
       this.F(drones, pTake, take, CFG.SRC_GAME, how);
       this.F(drones, this.put("mine", ["mines", "mined", "mining"]), take, CFG.SRC_GAME, how);   // the novel's own verb, so "what have the drones mined" lands on the tally
+      if (m.gemBarPct != null) {   // the Starblast loop (STARBLAST_REQ.md, 2026-09-06): the bar, the banked points, the tier-up
+        const bar = this.E("the gem bar", "the upgrade bar the mined gems fill; a full bar banks one upgrade point", ["gem bar", "upgrade bar", "the bar", "gems bar"]);
+        this.F(bar, pStatus, this.E(`${m.gemBarPct}% full, ${m.upgradePts} upgrade point${m.upgradePts === 1 ? "" : "s"} banked${m.tierReady ? ", tier-up ready" : (m.statsMaxed ? ", every stat maxed" : "")}`), CFG.SRC_GAME, how);
+        this.F(you, this.put("upgrade points", ["points", "banked points", "points banked", "upgrade point"]), this.E(`${m.upgradePts} upgrade point${m.upgradePts === 1 ? "" : "s"} banked - keys 1 to 8 spend one on a stat`), CFG.SRC_GAME, how);
+      }
     }
     if (extra && extra.mission) { const m = extra.mission; const q = this.E("the current mission", `${m.type}: ${m.title}`, ["mission", "our mission", "the mission", "current contract"]);
       this.F(you, pMission, q, CFG.SRC_GAME, how); this.F(q, pInst, this.E(m.type), CFG.SRC_GAME, how); if (m.targetName) this.F(q, pTarget, this.E(m.targetName), CFG.SRC_GAME, how);
