@@ -57,13 +57,15 @@ A brand-new player is shown **144 visible UI boxes and 5,043 characters of text*
 must already know to type. The intro's one instruction is "type into the box like you are talking
 to yourself" - about the Passenger, not about flying.
 
-- [ ] N5  75 terminal commands are unreachable without reading source -> DONE WHEN: `help` (or a paged version of it) names every branch `runCmd` accepts, verified by diffing the help text against the handler list.
 - [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
 
 ### Genre backlog
 - [ ] G0  Run the genre survey and rank the gaps -> DONE WHEN: `genre/genre_matrix.json` exists, `py genre/anchor_rank.py` prints a ranked gap list, and `py tools/upgrade_pass.py` writes GAME_UPGRADES.md.
 
 ## Done
+
+- [x] N5  Every command is now findable -> DONE. `help` names roughly 90 of the 246 aliases the chain accepts; the rest - `save`, `load`, `newgame`, `status`, `shield`, `wing`, `hauler`, `engbay`, `stat`, `terraform` and sixty-odd more - were reachable only by reading source. A new `commands` (`cmds`, `allcommands`) prints all of them, DERIVED FROM `runCmd.toString()` at call time rather than hand-listed, so whatever the chain accepts is exactly what it prints and it cannot drift when someone adds a branch.
+  Verified live: `commands` -> "138 handlers, 246 names" over 37 grouped lines with aliases in parentheses; `commands haul` -> `hauler (haulers)`; `commands zzzz` -> "nothing matches"; and all ten previously-hidden commands I checked now appear. `help` gained a closing section pointing at it, verified in the same run, and its audio line now reads `mute / unmute` since those are finally a pair.
 
 - [x] N4  Say when flight is paused -> DONE. A badge sits directly above the terminal input while it has focus: "flight paused while you type · Esc to fly". Verified in the live game in one run, badge AND the claim it makes: not typing -> hidden; typing -> shown, 0px above the input, thrust key leaves `MAN.thr` at 0 (the keys really are dead); after blur -> hidden and thrust goes to 1.
   It is driven by the frame loop reading `document.activeElement`, not by focus/blur events, for two reasons found while building it: the game's own guard is a live `activeElement` test, so reading the same thing cannot drift out of step with it; and focus/blur DO NOT FIRE when the document lacks OS focus, which is exactly the automated case - `el.focus()` still moves activeElement and still kills the keys, silently.

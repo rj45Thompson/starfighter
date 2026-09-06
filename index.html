@@ -332,7 +332,7 @@
 <script src="economy.js?v=20260906f"></script>
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
-<script src="cybertron.js?v=20260906d"></script>
+<script src="cybertron.js?v=20260906e"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -4161,6 +4161,28 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!r.item){ term(usage,'err'); return null; }
     return r.item;
   };
+  // EVERY COMMAND, READ OUT OF THE CODE (2026-09-06). `help` names about 90 of the 243 aliases the
+  // chain accepts; the rest were reachable only by reading source - `save`, `load`, `newgame`,
+  // `status`, `shield`, `wing`, `hauler`, `engbay`, `stat`, `terraform` and 60-odd more. Rather than
+  // hand-maintain a second list that would drift the day someone adds a branch, this DERIVES the
+  // list from runCmd's own source at call time, so it cannot be wrong: whatever the chain accepts
+  // is exactly what this prints. `help` stays the curated short list; this is the complete index.
+  if(c==='commands'||c==='cmds'||c==='allcommands'){
+    const src=runCmd.toString();
+    const groups=[]; const re=/if\s*\(\s*c\s*===\s*'([^']+)'((?:\s*\|\|\s*c\s*===\s*'[^']+')*)\s*\)/g;
+    let m; while((m=re.exec(src))!==null){
+      const set=[m[1]]; if(m[2]){ const r2=/\|\|\s*c\s*===\s*'([^']+)'/g; let e; while((e=r2.exec(m[2]))!==null) set.push(e[1]); }
+      groups.push(set);
+    }
+    const q=(a[1]||'').toLowerCase();
+    const shown=q?groups.filter(g=>g.some(x=>x.indexOf(q)>=0)):groups;
+    term(`<b style="color:#8fd0ff">◈ ALL COMMANDS</b> - ${groups.length} handlers, ${groups.reduce((n,g)=>n+g.length,0)} names`+(q?` · filtered by "<b>${q.replace(/</g,'&lt;')}</b>"`:'')+` <span style="opacity:.6">(read from the code, so it is never out of date)</span>`,'sys');
+    if(!shown.length){ term('&nbsp;&nbsp;nothing matches - try <b>commands</b> with no filter','err'); return; }
+    for(let i=0;i<shown.length;i+=4){
+      term('&nbsp;&nbsp;'+shown.slice(i,i+4).map(g=>'<b>'+g[0]+'</b>'+(g.length>1?' <span style="opacity:.5">('+g.slice(1).join(', ')+')</span>':'')).join(' &nbsp;·&nbsp; '),'sys');
+    }
+    term('&nbsp;&nbsp;<span style="opacity:.6">filter with <b>commands &lt;text&gt;</b> · <b>help</b> is the short curated list</span>','sys');
+    return; }
   if(c==='help'||c==='?'||c==='h'){
     const H=(t)=>term(`<b style="color:#8fd0ff">${t}</b>`,'sys'), L=(t)=>term('&nbsp;&nbsp;'+t,'sys');
     H('▸ THE WAR (Space-Rangers loop)');
@@ -4178,7 +4200,9 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     L('type anything → the PARASITE answers (<b>advice on|off</b> · <b>advice now</b> · <b>ponder on</b> · <b>intro</b>) · plain English orders the squadron ("everyone attack ORION")');
     L('ask &lt;pilot&gt; &lt;question&gt; · think &lt;pilot&gt; · story [text] · discuss · voices on|off · <b>deliberate &lt;planet&gt;</b> (watch a mind reason + seek knowledge) · <b>knowledge</b> (the persistent store) · inhabitant · society · agent · dynamics · autonomy · worldmodel · grounded · dialogue · watch convention');
     H('▸ SOUND & UI');
-    L('<b>mute</b> · <b>volume 0-1</b> · the TOP PILLS are buttons (starmap/radio/market/AGI HUD) · corner toasts = routine, highlighted lines = important');
+    L('<b>mute</b> / <b>unmute</b> · <b>volume 0-1</b> · <b>voices on|off</b> · the TOP PILLS are buttons (starmap/radio/market/AGI HUD) · corner toasts = routine, highlighted lines = important');
+    H('▸ EVERYTHING ELSE');
+    L('This page is the curated short list. <b>commands</b> prints EVERY command the ship accepts, read straight out of the code so it cannot go out of date - <b>commands &lt;text&gt;</b> filters it.');
     return; }
   if(c==='passenger'||c==='parasite'||c==='worm'){ if(!window.PASSENGER){ term('no symbiont aboard (passenger.js failed to load)','err'); return; }
     const pw=PASSENGER.powers(), st=PASSENGER._state();
