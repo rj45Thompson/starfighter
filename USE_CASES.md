@@ -48,7 +48,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-203 [E2] [PARTLY] Pilot sees where to sell what is held, from prices already seen :: FEATURE ATLAS burn-down 3
 - UC-204 [E2] [WORKS] Pilot buys a weapon with condition, weight and power :: weapon ballistic −193c
 - UC-205 [E2] [WORKS] Pilot compares a weapon against the fitted one before buying :: 20 comparison rows in the SHOP tab: dps, damage, rate, reach, barrels, homing, splash, damage type
-- UC-206 [E2] [PARTLY] Pilot fits gear into hardpoints and gizmo slots on a ship board :: ENGBAY shows; burn-down 5
+- UC-206 [E2] [WORKS] Pilot fits gear into hardpoints and gizmo slots on a ship board :: MOUNT BAYS slots: mount cost 220c, GUNS 1 to 2, DPS 66.7 to 128.7; unmount refunded 110c and reverted both
 - UC-207 [E2] [WORKS] Pilot takes a rank-gated contract from the board :: MISSIONS.accept via the UI
 - UC-208 [E2] [PARTLY] Pilot reads a contract as a card: target, distance, danger, reward :: burn-down 2
 - UC-209 [E2] [WORKS] Passenger chooses the contract and says why :: chooseMission + spoken reasons

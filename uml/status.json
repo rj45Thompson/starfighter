@@ -142,9 +142,9 @@
 {
 "id": "UC-206",
 "epic": "E2",
-"status": "PARTLY",
+"status": "WORKS",
 "story": "Pilot fits gear into hardpoints and gizmo slots on a ship board",
-"test": "ENGBAY shows; burn-down 5"
+"test": "MOUNT BAYS slots: mount cost 220c, GUNS 1 to 2, DPS 66.7 to 128.7; unmount refunded 110c and reverted both"
 },
 {
 "id": "UC-207",
@@ -386,8 +386,8 @@
 }
 ],
 "tally": {
-"WORKS": 33,
-"PARTLY": 7,
+"WORKS": 34,
+"PARTLY": 6,
 "MISSING": 9,
 "DEPRECATED": 2
 }

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:08:49",
+ "generated": "2026-09-06T12:11:56",
  "modules": [
   {
    "file": "acquire.js",
@@ -488,7 +488,7 @@
   },
   {
    "file": "engbay.js",
-   "lines": 696,
+   "lines": 791,
    "classes": [
     {
      "name": "ENGBAY",
@@ -528,6 +528,9 @@
     "gridSlotDefs",
     "gridBoxHtml",
     "micromoduleGridHtml",
+    "bayBoxHtml",
+    "bayGridHtml",
+    "totalsHtml",
     "slotGridHtml",
     "onGridClick",
     "onGridPick",
@@ -541,6 +544,8 @@
     "render",
     "onMountClick",
     "onPick",
+    "onBayClick",
+    "onBayPick",
     "wireClicks",
     "wireTips",
     "dropAccepts",
@@ -554,7 +559,7 @@
     "visible",
     "setShown"
    ],
-   "functionTotal": 45,
+   "functionTotal": 50,
    "cfg": [
     "VIEWBOX",
     "Z",
@@ -572,6 +577,8 @@
     "COL_WEAPON_DIM",
     "COL_GIZMO",
     "COL_GIZMO_DIM",
+    "COL_HARD",
+    "boxes",
     "COL_REF",
     "COL_TEXT",
     "COL_DIM",
@@ -585,7 +592,7 @@
     "every",
     "convention"
    ],
-   "cfgTotal": 28
+   "cfgTotal": 30
   },
   {
    "file": "gamemod.js",
@@ -2428,9 +2435,9 @@
   {
    "id": "UC-206",
    "epic": "E2",
-   "status": "PARTLY",
+   "status": "WORKS",
    "story": "Pilot fits gear into hardpoints and gizmo slots on a ship board",
-   "test": "ENGBAY shows; burn-down 5"
+   "test": "MOUNT BAYS slots: mount cost 220c, GUNS 1 to 2, DPS 66.7 to 128.7; unmount refunded 110c and reverted both"
   },
   {
    "id": "UC-207",
@@ -2672,8 +2679,8 @@
   }
  ],
  "tally": {
-  "WORKS": 33,
-  "PARTLY": 7,
+  "WORKS": 34,
+  "PARTLY": 6,
   "MISSING": 9,
   "DEPRECATED": 2
  }

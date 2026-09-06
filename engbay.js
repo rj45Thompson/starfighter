@@ -34,7 +34,7 @@ var CFG = {
   COL_HULL_FILL: 'rgba(70,214,255,0.07)', COL_HULL_STROKE: '#3a5a78',
   COL_EMPTY: '#1c2a3c', COL_EMPTY_STROKE: '#46617e',
   COL_WEAPON: '#ff6a6a', COL_WEAPON_DIM: '#5a2e2e',
-  COL_GIZMO: '#5ac8ff', COL_GIZMO_DIM: '#233c4e',
+  COL_GIZMO: '#5ac8ff', COL_GIZMO_DIM: '#233c4e', COL_HARD: '#ff8a6e',   // COL_HARD: the mount-bay hardpoint boxes (2026-09-06)
   COL_REF: '#8fa2b8', COL_TEXT: '#cfe2f5', COL_DIM: '#6f88a4',
   POLL_MS: 400,            // re-render cadence while open (cheap - just reflects HOST.P state, no animation)
   // SHIELD ARCS (task #83, "shield coverage as spatial arcs on the same schematic"): a bubble drawn around the
@@ -51,7 +51,7 @@ function HOST() { var w = win(); return w && w.HOST; }
 function el(tag, style, html) { var d = doc(); var e = d.createElement(tag); if (style) e.style.cssText = style; if (html != null) e.innerHTML = html; return e; }
 function esc(s) { return String(s == null ? '' : s).replace(/</g, '&lt;'); }
 
-var EB = { root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null, gridPick: null,
+var EB = { bayPick: null, root: null, body: null, shown: false, mounted: false, pickIdx: null, pickType: null, pollT: null, gridPick: null,
   dragging: null };   // "kind|key" while an item icon is mid-drag - the poll must NOT re-render then (a re-render destroys the dragged element and cancels the drag)
 
 // PROCEDURAL ITEM ICONS (user 2026-07-09 "icons, somewhat unique for each item... slot them in like diablo"):
@@ -219,11 +219,86 @@ function micromoduleGridHtml(h, s) {
     '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">MICROMODULES</div>' +
     '<div style="font-size:10px;color:' + (mods.length ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(label) + '</div></div>';
 }
+// MOUNT BAYS (RJ 2026-09-06 "ship building is such a mess"): the hardpoints and gizmo slots this hull carries were
+// only clickable DOTS on the schematic - nothing said what sat in each one, or how many were free. They are slots
+// like every other slot, so they render as slot boxes: one box per mount, its fitted item or "empty", click to fit
+// (mount) or clear (unmount). Both drive the existing dock-gated `hardpoint`/`gizmo` commands - no second path to
+// the same state, and undocked the boxes stay readable but inert, exactly like the rest of this screen.
+function bayBoxHtml(h, s, kind, idx, key, table, glyph) {
+  var it = key && table && table[key];
+  var docked = !!s.docked;
+  var face = it && iconImg(kind, key, it, table, 34, false);
+  var col = it ? (kind === 'hardpoint' ? CFG.COL_HARD : CFG.COL_GIZMO) : CFG.COL_EMPTY_STROKE;
+  var attrs = ' data-bay="' + kind + '" data-bayidx="' + idx + '"' + (docked ? ' style="cursor:pointer;' : ' style="') +
+    'border:1px solid ' + col + ';border-radius:8px;padding:8px;background:#0c1623;text-align:center;min-width:96px"';
+  var tip = it ? tipAttr(kind, key, it, null, docked ? 'click to remove' : 'dock to change') : '';
+  return '<div' + attrs + tip + '>' +
+    '<div style="font-size:20px;min-height:36px;display:flex;align-items:center;justify-content:center">' +
+      (face || '<span style="opacity:.45">' + glyph + '</span>') + '</div>' +
+    '<div style="font-size:9px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin-top:2px">' +
+      (kind === 'hardpoint' ? 'HARDPOINT ' : 'GIZMO ') + (idx + 1) + '</div>' +
+    '<div style="font-size:10px;color:' + (it ? CFG.COL_TEXT : CFG.COL_DIM) + ';margin-top:2px">' + esc(it ? it.n : 'empty') + '</div></div>';
+}
+function bayGridHtml(h, s) {
+  var schema = mountSchema(h, s);
+  var hp = (s.weaponSlots || []), gz = (s.gizmoSlots || []);
+  var nHp = schema.weaponPoints.length, nGz = schema.gizmoPoints.length;
+  if (!nHp && !nGz) return '';
+  var boxes = '', i;
+  for (i = 0; i < nHp; i++) boxes += bayBoxHtml(h, s, 'hardpoint', i, hp[i] || null, h.WEAPONS, '⚔');
+  for (i = 0; i < nGz; i++) boxes += bayBoxHtml(h, s, 'gizmo', i, gz[i] || null, h.GIZMOS, '⬡');
+  var pick = '';
+  if (EB.bayPick && s.docked) {
+    var isHp = EB.bayPick.kind === 'hardpoint';
+    var table = isHp ? h.WEAPONS : h.GIZMOS, keys = isHp ? h.WEAPON_ORDER : h.GIZMO_KEYS;
+    var rows = (keys || []).map(function (k) {
+      var it2 = table[k]; if (!it2) return '';
+      var cost = it2.cost || 0, can = (s.credits || 0) >= cost;
+      return '<div data-baypick="' + esc(k) + '" style="padding:4px 8px;border-radius:4px;display:flex;align-items:center;gap:6px;' +
+        (can ? 'cursor:pointer' : 'opacity:.45') + '" onmouseover="this.style.background=\'#152234\'" onmouseout="this.style.background=\'\'">' +
+        (iconImg(EB.bayPick.kind, k, it2, table, 24, false) || '') +
+        '<span><b style="color:' + CFG.COL_TEXT + '">' + esc(it2.n) + '</b> <span style="color:' + CFG.COL_DIM + '">' +
+        (cost ? cost + 'c' : 'free') + (it2.desc ? ' - ' + esc(it2.desc) : (it2.dmg != null ? ' - dmg ' + it2.dmg : '')) + '</span></span></div>';
+    }).join('');
+    pick = '<div style="border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:6px;padding:6px;background:#0c1623;margin-bottom:6px">' +
+      '<div style="color:' + CFG.COL_DIM + ';font-size:11px;margin-bottom:4px">fit ' + (EB.bayPick.kind === 'hardpoint' ? 'HARDPOINT ' : 'GIZMO ') +
+      (EB.bayPick.idx + 1) + ' - click one to buy and mount it:</div>' + rows + '</div>';
+  }
+  return '<div style="font-size:11px;color:' + CFG.COL_DIM + ';letter-spacing:.04em;margin:8px 0 6px">MOUNT BAYS - ' +
+      nHp + ' hardpoint' + (nHp === 1 ? '' : 's') + ' · ' + nGz + ' gizmo slot' + (nGz === 1 ? '' : 's') +
+      (s.docked ? ' · click a slot' : ' · dock to change') + '</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">' + boxes + '</div>' + pick;
+}
+
+// SHIP TOTALS (2026-09-06): what the fit adds up to, so a change on this screen is visible as a number and not
+// only as a filled box. Every figure is computed from the same registries the game flies on; a number this screen
+// cannot compute is omitted rather than guessed.
+function totalsHtml(h, s) {
+  var W = h.WEAPONS, prim = W && W[s.weaponType || 'energy'];
+  var dps = 0, guns = 0;
+  if (prim && prim.cd > 0) { dps += prim.dmg / prim.cd; guns++; }
+  (s.weaponSlots || []).forEach(function (k) { var w = k && W && W[k]; if (w && w.cd > 0) { dps += w.dmg / w.cd; guns++; } });
+  var sh = (typeof h.shieldOf === 'function') ? h.shieldOf(s) : null;
+  var sb = (typeof h.sb === 'function') ? h.sb(s) : null;
+  var cells = [
+    ['GUNS', guns + '', 'primary plus mounted hardpoints'],
+    ['DPS', dps.toFixed(1), 'sustained damage per second, every gun firing'],
+    ['HULL', Math.round(s.maxHp || 0) + '', 'maximum hull'],
+    ['SHIELD', sh ? Math.round(sh.max) + '' : null, 'total shield capacity across both arcs'],
+    ['HOLD', Math.round(s.holdCap || 0) + '', 'cargo capacity'],
+    ['STATS', sb ? (Object.keys(sb.stat).reduce(function (a, k) { return a + sb.stat[k]; }, 0) + '/' + (8 * sb.order.length)) : null, 'Starblast stat levels spent']
+  ];
+  return '<div style="display:flex;flex-wrap:wrap;gap:14px;border:1px solid ' + CFG.COL_EMPTY_STROKE + ';border-radius:8px;padding:8px 10px;margin-bottom:8px;background:#0b1420">' +
+    cells.filter(function (c) { return c[1] != null; }).map(function (c) {
+      return '<div title="' + attrEsc(c[2]) + '"><div style="font-size:9px;letter-spacing:.08em;color:' + CFG.COL_DIM + '">' + c[0] + '</div>' +
+        '<div style="font-size:15px;color:' + CFG.COL_TEXT + ';font-variant-numeric:tabular-nums">' + c[1] + '</div></div>';
+    }).join('') + '</div>';
+}
 function slotGridHtml(h, s) {
   var defs = gridSlotDefs(h);
   var boxes = defs.map(function (def) { return gridBoxHtml(h, s, def); }).join('');
   boxes += micromoduleGridHtml(h, s);
-  var html = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">' + boxes + '</div>';
+  var html = totalsHtml(h, s) + '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">' + boxes + '</div>' + bayGridHtml(h, s);
   var gp = EB.gridPick;
   if (gp) {
     var def = defs.filter(function (d) { return d.kind === gp; })[0];
@@ -412,6 +487,21 @@ function onPick(kind, idx, key) {
   render();
 }
 
+// A bay box click: a FILLED slot unmounts (the command refunds its own fraction), an EMPTY one opens the fit list.
+// Both go through the dock-gated `hardpoint`/`gizmo` commands, so the rules live in one place and this screen only
+// asks. Undocked, the command itself says "must be docked" - this screen does not need its own copy of that rule.
+function onBayClick(kind, idx) {
+  var h = HOST(), s = shipOr(h); if (!h || !s) return;
+  var arr = (kind === 'hardpoint' ? s.weaponSlots : s.gizmoSlots) || [];
+  if (arr[idx]) { h.runCmd(kind + ' unmount ' + (idx + 1)); EB.bayPick = null; }
+  else { EB.bayPick = (EB.bayPick && EB.bayPick.kind === kind && EB.bayPick.idx === idx) ? null : { kind: kind, idx: idx }; }
+  render();
+}
+function onBayPick(key) {
+  var h = HOST(); if (!h || !EB.bayPick) return;
+  h.runCmd(EB.bayPick.kind + ' mount ' + key);   // the command picks the first free slot, buys, and reports the cost
+  EB.bayPick = null; render();
+}
 function wireClicks() {
   EB.body.addEventListener('click', function (ev) {
     var pickEl = ev.target.closest && ev.target.closest('[data-pick]');
@@ -425,6 +515,11 @@ function wireClicks() {
     if (gridPickEl) { onGridPick(EB.gridPick, gridPickEl.getAttribute('data-gridpick')); return; }
     var gridEl = ev.target.closest && ev.target.closest('[data-grid]');
     if (gridEl) { onGridClick(gridEl.getAttribute('data-grid')); return; }
+    // MOUNT BAYS (2026-09-06): data-bay / data-baypick, same closest-match-and-return chain, disjoint vocabulary.
+    var bayPickEl = ev.target.closest && ev.target.closest('[data-baypick]');
+    if (bayPickEl) { onBayPick(bayPickEl.getAttribute('data-baypick')); return; }
+    var bayEl = ev.target.closest && ev.target.closest('[data-bay]');
+    if (bayEl) { onBayClick(bayEl.getAttribute('data-bay'), parseInt(bayEl.getAttribute('data-bayidx'), 10)); return; }
     var skillEl = ev.target.closest && ev.target.closest('[data-skill]');
     if (skillEl) { var h2 = HOST(); if (h2) h2.runCmd('skill ' + skillEl.getAttribute('data-skill')); render(); return; }
     // (2026-07-09: the embedded-shop data-act delegation is GONE with the shop itself - the Bay is loadout-only;
