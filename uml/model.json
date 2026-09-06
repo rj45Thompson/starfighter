@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:39:29",
+ "generated": "2026-09-06T12:46:40",
  "modules": [
   {
    "file": "acquire.js",
@@ -548,7 +548,7 @@
   },
   {
    "file": "empire.js",
-   "lines": 134,
+   "lines": 171,
    "classes": [
     {
      "name": "EMPIRE",
@@ -2623,9 +2623,9 @@
   {
    "id": "UC-303",
    "epic": "E3",
-   "status": "MISSING",
-   "story": "Pilot commands a wing: follow, attack, dock",
-   "test": "plain-English orders exist for the squad; no wing model"
+   "status": "WORKS",
+   "story": "Pilot commands a wing: follow, attack, mine, trade, hold, defend a world, go dock",
+   "test": "EMPIRE board + wing command; 36 ships took DEFEND and all four sampled closed 65-141u on the world in 25s"
   },
   {
    "id": "UC-304",
@@ -2762,9 +2762,9 @@
   }
  ],
  "tally": {
-  "WORKS": 40,
+  "WORKS": 41,
   "PARTLY": 4,
-  "MISSING": 5,
+  "MISSING": 4,
   "DEPRECATED": 2
  }
 }

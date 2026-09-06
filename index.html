@@ -308,7 +308,7 @@
 <script src="conquest.js?v=20260714c"></script>
 <script src="missions.js?v=20260906b"></script>
 <script src="economy.js?v=20260906f"></script>
-<script src="empire.js?v=20260906a"></script>
+<script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
 <script>
@@ -419,7 +419,11 @@ const CFG = {
   SHIP_BOUNCE:0.65,        // restitution of the ship-vs-ship velocity impulse (1 = perfectly elastic)
   SHIP_COLLIDE_SKIP_MULT:4,// broadphase: skip pairs farther than this ×SHIP_R on any axis (cheap early reject)
   // ---- player commands (chat) ----
-  CMD_DURATION:11,         // seconds an order from the player stays in force
+  CMD_DURATION:11,         // seconds a SHOUTED order (chat) stays in force
+  CMD_STANDING_S:1e9,      // a wing-board order is STANDING: it holds until you change it (2026-09-06)
+  WING_DEFEND_R:260,       // a WING ship told to defend a world holds this close and engages inside it. Deliberately
+                           // NOT the existing DEFEND_R (115) below, which is the planet's own defenders' radius:
+                           // a second key of that name in this same literal would have been silently overridden.
   NSHIPS:32,               // SR ramp (user: "ramp it up to 50 players"): 32 coalition + pirates/defenders ≈ 50+ live minds
   THINK_STRIDE:4,          // AI brains take turns thinking every Nth frame (dt accumulated, so rates stay exact) - physics every frame
   // ---- trading economy · planets (organic: prices EMERGE from stock; nothing scripted; hyperspace REMOVED) ----
@@ -2198,6 +2202,15 @@ function applyCommand(s,c,dt){ let mode='SEEK',target=null,aimDir=null,ease=1;
       if(lt){ mode='HUNT'; target=lt; aimDir=_v.copy(lt.pos).sub(s.pos); s.huntTarget=lt; s.huntUntil=T0+3; }
       else { mode='ESCORT'; target=L; aimDir=_v.copy(L.pos).sub(s.pos); const d=s.pos.distanceTo(L.pos); if(d<CFG.WINGMAN_STANDOFF) ease=clamp(d/CFG.WINGMAN_STANDOFF,0.12,1); } }
     else { mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0; } }
+  // DEFEND (2026-09-06): hold over a named world; anything hostile inside CFG.DEFEND_R is engaged, and the ship
+  // returns to the world when the fight drifts away. The ONE new flight behaviour the wing board needed.
+  else if(c.type==='defend'){ const w=c.world;
+    if(!w){ mode='HOLD'; aimDir=FWD.clone().applyQuaternion(s.quat); ease=0; }
+    else { const foe=ships.filter(x=>x.alive&&x.team!==s.team&&x.pos.distanceTo(w.pos)<CFG.WING_DEFEND_R)
+             .sort((a,b)=>a.pos.distanceTo(w.pos)-b.pos.distanceTo(w.pos))[0];
+      if(foe){ mode='HUNT'; target=foe; aimDir=_v.copy(foe.pos).sub(s.pos); s.huntTarget=foe; s.huntUntil=T0+3; }
+      else { const d=s.pos.distanceTo(w.pos); mode= d>CFG.WING_DEFEND_R*0.6 ? 'SEEK' : 'HOLD';
+        aimDir=_v.copy(w.pos).sub(s.pos); if(d<CFG.WING_DEFEND_R*0.6) ease=0.15; } } }
   else if(c.type==='mine'){ const r=asteroids.filter(a=>s.pos.distanceTo(a.pos)<CFG.SENSE_R*CFG.CMD_MINE_MUL); if(r.length){ mode='MINE'; target=pickTarget(s,r); aimDir=_v.copy(target.pos).sub(s.pos); } else { mode='SEEK'; aimDir=FWD.clone().applyQuaternion(s.quat); } }
   else if(c.type==='collect'){ if(gems.length){ mode='COLLECT'; target=pickTarget(s,gems.slice()); aimDir=_v.copy(target.pos).sub(s.pos); const gd=s.pos.distanceTo(target.pos); if(gd<CFG.GEM_EASE_R) ease=clamp(gd/CFG.GEM_EASE_R,0.25,1); } else { mode='SEEK'; aimDir=FWD.clone().applyQuaternion(s.quat); } }
   else if(c.type==='flee'){ mode='EVADE'; const th=nearestRival(s,senseRangeOf(s)); aimDir= th? _v.copy(s.pos).sub(th.pos) : _v.copy(s.pos).multiplyScalar(-1); }
@@ -4694,6 +4707,14 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
+  if(c==='wing'||c==='squad'){ const W=HOST.wing(); const sub=(a[1]||'').toLowerCase();
+    if(!sub||sub==='list'){ term(`YOUR WING (${W.length}):`,'sys');
+      W.forEach(w=>term(`&nbsp;&nbsp;<b>${w.name}</b> ${w.hullClass||''} · hull ${w.hull}/${w.maxHull} · ${w.dist}u out · ${w.order?`<b>${w.order}</b>${w.orderTarget?' '+w.orderTarget:''}${w.standing?' (standing)':''}`:(w.going?'flying to '+w.going:(w.docked?'docked at '+w.docked:'own lane'))}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">wing follow|hunt|mine|collect|hold|trade|defend &lt;world&gt;|goto &lt;world&gt;|release [ship]</span>','sys'); return; }
+    const named=a[2]&&ships.find(x=>x.name.toLowerCase()===String(a[2]).toLowerCase());
+    const who=named?[named.name]:null;
+    const r=HOST.wingOrder(who, sub, named?a[3]:a[2]);
+    term((r.ok?'&#9670; ':'&#9670; ')+r.msg, r.ok?'sys':'err'); return; }
   if(c==='station'||c==='stations'){ const E=window.ECONOMY; if(!need(E,'economy module not loaded')) return; const sub=(a[1]||'').toLowerCase(); const snap=E.snapshot();
     if(!sub||sub==='list'){ term(`YOUR STATIONS (${snap.stations.length}):`,'sys');
       snap.stations.forEach(st=>term(`&nbsp;&nbsp;<b>${st.planet}</b> Lv${st.lvl} · ${st.insName.join(' + ')} → <b>${st.outName}</b> · ${st.batch}/cycle every ${st.cycle}s · made ${st.made}, earned ${st.earned}c${st.stalled?` · <span style="color:#ff8a8a">STALLED: ${st.stalled}</span>`:''}`,'sys'));
@@ -6262,6 +6283,31 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 // =================================================================================================
 window.HOST={
   get T0(){ return T0; },   // the game clock, so a UI can age an observation honestly (planetmenu trade routes, 2026-09-06)
+  // THE WING (2026-09-06): who is in your squadron, what each is doing, and one way to order them. wingOrder
+  // routes the existing verbs through the SAME dispatch() the typed English orders use - no second command path -
+  // and adds the two a board needs that a shout never had: fly there and dock, hold over a world.
+  wing:()=>ships.filter(s=>s!==ships[0]&&s.alive&&s.team!=='pirate').map(s=>({
+    name:s.name, role:s.role, hull:Math.round(s.hp), maxHull:Math.round(s.maxHp), hullClass:s.hullClass,
+    order:(s.cmd&&T0<s.cmd.until)?s.cmd.type:null, standing:!!(s.cmd&&s.cmd.until>T0+CFG.CMD_DURATION+1),
+    orderTarget:(s.cmd&&s.cmd.target&&s.cmd.target.name)||(s.cmd&&s.cmd.world&&s.cmd.world.name)||null,
+    going:(s.obj&&s.obj.type==='goto'&&s.obj.planet)?s.obj.planet.name:null,
+    docked:s.docked?s.docked.name:null, dist:Math.round(s.pos.distanceTo(ships[0].pos)), credits:Math.round(s.credits||0) })),
+  wingOrder:(names,verb,arg)=>{
+    const list=(names&&names.length?ships.filter(s=>names.indexOf(s.name)>=0):ships.filter(s=>s!==ships[0]&&s.team!=='pirate')).filter(s=>s.alive);
+    if(!list.length) return {ok:false,msg:'no ship of yours to order'};
+    if(verb==='goto'||verb==='dock'){ const w=findPlanet(arg)||((base&&/^ranger|^base/i.test(arg||''))?{pos:base.pos.clone(),name:'Ranger Command',_base:true}:null);
+      if(!w) return {ok:false,msg:'no world called '+arg};
+      for(const s of list){ s.cmd=null; s.obj={type:'goto',planet:w}; say(s,`Course set for ${w.name}.`); }
+      return {ok:true,msg:`${list.length} ship${list.length===1?'':'s'} bound for ${w.name}`}; }
+    if(verb==='defend'){ const w=findPlanet(arg); if(!w) return {ok:false,msg:'no world called '+arg};
+      for(const s of list){ s.obj=null; s.cmd={type:'defend', world:w, target:null, until:T0+CFG.CMD_STANDING_S}; s.huntTarget=null; s.lock=null; say(s,`Holding over ${w.name}.`); }
+      return {ok:true,msg:`${list.length} ship${list.length===1?'':'s'} defending ${w.name}`}; }
+    if(verb==='release'){ for(const s of list){ s.cmd=null; say(s,'Back to my own lane.'); } return {ok:true,msg:'orders cleared'}; }
+    if(!ACK[verb]) return {ok:false,msg:'no order called '+verb};
+    const tgt=(verb==='hunt'||verb==='follow')?(arg?ships.find(x=>x.name===arg):ships[0]):null;
+    dispatch(list, verb, tgt, null);
+    for(const s of list) if(s.cmd) s.cmd.until=T0+CFG.CMD_STANDING_S;   // from the board it stands until changed
+    return {ok:true,msg:`${list.length} ship${list.length===1?'':'s'} ordered to ${verb}`}; },
   missionCandidates:(rankOnly)=>missionCandidates(rankOnly),   // the docked mission CARDS read exactly what the Passenger chose on (2026-09-06)
   sb:(s)=>sbSnapshot(s), spendStat:(k)=>spendStat(ships[0],k), takeTierUp:(k)=>takeTierUp(ships[0],k), term:(h,c)=>term(h,c),   // STARBLAST LOOP (sbhud.js reads / spends through these)
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },

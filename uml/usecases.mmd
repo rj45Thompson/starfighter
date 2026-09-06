@@ -38,7 +38,7 @@ flowchart LR
   subgraph E3["E3 EGOSOFT"]
     UC_301["UC-301 WORKS\nPilot builds a station on a held world and it produces goods"]
     UC_302["UC-302 WORKS\nPilot assigns AI ships to a trade route between two markets"]
-    UC_303["UC-303 MISSING\nPilot commands a wing: follow, attack, dock"]
+    UC_303["UC-303 WORKS\nPilot commands a wing: follow, attack, mine, trade, hold, defend a world, go dock"]
     UC_304["UC-304 MISSING\nSystems are separate bubbles joined by lanes; a contested system infects its neighbours"]
     UC_305["UC-305 MISSING\nSynod adapts its loadouts across generations"]
   end
@@ -128,7 +128,7 @@ flowchart LR
   Pilot --> UC_302
   style UC_302 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_303
-  style UC_303 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  style UC_303 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_304
   style UC_304 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
   Pilot --> UC_305

@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   var CFG = { TICK_MS: 500, EDGE: 'right', RGB: [12, 20, 30], DEFAULT_OPACITY: 0.9 };
-  var el = null, body = null, last = '', pick = null;   // pick: {hauler id} while assigning a route
+  var el = null, body = null, last = '', pick = null, wingPick = null;   // pick: hauler id while assigning a route; wingPick: ship name (or '*') while ordering
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   function E() { return window.ECONOMY; }
@@ -54,12 +54,34 @@
       + '<button data-assign="' + h.id + '">ASSIGN</button><button data-cancel="1">cancel</button></div>';
   }
 
+  // THE WING (RJ 2026-09-06, the Egosoft layer): who is in your squadron and one place to order them. The buttons
+  // call HOST.wingOrder, which routes through the SAME dispatch() the typed English orders use, so a board order
+  // and a shouted one are the same order - the board just makes it STANDING.
+  var WING_ORDERS = [['follow', 'FOLLOW'], ['hunt', 'ATTACK'], ['mine', 'MINE'], ['collect', 'COLLECT'], ['trade', 'TRADE'], ['hold', 'HOLD'], ['release', 'FREE']];
+  function wingRow(w) {
+    var doing = w.order ? (esc(w.order) + (w.orderTarget ? ' ' + esc(w.orderTarget) : '') + (w.standing ? '' : ' (shouted)'))
+      : (w.going ? 'flying to ' + esc(w.going) : (w.docked ? 'docked at ' + esc(w.docked) : 'own lane'));
+    var hp = w.maxHull ? w.hull / w.maxHull : 1;
+    return '<div class="epRow"><div class="epMain"><b>' + esc(w.name) + '</b> <span class="epDim">' + esc(w.hullClass || w.role || '') + ' · ' + w.dist + 'u</span>'
+      + '<div class="epSub">' + doing + '</div>' + bar(hp, hp > 0.5 ? '#5ee6a8' : '#ff8a8a') + '</div>'
+      + '<div class="epAct"><button data-wing-pick="' + esc(w.name) + '">ORDER</button></div></div>';
+  }
+  function wingForm(name) {
+    var names = planetNames();
+    return '<div class="epForm"><div class="epSub">order for <b>' + (name ? esc(name) : 'the whole wing') + '</b></div>'
+      + WING_ORDERS.map(function (o) { return '<button data-wing-order="' + o[0] + '">' + o[1] + '</button>'; }).join('')
+      + '<select data-world>' + names.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('') + '</select>'
+      + '<button data-wing-order="defend">DEFEND</button><button data-wing-order="goto">GO DOCK</button>'
+      + '<button data-cancel="1">cancel</button></div>';
+  }
   function render() {
     if (!body) return;
     var e = E(); if (!e) { body.innerHTML = '<div class="epPad epDim">economy module not loaded</div>'; return; }
     var s = e.snapshot();
     var key = JSON.stringify([s.stations.map(function (x) { return [x.planet, x.lvl, x.made, x.earned, x.stalled, Math.round(x.progress * 20), x.margin]; }),
-      s.haulers.map(function (x) { return [x.name, x.state, x.runs, x.profit, x.note, Math.round(x.pos * 20)]; }), pick]);
+      s.haulers.map(function (x) { return [x.name, x.state, x.runs, x.profit, x.note, Math.round(x.pos * 20)]; }), pick, wingPick,
+      ((H() && H().wing) ? H().wing().slice().sort(function (a, b) { return a.dist - b.dist; }).slice(0, 8)
+        .map(function (w) { return [w.name, w.hull, w.order, w.orderTarget, w.going, w.docked, Math.round(w.dist / 25)]; }) : [])]);
     if (key === last) return; last = key;
     var h = H(), credits = h && h.P ? Math.round(h.P.credits || 0) : 0;
     var pickH = pick ? e.haulerById(pick) : null;
@@ -70,6 +92,14 @@
       + '<h5>STATIONS</h5>'
       + (s.stations.length ? s.stations.map(stationRow).join('')
         : '<div class="epSub">None. Dock at a world and use <b>station build</b> - the chain is chosen from what that world makes, needs and charges.</div>')
+      + (function () { var h2 = H(); var w = (h2 && h2.wing) ? h2.wing() : [];
+          // the coalition flies ~37 ships and they all take your orders, so the board lists the NEAREST few by
+          // name and keeps one control for the rest - a list of 37 rows is not a command surface.
+          var near = w.slice().sort(function (a, b) { return a.dist - b.dist; }), shown = near.slice(0, 8);
+          return '<h5>WING <span class="epDim">' + w.length + ' ship' + (w.length === 1 ? '' : 's')
+            + (w.length > shown.length ? ', nearest ' + shown.length + ' listed' : '') + '</span></h5>'
+            + (w.length ? shown.map(wingRow).join('') + '<div class="epBuy"><button data-wing-pick="*">ORDER THE WHOLE WING</button></div>' : '<div class="epSub">No ships of yours are flying.</div>')
+            + (wingPick !== null ? wingForm(wingPick === '*' ? null : wingPick) : ''); })()
       + '<h5>HAULERS</h5>'
       + (s.haulers.length ? s.haulers.map(haulerRow).join('') : '<div class="epSub">None yet.</div>')
       + (pickH ? routeForm(pickH) : '')
@@ -89,7 +119,14 @@
     else if (b.dataset.sellH) r = e.sellHauler(e.haulerById(+b.dataset.sellH));
     else if (b.dataset.buyH) r = e.buyHauler();
     else if (b.dataset.route) { pick = (pick === +b.dataset.route) ? null : +b.dataset.route; }
-    else if (b.dataset.cancel) { pick = null; }
+    else if (b.dataset.wingPick) { wingPick = (wingPick === b.dataset.wingPick) ? null : b.dataset.wingPick; }
+    else if (b.dataset.wingOrder) {
+      var h3 = H(); var sel = b.parentNode.querySelector('[data-world]');
+      var who = (wingPick && wingPick !== '*') ? [wingPick] : null;
+      r = h3 && h3.wingOrder ? h3.wingOrder(who, b.dataset.wingOrder, sel ? sel.value : null) : { ok: false, msg: 'wing orders unavailable' };
+      if (r && r.ok) { wingPick = null; if (window.HOST && HOST.term) HOST.term('&#9670; ' + r.msg, 'sys'); }
+    }
+    else if (b.dataset.cancel) { pick = null; wingPick = null; }
     else if (b.dataset.assign) {
       var box = b.parentNode;
       r = e.assign(e.haulerById(+b.dataset.assign), box.querySelector('[data-from]').value,
