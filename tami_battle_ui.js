@@ -294,6 +294,38 @@
       cardsHtml += unitCard(units[i], units[i]===cur);
     }
 
+    // ---- DEPTH (RJ 2026-09-06, the ground battle "is not done ... just a toy") -------------------------------
+    // Four things a tactics screen owes the player, all of them facts the battle already knows and never showed:
+    // who acts next, what ground the current unit is standing on, what the armed technique would do to each target
+    // it can actually reach, and - before a shot - where to put your own team.
+    var depth = '';
+    if (opts.deploy) {
+      depth += '<div style="margin:6px 0;padding:6px 8px;border:1px solid ' + COLOR.techArmedBorder + ';border-radius:6px">' +
+        '<b style="color:' + COLOR.techArmedBorder + '">DEPLOY</b> ' + esc(opts.deploy.placed) + '/' + esc(opts.deploy.total) +
+        ' placed - click a blue tile on your two columns to set <b>' + esc(opts.deploy.next || '') + '</b>.</div>';
+    }
+    if (opts.order && opts.order.length) {
+      var ord = '';
+      for (var o = 0; o < opts.order.length; o++) {
+        var ou = opts.order[o], oc = ou.side === 'ally' ? COLOR.allyAccent : COLOR.foeAccent;
+        ord += '<span style="display:inline-block;margin-right:6px;padding:1px 5px;border-radius:4px;border:1px solid ' + oc +
+          ';color:' + oc + ';font-size:10px' + (o === 0 ? ';background:rgba(143,208,255,.14)' : ';opacity:.72') + '">' +
+          (o === 0 ? '&#9654; ' : '') + esc(ou.name) + ' <span style="opacity:.7">' + ou.hp + '</span></span>';
+      }
+      depth += '<div style="margin:4px 0 2px;font-size:10px;color:' + COLOR.textDim + ';letter-spacing:.08em">TURN ORDER</div>' +
+        '<div style="margin-bottom:4px">' + ord + '</div>';
+    }
+    if (opts.tile) {
+      var bits = [];
+      if (opts.tile.cost > 1) bits.push('costs ' + opts.tile.cost + ' to enter');
+      if (opts.tile.cover > 0) bits.push('gives ' + Math.round(opts.tile.cover * 100) + '% cover');
+      if (opts.tile.cover < 0) bits.push('exposed: ' + Math.round(-opts.tile.cover * 100) + '% more damage taken');
+      if (opts.tile.high > 0) bits.push('high ground: +' + Math.round(opts.tile.high * 100) + '% attack');
+      if (opts.tile.high < 0) bits.push(Math.round(-opts.tile.high * 100) + '% weaker attacks from down here');
+      depth += '<div style="font-size:11px;color:' + COLOR.textDim + '">standing on <b style="color:' + COLOR.text + '">' +
+        esc(opts.tile.name) + '</b>' + (bits.length ? ' - ' + esc(bits.join(', ')) : '') + '</div>';
+    }
+
     // ---- control area (mirrors drawBattleUI's bstate switch exactly) ----
     var ctrl = '';
     if(bstate==='player' && cur){
@@ -316,8 +348,29 @@
       if(selTech && TECHS[selTech]){
         var selInfo = TECHS[selTech];
         var wantAlly = selInfo.kind==='heal';
+        // TECHNIQUE DETAIL: what this move actually is, not only its name on a button
+        var det = [];
+        if (selInfo.power != null) det.push('power ' + selInfo.power);
+        det.push('range ' + selInfo.range);
+        if (selInfo.el) det.push(esc(selInfo.el));
+        if (selInfo.cd) det.push('cooldown ' + selInfo.cd);
+        if (selInfo.aff) det.push('may inflict ' + esc(selInfo.aff));
         ctrl += '<div style="margin-top:4px;color:'+COLOR.techArmedBorder+';font-size:12px">'+
-          esc(selInfo.name)+' armed - click a '+(wantAlly?'ally':'foe')+' in range ('+esc(selInfo.range)+').</div>';
+          esc(selInfo.name)+' armed <span style="opacity:.75">('+det.join(' &middot; ')+')</span> - click a '+(wantAlly?'ally':'foe')+' in range.</div>';
+        // MATCHUP PREVIEW: the damage band against every target it can reach, and whether that would finish them
+        if (opts.previews && opts.previews.length) {
+          var pv = '';
+          for (var q = 0; q < opts.previews.length; q++) {
+            var e2 = opts.previews[q], pr = e2.p || {};
+            var lethal = pr.kills ? ' <b style="color:' + COLOR.good + '">lethal</b>' : (pr.mayKill ? ' <span style="color:' + COLOR.good + '">may finish</span>' : '');
+            pv += '<div style="font-size:11px;margin-top:2px">&rarr; <b>' + esc(e2.name) + '</b> <span style="opacity:.7">' + e2.hp + '/' + e2.maxhp + '</span> ' +
+              '<b style="color:' + COLOR.text + '">' + esc(pr.text || '?') + '</b>' + lethal +
+              (pr.why ? ' <span style="opacity:.6">' + esc(pr.why) + '</span>' : '') + '</div>';
+          }
+          ctrl += '<div style="margin-top:3px;border-top:1px solid ' + COLOR.panelBorder + ';padding-top:3px">' + pv + '</div>';
+        } else if (opts.previews) {
+          ctrl += '<div style="font-size:11px;margin-top:3px;opacity:.7">nothing in range of that technique from here.</div>';
+        }
       }
     } else if(bstate==='win'){
       ctrl = '<div style="margin-top:8px;color:'+COLOR.good+';font-size:16px">VICTORY - the away team prevails.</div>'+
@@ -343,6 +396,7 @@
       'background:'+COLOR.panelBg+';border:1px solid '+COLOR.panelBorder+';border-radius:10px;padding:10px 12px">'+
         '<div style="color:'+COLOR.header+';font-weight:bold;margin-bottom:6px">TURN-BASED BATTLE '+
           '<span style="opacity:.5;font-weight:normal"> - a Tami-style away-team fight</span></div>'+
+        depth+
         cardsHtml+
         ctrl+
       '</div>'+

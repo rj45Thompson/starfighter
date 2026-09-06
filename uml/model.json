@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T13:03:56",
+ "generated": "2026-09-06T13:10:32",
  "modules": [
   {
    "file": "acquire.js",
@@ -2277,7 +2277,7 @@
   },
   {
    "file": "tami_battle_ui.js",
-   "lines": 550,
+   "lines": 604,
    "classes": [
     {
      "name": "TAMIBATTLEUI",
@@ -2753,9 +2753,9 @@
   {
    "id": "UC-404",
    "epic": "E4",
-   "status": "MISSING",
+   "status": "WORKS",
    "story": "Ground battle shows turn order, technique detail, matchup preview, terrain, deployment",
-   "test": "bring-over list, 10 rows"
+   "test": "deployed 3 by clicking tiles; Ion Bolt read 'power 15 range 4 Ionic cooldown 1' and previewed 19-25 vs Synod Blade, 20-26 vs Synod Gun"
   },
   {
    "id": "UC-501",
@@ -2850,9 +2850,9 @@
   }
  ],
  "tally": {
-  "WORKS": 44,
+  "WORKS": 45,
   "PARTLY": 4,
-  "MISSING": 1,
+  "MISSING": 0,
   "DEPRECATED": 2
  }
 }

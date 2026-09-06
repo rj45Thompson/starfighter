@@ -46,7 +46,7 @@ flowchart LR
     UC_401["UC-401 DEPRECATED\nThe old surface walk: boxes on a checkerboard"]
     UC_402["UC-402 DEPRECATED\nPilot fights a turn-based battle on the Tami rules"]
     UC_403["UC-403 WORKS\nPilot walks a first-person surface (three.js FPS view)"]
-    UC_404["UC-404 MISSING\nGround battle shows turn order, technique detail, matchup preview, terrain, deployment"]
+    UC_404["UC-404 WORKS\nGround battle shows turn order, technique detail, matchup preview, terrain, deployment"]
   end
   subgraph E5["E5 MINDS"]
     UC_501["UC-501 WORKS\nPilot asks the Passenger anything; it answers with a reasoning transcript from the novel, the live game or the shards, or refuses"]
@@ -140,7 +140,7 @@ flowchart LR
   Pilot --> UC_403
   style UC_403 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_404
-  style UC_404 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  style UC_404 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_501
   style UC_501 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Passenger --> UC_502

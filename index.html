@@ -293,7 +293,7 @@
 <script src="item_variance.js?v=20260714c"></script>
 <script src="tom_test.js?v=20260714c"></script>
 <script src="thoughts.js?v=20260714c"></script>
-<script src="tami_battle_ui.js?v=20260714c"></script>
+<script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
 <script src="panels.js?v=20260906e"></script>
 <script src="sbhud.js?v=20260906b"></script>
@@ -6892,6 +6892,58 @@ const AWAY=(function(){
     mkUnit('Synod Gun',  'foe',40,15,5,13,4,['bolt','venom'],7,4,['Toxin']),
     mkUnit('Synod Brute','foe',66,14,11,7,2,['strike','stunrod'],6,4,['Mineral']) ];
     return pool.slice(0,Math.max(2,Math.min(3,n))); }
+  // ---- BATTLEFIELD TERRAIN (RJ 2026-09-06: the ground battle "is not done ... just a toy") ------------------
+  // The grid was eight-by-eight of identical squares, so position meant nothing but distance. Every tile now has a
+  // KIND with real consequences, generated deterministically from the world's own name so a given planet always
+  // fights the same way: rubble costs two movement and gives cover, a ridge costs two and grants high ground,
+  // a crater is cheap to enter but exposes whoever stands in it.
+  const BTER={
+    open:   { n:'open ground', cost:1, cover:0.00, high:0.00, col:0x223150, rise:0.00 },
+    rubble: { n:'rubble',      cost:2, cover:0.25, high:0.00, col:0x2a3348, rise:0.18 },
+    ridge:  { n:'ridge',       cost:2, cover:0.10, high:0.20, col:0x39435c, rise:0.55 },
+    crater: { n:'crater',      cost:1, cover:-0.15, high:-0.10, col:0x1a2338, rise:-0.22 }
+  };
+  let bter=[];   // [gy][gx] -> a BTER key
+  function buildTerrain(seedStr){
+    let h=2166136261; const str=String(seedStr||'field');
+    for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h*16777619)>>>0; }
+    const rnd=()=>{ h=(h*1664525+1013904223)>>>0; return h/4294967296; };
+    bter=[];
+    for(let y=0;y<G.GRID;y++){ const row=[];
+      for(let x=0;x<G.GRID;x++){
+        // the two deployment columns stay open, or a fight could start with a party stuck in rubble
+        if(x<=1 || x>=G.GRID-2){ row.push('open'); continue; }
+        const r=rnd();
+        row.push(r<0.16?'ridge':(r<0.40?'rubble':(r<0.50?'crater':'open')));
+      }
+      bter.push(row); }
+    return bter; }
+  function terAt(gx,gy){ const k=(bter[gy]&&bter[gy][gx])||'open'; return BTER[k]||BTER.open; }
+  function terKind(gx,gy){ return (bter[gy]&&bter[gy][gx])||'open'; }
+
+  // ---- WHAT AN ATTACK WOULD DO, before you commit to it -----------------------------------------------------
+  // The same arithmetic useTech runs, without the dice: the UI shows the band a hit would fall in and why.
+  function previewTech(actor,tech,targ){
+    const info=TECHS[tech]; if(!info||!actor||!targ) return null;
+    if(info.kind==='heal') return { heal:info.power, text:`heals ${info.power}` };
+    const aTer=terAt(actor.gx,actor.gy), tTer=terAt(targ.gx,targ.gy);
+    const atk=(info.kind==='phys')?actor.atk:Math.round(actor.atk*0.8);
+    const def=(info.kind==='phys')?targ.def:Math.round(targ.def*0.5);
+    const raw=(info.power+atk-def)*(1+aTer.high)*(1-tTer.cover);
+    const lo=Math.max(2,Math.round(raw*0.85)), hi=Math.max(2,Math.round(raw*1.15));
+    const bits=[];
+    if(aTer.high) bits.push(`+${Math.round(aTer.high*100)}% from the ${aTer.n}`);
+    if(tTer.cover>0) bits.push(`-${Math.round(tTer.cover*100)}% behind ${tTer.n}`);
+    if(tTer.cover<0) bits.push(`+${Math.round(-tTer.cover*100)}% exposed in the ${tTer.n}`);
+    const kills=hi>=targ.hp, may=lo>=targ.hp;
+    return { lo, hi, text:`${lo}-${hi}`, why:bits.join(', '), kills:may, mayKill:kills&&!may, hpAfter:Math.max(0,targ.hp-Math.round((lo+hi)/2)) };
+  }
+  function turnOrder(n){
+    const live=order.filter(u=>u.alive); if(!live.length) return [];
+    const out=[]; let ix=turnIx;
+    for(let i=0;i<n&&i<live.length*2;i++){ ix=(ix+ (i===0?0:1))%order.length; const u=order[ix]; if(u&&u.alive) out.push(u); }
+    return out.slice(0,n);
+  }
   function tileFree(gx,gy,ignore){ if(gx<0||gy<0||gx>=G.GRID||gy>=G.GRID) return false; for(const u of units){ if(u.alive&&u!==ignore&&u.gx===gx&&u.gy===gy) return false; } return true; }
   function unitAt(gx,gy){ return units.find(u=>u.alive&&u.gx===gx&&u.gy===gy); }
   function w3(gx,gy){ return new T.Vector3((gx-(G.GRID-1)/2)*G.TILE, 0, (gy-(G.GRID-1)/2)*G.TILE); }
@@ -6899,22 +6951,53 @@ const AWAY=(function(){
   function buildBattleLegacy(foe){ pendingFoe=foe; phase='battle'; bstate='intro'; blog=[]; selTech=null; acted=false; moved=false; core=null; retreatArmed=false;
     bScene=new T.Scene(); const sk=0x0c1220; bScene.background=new T.Color(sk); bScene.fog=new T.Fog(sk,50,130);
     bScene.add(new T.HemisphereLight(0xcfe0ff,0x10131c,1.0)); const sun=new T.DirectionalLight(0xffffff,0.9); sun.position.set(20,40,15); bScene.add(sun);
-    tiles=[]; for(let y=0;y<G.GRID;y++) for(let x=0;x<G.GRID;x++){ const dark=(x+y)%2; const m=new T.Mesh(new T.BoxGeometry(G.TILE*0.96,0.4,G.TILE*0.96), new T.MeshStandardMaterial({color:dark?0x1b2740:0x223150,roughness:0.9}));
-      const w=w3(x,y); m.position.set(w.x,-0.2,w.z); m.userData={gx:x,gy:y,base:dark?0x1b2740:0x223150}; bScene.add(m); tiles.push(m); }
+    buildTerrain(awayPlanet&&awayPlanet.name);
+    tiles=[]; for(let y=0;y<G.GRID;y++) for(let x=0;x<G.GRID;x++){ const dark=(x+y)%2; const ter=terAt(x,y);
+      const m=new T.Mesh(new T.BoxGeometry(G.TILE*0.96,0.4+Math.max(0,ter.rise)*2,G.TILE*0.96), new T.MeshStandardMaterial({color:ter.col&&terKind(x,y)!=='open'?ter.col:(dark?0x1b2740:0x223150),roughness:0.9}));
+      const w=w3(x,y); m.position.set(w.x,-0.2+ter.rise*0.5,w.z);
+      m.userData={gx:x,gy:y,base:(terKind(x,y)!=='open'?ter.col:(dark?0x1b2740:0x223150)),ter:terKind(x,y)}; bScene.add(m); tiles.push(m); }
     units=party().concat(foeParty(foe? (foe.tier||2):2));
     for(const u of units){ u.mesh=unitMesh(u); const w=w3(u.gx,u.gy); u.mesh.position.set(w.x,0,w.z); bScene.add(u.mesh); u.label=floatLabel(u); u.mesh.add(u.label.sp); }
     bCam=new T.PerspectiveCamera(52,innerWidth/innerHeight,0.1,600); bCam.position.set(0,34,30); bCam.lookAt(0,0,2);
-    order=units.slice(); turnIx=-1; bt=0; log('The Iron Synod ambushes your away team!'); nextTurn(); }
+    order=units.slice(); turnIx=-1; bt=0;
+    // DEPLOYMENT: you place your own three before a shot is fired, on your two columns, with the terrain visible.
+    deployIx=0; bstate='deploy';
+    // the away team waits off the field until you place it, so an unplaced unit is never mistaken for a deployed one
+    for(const u of units){ if(u.side==='ally'){ u.gx=-9; u.gy=-9; u.mesh.position.set(0,-40,0); } }
+    reach=deployTiles();
+    log('Deploy your away team - click a tile in your two columns to place '+units.filter(u=>u.side==='ally')[0].name+'.');
+    paintTiles(); }
+  let deployIx=0;
+  function deployTiles(){ const s=new Set(); for(let y=0;y<G.GRID;y++) for(let x=0;x<2;x++){ if(tileFree(x,y)) s.add(x+','+y); } return s; }
+  function placeAlly(gx,gy){
+    const allies=units.filter(u=>u.side==='ally');
+    if(deployIx>=allies.length) return;
+    if(!tileFree(gx,gy)) { log('Someone is already standing there.'); return; }
+    const u=allies[deployIx]; u.gx=gx; u.gy=gy; const w=w3(gx,gy); u.mesh.position.set(w.x,terAt(gx,gy).rise*0.5,w.z);   // back onto the field, on the tile you chose
+    log(`${u.name} takes position on the ${terAt(gx,gy).n}.`);
+    deployIx++;
+    if(deployIx>=allies.length){ log('Away team deployed. The Iron Synod moves.'); nextTurn(); }
+    else log(`Place ${allies[deployIx].name}.`);
+    reach=deployTiles(); paintTiles(); }
   function unitMesh(u){ const g=new T.Group(); const col=u.side==='ally'?0x46d6ff:0xff5a6e;
     const b=new T.Mesh(new T.CylinderGeometry(0.9,1.1,2.2,12), new T.MeshStandardMaterial({color:col,emissive:new T.Color(col).multiplyScalar(0.18),roughness:0.5})); b.position.y=1.3; g.add(b);
     const h=new T.Mesh(new T.SphereGeometry(0.7,14,10), new T.MeshStandardMaterial({color:0xeaf4ff,roughness:0.4})); h.position.y=2.7; g.add(h); return g; }
   function floatLabel(u){ return spriteText(u.name,22,'#eaf2ff',{bg:'rgba(9,16,28,0.7)',pad:5,r:6,align:'center',ws:0.07}); }
   function log(m){ blog.push(m); if(blog.length>4) blog.shift(); }
   // battle rendering: highlight reachable tiles + current unit; draw the HTML panel
-  function paintTiles(){ for(const m of tiles){ let c=m.userData.base; if(reach.has(m.userData.gx+','+m.userData.gy)) c=0x2f6a4a; m.material.color.setHex(c); }
+  function paintTiles(){ for(const m of tiles){ let c=m.userData.base; if(reach.has(m.userData.gx+','+m.userData.gy)) c=(bstate==='deploy'?0x2a6a8c:0x2f6a4a); m.material.color.setHex(c); }
     if(cur){ const t=tiles.find(x=>x.userData.gx===cur.gx&&x.userData.gy===cur.gy); if(t) t.material.color.setHex(cur.side==='ally'?0x2a5b8c:0x7a2436); } }
+  // movement now PAYS the terrain: rubble and ridges cost two, so a shortcut through cover is a real decision
   function reachable(u){ const S=new Set(), q=[[u.gx,u.gy,0]]; S.add(u.gx+','+u.gy);
-    while(q.length){ const [x,y,d]=q.shift(); if(d>=u.mv) continue; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx,ny=y+dy,k=nx+','+ny; if(nx<0||ny<0||nx>=G.GRID||ny>=G.GRID||S.has(k)||!tileFree(nx,ny,u)) continue; S.add(k); q.push([nx,ny,d+1]); } } S.delete(u.gx+','+u.gy); return S; }
+    const best={}; best[u.gx+','+u.gy]=0;
+    while(q.length){ const [x,y,d]=q.shift();
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx,ny=y+dy,k=nx+','+ny;
+        if(nx<0||ny<0||nx>=G.GRID||ny>=G.GRID||!tileFree(nx,ny,u)) continue;
+        const nd=d+terAt(nx,ny).cost;                       // the terrain's own cost: rubble and ridges cost two
+        if(nd>u.mv) continue;
+        if(best[k]!=null && best[k]<=nd) continue;
+        best[k]=nd; S.add(k); q.push([nx,ny,nd]); } }
+    S.delete(u.gx+','+u.gy); return S; }
   function nextTurn(){ selTech=null; acted=false; moved=false;
     for(let n=0;n<units.length+1;n++){ turnIx=(turnIx+1)%order.length; if(turnIx===0) order.sort((a,b)=>b.spd-a.spd);   // re-sort each round
       cur=order[turnIx]; if(cur.alive) break; }
@@ -6938,7 +7021,11 @@ const AWAY=(function(){
         atk:P?actor.force:actor.int,def:P?targ.ten:targ.wis,stab,atkType:info.el,d1,d2,crit,rng});
       dmg(targ,amt,`${info.name} [C# wasm]${crit?' crit!':''}${mult>1.001?' SUPER EFFECTIVE':(mult<0.999?' resisted':'')}`);
       if(info.aff && targ.alive && Math.random()<0.6){ targ.aff[info.aff]=(info.aff==='Stun'?1:3); log(`${targ.name} is afflicted: ${info.aff}!`); } }
-    else { const raw=info.power + (info.kind==='phys'?actor.atk:Math.round(actor.atk*0.8)) - (info.kind==='phys'?targ.def:Math.round(targ.def*0.5)); const amt=Math.max(2,Math.round(raw*rr(0.85,1.15))); dmg(targ,amt,info.name);   // last resort: local JS stand-in math
+    else { const aTer=terAt(actor.gx,actor.gy), tTer=terAt(targ.gx,targ.gy);
+      const raw=(info.power + (info.kind==='phys'?actor.atk:Math.round(actor.atk*0.8)) - (info.kind==='phys'?targ.def:Math.round(targ.def*0.5)))*(1+aTer.high)*(1-tTer.cover);
+      const amt=Math.max(2,Math.round(raw*rr(0.85,1.15)));
+      const note=[info.name]; if(aTer.high) note.push('high ground'); if(tTer.cover>0) note.push('through '+tTer.n); if(tTer.cover<0) note.push(tTer.n+' offers nothing');
+      dmg(targ,amt,note.join(', '));   // last resort: local JS stand-in math
       if(info.aff && targ.alive && Math.random()<0.6){ targ.aff[info.aff]=(info.aff==='Stun'?1:3); log(`${targ.name} is afflicted: ${info.aff}!`); } }
     actor.cd[tech]=info.cd; acted=true; }
   function endTurn(){ if(checkEnd()) return; bstate='wait'; aiTimer=G.TURN_DELAY*0.6; }
@@ -6981,7 +7068,14 @@ const AWAY=(function(){
     // TAMI-STYLED BATTLE HUD (user 2026-07-07: "the surface fighting still is not using the tami sprites and tami
     // system... copy the tami menus closer"): real type/category icons (assets/tami_icons/, the actual Tami art)
     // + gradient HP bars + affliction chips, via tami_battle_ui.js - a pure renderer, same data this file always had.
-    const html = (window.TAMIBATTLEUI ? TAMIBATTLEUI.render(units, cur, bstate, selTech, TECHS, blog, retreatArmed, {tamiData:TAMIDATA, moved}) : legacyBattleHtml());
+    // the depth pass hands the renderer what it needs to SHOW the fight, not just list it: who acts next, what the
+    // armed technique actually does, what it would do to each target it can reach, and the ground both stand on
+    const previews=(bstate==='player'&&cur&&selTech)?units.filter(u=>u.alive&&(TECHS[selTech].kind==='heal'?u.side==='ally':u.side!==cur.side)&&inRange(cur,u,TECHS[selTech].range))
+      .map(u=>({ name:u.name, hp:u.hp, maxhp:u.maxhp, p:previewTech(cur,selTech,u) })):[];
+    const uiOpts={ tamiData:TAMIDATA, moved, order:turnOrder(6).map(u=>({name:u.name,side:u.side,hp:u.hp,maxhp:u.maxhp,spd:u.spd})),
+      previews, tile:cur?{ kind:terKind(cur.gx,cur.gy), name:terAt(cur.gx,cur.gy).n, cover:terAt(cur.gx,cur.gy).cover, high:terAt(cur.gx,cur.gy).high, cost:terAt(cur.gx,cur.gy).cost }:null,
+      deploy:(bstate==='deploy')?{ next:(units.filter(u=>u.side==='ally')[deployIx]||{}).name||null, placed:deployIx, total:units.filter(u=>u.side==='ally').length }:null };
+    const html = (window.TAMIBATTLEUI ? TAMIBATTLEUI.render(units, cur, bstate, selTech, TECHS, blog, retreatArmed, uiOpts) : legacyBattleHtml());
     if(!setUI(html)) return;   // USER-REPORTED BUG FIX: rewriting innerHTML EVERY frame (60fps) destroyed the buttons
                                // between a real mousedown and mouseup, so no click event ever fired ("couldn't click
                                // anything to attack"). Synthetic .click() in headless tests fires atomically on a live
@@ -6991,7 +7085,10 @@ const AWAY=(function(){
       if(a==='retreat'){ if(!retreatArmed){ retreatArmed=true; log('Retreat? Click again to confirm - the party flees with NO rewards.'); } else retreatBattle(); return; }
       retreatArmed=false;
       if(a==='end'){ selTech=null; endTurn(); } else if(a==='return'){ finishBattle(bstate==='win'); } }); }
-  function onBattleClick(mx,my){ if(bstate!=='player'||!cur) return; pointer.x=mx/innerWidth*2-1; pointer.y=-(my/innerHeight*2-1); ray.setFromCamera(pointer,bCam);
+  function onBattleClick(mx,my){
+    if(bstate==='deploy'){ pointer.x=mx/innerWidth*2-1; pointer.y=-(my/innerHeight*2-1); ray.setFromCamera(pointer,bCam);
+      const ht=ray.intersectObjects(tiles,false)[0]; if(ht){ const d=ht.object.userData; if(d.gx<2) placeAlly(d.gx,d.gy); else log('Deploy on your own two columns - the left edge.'); } return; }
+    if(bstate!=='player'||!cur) return; pointer.x=mx/innerWidth*2-1; pointer.y=-(my/innerHeight*2-1); ray.setFromCamera(pointer,bCam);
     // technique targeting?
     if(selTech){ const info=TECHS[selTech]; const hits=ray.intersectObjects(units.filter(u=>u.alive).map(u=>u.mesh),true); if(hits.length){ let m=hits[0].object; while(m.parent&&!units.find(u=>u.mesh===m)) m=m.parent; const tgt=units.find(u=>u.mesh===m);
         if(tgt){ const wantAlly=info.kind==='heal'; if((wantAlly&&tgt.side!=='ally')||(!wantAlly&&tgt.side!=='foe')){ log(`Invalid target for ${info.name}.`); return; }
