@@ -326,7 +326,7 @@
 <script src="economy.js?v=20260906f"></script>
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
-<script src="cybertron.js?v=20260906a"></script>
+<script src="cybertron.js?v=20260906b"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -6372,11 +6372,38 @@ function loadGame(){ try{ const raw=localStorage.getItem(SAVE_KEY); if(!raw) ret
 let _saveCd=CFG.SAVE_INTERVAL_S;
 function saveTick(dt){ _saveCd-=dt; if(_saveCd<=0){ _saveCd=CFG.SAVE_INTERVAL_S; saveGame(); } }
 
-makePlanets();
-makeBase();   // M8: the Ranger Command hub
-makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
-makeScienceStation();   // SR-M19: the Athenaeum - artifact analysis + mineral probes, paid in CORES
-makeMiningBelt();   // user 2026-07-14: the peaceful CERES BELT - dense rocks, no pirates (must run BEFORE the initial spawnAtShell loop so the belt gets its share)
+// ===== ONE GALAXY, THE SAME ONE EVERY TIME (2026-09-06) =====
+// REQUIREMENTS_SR SR-M1 calls this "a living galaxy you leave and return to", and UC-218 was marked
+// WORKS. Only the CAREER was persisted. The geography was not: makePlanets/makeSystems draw every
+// position from Math.random through T.MathUtils.randFloat, so the layout was RE-ROLLED on every
+// boot. The save restores per-planet state by NAME, so your reputation and your terraforming came
+// back attached to a planet that had moved somewhere else - the galaxy you learned was gone, while
+// the file said it had been kept.
+// The seed is generated once, stored, and reused. Rather than thread a PRNG through every one of
+// the hundreds of rand() calls in world generation (and miss some), Math.random itself is swapped
+// for a seeded xorshift for the duration of generation and restored immediately after in a
+// `finally`. Generation becomes reproducible; everything after it - combat, spawns, AI - keeps the
+// real random it has always had.
+const GALAXY_SEED_KEY='SF_GALAXY_SEED_v1';
+function galaxySeed(){
+  try{ const v=localStorage.getItem(GALAXY_SEED_KEY); const n=parseInt(v,10);
+       if(v!=null && isFinite(n) && n>0) return n>>>0; }catch(e){}
+  const n=((Math.random()*0xFFFFFFFF)>>>0)||0x9E3779B9;
+  try{ localStorage.setItem(GALAXY_SEED_KEY,String(n)); }catch(e){}   // a browser that refuses storage gets a fresh galaxy each time, which is the old behaviour, not a crash
+  return n;
+}
+function withSeed(seed, fn){
+  const real=Math.random; let s=(seed>>>0)||0x9E3779B9;
+  Math.random=function(){ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; };
+  try{ return fn(); } finally { Math.random=real; }   // finally: a throw inside generation must not leave the whole game running on a deterministic Math.random
+}
+withSeed(galaxySeed(), ()=>{
+  makePlanets();
+  makeBase();   // M8: the Ranger Command hub
+  makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
+  makeScienceStation();   // SR-M19: the Athenaeum - artifact analysis + mineral probes, paid in CORES
+  makeMiningBelt();   // user 2026-07-14: the peaceful CERES BELT - dense rocks, no pirates (must run BEFORE the initial spawnAtShell loop so the belt gets its share)
+});
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
 // START IN THE BELT (user 2026-09-06 "start the user off in the deep asteroid cluster"): the player opens inside the Ceres
 // Belt's disc, among the rocks, rather than at a random point of a random system. The save (loadGame below) does not carry
