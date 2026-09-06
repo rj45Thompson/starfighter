@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:55:52",
+ "generated": "2026-09-06T13:03:56",
  "modules": [
   {
    "file": "acquire.js",
@@ -778,6 +778,57 @@
     "seeded"
    ],
    "cfgTotal": 18
+  },
+  {
+   "file": "ground.js",
+   "lines": 363,
+   "classes": [
+    {
+     "name": "GROUND",
+     "members": [
+      "CFG",
+      "build",
+      "update",
+      "key",
+      "look",
+      "dispose",
+      "scene",
+      "camera",
+      "heightAt",
+      "state",
+      "teleport"
+     ],
+     "memberTotal": 11
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "SIZE",
+    "across",
+    "SEG",
+    "resolution",
+    "EYE",
+    "ground",
+    "WALK",
+    "RUN",
+    "ACCEL",
+    "FRICTION",
+    "GRAVITY",
+    "JUMP",
+    "LOOK",
+    "PITCH_LIMIT",
+    "BOB_HZ",
+    "BOB_AMP",
+    "RADIUS",
+    "PROPS",
+    "FOE_SPEED",
+    "FOE_ENGAGE_R",
+    "FOE_AGGRO_R",
+    "TALK_R",
+    "STARS"
+   ],
+   "cfgTotal": 23
   },
   {
    "file": "growth_loop.js",
@@ -2682,8 +2733,8 @@
    "id": "UC-401",
    "epic": "E4",
    "status": "DEPRECATED",
-   "story": "Pilot lands and walks the surface",
-   "test": "boxes on a checkerboard - a toy (RJ 2026-09-06)"
+   "story": "The old surface walk: boxes on a checkerboard",
+   "test": "replaced by UC-403; kept behind CFG.GROUND_FPS=false as the fallback"
   },
   {
    "id": "UC-402",
@@ -2695,9 +2746,9 @@
   {
    "id": "UC-403",
    "epic": "E4",
-   "status": "MISSING",
+   "status": "WORKS",
    "story": "Pilot walks a first-person surface (three.js FPS view)",
-   "test": "not built (RJ: copy an FPS repo)"
+   "test": "ground.js: seeded heightfield per world, 53 solids, pointer-lock look, walk 10.7u in 2s, jump rise 1.18m, stopped 5.9m short of a 9.1m building"
   },
   {
    "id": "UC-404",
@@ -2799,9 +2850,9 @@
   }
  ],
  "tally": {
-  "WORKS": 43,
+  "WORKS": 44,
   "PARTLY": 4,
-  "MISSING": 2,
+  "MISSING": 1,
   "DEPRECATED": 2
  }
 }

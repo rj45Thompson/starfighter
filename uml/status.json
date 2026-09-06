@@ -269,8 +269,8 @@
 "id": "UC-401",
 "epic": "E4",
 "status": "DEPRECATED",
-"story": "Pilot lands and walks the surface",
-"test": "boxes on a checkerboard - a toy (RJ 2026-09-06)"
+"story": "The old surface walk: boxes on a checkerboard",
+"test": "replaced by UC-403; kept behind CFG.GROUND_FPS=false as the fallback"
 },
 {
 "id": "UC-402",
@@ -282,9 +282,9 @@
 {
 "id": "UC-403",
 "epic": "E4",
-"status": "MISSING",
+"status": "WORKS",
 "story": "Pilot walks a first-person surface (three.js FPS view)",
-"test": "not built (RJ: copy an FPS repo)"
+"test": "ground.js: seeded heightfield per world, 53 solids, pointer-lock look, walk 10.7u in 2s, jump rise 1.18m, stopped 5.9m short of a 9.1m building"
 },
 {
 "id": "UC-404",
@@ -386,9 +386,9 @@
 }
 ],
 "tally": {
-"WORKS": 43,
+"WORKS": 44,
 "PARTLY": 4,
-"MISSING": 2,
+"MISSING": 1,
 "DEPRECATED": 2
 }
 }

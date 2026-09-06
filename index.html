@@ -309,6 +309,7 @@
 <script src="missions.js?v=20260906b"></script>
 <script src="economy.js?v=20260906f"></script>
 <script src="synod.js?v=20260906a"></script>
+<script src="ground.js?v=20260906d"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -421,6 +422,7 @@ const CFG = {
   SHIP_COLLIDE_SKIP_MULT:4,// broadphase: skip pairs farther than this ×SHIP_R on any axis (cheap early reject)
   // ---- player commands (chat) ----
   CMD_DURATION:11,         // seconds a SHOUTED order (chat) stays in force
+  GROUND_FPS:true,         // the first-person surface (ground.js). false falls back to the old flat-plane world
   CMD_STANDING_S:1e9,      // a wing-board order is STANDING: it holds until you change it (2026-09-06)
   WING_DEFEND_R:260,       // a WING ship told to defend a world holds this close and engages inside it. Deliberately
                            // NOT the existing DEFEND_R (115) below, which is the planet's own defenders' radius:
@@ -6781,6 +6783,10 @@ const AWAY=(function(){
   const hint=document.createElement('div'); hint.id='awayHint';
   hint.style.cssText='position:absolute;left:0;right:0;bottom:0;padding:12px 16px;font:14px/1.55 ui-monospace,Menlo,monospace;color:#cfe2f5;background:linear-gradient(0deg,rgba(4,7,13,.94),rgba(4,7,13,0));pointer-events:none;text-align:center;white-space:pre-wrap';
   wrap.appendChild(hint);
+  const cross=document.createElement('div'); cross.id='awayCross';
+  cross.style.cssText='position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;pointer-events:none;display:none';
+  cross.innerHTML='<svg viewBox="0 0 18 18" width="18" height="18"><circle cx="9" cy="9" r="1.4" fill="#8ff5ff"/><path d="M9 0v5M9 13v5M0 9h5M13 9h5" stroke="#8ff5ff" stroke-width="1.2" opacity=".8"/></svg>';
+  wrap.appendChild(cross);
   const ui=document.createElement('div'); ui.id='awayUI'; ui.style.cssText='position:absolute;inset:0;pointer-events:none;font:13px/1.4 ui-monospace,Menlo,monospace'; wrap.appendChild(ui);
   document.body.appendChild(wrap);
   const rend=new T.WebGLRenderer({canvas:cv,antialias:true}); rend.setPixelRatio(Math.min(2,devicePixelRatio||1));
@@ -7173,18 +7179,57 @@ const AWAY=(function(){
     autoOn=true; autoSteps=0; retreatArmed=false; autoQueue(); return 'core'; }
 
   // ================================ enter / exit / input / frame ================================
-  function enter(pl){ if(active) return; active=true; phase='ground'; worldName=pl&&pl.name||'the surface'; awayPlanet=pl||null; victoryHooked=false; buildGround(pl); size(); wrap.style.display='block'; keys.clear();
-    term(`Landed on <b>${worldName}</b>. You disembark - <b>on foot</b>. (W walk · A/D turn · Shift run · F interact · type <b>launch</b> or step on the pad to leave)`,'sys'); }
+  // FIRST PERSON (RJ 2026-09-06 "the level you walk around is very bad just a toy"): ground.js builds a real
+  // surface - a heightfield shaped by the world's type, a settlement sized by its development, people on it - and
+  // owns the walking. The old flat-plane-and-boxes world stays as the fallback for a page without that module, and
+  // is what the shell's BROKEN tab still describes.
+  let fps=null;   // the ground.js session while first-person is active
+  function enter(pl){ if(active) return; active=true; phase='ground'; worldName=pl&&pl.name||'the surface'; awayPlanet=pl||null; victoryHooked=false;
+    fps=(window.GROUND&&CFG.GROUND_FPS)?GROUND.build(pl,{THREE:T,hostileRep:CFG.REP_HOSTILE}):null;
+    if(fps){ gScene=fps.scene; gCam=fps.camera; foes=[]; cross.style.display='block'; }
+    else buildGround(pl);
+    size(); wrap.style.display='block'; keys.clear();
+    { const sb=document.getElementById('shellBar'); if(sb) sb.style.display='none'; }   // the surface is a mode, not a panel - the flight bar goes away with it
+    if(fps) term(`Landed on <b>${worldName}</b> - <b>on foot</b>. Click to look around · <b>W A S D</b> walk · <b>Shift</b> run · <b>Space</b> jump · <b>F</b> interact · <b>Esc</b> releases the mouse, again leaves.`,'sys');
+    else term(`Landed on <b>${worldName}</b>. You disembark - <b>on foot</b>. (W walk · A/D turn · Shift run · F interact · type <b>launch</b> or step on the pad to leave)`,'sys'); }
   function exit(){ autoStop(); retreatArmed=false; active=false; phase=''; wrap.style.display='none'; clearUI(); keys.clear();
+    { const sb=document.getElementById('shellBar'); if(sb) sb.style.display=''; }
+    if(fps&&window.GROUND){ GROUND.dispose(); fps=null; } cross.style.display='none';
+    if(document.pointerLockElement===cv) document.exitPointerLock();
     // dispose scenes lightly
     gScene=null; bScene=null; core=null; }
-  function interact(){ if(phase!=='ground') return; const foe=nearestFoe(); if(foe){ buildBattle(foe); return; } if(onPad()){ term('Launching back to orbit.','sys'); exit(); } }
-  function key(e,down){ if(down){ if(e.code==='Escape'){ if(phase==='battle'){ /* stay */ } else exit(); return; }
-      if(e.code==='KeyF'&&phase==='ground'){ interact(); return; } keys.add(e.code); }
-    else keys.delete(e.code); }
+  function interact(){ if(phase!=='ground') return;
+    if(fps){
+      if(fpsPrompt==='pad'){ term('Launching back to orbit.','sys'); exit(); return; }
+      if(fpsPrompt==='folk'){ const line=`A colonist on ${worldName} asks what brings you down here.`;
+        term(`&#128172; ${line}`,'sys');
+        if(window.PASSENGER&&PASSENGER.route) try{ paraLine('you',`what do the people on ${worldName} want`); PASSENGER.route(`what do the people on ${worldName} want`); }catch(e){}
+        return; }
+      say('Nothing here to work with - the pad is the bright ring at the centre.'); return; }
+    const foe=nearestFoe(); if(foe){ buildBattle(foe); return; } if(onPad()){ term('Launching back to orbit.','sys'); exit(); } }
+  function key(e,down){ if(down){ if(e.code==='Escape'){ if(phase==='battle'){ /* stay */ }
+        else if(fps&&document.pointerLockElement===cv){ document.exitPointerLock(); }   // first Esc gives the mouse back
+        else exit(); return; }
+      if(e.code==='KeyF'&&phase==='ground'){ interact(); return; } keys.add(e.code); if(fps) GROUND.key(e.code,true); }
+    else { keys.delete(e.code); if(fps) GROUND.key(e.code,false); } }
+  // POINTER LOCK: click the surface to look with the mouse, Esc to get the cursor back. Nothing else in the game
+  // takes the pointer, so this is the only place that asks for it.
+  cv.addEventListener('click',()=>{ if(active&&phase==='ground'&&fps&&document.pointerLockElement!==cv) cv.requestPointerLock(); });
+  document.addEventListener('mousemove',e=>{ if(active&&phase==='ground'&&fps&&document.pointerLockElement===cv) GROUND.look(e.movementX||0,e.movementY||0); });
   cv.addEventListener('mousedown',e=>{ if(phase==='battle'){ core?onCoreClick(e.clientX,e.clientY):onBattleClick(e.clientX,e.clientY); } });
   cv.addEventListener('touchstart',e=>{ if(phase==='battle'&&e.touches[0]){ const t=e.touches[0]; core?onCoreClick(t.clientX,t.clientY):onBattleClick(t.clientX,t.clientY); } },{passive:true});
-  function frame(dt){ if(phase==='ground') frameGround(dt); else if(phase==='battle'){ if(core) frameCore(dt); else frameBattle(dt); } }
+  function frameFps(dt){
+    const r=GROUND.update(dt); if(!r) return;
+    if(r.engaged){ say('&#9876; A Synod trooper is on you.'); const f=r.engaged; f.alive=false; if(f.mesh&&f.mesh.parent) f.mesh.parent.remove(f.mesh);
+      if(document.pointerLockElement===cv) document.exitPointerLock(); buildBattle({x:f.x,z:f.z,alive:true,mesh:f.mesh}); return; }
+    fpsPrompt = r.onPad ? 'pad' : (r.nearFolk ? 'folk' : '');
+    if(r.onPad) say('&#9650;  Landing pad - press <b>F</b> to lift off');
+    else if(r.nearFolk) say('&#128172;  A colonist - press <b>F</b> to speak with them');
+    else say(`<b>${worldName}</b> - on foot.  <b>WASD</b> walk · <b>Shift</b> run · <b>Space</b> jump · <b>F</b> interact${r.foesLeft?`   ·   ${r.foesLeft} Synod trooper${r.foesLeft===1?'':'s'} on this world`:''}`);
+    rend.render(gScene,gCam);
+  }
+  let fpsPrompt='';
+  function frame(dt){ if(phase==='ground'){ if(fps) frameFps(dt); else frameGround(dt); } else if(phase==='battle'){ if(core) frameCore(dt); else frameBattle(dt); } }
   return { active:()=>active, enter, exit, key, frame, debugStartBattle, autoBattle, autoStep, autoOn:()=>autoOn };
 })();
 
