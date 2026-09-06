@@ -438,18 +438,49 @@ if (typeof require !== 'undefined' && require.main === module) {
     THOUGHTS: { fitness: function () { return { top: [['VEGA', 4.2], ['ORION', 1.5]], pilots: { VEGA: {}, ORION: {} } }; } },
   };
 
+  // Real gate, not a smoke print: assert the behaviour and exit non-zero on any failure.
+  // (Previously this block only printed values and always exited 0, so a regression in mount/
+  // toggle/update would still have reported green.)
+  var pass = 0, fail = 0;
+  function check(name, cond) {
+    if (cond) { pass++; console.log('PASS - ' + name); }
+    else { fail++; console.log('FAIL - ' + name); }
+  }
+
   var k = require('./knowledge_hud.js');
-  var root = k.mount();
-  console.log('mount() ->', root ? 'built root el' : 'null (no DOM)');
-  console.log('visible() (pre-toggle) ->', k.visible());
-  k.toggle();
-  console.log('toggle() -> visible():', k.visible());
-  k.update();   // exercises renderText + drawGraph against the stub store
-  console.log('update() ran (snapshotted stub store: 3 shared / 2 private, 1 mind).');
-  k.toggle();
-  console.log('toggle() again -> visible():', k.visible());
-  console.log('API:', Object.keys(k).filter(function (x) { return typeof k[x] === 'function'; }).join(', '));
-  console.log('window.KHUD attached in browser; module.exports in node. OK.');
+  try {
+    var root = k.mount();
+    check('mount() builds a root element against the DOM stub', !!root);
+
+    var pre = k.visible();
+    check('visible() returns a boolean before any toggle', typeof pre === 'boolean');
+
+    k.toggle();
+    check('toggle() flips visibility away from its initial state', k.visible() !== pre);
+
+    // exercises renderText + drawGraph against the stub store (3 shared / 2 private, 1 mind)
+    var updateThrew = false;
+    try { k.update(); } catch (e) { updateThrew = true; console.log('    update() threw: ' + e.message); }
+    check('update() renders against the stub store without throwing', !updateThrew);
+
+    k.toggle();
+    check('toggle() returns visibility to its initial state', k.visible() === pre);
+
+    var api = Object.keys(k).filter(function (x) { return typeof k[x] === 'function'; });
+    ['mount', 'update', 'toggle', 'visible'].forEach(function (fn) {
+      check('API exposes ' + fn + '()', api.indexOf(fn) >= 0);
+    });
+    console.log('  API: ' + api.join(', '));
+  } catch (err) {
+    // An exception IS a failure - never swallow it into a green run.
+    fail++;
+    console.log('FAIL - self-test threw: ' + (err && err.message));
+  }
+
+  console.log('---');
+  console.log('TOTAL: ' + (pass + fail) + '  PASS: ' + pass + '  FAIL: ' + fail);
+  console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));
+  if (fail > 0) process.exit(1);
 }
 
 })();

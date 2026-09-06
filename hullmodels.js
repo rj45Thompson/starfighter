@@ -718,22 +718,40 @@
   //   require('./hullmodels.js')
   // never throws in the absence of THREE / a DOM.
   if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
+    // Real gate, not a smoke print: tally every assertion and exit non-zero on any failure.
+    // (Previously this block printed 'OK'/'FAIL' strings and always exited 0, so a regression here
+    // would have reported green forever. An exception was caught and swallowed for the same reason.)
+    var pass = 0, fail = 0;
+    function check(name, cond) {
+      if (cond) { pass++; console.log('PASS - ' + name); }
+      else { fail++; console.log('FAIL - ' + name); }
+    }
+    console.log('HULLMODELS self-test');
     try {
-      console.log('HULLMODELS self-test');
-      console.log('  classes():', classes().join(', '));
-      console.log('  API keys :', Object.keys(API).join(', '));
-      console.log('  default fallback key:', DEFAULT_KEY);
-      // Confirm the contract shape without needing real THREE: build() and
-      // scanBadge() require a T; we assert they demand it rather than crash.
+      var cls = classes();
+      check('classes() returns a non-empty array', Array.isArray(cls) && cls.length > 0);
+      check('default fallback key is a real class (' + DEFAULT_KEY + ')', cls.indexOf(DEFAULT_KEY) >= 0);
+      check('API exposes build + scanBadge + classes',
+        typeof API.build === 'function' && typeof API.scanBadge === 'function' && typeof API.classes === 'function');
+
+      // Contract shape without a real THREE: build()/scanBadge() must DEMAND a T, not crash oddly.
       var threw = false;
       try { build('fighter', null); } catch (e) { threw = true; }
-      console.log('  build() guards missing THREE:', threw ? 'OK' : 'FAIL');
+      check('build() guards missing THREE', threw);
+
       threw = false;
       try { scanBadge(null, {}); } catch (e) { threw = true; }
-      console.log('  scanBadge() guards missing THREE:', threw ? 'OK' : 'FAIL');
-      console.log('  hull classes exposed:', classes().length);
+      check('scanBadge() guards missing THREE', threw);
+
+      console.log('  classes (' + cls.length + '): ' + cls.join(', '));
     } catch (err) {
-      console.error('self-test error:', err && err.message);
+      // An exception IS a failure - never swallow it into a green run.
+      fail++;
+      console.log('FAIL - self-test threw: ' + (err && err.message));
     }
+    console.log('---');
+    console.log('TOTAL: ' + (pass + fail) + '  PASS: ' + pass + '  FAIL: ' + fail);
+    console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));
+    if (fail > 0) process.exit(1);
   }
 })();
