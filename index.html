@@ -313,6 +313,10 @@
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
+<!-- MEASUREMENT ONLY, opt-in: ?harness=1 loads sim_harness.js, which drives frame() with a synthetic
+     clock so the game can be measured in a tab that never paints (a hidden tab reports innerWidth 0
+     and freezes document.timeline, so rAF never fires). Not in the shipped path. -->
+<script>if(/[?&]harness=1/.test(location.search)){var _h=document.createElement('script');_h.src='sim_harness.js?v=20260906a';_h.async=false;document.head.appendChild(_h);}</script>
 <script>
 "use strict";
 // =================================================================================================
@@ -390,6 +394,8 @@ const CFG = {
 
   AST_KEEP:7600, AST_MAX:9200, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // user 2026-07-13 "MAKE 100X MORE ASTEROIDS ... go off and mine and level up without battling" + 2026-07-14 "can't you instance the rocks?": a literal ~100x field (was 76), 75% packed into the peaceful CERES BELT. Rocks are now GPU-INSTANCED (buildRockPools) - a few draw calls for the whole field - and both the collision loops AND the AI rock scans go through the spatial hash (astGrid), so CPU + GPU both scale.
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:3, AST_SPLIT_KICK:12, AST_DMG:20,
+  ROCK_LOD_UNIT:77, ROCK_LOD_MAX:8,   // ROCK DRAW BUDGET (measured 2026-09-06). writeRockInstance ran 7,781 times PER FRAME - once per rock in the field, every frame - and each call composes a Matrix4, whose Euler->quaternion step alone is 6 trig calls. It was the largest single cost inside step(). Now a rock's instance matrix is rewritten every Nth frame, N growing with distance from the player, staggered by index so no frame carries a spike. PHYSICS IS NOT STRIDED: position, spin, the bounce test and the collision grid still run every frame for every rock, so mining, hits and the AI rock-scans are bit-for-bit unchanged. Only how often a rock's DRAWN pose is refreshed changes. Why 77: AST_DRIFT caps rock speed at 3 u/s, so a rock strided at N frames is at most 3N/60 = N/20 units stale; that is under half a pixel (~0.00065 rad at this FOV) once distance exceeds N*77. Each tier is therefore sub-pixel BY CONSTRUCTION, and the error shrinks with distance because it scales as staleness/distance. Set ROCK_LOD_MAX to 1 to turn the whole thing off.
+
   AST_CELL:60, AST_GRID_EVERY:2, MINE_BELT_FRAC:0.75, MINE_BELT_RIN:0.12, MINE_BELT_ROUT:1.3, MINE_BELT_THICK:46, RADAR_ROCK_CAP:24,   // AST_CELL: spatial-hash cell edge (>> ship+rock+one-frame-bullet-step, so a 3x3x3 query is exact). MINE_BELT_*: fraction of rocks that spawn in the peaceful belt + the thick DISC they fill (inner/outer frac of SYSTEM_R, Y half-thickness) so it reads as a ring you fly through. RADAR_ROCK_CAP: cap rock blips so a dense field can't starve enemy/gem blips on the brain radar.
   // STARBLAST LOOP (STARBLAST_REQ.md SB3-SB5, 2026-09-06): mined gems fill a bar; a full bar banks an upgrade point; keys 1-8 spend a
   // point on one of eight stats (each level a declared multiplier at the ONE site that already reads the quantity); all eight maxed plus
@@ -1230,11 +1236,11 @@ function buildRockPools(){ if(ROCK_POOLS) return;
 function allocRockInstance(light){ const base=(randi(0,ROCK_GEO_VARIANTS-1)*ROCK_SHADES)+(light?1:0);
   for(let k=0;k<ROCK_POOLS.length;k++){ const pi=(base+k)%ROCK_POOLS.length, p=ROCK_POOLS[pi]; let slot=-1;
     if(p.free.length) slot=p.free.pop(); else if(p.count<p.inst.instanceMatrix.count){ slot=p.count++; p.inst.count=p.count; }
-    if(slot>=0) return { pool:pi, slot }; }
+    if(slot>=0){ p.dirty=true; return { pool:pi, slot }; } }   // a brand-new slot has never been uploaded; without this a far-spawned rock could sit unwritten for up to ROCK_FAR_STRIDE frames showing whatever the slot held before
   return null; }
-function writeRockInstance(a){ if(a.pool==null) return; const p=ROCK_POOLS[a.pool]; if(!p) return; _rm4.compose(a.pos, _rq.setFromEuler(_re.set(a.rx,a.ry,a.rz)), _rsv.setScalar(a.scale)); p.inst.setMatrixAt(a.slot,_rm4); }
-function freeRockInstance(a){ if(a.pool==null||!ROCK_POOLS) return; const p=ROCK_POOLS[a.pool]; if(!p){ a.pool=null; return; } p.inst.setMatrixAt(a.slot,_rzero); p.free.push(a.slot); a.pool=null; }
-function flushRockPools(){ if(!ROCK_POOLS) return; for(const p of ROCK_POOLS) p.inst.instanceMatrix.needsUpdate=true; }
+function writeRockInstance(a){ if(a.pool==null) return; const p=ROCK_POOLS[a.pool]; if(!p) return; _rm4.compose(a.pos, _rq.setFromEuler(_re.set(a.rx,a.ry,a.rz)), _rsv.setScalar(a.scale)); p.inst.setMatrixAt(a.slot,_rm4); p.dirty=true; }
+function freeRockInstance(a){ if(a.pool==null||!ROCK_POOLS) return; const p=ROCK_POOLS[a.pool]; if(!p){ a.pool=null; return; } p.inst.setMatrixAt(a.slot,_rzero); p.dirty=true; p.free.push(a.slot); a.pool=null; }   // a freed slot is zeroed, which is a real matrix change - it must reach the GPU or the rock keeps drawing
+function flushRockPools(){ if(!ROCK_POOLS) return; for(const p of ROCK_POOLS){ if(p.dirty){ p.inst.instanceMatrix.needsUpdate=true; p.dirty=false; } } }
 function spawnGem(pos,scale){ const credits=Math.max(1,Math.round(scale*CFG.GEM_CREDIT_PER_SCALE));
   const col=new T.Color().setHSL(credits>8?0.42:0.13,0.9,0.6);
   const gemGeo=ASSETS.gemGeos.length?ASSETS.gemGeos[randi(0,ASSETS.gemGeos.length-1)]:new T.OctahedronGeometry(1.5,0);   // Gems Ultimate Pack shapes when loaded
@@ -2542,10 +2548,23 @@ function step(dt){
       scene.remove(b.mesh); bullets.splice(i,1); if(p.hull<=0) destroyPlanet(p); break; } } }
   if(stronghold){ for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner]; if(owner&&owner.team==='pirate') continue;   // M12: coalition fire damages the stronghold (Hegemon fire doesn't)
     const shr=13+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,stronghold.pos)<shr*shr){ stronghold.hull-=(b.dmg||CFG.SHIP_BULLET_DMG); stronghold.hullT=T0; stronghold._lastHitBy=owner; burst(b.pos,b.col!=null?b.col:0xff7a4a,4,13,2.8); scene.remove(b.mesh); bullets.splice(i,1); if(stronghold.hull<=0){ destroyStronghold(owner); break; } } } }   // SR-M6: weapon's own color
+  // ROCK FIELD (see CFG.ROCK_NEAR_R): every rock still MOVES and spins every frame - only the cost of
+  // rewriting a far rock's instance matrix is spread across ROCK_FAR_STRIDE frames. The edge test is
+  // squared now; it used to call .length() (a sqrt) 7,787 times a frame to compare against a constant.
+  const _rockEye=(ships[0]&&ships[0].pos)?ships[0].pos:chaseCam.position;
+  const _u=CFG.ROCK_LOD_UNIT, _lod1=(2*_u)*(2*_u), _lod2=(4*_u)*(4*_u), _lod4=(8*_u)*(8*_u);   // squared tier edges, so no sqrt per rock
   for(let i=asteroids.length-1;i>=0;i--){ const a=asteroids[i]; a.pos.addScaledVector(a.vel,dt);
-    if(a.pos.length()>CFG.ARENA_R-a.scale){ a.pos.setLength(CFG.ARENA_R-a.scale); const n=a.pos.clone().normalize(); a.vel.addScaledVector(n,-2*a.vel.dot(n)); }
-    a.rx+=a.spin.x*dt; a.ry+=a.spin.y*dt; a.rz+=a.spin.z*dt; writeRockInstance(a); }
-  flushRockPools();   // one needsUpdate per instanced pool after all rock matrices are written this frame
+    const edge=CFG.ARENA_R-a.scale;
+    if(a.pos.lengthSq()>edge*edge){ a.pos.setLength(edge); const n=a.pos.clone().normalize(); a.vel.addScaledVector(n,-2*a.vel.dot(n)); writeRockInstance(a); }
+    a.rx+=a.spin.x*dt; a.ry+=a.spin.y*dt; a.rz+=a.spin.z*dt;
+    const dSq=a.pos.distanceToSquared(_rockEye);
+    // stride 1/2/4/8 by distance band. Powers of two so the "is it my turn" test is a bitmask, not a modulo.
+    // ROCK_LOD_MAX<=1 disables EVERY tier, not just the farthest - the off switch the CFG comment
+    // promises, and the A/B control used to measure this change against the old every-rock-every-frame
+    // behaviour at a matched ship count.
+    const stride = CFG.ROCK_LOD_MAX<=1 ? 1 : (dSq<_lod1 ? 1 : dSq<_lod2 ? 2 : dSq<_lod4 ? 4 : CFG.ROCK_LOD_MAX);
+    if(stride===1 || ((i+FRAME_N)&(stride-1))===0) writeRockInstance(a); }
+  flushRockPools();   // needsUpdate only on the pools actually written this frame - it re-uploads a pool's WHOLE instance buffer (~1230 matrices), so flagging all 8 unconditionally shipped ~630KB to the GPU every frame no matter how few rocks moved
   if(FRAME_N%CFG.AST_GRID_EVERY===0) rebuildAstGrid();   // dense-field broad phase; the grid holds live rock REFS (queries read current a.pos + gone-flag + incremental insert on spawn), so re-binning every 2nd frame is exact - drift is <0.1u vs a 60u cell
   for(let j=bullets.length-1;j>=0;j--){ const b=bullets[j]; const a=astHitBullet(b); if(!a) continue; const owner=shipById[b.owner];
     a.hp-=CFG.BULLET_DMG*(1+CFG.WEAPON_DMG*((owner?owner.lvl.weapon:1)-1))*(owner?statMult(owner,'damage'):1)*(1+CFG.SEAM_DMG_MULT*(a.seam||0)); burst(b.pos,b.col!=null?b.col:0xfff0c0,3,9,2); scene.remove(b.mesh); bullets.splice(j,1);   // SR-M6: weapon's own color; a bot-cut SEAM multiplies the hit (2026-09-06)
@@ -4000,6 +4019,30 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   const a=t.split(/\s+/), c=a[0].toLowerCase(), P=ships[0]; const dockedP=P.docked;
   if(typeof MAN!=='undefined' && ['go','warp','dock','hold','stop','flee','mine','trade','attack','hunt','bombard','siege','assault','base'].includes(c)) MAN.active=false;   // an autopilot order hands YOU back to the AI
   const need=(cond,msg)=>{ if(!cond){ term(msg,'err'); return false; } return true; };
+  // PICK A NAMED THING (fix 2026-09-06). Every station/hauler lookup below used
+  //   list.find(x => x.name.toLowerCase().startsWith((a[2]||'').toLowerCase()))
+  // and ''.startsWith('') is TRUE for every string. So a bare `station sell` - the natural way to
+  // find out the syntax - matched the FIRST station and sold it at STATION_SELL_FRAC (55%), with no
+  // argument, no confirmation and no way back. `hauler sell` did the same to a hauler, and
+  // `hauler recall` idled one mid-route and abandoned its cargo. Now: an empty needle matches
+  // NOTHING (so the caller's own usage line prints), an exact name beats a prefix, and an ambiguous
+  // prefix lists the candidates instead of silently taking whichever happened to be first.
+  const pickNamed=(list,field,needle)=>{
+    const q=String(needle==null?'':needle).trim().toLowerCase();
+    if(!q) return {};
+    const low=x=>String(x[field]==null?'':x[field]).toLowerCase();
+    const exact=list.filter(x=>low(x)===q); if(exact.length===1) return {item:exact[0]};
+    const pre=list.filter(x=>low(x).startsWith(q));
+    if(pre.length===1) return {item:pre[0]};
+    if(pre.length>1) return {ambiguous:pre.map(x=>x[field])};
+    return {};
+  };
+  const pickOr=(list,field,needle,usage)=>{   // returns the item, or prints and returns null
+    const r=pickNamed(list,field,needle);
+    if(r.ambiguous){ term('&#9670; which one? '+r.ambiguous.join(' &middot; '),'err'); return null; }
+    if(!r.item){ term(usage,'err'); return null; }
+    return r.item;
+  };
   if(c==='help'||c==='?'||c==='h'){
     const H=(t)=>term(`<b style="color:#8fd0ff">${t}</b>`,'sys'), L=(t)=>term('&nbsp;&nbsp;'+t,'sys');
     H('▸ THE WAR (Space-Rangers loop)');
@@ -4744,20 +4787,18 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       snap.stations.forEach(st=>term(`&nbsp;&nbsp;<b>${st.planet}</b> Lv${st.lvl} · ${st.insName.join(' + ')} → <b>${st.outName}</b> · ${st.batch}/cycle every ${st.cycle}s · made ${st.made}, earned ${st.earned}c${st.stalled?` · <span style="color:#ff8a8a">STALLED: ${st.stalled}</span>`:''}`,'sys'));
       term('&nbsp;&nbsp;<span style="opacity:.6">station build (while docked) · station upgrade &lt;planet&gt; · station sell &lt;planet&gt;</span>','sys'); return; }
     if(sub==='build'){ if(!need(dockedP,'dock at the world you want to build on')) return; const r=E.buildStation(dockedP); if(!r.ok) term('◆ '+r.msg,'err'); return; }
-    const target=E.stations().find(x=>x.planet.toLowerCase().startsWith((a[2]||'').toLowerCase()));
-    if(sub==='upgrade'){ if(!need(target,'station upgrade &lt;planet&gt;')) return; const r=E.upgradeStation(target); if(!r.ok) term('◆ '+r.msg,'err'); return; }
-    if(sub==='sell'){ if(!need(target,'station sell &lt;planet&gt;')) return; E.sellStation(target); return; }
+    if(sub==='upgrade'){ const target=pickOr(E.stations(),'planet',a[2],'station upgrade &lt;planet&gt;'); if(!target) return; const r=E.upgradeStation(target); if(!r.ok) term('◆ '+r.msg,'err'); return; }
+    if(sub==='sell'){ const target=pickOr(E.stations(),'planet',a[2],'station sell &lt;planet&gt; - name the world, this cannot be undone'); if(!target) return; E.sellStation(target); return; }
     term('◆ station list|build|upgrade &lt;planet&gt;|sell &lt;planet&gt;','sys'); return; }
   if(c==='hauler'||c==='haulers'){ const E=window.ECONOMY; if(!need(E,'economy module not loaded')) return; const sub=(a[1]||'').toLowerCase(); const snap=E.snapshot();
     if(!sub||sub==='list'){ term(`YOUR HAULERS (${snap.haulers.length}):`,'sys');
       snap.haulers.forEach(h=>term(`&nbsp;&nbsp;<b>${h.name}</b> ${h.from?`${h.from} → ${h.to} · ${h.goodName}`:'<span style="opacity:.5">no route</span>'} · ${h.state} · ${h.runs} runs, ${h.profit>=0?'+':''}${h.profit}c${h.note?` · <span style="opacity:.7">${h.note}</span>`:''}`,'sys'));
       term('&nbsp;&nbsp;<span style="opacity:.6">hauler buy · hauler route &lt;name&gt; &lt;from&gt; &lt;to&gt; &lt;good&gt; · hauler recall &lt;name&gt; · hauler sell &lt;name&gt;</span>','sys'); return; }
     if(sub==='buy'){ const r=E.buyHauler(a[2]); if(!r.ok) term('◆ '+r.msg,'err'); return; }
-    const h=E.haulers().find(x=>x.name.toLowerCase().startsWith((a[2]||'').toLowerCase()));
-    if(sub==='route'){ if(!need(h,'hauler route &lt;name&gt; &lt;from&gt; &lt;to&gt; &lt;good&gt;')) return; const g=findGood(a[5]); if(!need(g,'unknown good')) return;
+    if(sub==='route'){ const h=pickOr(E.haulers(),'name',a[2],'hauler route &lt;name&gt; &lt;from&gt; &lt;to&gt; &lt;good&gt;'); if(!h) return; const g=findGood(a[5]); if(!need(g,'unknown good')) return;
       const r=E.assign(h, a[3], a[4], g.k); if(!r.ok) term('◆ '+r.msg,'err'); return; }
-    if(sub==='recall'){ if(!need(h,'hauler recall &lt;name&gt;')) return; E.recall(h); term(`${h.name} recalled - idle until you give it a route.`,'sys'); return; }
-    if(sub==='sell'){ if(!need(h,'hauler sell &lt;name&gt;')) return; const r=E.sellHauler(h); term(`Sold ${h.name} (+${r.back}c).`,'sys'); return; }
+    if(sub==='recall'){ const h=pickOr(E.haulers(),'name',a[2],'hauler recall &lt;name&gt;'); if(!h) return; E.recall(h); term(`${h.name} recalled - idle until you give it a route.`,'sys'); return; }
+    if(sub==='sell'){ const h=pickOr(E.haulers(),'name',a[2],'hauler sell &lt;name&gt; - name the hauler, this cannot be undone'); if(!h) return; const r=E.sellHauler(h); term(`Sold ${h.name} (+${r.back}c).`,'sys'); return; }
     term('◆ hauler list|buy|route|recall|sell','sys'); return; }
   if(c==='stat'||c==='stats'||c==='spend'){ const d=sbSnapshot(P); if(!a[1]){ term(`◆ GEM BAR ${Math.round(100*d.bar/d.barMax)}% · <b>${d.pts}</b> point${d.pts===1?'':'s'} banked · ${d.hullName} (tier ${d.tier})`,'sys');
       CFG.STAT_ORDER.forEach((k,i)=>term(`&nbsp;&nbsp;<b>${i+1}</b> ${CFG.STAT_LABEL[k].padEnd(12,' ').replace(/ /g,'&nbsp;')} ${'▮'.repeat(d.stat[k])}${'▯'.repeat(CFG.STAT_MAX-d.stat[k])} ×${d.mult[k].toFixed(2)}`,'sys'));
