@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:51:42",
+ "generated": "2026-09-06T12:55:52",
  "modules": [
   {
    "file": "acquire.js",
@@ -2188,6 +2188,43 @@
    "cfgTotal": 33
   },
   {
+   "file": "synod.js",
+   "lines": 117,
+   "classes": [
+    {
+     "name": "SYNOD",
+     "members": [
+      "CFG",
+      "load",
+      "status",
+      "adapt",
+      "reset",
+      "noteHitOnSynod",
+      "noteSynodLoss",
+      "noteSynodKill",
+      "resFor",
+      "gunFor"
+     ],
+     "memberTotal": 10
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "KEY",
+    "RES_STEP",
+    "generation",
+    "type",
+    "RES_MIN",
+    "RES_MAX",
+    "all",
+    "TYPES",
+    "GUNS",
+    "with"
+   ],
+   "cfgTotal": 10
+  },
+  {
    "file": "tami_battle_ui.js",
    "lines": 550,
    "classes": [
@@ -2637,9 +2674,9 @@
   {
    "id": "UC-305",
    "epic": "E3",
-   "status": "MISSING",
-   "story": "Synod adapts its loadouts across generations",
-   "test": "SR-M15"
+   "status": "WORKS",
+   "story": "Synod adapts its armour and gun mix across generations",
+   "test": "synod.js: 40 frag hits moved frag armour to x0.93, ballistic weight 1 to 1.5, and 400 draws matched the new weights"
   },
   {
    "id": "UC-401",
@@ -2762,9 +2799,9 @@
   }
  ],
  "tally": {
-  "WORKS": 42,
+  "WORKS": 43,
   "PARTLY": 4,
-  "MISSING": 3,
+  "MISSING": 2,
   "DEPRECATED": 2
  }
 }

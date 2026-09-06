@@ -381,6 +381,19 @@ classDiagram
     +bake()
     +CFG()
   }
+  class SYNOD {
+    <<synod.js>>
+    +CFG()
+    +load()
+    +status()
+    +adapt()
+    +reset()
+    +noteHitOnSynod()
+    +noteSynodLoss()
+    +noteSynodKill()
+    +resFor()
+    +gunFor()
+  }
   class TAMIBATTLEUI {
     <<tami_battle_ui.js>>
     +render()

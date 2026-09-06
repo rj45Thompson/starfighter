@@ -308,6 +308,7 @@
 <script src="conquest.js?v=20260714c"></script>
 <script src="missions.js?v=20260906b"></script>
 <script src="economy.js?v=20260906f"></script>
+<script src="synod.js?v=20260906a"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -1801,7 +1802,7 @@ function addPirate(force){ if(!force && ships.filter(s=>s.team==='pirate').lengt
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:HT.hp, maxHp:HT.hp, credits:0, score:0,
     lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
     huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:rand(0,CFG.COMM_CD), role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty,   // SR (was 99 = permanently silent - pirates never coordinated at all; now ready-soon like every other ship, so wolf-pack calls actually happen)
-    weaponType:(ti===2?'flame':(ti===1&&rand(0,1)<CFG.FLAME_CRUISER_CHANCE?'flame':WEAPON_ORDER[ti])),   // INCINERATOR (user 2026-07-07): the Hegemon's own terror weapon - every Warlord carries it, some Cruisers too
+    weaponType:(ti===2?'flame':(ti===1&&rand(0,1)<CFG.FLAME_CRUISER_CHANCE?'flame':(window.SYNOD?SYNOD.gunFor(()=>rand(0,1)):WEAPON_ORDER[ti]))),   // the doctrine's weapon MIX (2026-09-06); Warlords keep the Incinerator   // INCINERATOR (user 2026-07-07): the Hegemon's own terror weapon - every Warlord carries it, some Cruisers too
     backstory:BACKSTORY.hegemon[nextId%BACKSTORY.hegemon.length],
     cargo:{}, fuel:0, tradePlan:null, tradeCd:0, warping:false, holdCap:0, fuelCap:0, senseR:CFG.PIRATE_HUNT_R, warpEff:1,   // IRON LAW: hunters fit long-range radar as EQUIPMENT (senseR=170, same stat the player can buy up) - their designed hunt range now flows through the one honest sensor limit instead of an omniscient global read
     mode:'HUNT', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(0.0) };
@@ -2517,6 +2518,7 @@ function step(dt){
         const rawDmg=(b.dmg!=null)?b.dmg:CFG.SHIP_BULLET_DMG;                                       // M3: damage baked at fire time
         let dmg=rawDmg*hullResFor(s,b.dmgType);   // STANDARD GEAR SLOTS + MANUFACTURER: E/S/M hull+manufacturer susceptibility, applied before shields
         if(s.role==='player'&&MAN.rearActive){ dmg*=(1-CFG.REAR_SHIELD_ABSORB); rearShieldHit(b.pos); }   // REAR-GUNNER SHIELD (user 2026-07-13): while manning the rear turret, the extra shield eats part of the hit + shows the energy-absorb flash
+        if(s.team==='pirate'&&owner&&owner.role==='player'&&window.SYNOD) SYNOD.noteHitOnSynod(b.dmgType);   // the tally the refit reads
         applyHullDamage(s, drainShield(s,dmg,b.pos)*(1-shieldGenPctFor(s)), b.pos); noteHarm(s,owner); ffRetaliate(s,owner); if(s.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(s.pos)<=s.senseR)?owner.name:null,dmg);   // gems-as-hull buffer fires on GUNFIRE now (shared sink); I1 FIX: attacker IDENTITY only learnable if on sensors; X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: Shield Generator flat-% layer
         if(b.slow>0){ s.slowT=T0+CFG.SLOW_DUR; s.slowMul=b.slow; }   // SR TRETON: a hit slows the target's engines for SLOW_DUR seconds
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
@@ -2652,7 +2654,9 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
   if(s.role==='defender'||s.role==='pirate') s.despawn=true;        // defenders/pirates don't respawn; they're removed
 }
 // killed by another pilot -> victim's credits scatter as bounty gems; killer earns score
-function killByShip(victim,killer){ const wasPirate=victim.team==='pirate'; if(killer&&killer!==victim){ victim.lastHitBy=killer; victim.lastHitT=T0; }   // a ram names its rammer   // victim's FULL credits are dropped by killShip -> dropCredits (a persistent stash)
+function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';
+  if(window.SYNOD){ if(wasPirate) SYNOD.noteSynodLoss(victim.weaponType);
+    else if(victim.role==='player'&&killer&&killer.team==='pirate') SYNOD.noteSynodKill(killer.weaponType); } if(killer&&killer!==victim){ victim.lastHitBy=killer; victim.lastHitT=T0; }   // a ram names its rammer   // victim's FULL credits are dropped by killShip -> dropCredits (a persistent stash)
   if(window.PASSENGER&&ships[0]&&ships[0].alive&&victim.pos.distanceTo(ships[0].pos)<=ships[0].senseR){ PASSENGER.onEvent('kill_seen'); if(window.GAMEMOD) GAMEMOD.emit('kill_seen'); if(window.CHATTER) CHATTER.onEvent('kill_seen',{victim,killer}); }   // the symbiont witnesses only what YOUR sensors touch
   if(killer&&killer!==victim){ noteLog(victim,`☠ killed by ${killer.name} (${facLabel(killer)})`,-1); noteLog(killer,`☠ I destroyed ${victim.name} (${facLabel(victim)})`,-1);
     victim.rel=victim.rel||{}; victim.rel[killer.name]=(victim.rel[killer.name]||0)-1; }   // a death is the strongest interaction note
@@ -3307,7 +3311,12 @@ const SHIELD_GENS={
   ultraplasmic:{n:'Ultraplasmic Shield Gen',cost:2900,pct:0.31,tier:8,desc:'T8 - 31% - a capital-grade screen'} };
 const SHIELD_GEN_KEYS=Object.keys(SHIELD_GENS);
 function shieldGenOf(s){ return SHIELD_GENS[s.shieldGenType||'none']||SHIELD_GENS.none; }
-function hullResFor(s,dmgType){ const base=(HULLS[s.hullClass]&&HULLS[s.hullClass].res&&HULLS[s.hullClass].res[dmgType])||1;
+function hullResFor(s,dmgType){
+  // THE SYNOD'S LEARNED ARMOUR (2026-09-06): their ships carry no hullClass, so this used to read a flat 1 for
+  // every enemy. Their resistance is now the doctrine synod.js refits between campaigns - what you shot them with
+  // last time, they wear against you this time.
+  if(s&&s.team==='pirate'&&window.SYNOD) return SYNOD.resFor(dmgType);
+  const base=(HULLS[s.hullClass]&&HULLS[s.hullClass].res&&HULLS[s.hullClass].res[dmgType])||1;
   const tech=Math.max(CFG.TECH_RES_FLOOR, 1-CFG.TECH_RES_PER_LVL*(((s.lvl&&s.lvl.hull)||1)-1));   // TECH LEVEL: your existing hull-upgrade level, live multiplier - Lv1 is a no-op (×1.00)
   return base*((manuOf(s).res&&manuOf(s).res[dmgType])||1)*tech; }   // STANDARD GEAR SLOTS + MANUFACTURER + TECH LEVEL: compose hull-class, manufacturer, and tech-level susceptibility
 function shieldGenPctFor(s){ return Math.min(0.9,(shieldGenOf(s).pct||0)*seriesOf(s).shieldGenMult*((s&&s.shieldGenInst&&s.shieldGenInst.powerMul)||1)); }   // HULL SERIES: Ironclad boosts the Shield Generator's effect; SR ITEM VARIANCE: shieldgen instance powerMul scales absorb %, capped at 0.9 (ship-agnostic)
@@ -4707,6 +4716,15 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
+  if(c==='synod'||c==='doctrine'){ if(!need(window.SYNOD,'synod module not loaded')) return; const d=SYNOD.status();
+    term(`<b style="color:#ff8a8a">IRON SYNOD DOCTRINE</b> - campaign ${d.gen}`,'sys');
+    term(`&nbsp;&nbsp;armour: ${Object.keys(d.res).map(k=>`${k} <b>x${d.res[k].toFixed(2)}</b>`).join(' · ')} <span style="opacity:.6">(below 1.00 = they take less of it)</span>`,'sys');
+    term(`&nbsp;&nbsp;gun mix: ${Object.keys(d.gun).map(k=>`${k} <b>${d.gun[k].toFixed(2)}</b>`).join(' · ')} <span style="opacity:.6">(relative weight when a ship is built)</span>`,'sys');
+    term(`&nbsp;&nbsp;this campaign so far: ${Object.keys(d.tally.hitsTakenBy).map(k=>`${k} ${d.tally.hitsTakenBy[k]}`).join(' · ')} hits taken · ${d.tally.losses} of theirs lost · ${d.tally.playerKills} of yours`,'sys');
+    if(d.history.length){ term('&nbsp;&nbsp;<span style="opacity:.6">refits:</span>','sys');
+      d.history.forEach(h=>term(`&nbsp;&nbsp;&nbsp;&nbsp;gen ${h.gen}: ${h.notes.join('; ')}`,'sys')); }
+    else term('&nbsp;&nbsp;<span style="opacity:.6">no refit yet - the first comes when a campaign ends</span>','sys');
+    return; }
   if(c==='wing'||c==='squad'){ const W=HOST.wing(); const sub=(a[1]||'').toLowerCase();
     if(!sub||sub==='list'){ term(`YOUR WING (${W.length}):`,'sys');
       W.forEach(w=>term(`&nbsp;&nbsp;<b>${w.name}</b> ${w.hullClass||''} · hull ${w.hull}/${w.maxHull} · ${w.dist}u out · ${w.order?`<b>${w.order}</b>${w.orderTarget?' '+w.orderTarget:''}${w.standing?' (standing)':''}`:(w.going?'flying to '+w.going:(w.docked?'docked at '+w.docked:'own lane'))}`,'sys'));
@@ -6348,7 +6366,8 @@ window.HOST={
   // GENERATION RESET (user: "if all territory is lost the game ends but the knowledge graphs persist and get better"):
   // the galaxy is reborn - worlds freed, fronts reset, the player back at Ranger Command - but GAME_KNOW is NOT touched:
   // every shared/private fact the minds earned carries into the next generation. Death of the world, not of the minds.
-  onNewGeneration(){ recordGenerationResults(window.STARMAP&&STARMAP.generation?STARMAP.generation():campaign);   // SR-M14: the one honest snapshot of this generation's final standing, BEFORE anything below wipes it
+  onNewGeneration(){ if(window.SYNOD) SYNOD.adapt();   // the enemy refits on what this generation actually did to it
+    recordGenerationResults(window.STARMAP&&STARMAP.generation?STARMAP.generation():campaign);   // SR-M14: the one honest snapshot of this generation's final standing, BEFORE anything below wipes it
     campaign++; escalation=0; warScore=0;
     for(const sy of systems){ sy.contested=false; sy.clearT=0; }
     for(const p of planets){ if(p.isPirateStation) continue;   // stays permanently hostile - not swept into the coalition/Hegemon reset

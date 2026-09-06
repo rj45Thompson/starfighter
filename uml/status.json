@@ -261,9 +261,9 @@
 {
 "id": "UC-305",
 "epic": "E3",
-"status": "MISSING",
-"story": "Synod adapts its loadouts across generations",
-"test": "SR-M15"
+"status": "WORKS",
+"story": "Synod adapts its armour and gun mix across generations",
+"test": "synod.js: 40 frag hits moved frag armour to x0.93, ballistic weight 1 to 1.5, and 400 draws matched the new weights"
 },
 {
 "id": "UC-401",
@@ -386,9 +386,9 @@
 }
 ],
 "tally": {
-"WORKS": 42,
+"WORKS": 43,
 "PARTLY": 4,
-"MISSING": 3,
+"MISSING": 2,
 "DEPRECATED": 2
 }
 }
