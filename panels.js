@@ -307,6 +307,32 @@ function applyDockPosition(rec, edge, pos){
   else if(edge==='left'){ setSide(el,'left',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }
   else { setSide(el,'right',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }
 }
+// CENTERED PANELS AND RESIZE (RJ 2026-09-06 "resize window doesn't work right for market").
+// #market is the only panel registered with centerX, which means it carries `transform:translateX(-50%)` on top
+// of its left. Setting an explicit width on a box translated by -50% of its OWN width grows it symmetrically
+// about its centre: measured on the live game, a 200px drag of the corner grip moved the right edge +100 and the
+// left edge -100. So the grip crawls away from the cursor at half speed (it ends the drag 100px behind the
+// pointer) and the panel simultaneously spreads leftward underneath whatever is beside it. Nothing about the
+// resize maths was wrong - `width` really did grow by the full 200 - the centring was eating half of it.
+// Freezing the centre into a real `left` before the first delta lands makes the anchored edge stay put and the
+// free edge track the cursor 1:1. The panel does not move when this runs: `left` absorbs exactly the translate
+// being removed. It records the same manualDock/pos/edge that a drag-to-redock writes, so the frozen centre
+// survives a reload through register()'s existing restore path (which also forces centerX:false for a manual
+// dock), rather than snapping back to centre and reintroducing the bug on the next load.
+function freezeCenterX(rec){
+  if(!rec.centerX) return;
+  const el=rec.el, r=el.getBoundingClientRect();
+  // clamped exactly like redock's own placement: the frozen left is PERSISTED, so a panel caught mid-slide or
+  // sized before its content exists must not write an off-screen dock that then survives every future reload.
+  const left=Math.round(Math.max(CFG.GAP, Math.min(window.innerWidth-r.width-CFG.GAP, r.left)));
+  rec.centerX=false;
+  const keep=el.style.transition; el.style.transition='none';   // before and after are the same pixels, but don't let the 320ms transform transition animate the swap
+  setSide(el,'left',left+'px'); setSide(el,'right',null);
+  el.style.transform = rec.open ? openTransform(false) : closedTransform(rec.edge,false);
+  void el.offsetWidth;                                          // commit the swap before the transition comes back
+  el.style.transition=keep;
+  store[rec.id]=store[rec.id]||{}; store[rec.id].edge=rec.edge; store[rec.id].pos=left; store[rec.id].manualDock=true; save();
+}
 function redock(rec, edge, x, y, panelLeft, panelTop){
   const oldEdge=rec.edge;
   if(oldEdge!==edge){
@@ -447,7 +473,9 @@ function register(id, el, opts){
         applyVisual(rec);
         document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',endDrag);
         document.removeEventListener('touchmove',onMove); document.removeEventListener('touchend',endDrag); };
-      const startDrag=(ev)=>{ dragging=true; const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
+      const startDrag=(ev)=>{ dragging=true;
+        freezeCenterX(rec);                         // a centered panel would otherwise grow BOTH ways at half speed - see freezeCenterX
+        const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
         anch=anchorOf(rec); rec._resizeAnch=anch;   // freeze for the whole drag
         startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
         document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
