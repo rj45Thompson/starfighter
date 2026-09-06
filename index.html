@@ -124,6 +124,12 @@
     background:rgba(12,24,38,.92); border:1px solid #2f6d99; color:#7fd4ff; cursor:pointer;
     font:700 15px/1 ui-monospace,monospace; display:flex; align-items:center; justify-content:center; padding:0; }
   #helpBtn:hover{ background:#14304a; color:#eaf5ff; }
+  /* FLIGHT PAUSED: the terminal swallows every flight key while it holds focus. That is correct -
+     you are typing - but nothing said so, and the keys simply stopped working. */
+  #flightPaused{ position:fixed; z-index:15; display:none; padding:3px 10px; border-radius:6px;
+    background:rgba(18,34,52,.95); border:1px solid #2f6d99; color:#7fd4ff;
+    font:11px/1.5 ui-monospace,monospace; letter-spacing:.03em; pointer-events:none; white-space:nowrap; }
+  #flightPaused b{ color:#eaf5ff; }
   #logbody{ padding:6px 10px 8px; }
   #logbody .tl{ opacity:.94; margin:1px 0; }
   #logbody .tl b{ font-weight:800; }
@@ -326,7 +332,7 @@
 <script src="economy.js?v=20260906f"></script>
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
-<script src="cybertron.js?v=20260906b"></script>
+<script src="cybertron.js?v=20260906d"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -6830,6 +6836,29 @@ async function showGeneratedArt(){
   const onFs=()=>{ b.textContent=document.fullscreenElement?'⤡':'⛶'; b.title=document.fullscreenElement?'Leave fullscreen':'Fullscreen (click again or Esc to leave)'; };
   document.addEventListener('fullscreenchange',onFs); })();
 const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
+// FLIGHT PAUSED BADGE (2026-09-06). The global keydown handler returns immediately while the chat
+// has focus, so W/A/S/D, Space, Tab, M, G, E and the eight upgrade keys all do nothing the moment
+// you click the box. That is the right behaviour - you are typing - but the game never said it, so
+// the keys just stopped working with no explanation. It sits above the input and names the way out.
+(function(){
+  const b=document.createElement('div'); b.id='flightPaused';
+  b.innerHTML='flight paused while you type &nbsp;·&nbsp; <b>Esc</b> to fly';
+  document.body.appendChild(b);
+  // Driven by the frame loop reading document.activeElement, NOT by focus/blur events. Two reasons.
+  // The guard it mirrors is itself a live `document.activeElement.id === 'chat'` test, so reading the
+  // same thing cannot drift out of step with it. And focus/blur do not fire at all when the DOCUMENT
+  // does not have OS focus - `el.focus()` still moves activeElement and still kills the flight keys,
+  // but no event is raised - so an event-driven badge is silently absent in exactly the automated
+  // case where it would otherwise be verified.
+  window.flightPausedTick=function(){
+    const on=document.activeElement===chatEl;
+    if(on===b._on) return;                       // one DOM write per transition, not per frame
+    b._on=on;
+    if(on){ const r=chatEl.getBoundingClientRect();
+      b.style.left=Math.round(r.left)+'px'; b.style.top=Math.round(Math.max(2,r.top-24))+'px'; }
+    b.style.display=on?'block':'none';
+  };
+})();
 chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
   if(e.key==='Enter'){ const v=chatEl.value.trim(); chatEl.value=''; if(v){ cmdHist.push(v); if(cmdHist.length>60) cmdHist.shift(); } histIdx=-1; if(activeTab!=='terminal'){ activeTab='terminal'; buildTabs(); } runCmd(v); }
   else if(e.key==='ArrowUp'){ e.preventDefault(); if(cmdHist.length){ histIdx=Math.min(histIdx+1,cmdHist.length-1); chatEl.value=cmdHist[cmdHist.length-1-histIdx]; } }
@@ -7566,7 +7595,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); backgroundTick(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering - but the empire it promised keeps running, see backgroundTick
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }

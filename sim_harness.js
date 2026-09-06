@@ -34,6 +34,7 @@
       }
       // a NaN that has escaped into a position is the failure that makes a world quietly unplayable,
       // so it is named here rather than left for someone to notice as "ships flew away"
+      out.simPaused = (typeof SF_LOCK !== 'undefined') ? !!SF_LOCK.paused : false;   // if true, nothing in this census is advancing
       out.nanShips = (typeof ships !== 'undefined')
         ? ships.filter(function (s) { return s.pos && ![s.pos.x, s.pos.y, s.pos.z].every(Number.isFinite); }).map(function (s) { return s.name; })
         : [];
@@ -55,6 +56,18 @@
   function run(seconds, opts) {
     opts = opts || {};
     if (typeof frame !== 'function') return { error: 'no global frame() - is the game loaded?' };
+    // THE SILENT ZERO (measured 2026-09-06): frame() returns on its FIRST line when the singleton
+    // lock has handed the sim to another tab. Every call still "succeeds", no error is raised, and
+    // the run reports a happy ms/frame for a game that did not advance a single step - which is how
+    // a real verification of a UI change came back as "the feature does not work". If the sim is
+    // paused, say so instead of returning a number that means nothing.
+    if (typeof SF_LOCK !== 'undefined' && SF_LOCK.paused) {
+      return {
+        error: 'SIM PAUSED - another tab holds the singleton lock, so frame() returns immediately and every number here would be meaningless.',
+        fix: 'click the veil in this tab, or run: SF_LOCK.myClaim = Date.now() + 1000; SF_LOCK.ch.postMessage({t:"claim", id:SF_LOCK.myClaim}); sfPause(false);',
+        paused: true
+      };
+    }
     var realRAF = root.requestAnimationFrame;
     root.requestAnimationFrame = function () { return 0; };
     var counts = {}, first = [], t = performance.now(), STEP = 1000 / 60;
@@ -95,6 +108,7 @@
     var r;
     try { r = run(seconds); }
     finally { restore.forEach(function (p) { root[p[0]] = p[1]; }); }
+    if (!r || !r.frames) return r;   // run() refused (paused sim, no frame()) - pass the reason up rather than dividing by an undefined frame count and reporting NaN
     r.hot = Object.keys(stats).map(function (k) {
       return {
         fn: k, ms: +stats[k].ms.toFixed(1), calls: stats[k].calls,

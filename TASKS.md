@@ -57,7 +57,6 @@ A brand-new player is shown **144 visible UI boxes and 5,043 characters of text*
 must already know to type. The intro's one instruction is "type into the box like you are talking
 to yourself" - about the Passenger, not about flying.
 
-- [ ] N4  Nine of ten flight keys are dead while the terminal has focus, and only a control card now says so -> DONE WHEN: a player who clicks into the terminal gets a visible cue that flight is paused, verified by looking at the live game with the chat focused.
 - [ ] N5  75 terminal commands are unreachable without reading source -> DONE WHEN: `help` (or a paged version of it) names every branch `runCmd` accepts, verified by diffing the help text against the handler list.
 - [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
 
@@ -65,6 +64,10 @@ to yourself" - about the Passenger, not about flying.
 - [ ] G0  Run the genre survey and rank the gaps -> DONE WHEN: `genre/genre_matrix.json` exists, `py genre/anchor_rank.py` prints a ranked gap list, and `py tools/upgrade_pass.py` writes GAME_UPGRADES.md.
 
 ## Done
+
+- [x] N4  Say when flight is paused -> DONE. A badge sits directly above the terminal input while it has focus: "flight paused while you type · Esc to fly". Verified in the live game in one run, badge AND the claim it makes: not typing -> hidden; typing -> shown, 0px above the input, thrust key leaves `MAN.thr` at 0 (the keys really are dead); after blur -> hidden and thrust goes to 1.
+  It is driven by the frame loop reading `document.activeElement`, not by focus/blur events, for two reasons found while building it: the game's own guard is a live `activeElement` test, so reading the same thing cannot drift out of step with it; and focus/blur DO NOT FIRE when the document lacks OS focus, which is exactly the automated case - `el.focus()` still moves activeElement and still kills the keys, silently.
+- [x] H1  The harness refuses to measure a paused sim -> DONE, earned by being fooled. `frame()` returns on its FIRST line when the singleton lock hands the sim to another tab. Every call still succeeds, no error is raised, and a run reports a healthy ms/frame for a game that advanced zero steps - which is how a correct UI change came back measuring as broken. `SIM.run` now returns a refusal naming the lock and how to reclaim it, `SIM.census` reports `simPaused`, and `SIM.profile` passes the refusal up instead of dividing by an undefined frame count.
 
 - [x] S1  The galaxy is the same galaxy every time you come back -> FIXED for the geography. REQUIREMENTS_SR SR-M1 calls this "a living galaxy you leave and return to" and UC-218 was marked WORKS, but only the CAREER persisted: `makePlanets`/`makeSystems` draw every position from `Math.random` via `T.MathUtils.randFloat`, so the layout was re-rolled on every boot while the save restored per-planet state BY NAME - your reputation came back attached to a planet that had moved. A seed is now stored once (`SF_GALAXY_SEED_v1`) and `Math.random` is swapped for a seeded xorshift for the duration of world generation only, restored in a `finally`.
   Verified across two real page loads: all 18 planets identical to 3 decimal places (`Halcyon@155.005,-0.568,34.548`, `Cydon@701.451,-1.049,750.087`, ...). Also proven, in one run: the same seed reproduces its stream, a different seed produces a different galaxy, and `Math.random` is genuinely restored afterwards, so combat, spawns and AI keep the real randomness they have always had. Whole-game check after: two 9-second runs, 0 errors, no NaN positions, no console errors.
