@@ -103,6 +103,32 @@ classDiagram
     +gapDescription()
     +seek()
   }
+  class ECONOMY {
+    <<economy.js>>
+    +CFG()
+    +tick()
+    +snapshot()
+    +save()
+    +load()
+    +recipeFor()
+    +stationAt()
+    +buildStation()
+    +upgradeStation()
+    +sellStation()
+    +stationById()
+    +haulerById()
+    +buyHauler()
+    +assign()
+    +recall()
+    +sellHauler()
+    +stations()
+    +haulers()
+  }
+  class EMPIRE {
+    <<empire.js>>
+    +init()
+    +refresh()
+  }
   class ENGBAY {
     <<engbay.js>>
     +mount()

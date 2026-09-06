@@ -297,7 +297,7 @@
 <script src="power_panel.js?v=20260906b"></script>
 <script src="panels.js?v=20260906e"></script>
 <script src="sbhud.js?v=20260906b"></script>
-<script src="shell.js?v=20260906a"></script>
+<script src="shell.js?v=20260906b"></script>
 <script type="module" src="brain/brain.js?v=20260906e"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
 
 <script src="item_icons.js?v=20260714c"></script>
@@ -307,6 +307,8 @@
 <script src="starmap.js?v=20260714c"></script>
 <script src="conquest.js?v=20260714c"></script>
 <script src="missions.js?v=20260906b"></script>
+<script src="economy.js?v=20260906f"></script>
+<script src="empire.js?v=20260906a"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
 <script>
@@ -4692,6 +4694,26 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
+  if(c==='station'||c==='stations'){ const E=window.ECONOMY; if(!need(E,'economy module not loaded')) return; const sub=(a[1]||'').toLowerCase(); const snap=E.snapshot();
+    if(!sub||sub==='list'){ term(`YOUR STATIONS (${snap.stations.length}):`,'sys');
+      snap.stations.forEach(st=>term(`&nbsp;&nbsp;<b>${st.planet}</b> Lv${st.lvl} · ${st.insName.join(' + ')} → <b>${st.outName}</b> · ${st.batch}/cycle every ${st.cycle}s · made ${st.made}, earned ${st.earned}c${st.stalled?` · <span style="color:#ff8a8a">STALLED: ${st.stalled}</span>`:''}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">station build (while docked) · station upgrade &lt;planet&gt; · station sell &lt;planet&gt;</span>','sys'); return; }
+    if(sub==='build'){ if(!need(dockedP,'dock at the world you want to build on')) return; const r=E.buildStation(dockedP); if(!r.ok) term('◆ '+r.msg,'err'); return; }
+    const target=E.stations().find(x=>x.planet.toLowerCase().startsWith((a[2]||'').toLowerCase()));
+    if(sub==='upgrade'){ if(!need(target,'station upgrade &lt;planet&gt;')) return; const r=E.upgradeStation(target); if(!r.ok) term('◆ '+r.msg,'err'); return; }
+    if(sub==='sell'){ if(!need(target,'station sell &lt;planet&gt;')) return; E.sellStation(target); return; }
+    term('◆ station list|build|upgrade &lt;planet&gt;|sell &lt;planet&gt;','sys'); return; }
+  if(c==='hauler'||c==='haulers'){ const E=window.ECONOMY; if(!need(E,'economy module not loaded')) return; const sub=(a[1]||'').toLowerCase(); const snap=E.snapshot();
+    if(!sub||sub==='list'){ term(`YOUR HAULERS (${snap.haulers.length}):`,'sys');
+      snap.haulers.forEach(h=>term(`&nbsp;&nbsp;<b>${h.name}</b> ${h.from?`${h.from} → ${h.to} · ${h.goodName}`:'<span style="opacity:.5">no route</span>'} · ${h.state} · ${h.runs} runs, ${h.profit>=0?'+':''}${h.profit}c${h.note?` · <span style="opacity:.7">${h.note}</span>`:''}`,'sys'));
+      term('&nbsp;&nbsp;<span style="opacity:.6">hauler buy · hauler route &lt;name&gt; &lt;from&gt; &lt;to&gt; &lt;good&gt; · hauler recall &lt;name&gt; · hauler sell &lt;name&gt;</span>','sys'); return; }
+    if(sub==='buy'){ const r=E.buyHauler(a[2]); if(!r.ok) term('◆ '+r.msg,'err'); return; }
+    const h=E.haulers().find(x=>x.name.toLowerCase().startsWith((a[2]||'').toLowerCase()));
+    if(sub==='route'){ if(!need(h,'hauler route &lt;name&gt; &lt;from&gt; &lt;to&gt; &lt;good&gt;')) return; const g=findGood(a[5]); if(!need(g,'unknown good')) return;
+      const r=E.assign(h, a[3], a[4], g.k); if(!r.ok) term('◆ '+r.msg,'err'); return; }
+    if(sub==='recall'){ if(!need(h,'hauler recall &lt;name&gt;')) return; E.recall(h); term(`${h.name} recalled - idle until you give it a route.`,'sys'); return; }
+    if(sub==='sell'){ if(!need(h,'hauler sell &lt;name&gt;')) return; const r=E.sellHauler(h); term(`Sold ${h.name} (+${r.back}c).`,'sys'); return; }
+    term('◆ hauler list|buy|route|recall|sell','sys'); return; }
   if(c==='stat'||c==='stats'||c==='spend'){ const d=sbSnapshot(P); if(!a[1]){ term(`◆ GEM BAR ${Math.round(100*d.bar/d.barMax)}% · <b>${d.pts}</b> point${d.pts===1?'':'s'} banked · ${d.hullName} (tier ${d.tier})`,'sys');
       CFG.STAT_ORDER.forEach((k,i)=>term(`&nbsp;&nbsp;<b>${i+1}</b> ${CFG.STAT_LABEL[k].padEnd(12,' ').replace(/ /g,'&nbsp;')} ${'▮'.repeat(d.stat[k])}${'▯'.repeat(CFG.STAT_MAX-d.stat[k])} ×${d.mult[k].toFixed(2)}`,'sys'));
       term(`&nbsp;&nbsp;<span style="opacity:.6">stat &lt;name|1-8&gt; spends a point · tierup takes the next hull when all eight are maxed${d.tierReady?' - <b>READY NOW</b>':''}</span>`,'sys'); return; }
@@ -6096,7 +6118,8 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
       shieldDivert:P.shieldDivert||null, shieldFwd:P.shieldFwd, shieldAft:P.shieldAft, capLaser:P.capLaser, capEngine:P.capEngine,
       rankShown:P.rankShown, engineType:P.engineType||'standard', gizmoSlots:[...(P.gizmoSlots||[])],
       skills:{...(P.skills||{})}, skillPts:P.skillPts||0,
-      gemBar:P.gemBar||0, gemPts:P.gemPts||0, stat:{...(P.stat||{})},   // STARBLAST LOOP: the bar, the banked points, the eight stat levels
+      gemBar:P.gemBar||0, gemPts:P.gemPts||0, stat:{...(P.stat||{})},
+      economy:(window.ECONOMY&&ECONOMY.save)?ECONOMY.save():null,   // EGOSOFT layer: your stations and haulers (2026-09-06)   // STARBLAST LOOP: the bar, the banked points, the eight stat levels
       stim:(P.stim&&P.stim.until>T0)?{n:P.stim.n,buffs:{...P.stim.buffs},left:Math.round(P.stim.until-T0)}:null,   // SR STIMULATORS: save REMAINING seconds (T0 resets on reload) - re-anchored in applySaveState
       weaponInst:P.weaponInst||null, engineInst:P.engineInst||null,   // SR ITEM VARIANCE: fitted weapon/engine instance rolls
 
@@ -6114,6 +6137,7 @@ function gatherSaveState(){ const P=ships[0]; if(!P) return null;
 function applySaveState(save){ if(!save||save.v!==1||!ships[0]) return false; const P=ships[0];
   campaign=save.campaign||1; escalation=save.escalation||0; warScore=save.warScore||0;
   const sp=save.player||{};
+  if(sp.economy&&window.ECONOMY&&ECONOMY.load) ECONOMY.load(sp.economy);   // EGOSOFT layer (2026-09-06)
   Object.assign(P,{ credits:num2(sp.credits,P.credits), score:num2(sp.score,P.score), weaponType:sp.weaponType||P.weaponType,
     lvl:sp.lvl||P.lvl, equip:sp.equip||P.equip, artifacts:sp.artifacts||P.artifacts, contraband:sp.contraband||P.contraband,
     fuel:num2(sp.fuel,P.fuel), fuelCap:num2(sp.fuelCap,P.fuelCap), holdCap:num2(sp.holdCap,P.holdCap), senseR:num2(sp.senseR,P.senseR),
@@ -7127,7 +7151,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); shopTick(dt); updateFx(dt); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }

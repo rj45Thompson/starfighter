@@ -19,6 +19,7 @@
     { id:'market',    t:'MARKET',    hint:'buy and sell cargo (M)', live:()=>!!window.PANELS, go:()=>panel('market') },
     { id:'upgrades',  t:'UPGRADES',  hint:'gem bar, the eight stats, tier-up (keys 1-8)', live:()=>!!window.SBHUD, go:()=>panel('sbhud') },
     { id:'contracts', t:'CONTRACTS', hint:'the mission board and what is accepted', live:()=>!!window.MISSIONS, go:()=>{ panel('missionlog',true); cmd('missions'); } },
+    { id:'empire',    t:'EMPIRE',    hint:'your stations and haulers - what you own and what it earns', live:()=>!!window.ECONOMY, go:()=>panel('empire') },
     { id:'passenger', t:'PASSENGER', hint:'talk to the ship AI - it answers from the novel and the live game', live:()=>!!window.PASSENGER,
       go:()=>{ panel('ticker',true); const t=[...document.querySelectorAll('#ticker .tab')].find(e=>/parasite/i.test(e.textContent)); if(t) t.click(); const c=document.getElementById('chat'); if(c) c.focus(); } },
     { id:'broken',    t:'BROKEN',    hint:'what is half built or a toy - listed honestly, not hidden', live:()=>true, sheet:true, go:()=>toggleSheet('broken') }

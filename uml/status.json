@@ -233,16 +233,16 @@
 {
 "id": "UC-301",
 "epic": "E3",
-"status": "MISSING",
+"status": "WORKS",
 "story": "Pilot builds a station on a held world and it produces goods",
-"test": "not built"
+"test": "economy.js chains; a Halcyon plant made 36 units, an Agri world picks pharma and a Mining world a smelter"
 },
 {
 "id": "UC-302",
 "epic": "E3",
-"status": "MISSING",
+"status": "WORKS",
 "story": "Pilot assigns AI ships to a trade route between two markets",
-"test": "not built"
+"test": "haulers fly real distance and trade at live prices; 8 runs, +460c, and they hold when a leg stops paying"
 },
 {
 "id": "UC-303",
@@ -386,9 +386,9 @@
 }
 ],
 "tally": {
-"WORKS": 38,
+"WORKS": 40,
 "PARTLY": 4,
-"MISSING": 7,
+"MISSING": 5,
 "DEPRECATED": 2
 }
 }

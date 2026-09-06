@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:27:31",
+ "generated": "2026-09-06T12:39:29",
  "modules": [
   {
    "file": "acquire.js",
@@ -485,6 +485,89 @@
     "chains"
    ],
    "cfgTotal": 13
+  },
+  {
+   "file": "economy.js",
+   "lines": 308,
+   "classes": [
+    {
+     "name": "ECONOMY",
+     "members": [
+      "CFG",
+      "tick",
+      "snapshot",
+      "save",
+      "load",
+      "recipeFor",
+      "stationAt",
+      "buildStation",
+      "upgradeStation",
+      "sellStation",
+      "stationById",
+      "haulerById",
+      "buyHauler",
+      "assign",
+      "recall",
+      "sellHauler",
+      "stations",
+      "haulers"
+     ],
+     "memberTotal": 18
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "STATION_COST",
+    "plant",
+    "STATION_UPGRADE",
+    "first",
+    "STATION_MAX_LVL",
+    "STATION_CYCLE_S",
+    "STATION_CYCLE_GAIN",
+    "fraction",
+    "STATION_BATCH",
+    "STATION_BATCH_GAIN",
+    "level",
+    "STATION_STOCK_FLOOR",
+    "EXPORT",
+    "which",
+    "inputs",
+    "dear",
+    "ore",
+    "So",
+    "PRICES",
+    "here",
+    "with",
+    "looks",
+    "smelter",
+    "output",
+    "there"
+   ],
+   "cfgTotal": 25
+  },
+  {
+   "file": "empire.js",
+   "lines": 134,
+   "classes": [
+    {
+     "name": "EMPIRE",
+     "members": [
+      "init",
+      "refresh"
+     ],
+     "memberTotal": 2
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "TICK_MS",
+    "EDGE",
+    "RGB",
+    "DEFAULT_OPACITY"
+   ],
+   "cfgTotal": 4
   },
   {
    "file": "engbay.js",
@@ -1760,7 +1843,7 @@
   },
   {
    "file": "shell.js",
-   "lines": 114,
+   "lines": 115,
    "classes": [
     {
      "name": "SHELL",
@@ -2526,16 +2609,16 @@
   {
    "id": "UC-301",
    "epic": "E3",
-   "status": "MISSING",
+   "status": "WORKS",
    "story": "Pilot builds a station on a held world and it produces goods",
-   "test": "not built"
+   "test": "economy.js chains; a Halcyon plant made 36 units, an Agri world picks pharma and a Mining world a smelter"
   },
   {
    "id": "UC-302",
    "epic": "E3",
-   "status": "MISSING",
+   "status": "WORKS",
    "story": "Pilot assigns AI ships to a trade route between two markets",
-   "test": "not built"
+   "test": "haulers fly real distance and trade at live prices; 8 runs, +460c, and they hold when a leg stops paying"
   },
   {
    "id": "UC-303",
@@ -2679,9 +2762,9 @@
   }
  ],
  "tally": {
-  "WORKS": 38,
+  "WORKS": 40,
   "PARTLY": 4,
-  "MISSING": 7,
+  "MISSING": 5,
   "DEPRECATED": 2
  }
 }

@@ -63,8 +63,8 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-218 [E2] [WORKS] The galaxy persists across reloads and generations :: SR-M1, SR-M14
 
 ### E3 EGOSOFT
-- UC-301 [E3] [MISSING] Pilot builds a station on a held world and it produces goods :: not built
-- UC-302 [E3] [MISSING] Pilot assigns AI ships to a trade route between two markets :: not built
+- UC-301 [E3] [WORKS] Pilot builds a station on a held world and it produces goods :: economy.js chains; a Halcyon plant made 36 units, an Agri world picks pharma and a Mining world a smelter
+- UC-302 [E3] [WORKS] Pilot assigns AI ships to a trade route between two markets :: haulers fly real distance and trade at live prices; 8 runs, +460c, and they hold when a leg stops paying
 - UC-303 [E3] [MISSING] Pilot commands a wing: follow, attack, dock :: plain-English orders exist for the squad; no wing model
 - UC-304 [E3] [MISSING] Systems are separate bubbles joined by lanes; a contested system infects its neighbours :: SR-M16
 - UC-305 [E3] [MISSING] Synod adapts its loadouts across generations :: SR-M15
