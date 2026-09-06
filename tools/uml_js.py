@@ -67,6 +67,14 @@ def extract_module(path):
         classes.append({"name": name, "members": keys[:40], "memberTotal": len(keys)})
     for m in re.finditer(r"^export\s+class\s+([A-Za-z_]\w*)", src, re.M):
         classes.append({"name": m.group(1), "members": [], "memberTotal": 0, "kind": "export class"})
+    # one file can assign the same global twice (a doc line and the real assignment); keep the richer record so the
+    # diagram shows one class per name per file instead of two, one of them thin
+    best = {}
+    for c in classes:
+        prev = best.get(c["name"])
+        if not prev or c["memberTotal"] > prev["memberTotal"]:
+            best[c["name"]] = c
+    classes = list(best.values())
     funcs = re.findall(r"^(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(", src, re.M)
     cfg = re.search(r"(?:const|var|let)\s+CFG\s*=\s*\{", src)
     cfg_keys = object_keys(src, cfg.end() - 1) if cfg else []

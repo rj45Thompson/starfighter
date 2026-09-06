@@ -27,6 +27,15 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - E5 MINDS — the Passenger and the AI pilots as an honest AGI test.
 - E6 SHELL — the presentation: one clean HUD, only what works, DEPRECATED behind a tab.
 
+
+## Where to review it
+
+- **The model as a page**: https://claude.ai/code/artifact/c9b7a203-1730-4000-94de-1aa1e088c926 - both UML views
+  rendered, every story with the measurement that decided its state, and the checks that now run. Rebuild it from
+  `uml/model.json` after changing this file.
+- **In the game**: the shell's BROKEN tab reads `uml/status.json`, so what the game admits is not ready is this
+  same model.
+
 ## Use cases
 
 ### E1 STARBLAST
@@ -71,7 +80,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 
 ### E4 GROUND
 - UC-401 [E4] [DEPRECATED] The old surface walk: boxes on a checkerboard :: replaced by UC-403; kept behind CFG.GROUND_FPS=false as the fallback
-- UC-402 [E4] [DEPRECATED] Pilot fights a turn-based battle on the Tami rules :: 8x8, 3 fixed units, no terrain / preview / deployment
+- UC-402 [E4] [WORKS] Pilot fights a turn-based battle on the Tami rules :: the same battle UC-404 rebuilt - terrain with cost, cover and high ground, deployment, turn order, technique detail and damage preview
 - UC-403 [E4] [WORKS] Pilot walks a first-person surface (three.js FPS view) :: ground.js: seeded heightfield per world, 53 solids, pointer-lock look, walk 10.7u in 2s, jump rise 1.18m, stopped 5.9m short of a 9.1m building
 - UC-404 [E4] [WORKS] Ground battle shows turn order, technique detail, matchup preview, terrain, deployment :: deployed 3 by clicking tiles; Ion Bolt read 'power 15 range 4 Ionic cooldown 1' and previewed 19-25 vs Synod Blade, 20-26 vs Synod Gun
 

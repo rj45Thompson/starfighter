@@ -44,7 +44,7 @@ flowchart LR
   end
   subgraph E4["E4 GROUND"]
     UC_401["UC-401 DEPRECATED\nThe old surface walk: boxes on a checkerboard"]
-    UC_402["UC-402 DEPRECATED\nPilot fights a turn-based battle on the Tami rules"]
+    UC_402["UC-402 WORKS\nPilot fights a turn-based battle on the Tami rules"]
     UC_403["UC-403 WORKS\nPilot walks a first-person surface (three.js FPS view)"]
     UC_404["UC-404 WORKS\nGround battle shows turn order, technique detail, matchup preview, terrain, deployment"]
   end
@@ -136,7 +136,7 @@ flowchart LR
   Pilot --> UC_401
   style UC_401 fill:#2a2040,stroke:#b48cff,color:#e3ebf3
   Pilot --> UC_402
-  style UC_402 fill:#2a2040,stroke:#b48cff,color:#e3ebf3
+  style UC_402 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_403
   style UC_403 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_404

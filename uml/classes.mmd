@@ -10,14 +10,6 @@ classDiagram
   class BRAIN {
     <<brain/brain.js>>
     +ready()
-    +status()
-    +ask()
-    +chooseMission()
-    +learnedCount()
-  }
-  class BRAIN {
-    <<brain/brain.js>>
-    +ready()
     +game()
     +world()
     +events()
@@ -185,12 +177,6 @@ classDiagram
     +scanBadge()
     +overlay()
   }
-  class HULLMODELS {
-    <<hullmodels.js>>
-    +build()
-    +classes()
-    +scanBadge()
-  }
   class ICONS {
     <<item_icons.js>>
     +dataURL()
@@ -202,12 +188,6 @@ classDiagram
     +CFG()
     +clearCache()
     +_setCanvasFactory()
-  }
-  class ITEMVAR {
-    <<item_variance.js>>
-    +roll()
-    +describe()
-    +QUALITY()
   }
   class ITEMVAR {
     <<item_variance.js>>
@@ -323,9 +303,6 @@ classDiagram
     +CFG()
     +_PP()
     +PP()
-  }
-  class HOST {
-    <<power_panel.js>>
   }
   class HOST {
     <<power_panel.js>>
@@ -451,7 +428,6 @@ classDiagram
     +VCFG()
     +create()
   }
-  BRAIN ..> HOST : reads live state
   BRAIN ..> HOST : reads live state
   CHATTER ..> HOST : reads live state
   ENGBAY ..> HOST : reads live state

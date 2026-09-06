@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T13:13:56",
+ "generated": "2026-09-06T13:14:33",
  "modules": [
   {
    "file": "acquire.js",
@@ -34,17 +34,6 @@
    "file": "brain/brain.js",
    "lines": 255,
    "classes": [
-    {
-     "name": "BRAIN",
-     "members": [
-      "ready",
-      "status",
-      "ask",
-      "chooseMission",
-      "learnedCount"
-     ],
-     "memberTotal": 5
-    },
     {
      "name": "BRAIN",
      "members": [
@@ -903,15 +892,6 @@
       "overlay"
      ],
      "memberTotal": 8
-    },
-    {
-     "name": "HULLMODELS",
-     "members": [
-      "build",
-      "classes",
-      "scanBadge"
-     ],
-     "memberTotal": 3
     }
    ],
    "functions": [],
@@ -1019,15 +999,6 @@
    "file": "item_variance.js",
    "lines": 100,
    "classes": [
-    {
-     "name": "ITEMVAR",
-     "members": [
-      "roll",
-      "describe",
-      "QUALITY"
-     ],
-     "memberTotal": 3
-    },
     {
      "name": "ITEMVAR",
      "members": [
@@ -1764,11 +1735,6 @@
       "PP"
      ],
      "memberTotal": 9
-    },
-    {
-     "name": "HOST",
-     "members": [],
-     "memberTotal": 0
     },
     {
      "name": "HOST",
@@ -2739,9 +2705,9 @@
   {
    "id": "UC-402",
    "epic": "E4",
-   "status": "DEPRECATED",
+   "status": "WORKS",
    "story": "Pilot fights a turn-based battle on the Tami rules",
-   "test": "8x8, 3 fixed units, no terrain / preview / deployment"
+   "test": "the same battle UC-404 rebuilt - terrain with cost, cover and high ground, deployment, turn order, technique detail and damage preview"
   },
   {
    "id": "UC-403",
@@ -2850,9 +2816,9 @@
   }
  ],
  "tally": {
-  "WORKS": 48,
+  "WORKS": 49,
   "PARTLY": 1,
   "MISSING": 0,
-  "DEPRECATED": 2
+  "DEPRECATED": 1
  }
 }
