@@ -108,6 +108,22 @@
   #awaken .line{ color:#d8c6f5; font:15px/1.65 ui-monospace,monospace; min-height:120px; }
   #awaken .who{ color:#9a7fd0; font:700 11px/1 ui-monospace,monospace; letter-spacing:.2em; margin-bottom:12px; }
   #awaken .hint{ color:#5f7189; font:11px/1 ui-monospace,monospace; margin-top:16px; }
+  /* FIRST FLIGHT CARD - the controls, shown before the lore on a first run and reachable forever
+     from the ? button. Same shell as the awaken overlay so it reads as one sequence, but its own
+     accent, because this one is the GAME talking and the other is the Passenger. */
+  #awaken .box.first{ border-color:#2f6d99; box-shadow:0 0 60px rgba(60,150,220,.22); }
+  #awaken .box.first .who{ color:#7fd4ff; }
+  #awaken .kgrid{ display:grid; grid-template-columns:auto 1fr; gap:7px 14px; align-items:baseline;
+    font:13px/1.5 ui-monospace,monospace; color:#cfe3f2; margin:4px 0 2px; }
+  #awaken .kgrid kbd{ background:#122234; border:1px solid #2f6d99; border-bottom-width:2px; border-radius:5px;
+    padding:2px 8px; font:12px/1.4 ui-monospace,monospace; color:#eaf5ff; white-space:nowrap; }
+  #awaken .kgrid .what{ color:#9fb6c9; }
+  #awaken .goal{ margin:16px 0 2px; padding:11px 13px; border-left:3px solid #2f6d99; background:#0d1c28;
+    border-radius:0 7px 7px 0; color:#eaf5ff; font:13.5px/1.6 ui-monospace,monospace; }
+  #helpBtn{ position:fixed; right:14px; bottom:58px; z-index:14; width:30px; height:30px; border-radius:50%;
+    background:rgba(12,24,38,.92); border:1px solid #2f6d99; color:#7fd4ff; cursor:pointer;
+    font:700 15px/1 ui-monospace,monospace; display:flex; align-items:center; justify-content:center; padding:0; }
+  #helpBtn:hover{ background:#14304a; color:#eaf5ff; }
   #logbody{ padding:6px 10px 8px; }
   #logbody .tl{ opacity:.94; margin:1px 0; }
   #logbody .tl b{ font-weight:800; }
@@ -3151,15 +3167,88 @@ function schedulePonder(text){
 function passengerInit(){ if(!window.PASSENGER) return;
   PASSENGER.init({ registry:PASSENGER_REGISTRY, telemetry:passengerTelemetry, speak:passengerSpeak, latent:(t)=>TAMI_SPEAK.latent(t), shock:parasiteShock });   // the old-libraries study channel (labeled GIVEN); shock = the screen effect for the anger tiers (2026-09-06)
   maybeAwaken(); }
+// ================= FIRST FLIGHT CARD (2026-09-06) =================
+// Measured on a wiped localStorage before this existed: a new player was shown 144 visible UI
+// boxes and 5,043 characters of text, and searching all of it found NO mention of the movement
+// keys, no mention of the fire key, and no statement of an objective. The only way to reach help
+// was to already know to type `help` into the terminal. Six pages of lore opened the game and
+// taught none of it.
+//
+// The card is GENERATED FROM KEYBIND, never typed out. That is the point: the keys are
+// rebindable and the prose drifted the moment they changed. README.md still says "space to fire"
+// when Space is THRUST and fire is F or left-mouse - exactly the kind of confidently wrong
+// instruction a hand-written card becomes. Reading the live binding means the card cannot lie,
+// and a player who has rebound anything sees their own keys.
+function keyLabel(code){
+  if(!code) return '-';
+  return String(code)
+    .replace(/^Key/, '').replace(/^Digit/, '')
+    .replace(/^Arrow(.+)$/, '$1 arrow')
+    .replace(/^ShiftLeft$/, 'Shift').replace(/^ShiftRight$/, 'R-Shift')
+    .replace(/^Space$/, 'Space').replace(/^Backquote$/, '`');
+}
+function controlCardHtml(){
+  const row=(k,what)=>'<kbd>'+k+'</kbd><span class="what">'+what+'</span>';
+  const rows=[
+    row(keyLabel(KEYBIND.thrust)+(OPT.rightMouseThrust?' / right-mouse':''),'thrust - hold to fly forward'),
+    row(keyLabel(KEYBIND.yawLeft)+' '+keyLabel(KEYBIND.yawRight),'turn left and right'),
+    row(keyLabel(KEYBIND.pitchDown)+' '+keyLabel(KEYBIND.pitchUp),'nose down and up (arrows work too)'),
+    row(keyLabel(KEYBIND.fire)+' / left-mouse','fire'),
+    row(keyLabel(KEYBIND.nitro),'boost'),
+    row('M','the market') + row('G','the galaxy map') + row('E','your ship'),
+    // The trap this card exists to defuse: the terminal swallows every flight key while it has
+    // focus, so a player who clicks the box finds W/A/S/D/Space/Tab/M/G/E all dead and nothing on
+    // screen says why. Escape has always freed the ship; it was simply never mentioned anywhere.
+    row('Enter','talk to the ship or the Passenger'),
+    row('Esc','stop typing - the flight keys work again'),
+  ].join('');
+  return '<div class="box first">'
+    + '<div class="who">BEFORE YOU FLY</div>'
+    + '<div class="kgrid">'+rows+'</div>'
+    + '<div class="goal">Shoot a rock. It splits and spills gems - collect them and the bar fills, '
+    + 'and a full bar buys an upgrade. That loop is the whole game; everything else is optional.</div>'
+    + '<div class="hint">click / space - continue &nbsp;·&nbsp; the <b>?</b> button, bottom right, brings this back any time</div>'
+    + '</div>';
+}
+function showControlCard(onDone){
+  const ov=document.createElement('div'); ov.id='awaken';
+  ov.innerHTML=controlCardHtml();
+  document.body.appendChild(ov);
+  const close=()=>{ ov.remove(); removeEventListener('keydown',onk,true); if(onDone) onDone(); };
+  const onk=e=>{ if(e.key===' '||e.key==='Enter'||e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); close(); } };
+  ov.addEventListener('click',close); addEventListener('keydown',onk,true);
+}
+// the always-available way back to it - the affordance that did not exist before
+function installHelpButton(){
+  if(document.getElementById('helpBtn')) return;
+  const b=document.createElement('button'); b.id='helpBtn'; b.type='button';
+  b.title='controls and what to do first'; b.textContent='?';
+  b.addEventListener('click',e=>{ e.stopPropagation(); if(!document.getElementById('awaken')) showControlCard(); });
+  document.body.appendChild(b);
+}
 function maybeAwaken(force){ const lines=PASSENGER.introLines(force);
+  installHelpButton();
   if(lines.length<=1){ paraLine('worm', lines[0]); return; }                       // re-greeting on later boots
+  // FIRST RUN ONLY: the same test the lore uses. A returning player has seen it and gets neither.
+  // Deferred one tick on purpose: passengerInit() runs ABOVE the `let KEYBIND` declaration in this
+  // same script, so building the card inline threw "Cannot access 'KEYBIND' before initialization"
+  // and took the whole boot down with it. Reading the bindings after the script body has finished
+  // is also the correct behaviour - the card must show the player's CURRENT keys, not the defaults.
+  setTimeout(()=>showControlCard(()=>awakenLore(lines)), 0);
+}
+function awakenLore(lines){
   let i=0; const ov=document.createElement('div'); ov.id='awaken';
   ov.innerHTML='<div class="box"><div class="who">🜏 SOMETHING SPEAKS FROM BEHIND YOUR EARS</div><div class="line" id="awline"></div><div class="hint">click / space - next · esc - enough</div></div>';
   document.body.appendChild(ov);
   const show=()=>{ const el=document.getElementById('awline'); if(el) el.textContent=lines[i]; };
   const done=()=>{ ov.remove(); removeEventListener('keydown',onk,true); PASSENGER.markIntroShown();
     lines.forEach(l=>paraLine('worm',l.replace(/</g,'&lt;')));                      // the monologue lands in the PARASITE tab for re-reading
-    paraLine('worm','Ask me anything. Or type <b>help</b> for the ship.'); const c=document.getElementById('chat'); if(c) c.focus(); };
+    // DO NOT STEAL FOCUS (2026-09-06). This used to end with chat.focus(), and the global keydown
+    // handler returns immediately while the chat has focus - so the instant the intro closed, every
+    // flight key the player had just been taught did nothing but type into a box. Nothing on screen
+    // explained it. The ship is left flyable; Enter reaches the terminal from anywhere and Escape
+    // comes back, and the control card now teaches that pair.
+    paraLine('worm','Ask me anything - press <b>Enter</b> to type, <b>Esc</b> to fly again. Or type <b>help</b> for the ship.'); };
   const next=()=>{ i++; if(i>=lines.length) done(); else show(); };
   ov.addEventListener('click',next);
   const onk=e=>{ if(e.key==='Escape'){ e.stopPropagation(); done(); } else if(e.key===' '||e.key==='Enter'){ e.stopPropagation(); e.preventDefault(); next(); } };

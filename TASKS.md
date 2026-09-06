@@ -33,9 +33,45 @@ No leak found: scene children oscillate 469-572, ships plateau at 63, 0 runtime 
 
 ## Open
 
-(nothing open in this lane - see "For the other lane" below for verified findings handed over)
+### Cybertron lane (the feature session, 2026-09-06 21:06Z - files: assets/gen_cybertron.py, cybertron.js, assets/planets/machine_*, and TWO lines of index.html)
+⚠ This lane edits index.html, which the other lane has UNCOMMITTED work in (the first-flight card).
+My footprint there is one script tag and one CFG value; commits are staged by hash from HEAD so the
+card is never swept in. Everything else lives in new files.
+
+- [ ] C1  Generate option A, the procedural machine-world skin -> DONE WHEN: albedo/emissive/normal applied to a planet in the running page, screenshotted, and the disc's day/night mean luma measured
+- [ ] C2  Generate option B, a FLUX Cybertron skin through the seam repair -> DONE WHEN: the same three measurements, from the same camera, on the same planet
+- [ ] C3  Build option C, a displaced machine MESH (not a textured ball) -> DONE WHEN: the same three measurements, and the geometry is visibly displaced (vertex count and radius spread reported)
+- [ ] C4  Answer "still very bright" with a number, not an opinion -> DONE WHEN: day-side disc mean luma measured before and after on the live page, and the bright disc beside the planets identified by raycast
+- [ ] C5  Publish the three options side by side for RJ to pick -> DONE WHEN: an artifact URL renders the three renders with their measurements
+- [ ] C6  Fix the wing-order argument bug the other lane found (empire.js:126) -> DONE WHEN: FOLLOW issued from the board follows the PLAYER, verified in the page
+- [ ] C7  Make ground.js deterministic and drop its dead store (ground.js:109, :297) -> DONE WHEN: two builds of the same world produce identical terrain colour, measured
+- [ ] C8  Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42) -> DONE WHEN: a fresh hauler's name matches its id, and a failed localStorage write is reported not swallowed
+- [ ] C9  Delete the dead code the other lane listed in my files -> DONE WHEN: planetmenu.js:885-907, missions.js:88/92 and power_panel.js:71 are gone and every file still parses
+
+
+### Produced from the first-run measurement (2026-09-06, measured on a wiped localStorage)
+A brand-new player is shown **144 visible UI boxes and 5,043 characters of text**, behind a
+**6-page lore intro**. Searched that on-screen text for the controls the README documents:
+`WASD` **absent**, "space to fire" **absent**, mouse aim **absent**, any statement of the goal
+**absent**. The only help affordance is the word `help` inside the terminal hint bar, which you
+must already know to type. The intro's one instruction is "type into the box like you are talking
+to yourself" - about the Passenger, not about flying.
+
+- [ ] N4  Nine of ten flight keys are dead while the terminal has focus, and only a control card now says so -> DONE WHEN: a player who clicks into the terminal gets a visible cue that flight is paused, verified by looking at the live game with the chat focused.
+- [ ] N5  75 terminal commands are unreachable without reading source -> DONE WHEN: `help` (or a paged version of it) names every branch `runCmd` accepts, verified by diffing the help text against the handler list.
+- [ ] N6  Six command aliases are shadowed and dead: `tom`, `mind`, `reason`, `deliberate`, `talk`, and `mute` (mute/unmute are not inverses - `mute` hits sound, `unmute` turns on voices) -> DONE WHEN: each resolves to its intended handler, verified by running all six in the live terminal.
+- [ ] S1  The galaxy does not persist; only the career does -> DONE WHEN: reloading twice puts the same planets in the same places, verified by comparing planet names and positions across a reload. (`makePlanets` re-rolls the layout with unseeded `rand` every boot; `stock` resets, `_obs` is wiped, and missions/wing/empire/conquest/quests are never serialized.)
+- [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
+
+### Genre backlog
+- [ ] G0  Run the genre survey and rank the gaps -> DONE WHEN: `genre/genre_matrix.json` exists, `py genre/anchor_rank.py` prints a ranked gap list, and `py tools/upgrade_pass.py` writes GAME_UPGRADES.md.
 
 ## Done
+
+- [x] N1  Tell a new player how to fly and what to do first -> DONE. A FIRST FLIGHT card now precedes the lore on a first run, and it is GENERATED FROM `KEYBIND` rather than typed, so it cannot drift and it shows a player's own rebinds. Re-ran the exact search that found the gap, on a wiped localStorage: thrust named **true**, turn keys **true**, fire **true**, first objective **true** (all were false). Verified live: card -> lore -> dismissed; a returning player with a save sees neither card nor overlay.
+  Writing it caught the docs being wrong: README.md says "space to fire", but Space is **thrust** and fire is **F or left-mouse**. A hand-written card would have shipped that error; a generated one cannot.
+- [x] N2  Make help reachable without knowing to type it -> DONE. A `?` button, bottom right, always present. Verified by clicking it in the live game: the card reopens. Before this the only route to help was typing `help`, which nothing told you.
+- [x] N1b THE TRAP the ground-truth audit found, fixed with N1 -> the intro ended with `chat.focus()`, and the global keydown handler returns immediately while the chat has focus. So the moment the intro closed, every key the player had just been taught did nothing but type into a box, with nothing on screen explaining it. Focus is no longer stolen. Verified live: focus after intro is `BODY`, and pressing the thrust key moves `MAN.thr` 0 -> 1. Escape already blurred the chat; the card now teaches the Enter/Esc pair.
 
 - [x] B3  `scan` leaked a GPU texture per badge and the badges never expired -> REPRODUCED then FIXED. The terminal line already promised "badges painted over live contacts for 8s"; `o._scanBadgeT = T0+8` was written and NOTHING in the repo read it, and a re-scan detached the old sprite without disposing its CanvasTexture. Measured on the live game with six ships parked alongside the player: one scan takes textures 57 -> 63 (the six badges); **ten scans take it to 64, not ~117** - each rescan disposes the one it replaces. Expiry verified on the same run: at +4s still 6 badges / tex 64 (it keeps its stated life), at +10s **0 badges / tex 59** - the textures are actually freed, not just detached.
 - [x] B4  An away mission silently froze the empire and stopped saving -> FIXED. The `AWAY.active()` branch returns before the whole tail of `frame()`, which is right for the space sim and the space render but also skipped `ECONOMY.tick` and `saveTick` while `T0` kept advancing. Measured over 30 simulated away seconds with the branch forced: stations produced (Halcyon 160->164, Pallas 256->264, Cydon 0->4) and `AWAY.frame` still ran all 1,800 frames, so the mission itself is unaffected. Autosave proved separately: with `SF_SAVE_v1` deleted first, 19 away seconds wrote an 11,767-byte save; before the fix nothing was written for the entire mission. The WAR sim stays paused on purpose - an away mission can decide the battle conquest is arbitrating, which is a design question, not an oversight to quietly fix.
