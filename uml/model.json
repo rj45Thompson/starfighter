@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T13:10:32",
+ "generated": "2026-09-06T13:13:56",
  "modules": [
   {
    "file": "acquire.js",
@@ -2529,9 +2529,9 @@
   {
    "id": "UC-106",
    "epic": "E1",
-   "status": "PARTLY",
+   "status": "WORKS",
    "story": "Pilot buys weapon / engine / hull levels with credits in flight",
-   "test": "SHOP panel, doUpgrade (2026-09-06)"
+   "test": "clicked all three SHOP buttons undocked: weapon, engine and hull each 1 to 2 for 72c"
   },
   {
    "id": "UC-107",
@@ -2676,16 +2676,16 @@
   {
    "id": "UC-216",
    "epic": "E2",
-   "status": "PARTLY",
-   "story": "Pilot hears rumours and hires a wingman at the bar",
-   "test": "SR-M18, not re-measured"
+   "status": "WORKS",
+   "story": "Pilot hears a pilot's story and hires them at the bar",
+   "test": "BAR tab lists four pilots with their histories; hiring ALTAIR cost 300c and put them on the wing"
   },
   {
    "id": "UC-217",
    "epic": "E2",
-   "status": "PARTLY",
+   "status": "WORKS",
    "story": "Pilot analyzes artifacts and deploys probes at the science station",
-   "test": "SR-M19 commands"
+   "test": "bought 2 probes for 6 cores at the Athenaeum, deployed one on Halcyon mining 2 ore/min, every refusal names its requirement"
   },
   {
    "id": "UC-218",
@@ -2797,7 +2797,7 @@
    "epic": "E5",
    "status": "PARTLY",
    "story": "Pilots talk aloud and the Pilot can speak back",
-   "test": "browser voices"
+   "test": "both paths present (speech recognition supported, voice output togglable) but audio itself cannot be verified from here - the honest status"
   },
   {
    "id": "UC-507",
@@ -2850,8 +2850,8 @@
   }
  ],
  "tally": {
-  "WORKS": 45,
-  "PARTLY": 4,
+  "WORKS": 48,
+  "PARTLY": 1,
   "MISSING": 0,
   "DEPRECATED": 2
  }

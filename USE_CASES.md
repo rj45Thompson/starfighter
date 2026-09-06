@@ -35,7 +35,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-103 [E1] [WORKS] Drone fetches loose gems and cuts seams into rocks :: 30 s hand-stepped: 8 rocks, 6 gems, 43c
 - UC-104 [E1] [WORKS] Mined gems fill a gem bar; a full bar banks an upgrade point :: 60 s hand-stepped drone run: 22 rocks, 102c, bar 13%, 2 points
 - UC-105 [E1] [WORKS] Pilot spends a point on one of eight stats with keys 1-8, in flight :: 8 spends read back Lv1 each; shield max 40 to 44, capacitor 100 to 110
-- UC-106 [E1] [PARTLY] Pilot buys weapon / engine / hull levels with credits in flight :: SHOP panel, doUpgrade (2026-09-06)
+- UC-106 [E1] [WORKS] Pilot buys weapon / engine / hull levels with credits in flight :: clicked all three SHOP buttons undocked: weapon, engine and hull each 1 to 2 for 72c
 - UC-107 [E1] [WORKS] A maxed ship offers the next tier; Pilot chooses a hull anywhere :: card offered at 8/8 + 1 point; Scout to Fighter in flight, hull 70 to 100, stats reset
 - UC-108 [E1] [WORKS] Pilot dies; gems and credits spill; Pilot respawns as a Scout in the belt :: killShip, respawn branch
 - UC-109 [E1] [WORKS] Pilot reads rocks, gems, ships and drones on the radar :: top-down inset blips
@@ -58,8 +58,8 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-213 [E2] [WORKS] Reputation, customs, contraband, fence :: SR-M4 verified
 - UC-214 [E2] [WORKS] Pilot ranks up and spends skill points :: SR-M17
 - UC-215 [E2] [WORKS] Pilot plays a text quest at a planet :: textquests self-test 16/16
-- UC-216 [E2] [PARTLY] Pilot hears rumours and hires a wingman at the bar :: SR-M18, not re-measured
-- UC-217 [E2] [PARTLY] Pilot analyzes artifacts and deploys probes at the science station :: SR-M19 commands
+- UC-216 [E2] [WORKS] Pilot hears a pilot's story and hires them at the bar :: BAR tab lists four pilots with their histories; hiring ALTAIR cost 300c and put them on the wing
+- UC-217 [E2] [WORKS] Pilot analyzes artifacts and deploys probes at the science station :: bought 2 probes for 6 cores at the Athenaeum, deployed one on Halcyon mining 2 ore/min, every refusal names its requirement
 - UC-218 [E2] [WORKS] The galaxy persists across reloads and generations :: SR-M1, SR-M14
 
 ### E3 EGOSOFT
@@ -81,7 +81,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-503 [E5] [WORKS] Passenger gets angry when ignored and shocks the screen; calms when obeyed :: noteAdvice, 4 tiers
 - UC-504 [E5] [WORKS] AI pilots trade, hunt, learn steering and targets :: think(), IRON_LAW_AUDIT
 - UC-505 [E5] [WORKS] Pilot inspects the minds: knowledge store, Kripke frame, coop proof, growth, ToM :: 12 commands run in-page
-- UC-506 [E5] [PARTLY] Pilots talk aloud and the Pilot can speak back :: browser voices
+- UC-506 [E5] [PARTLY] Pilots talk aloud and the Pilot can speak back :: both paths present (speech recognition supported, voice output togglable) but audio itself cannot be verified from here - the honest status
 - UC-507 [E5] [WORKS] The minds write validated rules into the game :: gamemod ledger
 
 ### E6 SHELL

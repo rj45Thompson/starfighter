@@ -8,7 +8,7 @@ flowchart LR
     UC_103["UC-103 WORKS\nDrone fetches loose gems and cuts seams into rocks"]
     UC_104["UC-104 WORKS\nMined gems fill a gem bar; a full bar banks an upgrade point"]
     UC_105["UC-105 WORKS\nPilot spends a point on one of eight stats with keys 1-8, in flight"]
-    UC_106["UC-106 PARTLY\nPilot buys weapon / engine / hull levels with credits in flight"]
+    UC_106["UC-106 WORKS\nPilot buys weapon / engine / hull levels with credits in flight"]
     UC_107["UC-107 WORKS\nA maxed ship offers the next tier; Pilot chooses a hull anywhere"]
     UC_108["UC-108 WORKS\nPilot dies; gems and credits spill; Pilot respawns as a Scout in the belt"]
     UC_109["UC-109 WORKS\nPilot reads rocks, gems, ships and drones on the radar"]
@@ -31,8 +31,8 @@ flowchart LR
     UC_213["UC-213 WORKS\nReputation, customs, contraband, fence"]
     UC_214["UC-214 WORKS\nPilot ranks up and spends skill points"]
     UC_215["UC-215 WORKS\nPilot plays a text quest at a planet"]
-    UC_216["UC-216 PARTLY\nPilot hears rumours and hires a wingman at the bar"]
-    UC_217["UC-217 PARTLY\nPilot analyzes artifacts and deploys probes at the science station"]
+    UC_216["UC-216 WORKS\nPilot hears a pilot's story and hires them at the bar"]
+    UC_217["UC-217 WORKS\nPilot analyzes artifacts and deploys probes at the science station"]
     UC_218["UC-218 WORKS\nThe galaxy persists across reloads and generations"]
   end
   subgraph E3["E3 EGOSOFT"]
@@ -76,7 +76,7 @@ flowchart LR
   Pilot --> UC_105
   style UC_105 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_106
-  style UC_106 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  style UC_106 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_107
   style UC_107 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_108
@@ -118,9 +118,9 @@ flowchart LR
   Pilot --> UC_215
   style UC_215 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_216
-  style UC_216 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  style UC_216 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_217
-  style UC_217 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  style UC_217 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_218
   style UC_218 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_301

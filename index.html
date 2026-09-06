@@ -4624,7 +4624,11 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const unid=P.artifactsUnid||[]; if(!need(unid.length,'nothing unidentified aboard')) return;
     const nDo=(a[1]==='all')?unid.length:1;
     let done=0; for(let i=0;i<nDo;i++){ if((P.cores||0)<CFG.ANALYZE_COST_CORES) break;
-      P.cores-=CFG.ANALYZE_COST_CORES; const key=unid.shift(); (P.artifacts=P.artifacts||[]).push(key); done++;
+      const key=unid.shift();
+      // a key the ARTIFACTS table no longer carries (an older save, a renamed relic) used to throw here and take the
+      // command with it. Say what happened, charge nothing, keep going.
+      if(!ARTIFACTS[key]){ term(`⚗ the lab cannot identify "${String(key).replace(/</g,'&lt;')}" - that relic is not in the Athenaeum's catalogue. Discarded.`,'err'); continue; }
+      P.cores-=CFG.ANALYZE_COST_CORES; (P.artifacts=P.artifacts||[]).push(key); done++;
       term(`⚗ ANALYSIS COMPLETE: it's <b>${ARTIFACTS[key].n}</b> - ${ARTIFACTS[key].desc} (equip: artifacts ${key})`,'sys'); }
     if(!done) term(`analysis costs ${CFG.ANALYZE_COST_CORES} cores each (you hold ${P.cores||0}) - salvage cores from Hegemon wrecks`,'err');
     else term(`  <span style="opacity:.6">${unid.length} still unidentified · ${P.cores||0} cores left</span>`,'sys'); return; }
