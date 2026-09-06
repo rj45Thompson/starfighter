@@ -313,8 +313,8 @@
     shoot: function (opt) {
       var key = (opt.variant === 'enemy') ? 'weapon_enemy' : 'weapon_player';
       if (playSample(key, opt.vol)) return;
-      voice({ wave: 'square', freq: 760, f2: 1500, mWave: 'square', mRatio: 1.5, mDepth: 240, mDepthEnd: 0,
-              a: 0.004, d: 0.02, r: 0.06, dur: 0.11, gain: 0.34 }, opt.vol, opt.when);
+      voice({ wave: 'square', freq: 620, f2: 1100, mWave: 'square', mRatio: 1.5, mDepth: 180, mDepthEnd: 0,
+              a: 0.004, d: 0.02, r: 0.06, dur: 0.1, gain: 0.18 }, opt.vol, opt.when);   // softened 2026-09-06: lower sweep, half the gain (only the fallback when the sample is not decoded)
     },
     // Bullet-on-hull: dull, short, downward - a body thud, not a ring.
     hit: function (opt) {
@@ -334,9 +334,9 @@
     // Pickup / gem: bright two-note "coin" - the classic up-a-fifth blip.
     pickup: function (opt) {
       seq([
-        { freq: 988, dur: 0.07, r: 0.04 },
-        { freq: 1319, when: 0.06, dur: 0.13, r: 0.09 }
-      ], { wave: 'square', mWave: 'square', mRatio: 3, mDepth: 60, a: 0.003, d: 0.02, gain: 0.3 }, opt.vol);
+        { freq: 494, dur: 0.06, r: 0.04 },
+        { freq: 659, when: 0.05, dur: 0.11, r: 0.08 }
+      ], { wave: 'triangle', mWave: 'sine', mRatio: 2, mDepth: 30, a: 0.004, d: 0.02, gain: 0.11 }, opt.vol);   // user 2026-09-06 "make the high beep sounds softer": an octave down, triangle not square, a third of the gain - the mining bots fire this on every gem
     },
     // Dock: warm 3-note major arpeggio (a soft "you have arrived" chord).
     dock: function (opt) {
@@ -353,7 +353,7 @@
     },
     // UI: tiny high click.
     ui: function (opt) {
-      voice({ wave: 'square', freq: 1500, f2: 1400, a: 0.001, d: 0.008, r: 0.02, dur: 0.04, gain: 0.16 }, opt.vol, opt.when);
+      voice({ wave: 'triangle', freq: 900, f2: 820, a: 0.001, d: 0.008, r: 0.02, dur: 0.035, gain: 0.05 }, opt.vol, opt.when);   // softened 2026-09-06 (was a 1500 Hz square at 0.16)
     },
     // Alarm: urgent two-tone (hi/lo) square siren - for threats.
     alarm: function (opt) {
