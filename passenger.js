@@ -87,6 +87,48 @@ if(S.counts.studied==null) S.counts.studied=0;
 if(!S.host) S.host={};                                                // migrate pre-ponder states
 if(S.ponder_on==null) S.ponder_on=true;
 if(S.advice_on==null) S.advice_on=true;                               // the worm advises by default (user asked for it)
+if(!S.mood) S.mood={ level:0, key:null, count:0, ignored:0 };        // 2026-09-06: the anger machine (see noteAdvice)
+
+// ---- THE BRAIN + THE VOICE (2026-09-06) ----------------------------------------------------------------------------
+// brain/brain.js runs the anchor reasoning engine over the novel, the lore, the live game and (when its server is up)
+// the Wikidata-lineage shards; it calls onBrain() when built. brain/voice.json holds the personality: mood tiers, the
+// lines for being ignored, the prefixes per answer tier, the mission phrasing. Data, filled from telemetry - no line
+// here is composed by code. Until either arrives, the older composer path below still answers, and says that it is.
+let brain = null, VOICE = null;
+(function(){ try{ fetch('brain/voice.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(v=>{ VOICE=v; }).catch(()=>{}); }catch(e){} })();
+function moodTier(){ const lv=Math.min(3,(S.mood&&S.mood.level)||0); return (VOICE&&VOICE.moods&&VOICE.moods[lv])||null; }
+function pickLine(arr){ return (arr&&arr.length)?arr[Math.floor(Math.random()*arr.length)]:''; }
+function fill(tpl, slots){ return String(tpl||'').replace(/\{(\w+)\}/g,(m,k)=>(slots&&slots[k]!=null)?slots[k]:m); }
+function voicePrefix(kind, tier){ if(!VOICE) return ''; const mood=moodTier(); const mp=mood?pickLine(mood.prefix):''; const ap=(VOICE.answered&&VOICE.answered[tier])?pickLine(VOICE.answered[tier]):''; return mp+ap; }
+// ANGER (user 2026-09-06 "make the parasite shock your screen and get angry if you do not listen to it"): the host calls
+// this each time it re-speaks an urgent advice (same key = the pilot has not acted) and with null when the condition
+// has cleared. Two repeats raise the mood one tier; a cleared condition drops it to calm with an 'obeyed' line.
+// Returns null, {obeyed,text} or {level,name,shock,text}; the host shows the text and applies the shock.
+function noteAdvice(a, t){
+  if(!S.mood) S.mood={ level:0, key:null, count:0, ignored:0 };
+  if(!a || a.urgency<1){
+    if(S.mood.level>0){ const line=pickLine(VOICE&&VOICE.obeyed); S.mood.level=0; S.mood.key=null; S.mood.count=0; save(); return line?{ obeyed:true, text:line }:null; }
+    if(S.mood.key){ S.mood.key=null; S.mood.count=0; save(); } return null; }
+  if(a.key===S.mood.key){ S.mood.count++; if(S.mood.count>=2 && S.mood.count%2===0 && S.mood.level<3){ S.mood.level++; S.mood.ignored++; } }
+  else { S.mood.key=a.key; S.mood.count=1; }
+  save();
+  const tier=moodTier(); if(!tier||S.mood.level===0) return null;
+  const short=String(a.text||'').split(/[.!?]/)[0].trim();
+  const text=fill(pickLine(tier.ignored), { advice_short: short.charAt(0).toLowerCase()+short.slice(1), hull_pct: (t&&t.maxHull)?Math.round(100*t.hull/t.maxHull):'?', ignored: S.mood.ignored });
+  return { level:S.mood.level, name:tier.name, shock:tier.shock, text };
+}
+// MISSION CHOICE (user 2026-09-06 "make the parasite automatically choose your mission and let it tell you why"): the
+// brain scores the postings from measured numbers (reward, distance, Synod ships near the target, the pilot's gun and
+// hull); this puts the reasons into the Passenger's mouth from voice.json and records the choice as facts (brain).
+function chooseMission(cands, t){
+  if(!brain||!brain.chooseMission) return null;
+  const c=brain.chooseMission(cands, t); if(!c) return null;
+  const tpl=(VOICE&&VOICE.mission)?pickLine(VOICE.mission.chosen):'{title}. {why}';
+  c.spoken=fill(tpl,{ title:c.title, why:c.summary });
+  c.others=(c.others||[]).map(o=>({ ...o, text: fill((VOICE&&VOICE.mission&&VOICE.mission.rejected)||'I passed on {title}: {why}.', { title:o.title, why:o.why }) }));
+  conv.push({q:'(mission board)', a:c.spoken}); if(conv.length>CFG.CONV_CAP*2) conv.shift(); save();
+  return c;
+}
 function save(){ try{ localStorage.setItem(CFG.STATE_KEY, JSON.stringify(S)); }catch(e){} }
 
 let hooks = { registry:[], telemetry:null, speak:null, say:null };   // injected at init by the game
@@ -365,8 +407,30 @@ async function route(text){
     const usage = h.usage? ` Usage: ${h.usage}.` : '';
     return { kind:'help', reply: `You are reaching for \`${h.name}\` - ${h.desc||'a command I know'}.${usage} Say it plainly and I will do the rest.` };
   }
+  // THE BRAIN FIRST (2026-09-06): the reasoning engine over the novel / lore / live game, then the world shards. A
+  // CONCLUDE is spoken with its tier's prefix; an ASK is put to the pilot; a REFUSE from every tier falls through to
+  // the older composer with a NOTE that says so - the transcript travels with every reply so the host can print it.
+  if(brain && brain.ready){
+    // "you" / "I" are the reader and the system to the engine's planner (it refuses pronoun subjects on purpose); in
+    // this cockpit they are the Passenger and the pilot, both entities of the game tier - so the question is rewritten
+    // to name them, and the rewrite is visible in the RESTATE line
+    let asked=text;
+    if(/\b(what|who)\s+are\s+you\b|\byour\s+(story|origin|past|kind)\b|\bwho\s+am\s+i\s+talking\s+to\b/i.test(text)) asked='who is the Passenger';
+    else if(/\bwho\s+am\s+i\b|\bmy\s+(story|past|backstory|history)\b|\bwhere\s+(am\s+i|do\s+i\s+come)\s+from\b|\babout\s+me\b/i.test(text)) asked='who is the pilot';
+    else asked=text.replace(/\byourself\b/ig,'the Passenger').replace(/\byou\b/ig,'the Passenger').replace(/\bmyself\b/ig,'the pilot').replace(/\bme\b/ig,'the pilot').replace(/\bmy ship\b/ig,'the pilot').replace(/\bI\b/g,'the pilot');
+    let r=null; try{ r=await brain.ask(asked,{ grow:true }); }catch(e){ r={ answered:false, steps:[], refuse:'the engine threw: '+(e&&e.message||e) }; }
+    if(r.answered){ const reply=voicePrefix('answered', r.tier)+r.reply; conv.push({q:text,a:reply}); if(conv.length>CFG.CONV_CAP*2) conv.shift(); S.counts.asks++; save(); return { kind:'brain', reply, tier:r.tier, steps:r.steps, ms:r.ms }; }
+    if(r.ask){ const reply=voicePrefix('answered','game')+r.ask.text; return { kind:'brain-ask', reply, tier:'ask', steps:r.steps, options:r.ask.options||null, ms:r.ms }; }
+    const why=(r.refuse||'no chain')+(r.worldOffline?'; the old libraries are offline ('+String(r.worldWhy||'').split(' - ')[0]+')':'');
+    // the composer only when something it holds actually overlaps the question; otherwise the refusal itself is spoken
+    const grounded=LORE.concat(PLAYER_STORY, stateFacts(), telemetryFacts());
+    if(bestOverlap(text, grounded)>0){ const s=await speakAnswer(text); return { kind:'passenger', reply:s.reply, tier:s.tier, steps:r.steps, note:'no proof for that - '+why+' - so this is my lattice speaking from what it holds, not a verified chain', ms:r.ms }; }
+    const reply=fill(pickLine(VOICE&&VOICE.refused)||'I do not know, and I will not pretend to. {reason}', { reason: why });
+    conv.push({q:text,a:reply}); if(conv.length>CFG.CONV_CAP*2) conv.shift(); save();
+    return { kind:'brain-refuse', reply, tier:'refused', steps:r.steps, ms:r.ms };
+  }
   const s = await speakAnswer(text);
-  return { kind:'passenger', reply: s.reply, tier: s.tier };
+  return { kind:'passenger', reply: s.reply, tier: s.tier, note: brain?'my deeper mind is still building':'my deeper mind (brain/brain.js) did not load' };
 }
 
 function powers(){   // the in-fiction honesty ledger
@@ -384,6 +448,17 @@ function powers(){   // the in-fiction honesty ledger
 window.PASSENGER = {
   init(h){ hooks = Object.assign(hooks, h||{}); },
   route, onEvent, powers, ponder, advise, powerAdvice,
+  // 2026-09-06: the brain and the voice
+  canon(){ return { LORE: LORE.slice(), PLAYER_STORY: PLAYER_STORY.slice() }; },   // authored canon, for the brain's game tier
+  onBrain(b){ brain=b; },
+  brainStatus(){ return brain?brain.status():null; },
+  chooseMission, noteAdvice,
+  // the board refused the brain's first choice (rank, freshness) and the host accepted another posting: record THAT one as the
+  // mission the facts describe, and say so - the recorded reason is the refusal, not an invented preference
+  missionTaken(cand, choice){ if(!cand) return null; const why=[`the board refused ${choice?choice.title:'my first choice'}, so this is what it would give us`];
+    if(brain&&brain.refreshLive) brain.refreshLive((typeof window!=='undefined')?window.HOST:null, { mission:{ type:cand.type, title:cand.title, reward:cand.reward, targetName:cand.targetName, why } });
+    return `The board would not give us ${choice?choice.title:'my first choice'}. We take ${cand.title} - ${cand.reward}c, ${cand.dist!=null?Math.round(cand.dist)+' units out':'distance unknown'}.`; },
+  mood(){ return S.mood?{ ...S.mood, name:(moodTier()||{}).name }:null; },
   setPonder(on){ S.ponder_on=!!on; save(); return S.ponder_on; },
   setAdvice(on){ S.advice_on=!!on; save(); return S.advice_on; },
   adviceOn(){ return S.advice_on!==false; },

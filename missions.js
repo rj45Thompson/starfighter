@@ -549,6 +549,10 @@
     accept: accept,
     abandon: abandon,
     active: function () { return activeM; },
+    // 2026-09-06: the Passenger chooses the mission (BRAIN.chooseMission) - it needs the postings as DATA, not the board's HTML.
+    // idx is the 1-based number accept() takes; tgt is passed through as-is (planetName / shipRef / ...).
+    postings: function () { return board.map(function (m, i) { return { idx: i + 1, id: m.id, type: m.type, rank: m.rank, title: m.title, desc: m.desc, reward: m.reward, score: m.score, tgt: m.tgt || {} }; }); },
+    playerRank: function () { return playerRankIdx(); },   // so a chooser can skip the postings accept() would refuse on rank
     onKill: onKill,
     onAwayVictory: onAwayVictory,
     onStrongholdDown: onStrongholdDown,

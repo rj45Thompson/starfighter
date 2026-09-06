@@ -49,6 +49,22 @@ Where the claims are audited:
 - `REQUIREMENTS_SR.md`: the Space Rangers systems mapped onto the game, with status.
 - `bench_results.json`: the headless bench run (78/78 suite, 581 claims at the last generation stamp in the file).
 
+## The Passenger's brain (2026-09-06)
+
+The parasite no longer composes sentences by word overlap. `brain/brain.js` runs the anchor reasoning engine
+(`brain/engine/`, the same code as the anchor2 rebuild) inside the game over two tiers of facts:
+- GAME: the novel THE LANES THAT BURNED (`novel_graph.json`, 3,220 subject-verb-object triples over 25 chapters),
+  the pilot / faction / world bios (`lore_bios.json`), the Passenger's own canon, and the live game (planets,
+  systems, ships, missions, the pilot) refreshed every few seconds. Every fact carries its source (chapter, file,
+  or "the game, live"); canon is labelled as canon, never as a measured agreement.
+- WORLD: the 7.7-million-entity Wikidata-lineage store anchor2 exports, read from `D:/code/anchor2/serve.py`
+  (a CORS static server on 127.0.0.1:8793) when it is running. Offline, the Passenger says so.
+Every reply prints the transcript (RESTATE, LINK, LOOKUP, RANK, CONCLUDE, or REFUSE / ASK) in the PARASITE tab
+before the spoken line. A name the game knows is answered by the game, never by a namesake from the libraries.
+The Passenger chooses the mission from the board (distance to the target, Synod ships near it, reward, the pilot's
+gun and hull), says why, and records the reasons as facts. Ignored urgent advice raises its mood through four tiers
+(`brain/voice.json`, data not code) with a screen shock at each; acting on it drops the mood back.
+
 ## 2026-09-06 pass (generated art, HUD)
 
 Every piece of art that could be generated was generated with the tools already on this machine, at the highest

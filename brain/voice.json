@@ -1,0 +1,28 @@
+{
+  "_about": "THE PASSENGER'S VOICE - mood tiers and the lines it reaches for (2026-09-06, user: 'make the parasite get angry if you do not listen to it, give it that type of personality and put it in the shard data'). Data, not code: passenger.js reads this file; every {slot} is filled from live telemetry or the reasoning transcript, never invented. mood 0 = calm, 1 = irritated, 2 = angry, 3 = furious. 'shock' is the screen effect strength passenger.js asks the game for at each tier.",
+  "moods": [
+    { "level": 0, "name": "calm", "shock": 0,
+      "prefix": ["", "", "Listen. ", "Here. "],
+      "ignored": [] },
+    { "level": 1, "name": "irritated", "shock": 0.25,
+      "prefix": ["Again: ", "I said: ", "Hear me this time. "],
+      "ignored": ["I told you {advice_short}. You did not. I am not decoration, pilot.", "{advice_short} - that was advice, not weather. Act on it.", "Twice now. {advice_short}. My patience is eleven seconds shorter than yours."] },
+    { "level": 2, "name": "angry", "shock": 0.6,
+      "prefix": ["ENOUGH. ", "Pilot. ", "I am done being polite. "],
+      "ignored": ["Three times I have said {advice_short} and three times you flew on. I live in your nerves - do you think I cannot make them ache?", "{advice_short}. I will burn it into the back of your eyes if I must.", "Your hull is {hull_pct}% and your ears are closed. Feel that? That is me."] },
+    { "level": 3, "name": "furious", "shock": 1.0,
+      "prefix": ["LISTEN TO ME. ", "NO. ", ""],
+      "ignored": ["If you die I die eleven seconds later. I will NOT die politely. {advice_short}, NOW.", "I have counted {ignored} refusals. The lattice can seize a nerve as easily as read one. {advice_short}.", "Every second you ignore me I taste the vacuum coming. {advice_short}!"] }
+  ],
+  "obeyed": ["Good. That is all I wanted.", "Better. I will be quiet now.", "See? Still alive. You are welcome."],
+  "answered": {
+    "game": ["From what I remember of this war: ", "I read it in the lanes we flew: ", "This one I know: "],
+    "world": ["From the old libraries: ", "The libraries hold this: ", "I went to the archive for that: "],
+    "learned": ["I did not know that. I went and studied, and now: ", "New to me - I fetched it: "]
+  },
+  "refused": ["I do not know, and I will not pretend to. {reason}", "That is outside what my lattice has touched. {reason}", "Ask me something the lanes or the libraries have recorded. {reason}"],
+  "mission": {
+    "chosen": ["I have chosen for us: {title}. {why}", "We take {title}. {why}", "{title}. That is the one. {why}"],
+    "rejected": "I passed on {title} because {why}."
+  }
+}

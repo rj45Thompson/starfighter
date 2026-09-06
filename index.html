@@ -267,7 +267,7 @@
      script's boot code (makeShip → nothing here, INH.awaken() at end) and function bodies reference them. -->
 <script src="speech_tier.js?v=20260714c"></script>
 <script src="inhabitant.js?v=20260714c"></script>
-<script src="passenger.js?v=20260905a"></script>
+<script src="passenger.js?v=20260906a"></script>
 <script src="gamemod.js?v=20260714c"></script>
 <script src="chatter.js?v=20260714c"></script>
 <script src="speech_gen.js?v=20260714c"></script>
@@ -295,13 +295,15 @@
 <script src="tami_battle_ui.js?v=20260714c"></script>
 <script src="power_panel.js?v=20260906b"></script>
 <script src="panels.js?v=20260906b"></script>
+<script type="module" src="brain/brain.js?v=20260906c"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
+
 <script src="item_icons.js?v=20260714c"></script>
 <script src="engbay.js?v=20260714c"></script>
 <!-- SR wave (user 2026-07-07): Rise-of-the-Dominators-scale galaxy - 2D starmap+territory+generations · ground
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
 <script src="starmap.js?v=20260714c"></script>
 <script src="conquest.js?v=20260714c"></script>
-<script src="missions.js?v=20260714c"></script>
+<script src="missions.js?v=20260906a"></script>
 <script src="planetmenu.js?v=20260714c"></script>
 <script src="textquests.js?v=20260714c"></script>
 <script>
@@ -348,6 +350,8 @@ const CFG = {
   START_IN_BELT:true,                              // user 2026-09-06 "start the user off in the deep asteroid cluster": a boot and a generation reset put the player inside the Ceres Belt's disc
   MINING_BOTS:2, BOT_SPEED:46, BOT_ACCEL:90, BOT_GEM_R:140, BOT_MINE_R:120, BOT_STANDOFF:3.5, BOT_GRAB_R:2.6, BOT_IDLE_R:9, BOT_LASER_COL:0x7fe8ff,   // user 2026-09-06: mining bots shoot out of the ship, fetch gems and laser SEAMS into rocks
   BOT_SEAM_RATE:0.55, SEAM_DMG_MULT:3.0,           // a bot's laser fills a rock's seam (0..1) at this rate (slower on big rocks); your guns do (1 + SEAM_DMG_MULT x seam) to a seamed rock, so a full seam splits it in a quarter of the shots
+  BRAIN_WORLD_URL:'http://127.0.0.1:8793/data/',   // THE BRAIN's world tier: anchor2's exported shards, served by D:/code/anchor2/serve.py (CORS). Offline = the Passenger says so; nothing substituted. 127.0.0.1, not localhost: Chrome resolved localhost to ::1 first and the server only listened on IPv4 (measured 2026-09-06: "Failed to fetch" on localhost, 200 on 127.0.0.1)
+  PARASITE_SHOCK:true, SHOCK_DUR:0.7, BRAIN_STEPS_SHOWN:12,               // user 2026-09-06 "make the parasite shock your screen ... if you do not listen": a violet flash + camera rock scaled by the mood tier (brain/voice.json)
   MARKER_EDGE_PAD:56,                              // mission marker: how far inside the frame the edge-pinned pointer sits (px)
   MISSION_AUTO:true, MISSION_AUTO_S:5,             // user 2026-09-06: with no contract held, accept the first posting the rank allows every MISSION_AUTO_S seconds, so the tracker always points somewhere
   SHOP_AUTO:true, SHOP_SNOOZE_S:60,                // user 2026-09-06: the SHOP panel opens itself when an upgrade is affordable (no docking); closing it by hand snoozes it this long
@@ -2869,7 +2873,8 @@ function passengerAdviseTick(dt){
   if(!window.PASSENGER||!PASSENGER.adviceOn||!PASSENGER.adviceOn()) return;
   _advClock+=dt||0; if(_advClock<3) return; _advClock=0;                 // assess ~every 3s
   const t0=passengerTelemetry(); passengerPowerTick(t0);                 // R2D2: try to help with power BEFORE the spoken-advice gate below (its own cooldown/urgency, independent of the advice text cadence)
-  const a=PASSENGER.advise(t0); if(!a) return;
+  const a=PASSENGER.advise(t0);
+  if(!a||a.urgency<1){ if(PASSENGER.noteAdvice){ const m=PASSENGER.noteAdvice(null,t0); if(m&&m.obeyed){ paraLine('worm', `<span style="color:#9fe6b8">${String(m.text).replace(/</g,'&lt;')}</span>`); if(window.CHATTER) CHATTER.voiceWorm(m.text); } } if(!a) return; }   // the pressing condition has cleared: the mood drops back to calm (2026-09-06)
   const now=(typeof T0!=='undefined')?T0:0;
   const cooldown = a.urgency>=2? 8 : (a.urgency>=1? 16 : 30);            // urgent threats repeat sooner
   if(a.key===_advLastKey && (now-_advLastT)<cooldown*3) return;         // don't repeat the same advice too often
@@ -2878,8 +2883,20 @@ function passengerAdviseTick(dt){
     const col = a.urgency>=2?'#ff9a9a':(a.urgency>=1?'#ffcf8a':'#c9a0ff');
     paraLine('worm', `<span style="color:${col}">▸ ${String(a.text).replace(/</g,'&lt;')}</span>`);
     if(window.CHATTER) CHATTER.voiceWorm(a.text);   // BUGFIX 2026-07-08: same dead CHATTER.voiceOn()/speakAloud() call as passengerPowerTick above - see that fix's comment
+    // ANGER (2026-09-06): the same urgent advice spoken again means the pilot did not act on it
+    if(PASSENGER.noteAdvice){ const mood=PASSENGER.noteAdvice(a, t0); if(mood&&!mood.obeyed){ paraLine('worm', `<span style="color:#ff6ab0;font-weight:800">${String(mood.text).replace(/</g,'&lt;')}</span>`); parasiteShock(mood.shock); if(window.CHATTER) CHATTER.voiceWorm(mood.text); } }
   }
 }
+// THE SHOCK (user 2026-09-06): a violet vignette + the same camera rock a hull hit gives, scaled by the mood tier. It is
+// feedback, not damage - the hull is untouched. #shockfx is its own overlay so it never fights the red hit flash.
+let _shockT=0, _shockMag=0; const shockfxEl=(function(){ const d=document.createElement('div'); d.id='shockfx'; d.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0'; document.body.appendChild(d); return d; })();
+function parasiteShock(strength){ if(!CFG.PARASITE_SHOCK||!(strength>0)) return; _shockMag=Math.min(1,strength); _shockT=CFG.SHOCK_DUR;
+  hitfxRX=0; hitfxFZ=-0.4; hitfxMag=Math.max(hitfxMag,0.4+0.6*_shockMag); hitfxT=Math.max(hitfxT,CFG.SHOCK_DUR*0.6);   // borrow the hit-rock (the red flash under it is far dimmer than the violet)
+  if(window.SOUND) try{ SOUND.play('alarm',{vol:0.25+0.35*_shockMag}); }catch(e){} }
+function updateShockFx(dt){ if(_shockT<=0) return; _shockT=Math.max(0,_shockT-dt); const k=_shockT/CFG.SHOCK_DUR, flick=0.75+0.25*Math.sin(T0*60);
+  shockfxEl.style.opacity=(k*_shockMag*flick).toFixed(3);
+  shockfxEl.style.background=`radial-gradient(circle at 50% 50%, rgba(170,60,255,0) 30%, rgba(150,40,255,${(0.45*_shockMag).toFixed(2)}) 70%, rgba(255,80,220,${(0.8*_shockMag).toFixed(2)}) 100%)`;
+  if(_shockT<=0) shockfxEl.style.opacity='0'; }
 async function passengerSpeak(req){   // Qwen tier via the speech sidecar; server-side entity/number guard applies
   if(!TAMI_SPEAK.alive) return null; const j=await TAMI_SPEAK.speak(req); return j&&j.reply?j.reply:null; }
 // ⚓ DOCK MENU (user 2026-07-07: "when you dock you should get a new terminal menu that makes buying/selling/
@@ -2933,7 +2950,14 @@ async function parasiteRoute(text){
         }catch(e){ /* fall through to the plain refusal */ }
       }
       paraLine('worm', String(m.why).replace(/</g,'&lt;')); paraBusy=false; return; }
-    const r=await PASSENGER.route(text); paraLine('worm', String(r.reply||'…').replace(/</g,'&lt;'));
+    const r=await PASSENGER.route(text);
+    // THE BRAIN's transcript (2026-09-06): every step the engine actually took, dimmed, before the spoken line - the
+    // same RESTATE / LINK / LOOKUP / RANK / CONCLUDE lines the anchor demo shows; [game] or [world] names the tier
+    if(r.steps&&r.steps.length){ const shown=r.steps.slice(0,CFG.BRAIN_STEPS_SHOWN); for(const s of shown) paraLine('worm', `<span style="opacity:.62;font-size:10.5px">[${s.tier}] <b>${s.step}</b> ${String(s.text||'').replace(/</g,'&lt;').slice(0,260)}</span>`);
+      if(r.steps.length>shown.length) paraLine('worm', `<span style="opacity:.5;font-size:10px">… ${r.steps.length-shown.length} more step(s) not shown (CFG.BRAIN_STEPS_SHOWN)</span>`); }
+    if(r.note) paraLine('worm', `<span style="opacity:.6;font-size:10.5px">(${String(r.note).replace(/</g,'&lt;')})</span>`);
+    paraLine('worm', String(r.reply||'…').replace(/</g,'&lt;'));
+    if(r.options&&r.options.length) paraLine('worm', `<span style="opacity:.7;font-size:10.5px">readings: ${r.options.slice(0,6).map(o=>String(o.label)+(o.desc?' ('+String(o.desc).replace(/</g,'&lt;').slice(0,60)+')':'')).join(' · ')}</span>`);
     schedulePonder(text);
   }
   catch(e){ paraLine('worm','Something in me misfired. Say it again.'); console.warn('PASSENGER.route',e); }
@@ -2946,7 +2970,7 @@ function schedulePonder(text){
   PASSENGER.ponder(text).then(p=>{ if(p) paraLine('worm','<i style="opacity:.72">⌁ '+String(p).replace(/</g,'&lt;')+'</i>'); }).catch(()=>{});
 }
 function passengerInit(){ if(!window.PASSENGER) return;
-  PASSENGER.init({ registry:PASSENGER_REGISTRY, telemetry:passengerTelemetry, speak:passengerSpeak, latent:(t)=>TAMI_SPEAK.latent(t) });   // the old-libraries study channel (labeled GIVEN)
+  PASSENGER.init({ registry:PASSENGER_REGISTRY, telemetry:passengerTelemetry, speak:passengerSpeak, latent:(t)=>TAMI_SPEAK.latent(t), shock:parasiteShock });   // the old-libraries study channel (labeled GIVEN); shock = the screen effect for the anger tiers (2026-09-06)
   maybeAwaken(); }
 function maybeAwaken(force){ const lines=PASSENGER.introLines(force);
   if(lines.length<=1){ paraLine('worm', lines[0]); return; }                       // re-greeting on later boots
@@ -5642,7 +5666,22 @@ let _missionAutoT=0;
 function missionAutoTick(dt){ if(!CFG.MISSION_AUTO||!window.MISSIONS||!MISSIONS.accept||!MISSIONS.active) return;
   _missionAutoT-=dt; if(_missionAutoT>0) return; _missionAutoT=CFG.MISSION_AUTO_S;
   const P=ships[0]; if(!P||!P.alive||MISSIONS.active()) return;
-  for(let i=1;i<=4;i++){ const r=MISSIONS.accept(i); if(r&&r.ok){ term('★ Tracker locked: '+r.msg+' - follow the arrow at the top of the screen (abandon to drop it).','sys'); return; } if(r&&/no postings|no such posting/.test(r.msg||'')) return; } }
+  // THE PASSENGER CHOOSES (user 2026-09-06 "make the parasite automatically choose your mission and let it tell you why"):
+  // every posting becomes a candidate with MEASURED numbers - distance to its target, Synod ships within 300 u of it -
+  // and the brain ranks them against the pilot's gun and hull; the choice and its reasons are spoken in the PARASITE tab
+  // and recorded as facts ("why this mission" is then answerable). Postings the rank refuses are simply skipped.
+  const rank=MISSIONS.playerRank?MISSIONS.playerRank():99;
+  const posts=(MISSIONS.postings?MISSIONS.postings():[]).filter(m=>m.rank==null||m.rank<=rank); if(!posts.length) return;   // only what the board would let this rank accept
+  const cands=posts.map(m=>{ const tp=postingTargetPos(m); const dist=tp?P.pos.distanceTo(tp):null; const danger=tp?ships.filter(s=>s.alive&&s.team==='pirate'&&s.pos.distanceTo(tp)<300).length:0;
+    return { idx:m.idx, type:m.type, title:m.title, reward:m.reward, rank:m.rank, dist, danger, targetName:(m.tgt&&(m.tgt.planetName||(m.tgt.shipRef&&m.tgt.shipRef.name)))||null }; });
+  const choice=(window.PASSENGER&&PASSENGER.chooseMission)?PASSENGER.chooseMission(cands, passengerTelemetry()):null;
+  const order=choice?[choice.idx,...cands.map(c=>c.idx).filter(i=>i!==choice.idx)]:cands.map(c=>c.idx);
+  for(const i of order){ const r=MISSIONS.accept(i); if(r&&r.ok){
+      if(choice&&choice.idx===i){ paraLine('worm', String(choice.spoken).replace(/</g,'&lt;')); if(window.CHATTER) CHATTER.voiceWorm(choice.spoken); for(const o of choice.others) paraLine('worm', `<i style="opacity:.62">${String(o.text).replace(/</g,'&lt;')}</i>`); }
+      else { const taken=cands.find(c=>c.idx===i); const line=(window.PASSENGER&&PASSENGER.missionTaken)?PASSENGER.missionTaken(taken, choice):null; if(line){ paraLine('worm', String(line).replace(/</g,'&lt;')); if(window.CHATTER) CHATTER.voiceWorm(line); } term('★ '+r.msg+' - follow the marker.','sys'); }
+      return; }
+    if(r&&/no postings/.test(r.msg||'')) return; } }
+function postingTargetPos(m){ const t=(m&&m.tgt)||{}; if(t.shipRef&&t.shipRef.alive&&t.shipRef.pos) return t.shipRef.pos; if(t.planetName){ const p=findPlanet(t.planetName); return p?p.pos:null; } if(m&&m.type==='ASSAULT') return (typeof stronghold!=='undefined'&&stronghold)?stronghold.pos:null; return null; }
 
 // THE SHOP (user 2026-09-06): appears on its own when an upgrade is affordable, buys without docking, closes when
 // nothing is affordable. One PANELS panel, edge right; closing it by hand snoozes it for CFG.SHOP_SNOOZE_S so it
@@ -6947,7 +6986,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); shopTick(dt); updateFx(dt); miningBotsTick(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); shopTick(dt); updateFx(dt); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
