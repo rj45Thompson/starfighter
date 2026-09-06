@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T14:59:59",
+ "generated": "2026-09-06T15:24:42",
  "modules": [
   {
    "file": "acquire.js",
@@ -519,6 +519,31 @@
    "file": "coop_proof.js",
    "lines": 482,
    "classes": [],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
+  },
+  {
+   "file": "cybertron.js",
+   "lines": 263,
+   "classes": [
+    {
+     "name": "CYBERTRON",
+     "members": [
+      "CFG",
+      "CFGX",
+      "apply",
+      "measure",
+      "compare",
+      "ready",
+      "pathsFor",
+      "saved",
+      "shells"
+     ],
+     "memberTotal": 9
+    }
+   ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [],
@@ -2010,7 +2035,7 @@
   },
   {
    "file": "sim_harness.js",
-   "lines": 125,
+   "lines": 139,
    "classes": [
     {
      "name": "SIM",

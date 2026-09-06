@@ -1,0 +1,3637 @@
+{
+ "generated": "2026-09-06",
+ "games": [
+  {
+   "key": "starblast",
+   "name": "Starblast.io",
+   "studio": "Neuronality",
+   "note": "2016 browser multiplayer arcade miner/shooter; 2D top-down, match-scoped, no persistent galaxy"
+  },
+  {
+   "key": "x_series",
+   "name": "X4: Foundations",
+   "studio": "Egosoft",
+   "note": "2018; answered for X4 specifically (not X3: Terran Conflict), including released expansions"
+  },
+  {
+   "key": "space_rangers_2",
+   "name": "Space Rangers 2: Rise of the Dominators",
+   "studio": "Elemental Games",
+   "note": "2004; answers cover the HD: A War Apart re-release where sources referred to it"
+  },
+  {
+   "key": "elite_dangerous",
+   "name": "Elite Dangerous",
+   "studio": "Frontier Developments",
+   "note": "2014 onward, including Horizons and Odyssey and the 2025 Colonisation update"
+  },
+  {
+   "key": "freelancer",
+   "name": "Freelancer",
+   "studio": "Digital Anvil / Microsoft Game Studios",
+   "note": "2003; answered for the shipped vanilla game, NOT community mods such as Discovery"
+  },
+  {
+   "key": "eve_online",
+   "name": "EVE Online",
+   "studio": "CCP Games",
+   "note": "2003 onward, live service; answered for the current live game on Tranquility"
+  },
+  {
+   "key": "ftl",
+   "name": "FTL: Faster Than Light",
+   "studio": "Subset Games",
+   "note": "2012 including the free Advanced Edition; a roguelike where the ship is commanded, not piloted"
+  },
+  {
+   "key": "ev_nova",
+   "name": "Escape Velocity: Nova",
+   "studio": "Ambrosia Software / ATMOS",
+   "note": "2002; least-documented title here, so it carries the most recall and unknown"
+  }
+ ],
+ "features": [
+  {
+   "id": "F01",
+   "capability": "player directly pilots a single ship in real time",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/673260/Starblast/"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/392160/X4_Foundations/"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall",
+     "note": "orders/click-to-move on a 2D map, not direct stick piloting"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Manual_piloting",
+     "note": "real time, but click-to-orbit commands rather than analog piloting"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "manages systems and crew, never steers the ship"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Escape_Velocity_Nova"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-101",
+    "note": "pilot shoots a rock in flight; E1 loop is direct real-time control"
+   }
+  },
+  {
+   "id": "F02",
+   "capability": "ship movement carries momentum or inertia rather than instant-stop arcade handling",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Speed"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/4342110886679478891/",
+     "note": "flight-assist-off gives pseudo-Newtonian drift"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Elite_Dangerous"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Acceleration",
+     "note": "mass x agility gives real inertia and align time"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "ship auto-dodges by stat, there is no steering"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://geekinsider.com/escape-velocity-nova-review/"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "",
+    "note": "index.html:2456 flyStep integrates velocity: s.vel.addScaledVector(fwd, THRUST*...*dt) and position follows vel. Thrust adds to momentum; there is no instant-stop.",
+    "settledFrom": "code read 2026-09-06"
+   }
+  },
+  {
+   "id": "F03",
+   "capability": "player can divert ship power between weapons, engines and shields during flight",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://github.com/pmgl/starblast-modding/blob/master/README.md",
+     "note": "no power-diversion field in the documented ship API"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Power_Distributor",
+     "note": "pips allocate across SYS/ENG/WEP"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Capacitor",
+     "note": "one shared capacitor pool, no manual routing"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "reactor power reassigned live between systems"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": null,
+    "note": "POWERPANEL.setPower / readDivert / COL_WEAPONS-ENGINES-SHIELDS exist in model.json but no use case claims it works"
+   }
+  },
+  {
+   "id": "F04",
+   "capability": "shields or armour are directional and tracked per facing",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://github.com/pmgl/starblast-modding/blob/master/README.md"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/603017265648024588/",
+     "note": "hull shield plus per-component pools, not facings"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Shield_Generator",
+     "note": "one unified shield bubble"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Tanking",
+     "note": "resistance profiles by damage type, not facing"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Shields",
+     "note": "omnidirectional layered bubble"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": null,
+    "note": "ENGBAY.shieldArcSvg / POWERPANEL.readShieldArcs + CFG.ARCS in model.json; no use case covers per-facing damage"
+   }
+  },
+  {
+   "id": "F05",
+   "capability": "firing drains a regenerating energy pool that limits sustained fire",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Upgrades",
+     "note": "energy capacity and regen are upgradeable stats"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2826705145",
+     "note": "heat builds while firing and cools when idle"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Power_Distributor"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Capacitor"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "per-weapon cooldown timers, not a shared pool"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-110",
+    "note": "shooting drains energy and it regenerates (capLaser)"
+   }
+  },
+  {
+   "id": "F06",
+   "capability": "player can target and disable individual subsystems on an enemy ship",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://github.com/pmgl/starblast-modding/blob/master/README.md"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Boarding",
+     "note": "boarding prep disables engines and turrets"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/359320/discussions/0/483367798515287340/",
+     "note": "cycle subsystems: power plant, thrusters, FSD"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "capital-ship turrets are individually targetable; fighters have none"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Enemy_Ships",
+     "note": "weapons are aimed at specific enemy rooms"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://geekinsider.com/escape-velocity-nova-review/"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no use case and no module in model.json names subsystem targeting"
+   }
+  },
+  {
+   "id": "F07",
+   "capability": "player can mine asteroids or resource nodes for sellable material",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Gems"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://spacerangers.fandom.com/wiki/Asteroid"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Elite_Dangerous"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Beginners_help"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "one scripted asteroid event with the Scrap Recovery Arm; no mining loop"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "mining scoop outfit collects resource boxes"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-101",
+    "note": "shoot rock, it splits and spills gems; UC-103 drone cuts seams"
+   }
+  },
+  {
+   "id": "F08",
+   "capability": "player can pause or slow time in combat to issue orders",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/SETA",
+     "note": "SETA speeds time up; there is no pause-to-order"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "space is real-time-with-pause; orders are queued while stopped"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "the game explicitly pauses for command input"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "ship combat is continuous; the turn-based layer (UC-402) is the separate ground battle"
+   }
+  },
+  {
+   "id": "F09",
+   "capability": "flight is full 3D with pitch, yaw and roll rather than a fixed plane",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://neuronality.itch.io/starblast",
+     "note": "tagged 2D top-down shooter"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://manualmachine.com/gamespc/freelancer/1119795-user-manual/",
+     "note": "mouse frees pitch and yaw; roll is automatic banking"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Manual_piloting",
+     "note": "true 3D positioning, but rotation is command-driven"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Escape_Velocity_Nova"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "",
+    "note": "pitch and yaw are real player axes (MAN.pitch / MAN.yaw, applyKeys index.html:6650). ROLL is not: s.bank is derived from yaw (index.html:2459 lerp(s.bank,-s.ctrl.yaw*BANK_MAX)) and applied to the MESH only at :2489 - a visual bank, not a controllable third axis.",
+    "settledFrom": "code read 2026-09-06"
+   }
+  },
+  {
+   "id": "F10",
+   "capability": "player manages internal crew and damage control aboard their own ship",
+   "category": "flight",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/594011786520307472/",
+     "note": "service-crew skill and repair drones drive self-repair"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "crew assigned to stations, repair and firefighting"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "crew stat only affects boarding odds"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no use case or module covers internal crew stations"
+   }
+  },
+  {
+   "id": "F11",
+   "capability": "player spends earned points to permanently raise ship stats",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Survival_Mode",
+     "note": "upgrades are per-match and lost on death"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/1743353164075732556/",
+     "note": "no XP or spendable points exist"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/pc/920464-space-rangers-2-rise-of-the-dominators/faqs/52055"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "scrap upgrades reset every run"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-105",
+    "note": "eight stats spent with keys 1-8 in flight; shield max 40 to 44"
+   }
+  },
+  {
+   "id": "F12",
+   "capability": "player advances mainly by buying larger hull classes rather than levelling one hull",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Ships",
+     "note": "7-tier hull progression, 32 ships"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/1743353164075732556/"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://spacerangers.fandom.com/wiki/Hulls"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "one hull per run, upgraded not replaced"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-107",
+    "note": "maxed ship offers next tier; Scout to Fighter, hull 70 to 100, stats reset"
+   }
+  },
+  {
+   "id": "F13",
+   "capability": "the player character has skills separate from the ship",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/3204869541730471565/",
+     "note": "skills belong to hired crew, not the avatar"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/pc/920464-space-rangers-2-rise-of-the-dominators/faqs/52055"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall",
+     "note": "pilot level is a net-worth gate, not a skill"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Skills_and_learning",
+     "note": "skills train in real time, even offline"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-214",
+    "note": "pilot ranks up and spends skill points (SR-M17); ENGBAY.skillsHtml"
+   }
+  },
+  {
+   "id": "F14",
+   "capability": "player fits modular equipment into a limited number of slots or hardpoints",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall",
+     "note": "stats are numeric upgrade levels; no fitting screen"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.magicgameworld.com/x4-foundations-ship-loadout-options/"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://spacerangers.fandom.com/wiki/Hulls",
+     "note": "hull size sets the available equipment slots"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Elite_Dangerous"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Turrets",
+     "note": "weapons mount only to matching hardpoint types"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/High_slot",
+     "note": "high/mid/low slots plus rigs"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Systems",
+     "note": "limited system, weapon and augment slots"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-206",
+    "note": "MOUNT BAYS hardpoints and gizmo slots; mount 220c, GUNS 1 to 2, DPS 66.7 to 128.7"
+   }
+  },
+  {
+   "id": "F15",
+   "capability": "individual items vary in quality or condition so two of the same item differ",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/2960544187643693439/",
+     "note": "equipment mods roll random stats"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/540738052710170595",
+     "note": "equipment has a wear bar and degrades"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://inara.cz/elite/blueprint/21/",
+     "note": "engineering grades make identical modules differ"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Mutaplasmids",
+     "note": "abyssal mutaplasmids randomise stats; base items do not vary"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-204",
+    "note": "weapon bought with condition, weight and power; ITEMVAR.roll / QUALITY in model.json"
+   }
+  },
+  {
+   "id": "F16",
+   "capability": "some purchases are gated behind rank, licence or skill rather than money alone",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Reputation",
+     "note": "faction rank grants licences for restricted wares"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Federal_Corvette",
+     "note": "requires Federal Rear Admiral rank"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/pc/913966-freelancer/faqs/46604",
+     "note": "weapons gated by pilot level and faction standing"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Store",
+     "note": "gated only by scrap and free slots"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "Require / RequireGovt fields on outfits"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "UC-217",
+    "note": "science-station purchases refuse with a named requirement; the explicit rank gates are on contracts (UC-207), not on goods"
+   }
+  },
+  {
+   "id": "F17",
+   "capability": "player unlocks new technology through research over time",
+   "category": "progression",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Research",
+     "note": "Player HQ research menu"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/1741105805754171052/",
+     "note": "unique ships need science-station research"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Technology_Broker"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Invention",
+     "note": "invention unlocks Tech 2 blueprints"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "UC-217",
+    "note": "artifacts analysed and probes deployed at the science station; not a persistent tech tree"
+   }
+  },
+  {
+   "id": "F18",
+   "capability": "goods have per-location prices driven by local supply and demand",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://worthplaying.com/article/2006/4/20/reviews/32660-pc-review-space-rangers-2/",
+     "note": "market prices change daily and with news"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Market_Economy"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "prices differ by place but are static, not simulated"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Economics",
+     "note": "regional player-driven markets"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Stores_and_resources"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-202",
+    "note": "buy and sell goods at organic prices; buy ore 5 -115c, sell +118c"
+   }
+  },
+  {
+   "id": "F19",
+   "capability": "the player's own buying and selling moves local prices",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Market_Economy"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Economics",
+     "note": "player orders set prices outright"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Stores_and_resources"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "unknown",
+    "uc": "UC-202",
+    "note": "UC-202's own numbers are linear (5 ore = -115c, +1 = -23c) so nothing shows player trades moving the price"
+   }
+  },
+  {
+   "id": "F20",
+   "capability": "cargo is limited by a hold capacity the player can enlarge",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Upgrades",
+     "note": "crystal capacity scales with ship level"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.octopusoverlords.com/forum/viewtopic.php?t=16820&start=360",
+     "note": "cargo space is leftover hull capacity"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "capacity comes with a bigger purchased ship; no in-place hold upgrade"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://eve.fandom.com/wiki/Expanded_Cargoholds"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Systems",
+     "note": "equipment slots exist but there is no trade cargo hold"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "",
+    "note": "index.html:1691 s.holdCap = hull's base hold + 15 per Cargo Pod fitted; :1752 a buy is clamped by (holdCap - cargoTotal), so the cap really binds; EQUIP.cargo at :3277 is the purchasable enlargement ('+15 hold', 120c).",
+    "settledFrom": "code read 2026-09-06"
+   }
+  },
+  {
+   "id": "F21",
+   "capability": "illegal goods exist and are detected by scans or customs",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://forums.eveonline.com/t/getting-caught-with-contraband/448654"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "ScanMask flags contraband and triggers fines"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-213",
+    "note": "reputation, customs, contraband and a fence, verified SR-M4"
+   }
+  },
+  {
+   "id": "F22",
+   "capability": "the game shows the player where their held goods sell best",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/359320/discussions/0/595144081821200931/",
+     "note": "galaxy map commodity mode shows import/export markers"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Using_EVE-Central_to_haul_profitably",
+     "note": "players rely on third-party tools, not the client"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-203",
+    "note": "TRADE ROUTES panel: best two seen buyers per good with distance and per-unit gain"
+   }
+  },
+  {
+   "id": "F23",
+   "capability": "NPC traders physically move goods between markets and can be attacked",
+   "category": "economy",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Team_Mode",
+     "note": "miners are human players, not NPC traders"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/The_Missing_Convoy",
+     "note": "hauling is done by players; convoys are scripted PvE sites"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "trader-type NPC fleets travel between planets"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-302",
+    "note": "haulers fly real distance and trade at live prices; 8 runs, +460c"
+   }
+  },
+  {
+   "id": "F24",
+   "capability": "player can own more than one ship at once",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall",
+     "note": "one ship; wingmen are hired NPCs with their own ships"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Base_Features",
+     "note": "buying a new ship auto-sells the current one"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Escape_Velocity_Nova",
+     "note": "controllable escort ships alongside the main ship"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-303",
+    "note": "EMPIRE board plus a wing; 36 ships took DEFEND"
+   }
+  },
+  {
+   "id": "F25",
+   "capability": "player can give AI wingmen simple combat orders",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Team_Mode",
+     "note": "teammates are human, not AI under orders"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/359320/discussions/0/133257636772030381/",
+     "note": "Attack My Target, Hold Fire, Follow"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Drones",
+     "note": "drones, not wingmen: engage/orbit/return/guard"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-303",
+    "note": "follow, attack, mine, trade, hold, defend a world, go dock"
+   }
+  },
+  {
+   "id": "F26",
+   "capability": "player can assign owned ships to trade routes that run without the player present",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://forums.frontier.co.uk/threads/automated-trading.260506/",
+     "note": "design keeps the pilot flying; no autopilot trading"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "escorts carry cargo only while with the player"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-302",
+    "note": "haulers hold when a leg stops paying, so the route is genuinely autonomous"
+   }
+  },
+  {
+   "id": "F27",
+   "capability": "player can own stations or factories that produce while the player is elsewhere",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/392160/X4_Foundations/",
+     "note": "modular station building"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/System_Colonisation",
+     "note": "via 2025 Colonisation refinery hubs; Fleet Carriers only trade"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Upwell_structures",
+     "note": "manufacturing runs while the player is offline"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-301",
+    "note": "a Halcyon plant made 36 units; agri world picks pharma, mining world a smelter"
+   }
+  },
+  {
+   "id": "F28",
+   "capability": "player can hire named crew or pilots with individual identities",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4playershandbook.com/index.php/index-concepts/crew/",
+     "note": "hired crew have names and skill ratings"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "Crew Lounge hires named NPC pilots"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall",
+     "note": "hired mercenaries are generic"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "crew are named with individually tracked skills"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-216",
+    "note": "BAR lists four pilots with their histories; hiring ALTAIR cost 300c"
+   }
+  },
+  {
+   "id": "F29",
+   "capability": "player can capture an enemy ship and keep it",
+   "category": "fleet",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Boarding",
+     "note": "marines capture L/XL ships via boarding pods"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/1741105805754171052/"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "boarding wins bonus scrap, not a second ship"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.cheatbook.de/wfiles/escapevelocitynovaclosecombat.htm",
+     "note": "captured ships become sellable or fleet escorts"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no use case or module covers boarding or capture"
+   }
+  },
+  {
+   "id": "F30",
+   "capability": "ports offer a refreshing board of generated jobs",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Agent",
+     "note": "station agents offer missions on a cooldown"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "a beacon triggers one scripted event, not a board"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-208",
+    "note": "cards from HOST.missionCandidates; missions.js has BOARD_N and REFRESH_S"
+   }
+  },
+  {
+   "id": "F31",
+   "capability": "there is an authored main storyline with scripted missions",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/673260/Starblast/",
+     "note": "arcade modes only, no campaign"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Plots"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.pcgamesn.com/elite-dangerous/aftermath-thargoids",
+     "note": "dev-authored ongoing arcs rather than a fixed campaign"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Single_Player_Campaign",
+     "note": "13-mission authored story"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/The_Blood-Stained_Stars",
+     "note": "authored 52-mission epic arc"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "flee the Rebels to the Federation, flagship finale"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Escape_Velocity_Nova",
+     "note": "six mutually exclusive storylines"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "UC-212",
+    "note": "an escalating tier structure (HEG_TIERS: liberate, defend, assault) rather than authored scripted story missions"
+   }
+  },
+  {
+   "id": "F32",
+   "capability": "some missions are locked behind a rank or reputation threshold",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Agent",
+     "note": "agent level gated by standing"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "AvailRating requires a minimum combat rating"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-207",
+    "note": "rank-gated contract taken from the board; missions.js RANK_PATROL..RANK_ASSAULT"
+   }
+  },
+  {
+   "id": "F33",
+   "capability": "standing is tracked separately per faction and changes with player actions",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Team_Mode",
+     "note": "teams are reassigned each match"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Reputation"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/357286119110504783/",
+     "note": "per-planet and per-faction standing"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Reputation"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/NPC_standings"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "legal record tracked per government"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-213",
+    "note": "reputation with customs and a fence, verified SR-M4"
+   }
+  },
+  {
+   "id": "F34",
+   "capability": "attacking one faction raises standing with its rival",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://teladitraders.com/improve-your-relations-with-enemy-factions-in-x4/"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Reputation"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/NPC_standings",
+     "note": "derived standing only hurts allies, never boosts a rival"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "unknown",
+     "basis": "none"
+    }
+   },
+   "ours": {
+    "v": "unknown",
+    "uc": null,
+    "note": "one hostile faction (Synod) plus world owners; no use case states cross-faction standing transfer"
+   }
+  },
+  {
+   "id": "F35",
+   "capability": "missions can fail and the failure has a lasting consequence",
+   "category": "missions",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Reputation",
+     "note": "failed missions incur a fine and reputation loss"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://ftl.fandom.com/wiki/Ancestry",
+     "note": "a crewmate death permanently locks the secret questline"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "unknown",
+    "uc": null,
+    "note": "missions.js exists but no use case covers a failure path or its consequence"
+   }
+  },
+  {
+   "id": "F36",
+   "capability": "the simulation keeps running for NPCs and markets while the player is elsewhere",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/X4:_Foundations"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_(video_game)",
+     "note": "wars are ongoing and unscripted across the series"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Background_Simulation"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-304",
+    "note": "warTick and conquest.js slowTick run per-system; UC-301/302 produce and haul unattended"
+   }
+  },
+  {
+   "id": "F37",
+   "capability": "territory changes hands between factions during a playthrough",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/3419937528169148658/",
+     "note": "Xenon can conquer whole sectors"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/517142892073148343/"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "http://remlok-industries.fr/the-complete-background-simulation-guide/?lang=en"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Sovereignty"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "system government is static"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-304",
+    "note": "a contested system infects its lane neighbours; conquest.js progressInvasion"
+   }
+  },
+  {
+   "id": "F38",
+   "capability": "player action can permanently flip which faction holds a region",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Plots",
+     "note": "DLC plots let the player force war, peace or mergers"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "http://remlok-industries.fr/the-complete-background-simulation-guide/?lang=en"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Sovereignty",
+     "note": "entosis warfare flips a system's owner"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-212",
+    "note": "liberate, defend and assault the stronghold; conquest.js capture is idempotent"
+   }
+  },
+  {
+   "id": "F39",
+   "capability": "an escalating galaxy-wide threat drives the long campaign",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Invasion",
+     "note": "wave escalation is scoped to one match"
+    },
+    "x_series": {
+     "v": "unknown",
+     "basis": "none",
+     "note": "Xenon pressure exists but no source confirms it as a designed escalating campaign frame"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators",
+     "note": "Dominators conquer the galaxy planet by planet"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.pcgamesn.com/elite-dangerous/aftermath-thargoids"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Nomad"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.ccpgames.com/news/2019/eve-online-invasion-chapter-2-escalates-the-triglavian-menace-in-new-eden"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "the rebel fleet advances with every jump"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall",
+     "note": "regional faction wars rather than one shared threat"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-212",
+    "note": "Synod escalates through HEG_TIERS and adapts across generations (UC-305)"
+   }
+  },
+  {
+   "id": "F40",
+   "capability": "the world is shared in real time with many other human players",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/673260/Starblast/"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.pcgamer.com/x4-foundations-goes-online-but-dont-expect-multiplayer/",
+     "note": "Ventures is asynchronous, not a shared world"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Game_Mode",
+     "note": "one shared galaxy instanced across Open/Private/Solo"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "dedicated servers up to 128 players"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "one Tranquility shard"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no networking or multiplayer module appears in model.json"
+   }
+  },
+  {
+   "id": "F41",
+   "capability": "the playable galaxy is procedurally generated rather than hand-authored",
+   "category": "world",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://neuronality.itch.io/starblast",
+     "note": "procedurally generated systems and asteroid fields"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.egosoft.com/X4%20Foundations%20Wiki/Manual%20and%20Guides/Objects%20in%20the%20Game%20Universe/Systems,%20Sectors%20and%20Zones/",
+     "note": "sector layout is identical across game-starts"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/214730/Space_Rangers_HD_A_War_Apart/",
+     "note": "store page: no two playthroughs the same"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Stellar_Forge"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "48 hand-authored systems"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.pcgamer.com/the-9-year-journey-to-explore-each-of-eve-onlines-7805-solar-systems/",
+     "note": "fixed ~7,805-system map"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "eight sectors randomly generated per run"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-218",
+    "note": "galaxy persists across reloads AND generations; starmap.js galaxySig/rebuildLayout, ground.js seeded heightfield per world"
+   }
+  },
+  {
+   "id": "F42",
+   "capability": "player picks a destination on a star map and travels between systems",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall",
+     "note": "one arena per match"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "jump gates between systems"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://support.eveonline.com/hc/en-us/articles/203273861-Can-t-set-route-to-destination"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "beacon-to-beacon on a sector map"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-211",
+    "note": "star map jumps between systems (starmap.js)"
+   }
+  },
+  {
+   "id": "F43",
+   "capability": "interstellar travel consumes fuel that must be replenished",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Energy_Cells",
+     "note": "energy cells no longer fuel travel"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://spacerangers.fandom.com/wiki/Fuel_Tanks"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Jump_drives",
+     "note": "gates and warp are free; only capital jump drives burn isotopes"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "every jump consumes one fuel"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-211",
+    "note": "jumps pay fuel; UC-304 measured a lane jump at 1004u for 19 fuel"
+   }
+  },
+  {
+   "id": "F44",
+   "capability": "there is an in-system fast-travel layer distinct from combat flight",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "Travel Mode"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "supercruise"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/Trade_Lanes",
+     "note": "trade lanes are a fixed-track speed highway"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Warp_mechanics"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall",
+     "note": "autopilot automates normal flight, it is not a separate layer"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": "UC-304",
+    "note": "lanes join systems, not points inside one; no in-system fast-travel layer is described"
+   }
+  },
+  {
+   "id": "F45",
+   "capability": "player can discover unvisited systems and record or sell the data",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://x4-foundations-wiki.fandom.com/wiki/Exploring",
+     "note": "faction reps buy first sector-scan data"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "Universal Cartographics buys first-discovery scan data"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "hidden jump holes found by exploring are added to the map; no sale"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Exploration",
+     "note": "exploration pays in site loot, not discovery data"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "UC-203",
+    "note": "the game records what has been seen (starmap knowCounts, seen prices) but nothing sells survey data"
+   }
+  },
+  {
+   "id": "F46",
+   "capability": "player can leave the ship and move on a planetary surface",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/1735467426089921679/?ctp=3"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators",
+     "note": "top-down planetary robot battles, not an on-foot avatar"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Elite_Dangerous",
+     "note": "Odyssey adds on-foot with suit survival stats"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://massivelyop.com/2017/07/13/eve-online-is-killing-off-the-last-remnant-of-walking-in-stations/",
+     "note": "Captain's Quarters removed 2017; never a planet surface"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-403",
+    "note": "first-person surface walk: seeded heightfield, 53 solids, pointer-lock look, jump rise 1.18m"
+   }
+  },
+  {
+   "id": "F47",
+   "capability": "docking opens a port interior with its own screens",
+   "category": "exploration",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall",
+     "note": "docking opens an upgrade overlay, not a port"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/",
+     "note": "bar, trade, outfitter, shipyard, mission screens"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-201",
+    "note": "PLANETMENU.open with 7 tabs"
+   }
+  },
+  {
+   "id": "F48",
+   "capability": "player death ends the run permanently",
+   "category": "failure",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Survival_Mode",
+     "note": "normally respawns; permadeath only in the endgame phase"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "recall",
+     "note": "death is game-over then reload; ordinary save slots exist"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Redeployment"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Jump_clones",
+     "note": "podding wakes the character in a new clone"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/",
+     "note": "store page: when you die, there is no coming back"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall",
+     "note": "dying without an escape pod forces loading a saved pilot"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": "UC-108",
+    "note": "pilot respawns as a Scout in the belt"
+   }
+  },
+  {
+   "id": "F49",
+   "capability": "death costs resources but the campaign continues",
+   "category": "failure",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Survival_Mode",
+     "note": "death drops ship tier and costs a life"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/3104642254789348785/",
+     "note": "death is a hard reload, not a continue"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Redeployment",
+     "note": "rebuy cost charged, commander carries on"
+    },
+    "freelancer": {
+     "v": "unknown",
+     "basis": "none",
+     "note": "unclear whether any penalty-then-continue path exists in single player"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Jump_clones"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://evn.fandom.com/wiki/Escape_Pod",
+     "note": "ejecting gives a new shuttle and resets the legal record"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-108",
+    "note": "gems and credits spill on death, then respawn"
+   }
+  },
+  {
+   "id": "F50",
+   "capability": "progress is saved to one persistent world state rather than free save slots",
+   "category": "failure",
+   "cells": {
+    "starblast": {
+     "v": "unknown",
+     "basis": "none",
+     "note": "no save slots at all, but a match is a session rather than a persistent world"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/boards/913966-freelancer/42628862",
+     "note": "multiple named save slots"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "the save file is deleted on run failure"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-218",
+    "note": "galaxy persists across reloads and generations (SR-M1, SR-M14); no save-slot UI"
+   }
+  },
+  {
+   "id": "F51",
+   "capability": "a destroyed ship is replaced through insurance or a free starter hull",
+   "category": "failure",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Survival_Mode",
+     "note": "respawns as a free Tier 1 ship"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/4355618325410929162/"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://worthplaying.com/article/2006/4/20/reviews/32660-pc-review-space-rangers-2/",
+     "note": "buyable life insurance"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://elite-dangerous.fandom.com/wiki/Redeployment",
+     "note": "insurance rebuy or a loaner Sidewinder"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Corvettes",
+     "note": "free rookie corvette plus a separate insurance system"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://evn.fandom.com/wiki/Escape_Pod",
+     "note": "escape pod gives a free replacement shuttle"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-108",
+    "note": "respawns as a Scout at no cost"
+   }
+  },
+  {
+   "id": "F52",
+   "capability": "destroyed ships and cargo drop physical loot that anyone can collect",
+   "category": "failure",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Gems",
+     "note": "crystals drop from wrecks"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "cargo canisters anyone can scoop"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Ninja_Salvaging_and_Stealing"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "scrap is awarded abstractly; nothing physical drops into a world"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-108",
+    "note": "gems and credits spill into the belt; UC-103 drone fetches loose gems"
+   }
+  },
+  {
+   "id": "F53",
+   "capability": "player converses with NPCs through dialogue choices",
+   "category": "social",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/644693912552798138/",
+     "note": "comm-menu topics can trigger rumour missions"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://forums.frontier.co.uk/threads/elite-dangerous-odyssey-q-a-interface-and-npcs.563794/",
+     "note": "on-foot conversation trees in Odyssey"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "the player has no choice of input in NPC talks"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall",
+     "note": "mission text is accept/decline"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "text events present multiple-choice decisions"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-215",
+    "note": "text quests at a planet, self-test 16/16; UC-501 free-text ask to the Passenger"
+   }
+  },
+  {
+   "id": "F54",
+   "capability": "ports offer self-contained text vignettes or mini-narratives",
+   "category": "social",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Space_Rangers_2:_Dominators",
+     "note": "planets trigger text-adventure quests"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "bar rumours and news tickers"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "mission briefings are short flavour vignettes"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/",
+     "note": "hundreds of text-based encounters"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-215",
+    "note": "TEXTQUESTS templates offered at planets; PLANETMENU barRumors/barPatrons"
+   }
+  },
+  {
+   "id": "F55",
+   "capability": "individual NPCs have persistent names and readable histories",
+   "category": "social",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Aliens",
+     "note": "aliens are generic wave types"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "crew roster shows named individuals with skills"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall",
+     "note": "no bios beyond named story characters"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall",
+     "note": "crew have a name and race but no history"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "pers resource creates named individuals with linked missions"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-216",
+    "note": "BAR tab lists four pilots with their histories"
+   }
+  },
+  {
+   "id": "F56",
+   "capability": "player can cooperate or fight with other human players",
+   "category": "social",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Team_Mode"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.pcgamer.com/x4-foundations-goes-online-but-dont-expect-multiplayer/"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/359320/Elite_Dangerous/",
+     "note": "Wings co-op and Open Play PvP"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no networking or multiplayer module appears in model.json"
+   }
+  },
+  {
+   "id": "F57",
+   "capability": "an AI companion comments unprompted on the player's situation",
+   "category": "social",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://forums.frontier.co.uk/threads/customizeable-ship-ai-voice.239895/",
+     "note": "COVAS ship voice narrates status"
+    },
+    "freelancer": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.eveonline.com/news/view/eve-evolved-aura-guidance",
+     "note": "Aura Guidance is optional and on-demand, not unprompted"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-503",
+    "note": "the Passenger advises unprompted (UC-502), gets angry when ignored across 4 tiers, calms when obeyed"
+   }
+  },
+  {
+   "id": "F58",
+   "capability": "a guided tutorial or scripted opening teaches the basics",
+   "category": "onboarding",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Tutorial"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/X4:_Foundations",
+     "note": "guided game-start scenarios"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://community.elitedangerous.com/en/tutorial-videos",
+     "note": "training sims plus an on-foot tutorial mission"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/pc/913966-freelancer/faqs/22246",
+     "note": "scripted opening escort mission"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Career_Agents"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.thegamer.com/ftl-faster-light-beginners-guide/"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/",
+     "note": "mentor pilot guides the opening"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": null,
+    "note": "PASSENGER.INTRO / introLines / markIntroShown exist in model.json but no use case covers a tutorial"
+   }
+  },
+  {
+   "id": "F59",
+   "capability": "the game is playable within a minute with no installation",
+   "category": "onboarding",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.io/",
+     "note": "instant browser play"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/392160/X4_Foundations/",
+     "note": "large Steam install"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.eveonline.com/download"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/212680/FTL_Faster_Than_Light/"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": null,
+    "note": "browser page: model.json modules are all window/document/canvas/localStorage; no install step in any use case"
+   }
+  },
+  {
+   "id": "F60",
+   "capability": "the player picks a difficulty or starting scenario before playing",
+   "category": "onboarding",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall",
+     "note": "picks a mode and server, not a difficulty"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/X4:_Foundations",
+     "note": "scenario choice sets starting ship and assets"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://worthplaying.com/article/2006/4/20/reviews/32660-pc-review-space-rangers-2/",
+     "note": "race, occupation and one of four difficulties"
+    },
+    "elite_dangerous": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "http://www.cheatsguru.com/pc/freelancer/cheats/8338.htm",
+     "note": "difficulty only changeable by editing an ini"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "race/bloodline sets the starting scenario; no difficulty setting"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "difficulty modes plus unlockable ships and layouts"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://andrews05.github.io/evstuff/guides/evnbible.html",
+     "note": "char resource defines multiple starting scenarios"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no use case or module covers difficulty or a start-scenario picker"
+   }
+  },
+  {
+   "id": "F61",
+   "capability": "a radar or scanner shows nearby objects around the ship",
+   "category": "ui",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblast.fandom.com/wiki/Game_tutorial"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://spacerangers.fandom.com/wiki/Standard_Equipment"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://freelancer.fandom.com/wiki/New_Player_Guide"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "overview window and directional scanner"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-109",
+    "note": "top-down inset showing rocks, gems, ships and drones"
+   }
+  },
+  {
+   "id": "F62",
+   "capability": "an on-screen marker or arrow points at the active objective",
+   "category": "ui",
+   "cells": {
+    "starblast": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://gamefaqs.gamespot.com/pc/913966-freelancer/faqs/22246"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall",
+     "note": "brackets highlight targets, no objective arrow"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall",
+     "note": "combat target indicator only"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-210",
+    "note": "updateMissionArrow and updateMissionMarker"
+   }
+  },
+  {
+   "id": "F63",
+   "capability": "the player can compare an item on sale against the one already fitted",
+   "category": "ui",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "outfitting shows a delta versus the fitted module"
+    },
+    "freelancer": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://wiki.eveuniversity.org/Show_Info_and_Compare"
+    },
+    "ftl": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall",
+     "note": "outfitter lists stats separately, no compare view"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-205",
+    "note": "20 comparison rows in SHOP: dps, damage, rate, reach, barrels, homing, splash, damage type"
+   }
+  },
+  {
+   "id": "F64",
+   "capability": "the player can rebind controls",
+   "category": "ui",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://starblastio.net/starblast-io-controls-guide/"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "deep per-device rebinding"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://the-starport.com/forums/topic/710/keyboard-mapping"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://lparchive.org/Escape-Velocity-Nova/Update%2001/"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "",
+    "note": "index.html:6729 KB_ACTIONS lists 7 rebindable actions; window._rebindCapture (index.html:6742) grabs the next keypress from the options panel; loadControls/saveControls persist to SF_CONTROLS_v1. Arrow keys + right-Shift are a deliberate un-rebindable fallback so a bad rebind cannot lock you out.",
+    "settledFrom": "code read 2026-09-06"
+   }
+  },
+  {
+   "id": "F65",
+   "capability": "the player can rearrange, resize or hide HUD panels",
+   "category": "ui",
+   "cells": {
+    "starblast": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "x_series": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "space_rangers_2": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://edblackbox.com/guides/systems/new-pilot-and-interface/hud-customization.html",
+     "note": "panels toggle or pull out; no free rearrange"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Freelancer_(video_game)",
+     "note": "info boxes can be minimised, not fully rearranged"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "windows are movable, resizable and dockable"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "yes",
+    "uc": "UC-601",
+    "note": "WINDOWS menu shows/hides any panel; UC-602 sets per-panel transparency; panels.js drags, resizes and redocks"
+   }
+  },
+  {
+   "id": "F66",
+   "capability": "NPC dialogue is voiced",
+   "category": "audio",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/603023732673411467/",
+     "note": "separate voice-language option confirms voiced audio"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://worthplaying.com/article/2006/4/20/reviews/32660-pc-review-space-rangers-2/",
+     "note": "review calls out the lack of voice acting"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall",
+     "note": "ATC, station comms and NPC barks"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.imdb.com/title/tt0165789/",
+     "note": "large recorded voice cast"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://universe.eveonline.com/lore/aura",
+     "note": "Aura is voiced; agent mission text is not"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "partial",
+    "uc": "UC-506",
+    "note": "status is PARTLY: speech in and voice out paths present, audio itself unverified"
+   }
+  },
+  {
+   "id": "F67",
+   "capability": "music changes with the situation, for example combat versus travel",
+   "category": "audio",
+   "cells": {
+    "starblast": {
+     "v": "unknown",
+     "basis": "none",
+     "note": "per-mode tracks found; an adaptive combat shift was not confirmed"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.nexusmods.com/x4foundations/mods/172?tab=posts",
+     "note": "a mod exists purely to strip the battle music"
+    },
+    "space_rangers_2": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "freelancer": {
+     "v": "yes",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.eveonline.com/news/view/the-soundscape-of-uprising"
+    },
+    "ftl": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/FTL:_Faster_Than_Light",
+     "note": "the score crossfades explore and battle themes"
+    },
+    "ev_nova": {
+     "v": "yes",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": "",
+    "note": "ABSENT, proven not present: grep for music|soundtrack|bgm across every .js and .html in the repo (excluding the three vendored libraries) returns zero hits. sound.js plays one-shot effects and one looping noise source; there is no track system to change with the situation.",
+    "settledFrom": "code read 2026-09-06"
+   }
+  },
+  {
+   "id": "F68",
+   "capability": "the game supports a gamepad",
+   "category": "accessibility",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://neuronality.itch.io/starblast",
+     "note": "lists Gamepad (any) as supported input"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/1743353164081532041/",
+     "note": "native controller profile since 7.0"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/214730/discussions/1/792924412444907344/",
+     "note": "developer states there is no gamepad support"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://store.steampowered.com/app/359320/Elite_Dangerous/"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://www.nexusmods.com/freelancer/mods/21",
+     "note": "a third-party mod is needed"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://controller.wtf/ftl-faster-than-light"
+    },
+    "ev_nova": {
+     "v": "unknown",
+     "basis": "none",
+     "note": "joystick likely supported; modern gamepad support unconfirmed"
+    }
+   },
+   "ours": {
+    "v": "unknown",
+    "uc": null,
+    "note": "no use case or module names an input device other than keys and pointer"
+   }
+  },
+  {
+   "id": "F69",
+   "capability": "the game offers colourblind or other accessibility options",
+   "category": "accessibility",
+   "cells": {
+    "starblast": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://neuronality.itch.io/starblast",
+     "note": "lists colour-blind friendly and high-contrast modes"
+    },
+    "x_series": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/4365751613882119146/"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/359320/discussions/0/537714481029981894/",
+     "note": "gamma slider only, no colourblind mode"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://www.eveonline.com/news/view/color-blindness-support-is-coming-to-eve-online"
+    },
+    "ftl": {
+     "v": "unknown",
+     "basis": "none"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "unknown",
+    "uc": null,
+    "note": "UC-602 panel opacity is a layout control, not an accessibility option; nothing else applies"
+   }
+  },
+  {
+   "id": "F70",
+   "capability": "the game supports VR headsets",
+   "category": "accessibility",
+   "cells": {
+    "starblast": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "x_series": {
+     "v": "no",
+     "basis": "source",
+     "url": "https://steamcommunity.com/app/392160/discussions/0/550107357479241941/",
+     "note": "no native VR; only unofficial workarounds"
+    },
+    "space_rangers_2": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "elite_dangerous": {
+     "v": "yes",
+     "basis": "source",
+     "url": "https://en.wikipedia.org/wiki/Elite_Dangerous",
+     "note": "PC only; Odyssey on-foot renders flat inside the headset"
+    },
+    "freelancer": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "eve_online": {
+     "v": "no",
+     "basis": "recall",
+     "note": "EVE Valkyrie was a separate VR product"
+    },
+    "ftl": {
+     "v": "no",
+     "basis": "recall"
+    },
+    "ev_nova": {
+     "v": "no",
+     "basis": "recall"
+    }
+   },
+   "ours": {
+    "v": "no",
+    "uc": null,
+    "note": "no VR module or use case; the renderer is a browser three.js canvas"
+   }
+  }
+ ],
+ "oursNote": "`ours` cells marked settledFrom=code were read directly from source on 2026-09-06 and carry the file:line in their note. Cells still `unknown` are genuinely unmeasured, not assumed absent."
+}

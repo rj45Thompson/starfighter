@@ -46,6 +46,8 @@ card is never swept in. Everything else lives in new files.
 - [ ] C6  Fix the wing-order argument bug the other lane found (empire.js:126) -> DONE WHEN: FOLLOW issued from the board follows the PLAYER, verified in the page
 - [ ] C7  Make ground.js deterministic and drop its dead store (ground.js:109, :297) -> DONE WHEN: two builds of the same world produce identical terrain colour, measured
 - [ ] C8  Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42) -> DONE WHEN: a fresh hauler's name matches its id, and a failed localStorage write is reported not swallowed
+- [ ] C10 More LOOKS, not one: named machine-world presets RJ can flip between -> DONE WHEN: `cybertron <look>` switches at least 6 distinct worlds in the page, each screenshotted
+- [ ] C11 AAA the planet render: roughness/AO maps, an atmosphere rim, a smog layer, terminator city-light ignition -> DONE WHEN: each channel is measured present and the render is looked at
 - [ ] C9  Delete the dead code the other lane listed in my files -> DONE WHEN: planetmenu.js:885-907, missions.js:88/92 and power_panel.js:71 are gone and every file still parses
 
 
@@ -60,7 +62,16 @@ to yourself" - about the Passenger, not about flying.
 - [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
 
 ### Genre backlog
-- [ ] G0  Run the genre survey and rank the gaps -> DONE WHEN: `genre/genre_matrix.json` exists, `py genre/anchor_rank.py` prints a ranked gap list, and `py tools/upgrade_pass.py` writes GAME_UPGRADES.md.
+### Genre gaps, anchor-ranked (regenerate with `py tools/upgrade_pass.py`)
+Anchor count = how many of 8 surveyed games have the capability. It is the ranking key: a thing six
+independent games all do is a genre expectation; a thing one game does is that game's idea.
+
+- [ ] F58  A guided opening that teaches the basics -> anchor **8/8**, ours=partial. DONE WHEN: a new player can complete one full mine-collect-upgrade loop guided, verified by driving it in the live game. (The FIRST FLIGHT card landed this session and is why this is `partial` not `no`; what is missing is the guided first loop, not the key list.)
+- [ ] F31  An authored main storyline with scripted missions -> anchor **7/8**, ours=partial UC-212. DONE WHEN: a named story arc with at least 3 ordered beats can be started, advanced and completed, verified by running it end to end.
+- [ ] F67  Music that changes with the situation -> anchor **7/7**, ours=**no, proven**: grep for music|soundtrack|bgm across every .js and .html (minus the 3 vendored libs) returns ZERO hits; sound.js plays one-shot effects only. DONE WHEN: combat and travel play different beds and the switch is audible, verified by reading which track is selected in each state.
+- [ ] F16  Purchases gated by rank or licence, not money alone -> anchor **6/8**, ours=partial UC-217. DONE WHEN: at least one purchase refuses on rank with a message naming the rank needed, verified in the live terminal.
+- [ ] F35  Missions can fail, with a lasting consequence -> anchor **6/8**, ours=**unknown - unmeasured, not absent**. DONE WHEN: the code path is read and the cell is settled either way with a file:line, the same way F02/F09/F20/F64/F67 were.
+- [ ] F60  Pick a difficulty or starting scenario before playing -> anchor **5/7**, ours=no. DONE WHEN: a choice at first run changes at least one measurable starting condition, verified across two fresh starts.
 
 ## Done
 
