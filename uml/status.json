@@ -156,9 +156,9 @@
 {
 "id": "UC-208",
 "epic": "E2",
-"status": "PARTLY",
+"status": "WORKS",
 "story": "Pilot reads a contract as a card: target, distance, danger, reward",
-"test": "burn-down 2"
+"test": "cards from HOST.missionCandidates, the same numbers the Passenger chooses on; ACCEPT set the active mission in-page"
 },
 {
 "id": "UC-209",
@@ -359,16 +359,16 @@
 {
 "id": "UC-603",
 "epic": "E6",
-"status": "MISSING",
-"story": "Pilot sees one top bar: FLY \u00b7 MAP \u00b7 SHIP \u00b7 MARKET \u00b7 CONTRACTS \u00b7 PASSENGER \u00b7 DEPRECATED",
-"test": "burn-down 6"
+"status": "WORKS",
+"story": "Pilot sees one top bar: FLY, MAP, SHIP, MARKET, UPGRADES, CONTRACTS, PASSENGER, BROKEN",
+"test": "shell.js, 8 tabs live, zero elements overlapping its band"
 },
 {
 "id": "UC-604",
 "epic": "E6",
-"status": "MISSING",
-"story": "What is broken sits behind DEPRECATED and is not advertised",
-"test": "burn-down 1"
+"status": "WORKS",
+"story": "What is broken sits behind a BROKEN tab and is not advertised",
+"test": "the tab renders 2 deprecated, 8 half built, 9 not built from uml/status.json"
 },
 {
 "id": "UC-605",
@@ -386,9 +386,9 @@
 }
 ],
 "tally": {
-"WORKS": 35,
-"PARTLY": 5,
-"MISSING": 9,
+"WORKS": 38,
+"PARTLY": 4,
+"MISSING": 7,
 "DEPRECATED": 2
 }
 }

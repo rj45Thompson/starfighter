@@ -306,8 +306,8 @@
      capture-the-flag+defenses+infrastructure · rank-gated Ranger missions · the Space-Rangers planet screen. -->
 <script src="starmap.js?v=20260714c"></script>
 <script src="conquest.js?v=20260714c"></script>
-<script src="missions.js?v=20260906a"></script>
-<script src="planetmenu.js?v=20260906e"></script>
+<script src="missions.js?v=20260906b"></script>
+<script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
 <script>
 "use strict";
@@ -5795,10 +5795,7 @@ function missionAutoTick(dt){ if(!CFG.MISSION_AUTO||!window.MISSIONS||!MISSIONS.
   // every posting becomes a candidate with MEASURED numbers - distance to its target, Synod ships within 300 u of it -
   // and the brain ranks them against the pilot's gun and hull; the choice and its reasons are spoken in the PARASITE tab
   // and recorded as facts ("why this mission" is then answerable). Postings the rank refuses are simply skipped.
-  const rank=MISSIONS.playerRank?MISSIONS.playerRank():99;
-  const posts=(MISSIONS.postings?MISSIONS.postings():[]).filter(m=>m.rank==null||m.rank<=rank); if(!posts.length) return;   // only what the board would let this rank accept
-  const cands=posts.map(m=>{ const tp=postingTargetPos(m); const dist=tp?P.pos.distanceTo(tp):null; const danger=tp?ships.filter(s=>s.alive&&s.team==='pirate'&&s.pos.distanceTo(tp)<300).length:0;
-    return { idx:m.idx, type:m.type, title:m.title, reward:m.reward, rank:m.rank, dist, danger, targetName:(m.tgt&&(m.tgt.planetName||(m.tgt.shipRef&&m.tgt.shipRef.name)))||null }; });
+  const cands=missionCandidates(true); if(!cands.length) return;   // only what the board would let this rank accept
   const choice=(window.PASSENGER&&PASSENGER.chooseMission)?PASSENGER.chooseMission(cands, passengerTelemetry()):null;
   const order=choice?[choice.idx,...cands.map(c=>c.idx).filter(i=>i!==choice.idx)]:cands.map(c=>c.idx);
   for(const i of order){ const r=MISSIONS.accept(i); if(r&&r.ok){
@@ -5806,6 +5803,19 @@ function missionAutoTick(dt){ if(!CFG.MISSION_AUTO||!window.MISSIONS||!MISSIONS.
       else { const taken=cands.find(c=>c.idx===i); const line=(window.PASSENGER&&PASSENGER.missionTaken)?PASSENGER.missionTaken(taken, choice):null; if(line){ paraLine('worm', String(line).replace(/</g,'&lt;')); if(window.CHATTER) CHATTER.voiceWorm(line); } term('★ '+r.msg+' - follow the marker.','sys'); }
       return; }
     if(r&&/no postings/.test(r.msg||'')) return; } }
+// ONE builder for "what is on the board and what does it cost you" (2026-09-06). The Passenger's auto-chooser and
+// the docked mission CARDS both read this, so the distance and the Synod count a card shows are the same numbers
+// the choice was made on - never a second estimate that can drift from it. rankOnly=true drops the postings this
+// rank cannot accept (what the chooser wants); the cards ask for all of them and show the lock instead.
+function missionCandidates(rankOnly){
+  const P=ships[0]; if(!P||!window.MISSIONS||!MISSIONS.postings) return [];
+  const rank=MISSIONS.playerRank?MISSIONS.playerRank():99;
+  const posts=MISSIONS.postings().filter(m=>!rankOnly||m.rank==null||m.rank<=rank);
+  return posts.map(m=>{ const tp=postingTargetPos(m); const dist=tp?P.pos.distanceTo(tp):null;
+    const danger=tp?ships.filter(s=>s.alive&&s.team==='pirate'&&s.pos.distanceTo(tp)<300).length:0;
+    return { idx:m.idx, id:m.id, type:m.type, title:m.title, desc:m.desc, reward:m.reward, rank:m.rank,
+      locked:(m.rank!=null&&m.rank>rank), dist:dist!=null?Math.round(dist):null, danger,
+      targetName:(m.tgt&&(m.tgt.planetName||(m.tgt.shipRef&&m.tgt.shipRef.name)))||null }; }); }
 function postingTargetPos(m){ const t=(m&&m.tgt)||{}; if(t.shipRef&&t.shipRef.alive&&t.shipRef.pos) return t.shipRef.pos; if(t.planetName){ const p=findPlanet(t.planetName); return p?p.pos:null; } if(m&&m.type==='ASSAULT') return (typeof stronghold!=='undefined'&&stronghold)?stronghold.pos:null; return null; }
 
 // THE SHOP (user 2026-09-06): appears on its own when an upgrade is affordable, buys without docking, closes when
@@ -6228,6 +6238,7 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 // =================================================================================================
 window.HOST={
   get T0(){ return T0; },   // the game clock, so a UI can age an observation honestly (planetmenu trade routes, 2026-09-06)
+  missionCandidates:(rankOnly)=>missionCandidates(rankOnly),   // the docked mission CARDS read exactly what the Passenger chose on (2026-09-06)
   sb:(s)=>sbSnapshot(s), spendStat:(k)=>spendStat(ships[0],k), takeTierUp:(k)=>takeTierUp(ships[0],k), term:(h,c)=>term(h,c),   // STARBLAST LOOP (sbhud.js reads / spends through these)
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },

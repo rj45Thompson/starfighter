@@ -23,7 +23,7 @@ flowchart LR
     UC_205["UC-205 WORKS\nPilot compares a weapon against the fitted one before buying"]
     UC_206["UC-206 WORKS\nPilot fits gear into hardpoints and gizmo slots on a ship board"]
     UC_207["UC-207 WORKS\nPilot takes a rank-gated contract from the board"]
-    UC_208["UC-208 PARTLY\nPilot reads a contract as a card: target, distance, danger, reward"]
+    UC_208["UC-208 WORKS\nPilot reads a contract as a card: target, distance, danger, reward"]
     UC_209["UC-209 WORKS\nPassenger chooses the contract and says why"]
     UC_210["UC-210 WORKS\nPilot follows the tracker and the on-screen marker to the target"]
     UC_211["UC-211 WORKS\nPilot jumps between systems on the star map, paying fuel"]
@@ -60,8 +60,8 @@ flowchart LR
   subgraph E6["E6 SHELL"]
     UC_601["UC-601 WORKS\nPilot shows or hides any window and opens any screen from one place"]
     UC_602["UC-602 WORKS\nPilot sets any panel's transparency; the box really darkens"]
-    UC_603["UC-603 MISSING\nPilot sees one top bar: FLY · MAP · SHIP · MARKET · CONTRACTS · PASSENGER · DEPRECATED"]
-    UC_604["UC-604 MISSING\nWhat is broken sits behind DEPRECATED and is not advertised"]
+    UC_603["UC-603 WORKS\nPilot sees one top bar: FLY, MAP, SHIP, MARKET, UPGRADES, CONTRACTS, PASSENGER, BROKEN"]
+    UC_604["UC-604 WORKS\nWhat is broken sits behind a BROKEN tab and is not advertised"]
     UC_605["UC-605 WORKS\nPilot goes fullscreen"]
     UC_606["UC-606 WORKS\nPilot finds every generated art file with its prompt"]
   end
@@ -102,7 +102,7 @@ flowchart LR
   Pilot --> UC_207
   style UC_207 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_208
-  style UC_208 fill:#3d2e12,stroke:#ffb74d,color:#e3ebf3
+  style UC_208 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Passenger --> UC_209
   style UC_209 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_210
@@ -160,9 +160,9 @@ flowchart LR
   Pilot --> UC_602
   style UC_602 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_603
-  style UC_603 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  style UC_603 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_604
-  style UC_604 fill:#2a2f3a,stroke:#6f7f90,color:#e3ebf3
+  style UC_604 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_605
   style UC_605 fill:#153a2c,stroke:#5ee6a8,color:#e3ebf3
   Pilot --> UC_606

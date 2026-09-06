@@ -907,14 +907,61 @@ function blackmarketFenceHtml(p){
   return out; }
 
 /* ------------------------------------------------ TAB: MISSIONS */
+/* MISSION CARDS (RJ 2026-09-06: "and missions"). The board was a wall of monospace text plus a four-column table
+   whose only facts were a title and a price. A contract is a decision, so each posting is now a card carrying the
+   four things the decision turns on: WHERE (target and its distance), HOW DANGEROUS (Synod ships counted near that
+   target), WHAT IT PAYS, and whether your rank can take it at all.
+   Every number comes from HOST.missionCandidates() - the same builder the Passenger's own chooser reads - so a card
+   can never quietly disagree with the reason the Passenger gives for its pick. If that builder is not there (an old
+   host), this returns '' and the plain table below still renders. */
+var TYPE_COL = { BOUNTY:'#ff8a8a', ASSAULT:'#ff8a8a', PATROL:'#8fd0ff', ESCORT:'#8fd0ff', SUPPLY:'#7fd0b0', LIBERATE:'#c9a0ff', DEFEND:'#ffd27a' };
+function dangerBar(n){
+  var pips='', i, cap=5;
+  for(i=0;i<cap;i++) pips += '<i style="display:inline-block;width:7px;height:7px;margin-right:2px;border-radius:1px;border:1px solid '
+    + (i<n?'#ff8a8a':'#3a4a5e') + ';background:'+(i<n?'#ff8a8a':'transparent')+'"></i>';
+  return pips + ' <span style="color:'+(n?COL.BAD:COL.GOOD)+'">' + (n ? n+' Synod near the target' : 'none seen near the target') + '</span>'; }
+function missionCardsHtml(){
+  var h=H(); if(!h || typeof h.missionCandidates!=='function') return '';
+  var cs=[]; try{ cs=h.missionCandidates(false)||[]; }catch(e){ return ''; }
+  if(!cs.length) return '';
+  var M=window.MISSIONS, act=(M&&M.active&&M.active())||null;
+  var out='<div class="pm-note" style="margin:6px 0 4px">Each card shows what the choice turns on - where it is, what waits there, what it pays, and whether your clearance covers it. The Passenger reads the same numbers.</div>';
+  for(var i=0;i<cs.length;i++){ var c=cs[i];
+    var col=TYPE_COL[c.type]||COL.HEAD;
+    var accepted = act && (act.title===c.title);
+    out += '<div class="pm-row" style="align-items:flex-start;border:1px solid '+(accepted?COL.GOOD:COL.BORDER)+';border-radius:7px;padding:8px 10px;margin-bottom:6px;background:rgba(11,18,30,.7)">'
+      + '<div class="pm-grow">'
+      +   '<div><span class="pm-tag" style="color:'+col+';border:1px solid '+col+'66;margin-left:0">'+esc(c.type||'JOB')+'</span> '
+      +     '<b style="color:'+COL.TEXT+'">'+esc(c.title||('posting '+c.idx))+'</b>'
+      +     (accepted?' <span style="color:'+COL.GOOD+'">ACCEPTED</span>':'')
+      +     (c.locked?' <span class="pm-tag nd">needs higher clearance</span>':'') + '</div>'
+      +   (c.desc?'<div class="pm-sub" style="margin-top:2px">'+esc(c.desc)+'</div>':'')
+      +   '<div class="pm-cmpRow" style="margin-top:5px">'
+      +     '<span class="pm-cmp'+(c.dist==null?' none':'')+'">target <b>'+esc(c.targetName||'unnamed')+'</b>'
+      +       (c.dist!=null?' · '+c.dist+'u out':' · distance unknown')+'</span>'
+      +     '<span class="pm-cmp '+(c.danger?'dn':'up')+'">'+dangerBar(c.danger)+'</span>'
+      +   '</div>'
+      + '</div>'
+      + '<div style="text-align:right;min-width:96px">'
+      +   '<div style="color:'+COL.AMBER+';font-size:15px">'+num(c.reward,0)+'c</div>'
+      +   (c.dist?'<div class="pm-sub">'+(c.reward/Math.max(1,c.dist)).toFixed(2)+'c per unit flown</div>':'')
+      +   '<button class="pm-b pm-go" data-act="cmd" data-cmd="accept m'+c.idx+'" style="margin-top:5px;min-width:84px"'   // `accept m<n>` is the MISSION board; a bare `accept <n>` is a coalition CONTRACT id
+      +     ((accepted||c.locked)?' disabled':'')+'>'+(accepted?'ACTIVE':(c.locked?'LOCKED':'ACCEPT'))+'</button>'
+      + '</div></div>'; }
+  return out; }
 function missionsHtml(){
   var M=window.MISSIONS, board='(mission system offline)';
-  if(M && typeof M.board==='function'){ try{ board=String(M.board()); }catch(e){ board='(mission board glitched)'; } }
+  // when the CARDS below can render, the monospace board prints only its status lines - clearance, next refresh,
+  // what is active - instead of repeating every posting a second time on the same screen.
+  var useCards=!!missionCardsHtml();
+  if(M && typeof M.board==='function'){ try{ board=String((useCards&&M.header)?M.header():M.board()); }catch(e){ board='(mission board glitched)'; } }
   var h='<div class="pm-board">'+board+'</div>';
   var list=null;
   if(M){ try{ if(typeof M.list==='function') list=M.list(); else if(Array.isArray(M.missions)) list=M.missions; }catch(e){ list=null; } }
   if(M && typeof M.accept==='function'){
-    if(Array.isArray(list) && list.length){
+    var cards=missionCardsHtml();
+    if(cards){ h+=cards; }
+    else if(Array.isArray(list) && list.length){
       var i; h+='<table class="pm-t"><tr><th>#</th><th>MISSION</th><th>REWARD</th><th></th></tr>';
       for(i=0;i<list.length;i++){ var m=list[i]||{};
         var d=m.desc||m.title||m.n||m.name||('mission '+(i+1));

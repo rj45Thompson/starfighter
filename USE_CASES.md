@@ -50,7 +50,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-205 [E2] [WORKS] Pilot compares a weapon against the fitted one before buying :: 20 comparison rows in the SHOP tab: dps, damage, rate, reach, barrels, homing, splash, damage type
 - UC-206 [E2] [WORKS] Pilot fits gear into hardpoints and gizmo slots on a ship board :: MOUNT BAYS slots: mount cost 220c, GUNS 1 to 2, DPS 66.7 to 128.7; unmount refunded 110c and reverted both
 - UC-207 [E2] [WORKS] Pilot takes a rank-gated contract from the board :: MISSIONS.accept via the UI
-- UC-208 [E2] [PARTLY] Pilot reads a contract as a card: target, distance, danger, reward :: burn-down 2
+- UC-208 [E2] [WORKS] Pilot reads a contract as a card: target, distance, danger, reward :: cards from HOST.missionCandidates, the same numbers the Passenger chooses on; ACCEPT set the active mission in-page
 - UC-209 [E2] [WORKS] Passenger chooses the contract and says why :: chooseMission + spoken reasons
 - UC-210 [E2] [WORKS] Pilot follows the tracker and the on-screen marker to the target :: updateMissionArrow / Marker
 - UC-211 [E2] [WORKS] Pilot jumps between systems on the star map, paying fuel :: starmap.js
@@ -87,7 +87,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 ### E6 SHELL
 - UC-601 [E6] [WORKS] Pilot shows or hides any window and opens any screen from one place :: WINDOWS menu
 - UC-602 [E6] [WORKS] Pilot sets any panel's transparency; the box really darkens :: panels.js 0.25-1.0
-- UC-603 [E6] [MISSING] Pilot sees one top bar: FLY · MAP · SHIP · MARKET · CONTRACTS · PASSENGER · DEPRECATED :: burn-down 6
-- UC-604 [E6] [MISSING] What is broken sits behind DEPRECATED and is not advertised :: burn-down 1
+- UC-603 [E6] [WORKS] Pilot sees one top bar: FLY, MAP, SHIP, MARKET, UPGRADES, CONTRACTS, PASSENGER, BROKEN :: shell.js, 8 tabs live, zero elements overlapping its band
+- UC-604 [E6] [WORKS] What is broken sits behind a BROKEN tab and is not advertised :: the tab renders 2 deprecated, 8 half built, 9 not built from uml/status.json
 - UC-605 [E6] [WORKS] Pilot goes fullscreen :: ⛶ button
 - UC-606 [E6] [WORKS] Pilot finds every generated art file with its prompt :: Generated art screen

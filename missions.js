@@ -461,7 +461,10 @@
       '<br><span style="opacity:.85;margin-left:14px">' + m.desc + '</span> ' + pay + '</div>';
   }
 
-  function boardHtml() {
+  // opts.rows===false renders only the header (clearance, refresh, ACTIVE) - what a caller that draws its own
+  // posting cards wants, so the same board is never printed twice on one screen (planetmenu cards, 2026-09-06).
+  function boardHtml(opts) {
+    var showRows = !(opts && opts.rows === false);
     try {
       var h = H();
       if (!h) return '<div style="color:' + CFG.COL_ERR + '">RANGER COMMAND uplink offline.</div>';
@@ -477,8 +480,8 @@
           esc(str(activeM.prog, 'underway')) + ' <span style="color:' + CFG.COL_DIM + '">(abandon to drop)</span></div>';
       }
       if (!board.length) out += '<div style="color:' + CFG.COL_DIM + '">No postings right now - check back after the next refresh.</div>';
-      for (var i = 0; i < board.length; i++) out += rowHtml(board[i], i, pr);
-      out += '<div style="color:' + CFG.COL_DIM + ';margin-top:6px">accept &lt;n&gt; to take a contract - one active at a time</div>';
+      if (showRows) { for (var i = 0; i < board.length; i++) out += rowHtml(board[i], i, pr);
+        out += '<div style="color:' + CFG.COL_DIM + ';margin-top:6px">accept &lt;n&gt; to take a contract - one active at a time</div>'; }
       out += '</div>';
       return out;
     } catch (e) { return '<div style="color:' + CFG.COL_ERR + '">RANGER COMMAND board glitched - try again.</div>'; }
@@ -546,6 +549,7 @@
     init: init,
     tick: tick,
     board: boardHtml,
+    header: function () { return boardHtml({ rows: false }); },   // the board's status lines without its postings (2026-09-06)
     accept: accept,
     abandon: abandon,
     active: function () { return activeM; },
