@@ -568,6 +568,68 @@ function contrabandHtml(){
   return '<div class="pm-panel"><h4 style="color:'+COL.VIOLET+'">☠ BLACK MARKET'+(canFence&&!atBM?' - FENCE':'')+'</h4>'
     + '<div style="margin-bottom:6px;color:'+COL.DIM+'">'+note+(holding?' Carrying <b style="color:'+COL.AMBER+'">'+holding+'</b> unit'+(holding>1?'s':'')+'.':'')+'</div>'
     + '<table class="pm-t"><tr><th>WARE</th><th>BUY</th><th>FENCE AT</th><th>HELD</th><th>TRADE</th></tr>'+rows+'</table></div>'; }
+/* TRADE ROUTES (RJ 2026-09-06, after the shop and the bay: "then there is trading"). The market told you this
+   world's prices and nothing else, so working out where to take a hold meant flying around and remembering.
+   This block answers the two questions a trader actually has, and answers them ONLY from prices this pilot has
+   personally seen: recordObservedPrices writes p._obs on every dock, so a world you have never docked at simply
+   does not appear. Nothing here peeks at live prices elsewhere - that would be the cheat this codebase forbids.
+   An observation carries its age, because a remembered price is a lead, not a promise. */
+function obsOf(pl, k){ return (pl && pl._obs && pl._obs[k]) || null; }
+function ageOf(rec){ var h=H(), now=(h&&h.T0!=null)?h.T0:null;
+  if(!rec || now==null || rec.atT==null) return '';
+  var mins=Math.max(0,(now-rec.atT)/60);
+  return mins<1 ? 'just seen' : (mins<60 ? Math.round(mins)+' min ago' : Math.round(mins/60)+' h ago'); }
+function distFrom(a, b){ if(!a||!b||!a.pos||!b.pos) return null;
+  var dx=a.pos.x-b.pos.x, dy=a.pos.y-b.pos.y, dz=a.pos.z-b.pos.z; return Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)); }
+function knownBuyers(here, k, hereSell){
+  var h=H(), out=[], i, list=(h&&h.planets)||[];
+  for(i=0;i<list.length;i++){ var pl=list[i]; if(pl===here) continue;
+    var rec=obsOf(pl,k); if(!rec) continue;
+    out.push({ planet:pl, price:rec.price, age:ageOf(rec), dist:distFrom(here,pl), gain:Math.round(rec.price)-Math.round(hereSell) }); }   // rounded against rounded: the row's arithmetic must add up on screen
+  out.sort(function(a,b){ return b.price-a.price; });
+  return out; }
+function routesHtml(here, P){
+  var G=goods(), hold=holdOf(P), rows='', i, any=false, seen=0;
+  var h=H(), list=(h&&h.planets)||[];
+  for(i=0;i<list.length;i++) if(list[i]._obs) seen++;
+  // 1) what you are CARRYING - who has been seen paying most for it
+  for(i=0;i<G.length;i++){ var g=G[i]; var have=Math.round(num(hold[g.k],0)); if(have<=0) continue;
+    any=true;
+    var hereSell=price(here,g.k,false);
+    var buyers=knownBuyers(here,g.k,hereSell).slice(0,2);
+    var cells = buyers.length
+      ? buyers.map(function(b){
+          var col = b.gain>0 ? COL.GOOD : COL.DIM;
+          return '<span class="pm-cmp '+(b.gain>0?'up':'eq')+'" title="last seen at '+esc(b.planet.name)+', '+esc(b.age||'age unknown')+'">'
+            + esc(b.planet.name)+' <b>'+fmtC(Math.round(b.price))+'</b>'
+            + (b.dist!=null?' <span style="opacity:.6">'+b.dist+'u</span>':'')
+            + ' <i style="color:'+col+'">'+(b.gain>0?'+':'')+b.gain+'/unit</i></span>'; }).join('')
+      : '<span class="pm-cmp none">no market seen yet - dock somewhere and this fills in</span>';
+    rows += '<div class="pm-row"><div class="pm-grow"><b>'+esc(g.n)+'</b> <span class="pm-sub">'+have+' aboard · '
+      + 'sells here at '+fmtC(Math.round(hereSell))+'</span><div class="pm-cmpRow">'+cells+'</div></div>'
+      + (buyers.length && buyers[0].gain>0
+          ? '<div style="color:'+COL.GOOD+';min-width:74px;text-align:right">+'+(buyers[0].gain*have)+'c</div>'
+          : '<div style="color:'+COL.DIM+';min-width:74px;text-align:right">-</div>')
+      + '</div>'; }
+  // 2) what is CHEAP here and has been seen dear elsewhere - the run to make next
+  var runs='', j=0;
+  for(i=0;i<G.length && j<3;i++){ var g2=G[i];
+    var buyHere=price(here,g2.k,true);
+    var best=knownBuyers(here,g2.k,buyHere)[0];
+    if(!best || best.price<=buyHere*1.12) continue;
+    j++;
+    runs += '<div class="pm-row"><div class="pm-grow"><b>'+esc(g2.n)+'</b> <span class="pm-sub">buy here at '
+      + fmtC(Math.round(buyHere))+' · last seen at '+esc(best.planet.name)+' for '+fmtC(Math.round(best.price))
+      + (best.dist!=null?' ('+best.dist+'u away)':'')+' · '+esc(best.age||'age unknown')+'</span></div>'
+      + '<div style="color:'+COL.GOOD+';min-width:74px;text-align:right">+'+(Math.round(best.price)-Math.round(buyHere))+'/unit</div></div>'; }
+  var note='<div class="pm-note" style="margin-top:6px">Built only from prices you have personally seen - '
+    + seen+' world'+(seen===1?'':'s')+' visited so far. A world you have never docked at is not listed, and a '
+    + 'remembered price can have moved since.</div>';
+  if(!any && !runs) return '<div class="pm-panel"><h4>TRADE ROUTES</h4><div class="pm-note">Nothing aboard, and no run worth naming from what you have seen yet.</div>'+note+'</div>';
+  return '<div class="pm-panel"><h4>TRADE ROUTES</h4>'
+    + (any ? '<div class="pm-sub" style="margin-bottom:4px">YOUR HOLD - best price seen elsewhere</div>'+rows : '')
+    + (runs ? '<div class="pm-sub" style="margin:8px 0 4px">RUN FROM HERE - cheap here, dear where you have been</div>'+runs : '')
+    + note + '</div>'; }
 function marketHtml(){
   var p=S.planet, P=player(), G=goods();
   if(S.isBase) return '<div class="pm-note">No commodity exchange at Ranger Command - the base deals in hulls (SHOP tab) and the wares below.</div>'+contrabandHtml();
@@ -607,7 +669,7 @@ function marketHtml(){
   var foot = '<div class="pm-note" style="margin-top:8px">hold '+htot+'/'+Math.round(hcap)
     + ' - credits <span style="color:'+COL.AMBER+'">'+Math.round(num(P&&P.credits,0))+'c</span>'
     + ' - reputation moves prices: allied worlds sell cheap and buy dear.</div>';
-  return head+table+foot+terraformHtml(p)+contrabandHtml()+probeHtml(p); }
+  return head+table+foot+routesHtml(p,P)+terraformHtml(p)+contrabandHtml()+probeHtml(p); }
 
 /* SR:AWA parity slice (2026-07-09): mineral probes were TERMINAL-ONLY at deploy time - the Athenaeum's own
    SCIENCE tab sells them, but the `deployprobe`/`collectprobe` commands only work at OTHER worlds, where no

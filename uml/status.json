@@ -121,9 +121,9 @@
 {
 "id": "UC-203",
 "epic": "E2",
-"status": "PARTLY",
+"status": "WORKS",
 "story": "Pilot sees where to sell what is held, from prices already seen",
-"test": "FEATURE ATLAS burn-down 3"
+"test": "TRADE ROUTES under the market: best two seen buyers per good with distance and per-unit gain, plus three runs from here"
 },
 {
 "id": "UC-204",
@@ -386,8 +386,8 @@
 }
 ],
 "tally": {
-"WORKS": 34,
-"PARTLY": 6,
+"WORKS": 35,
+"PARTLY": 5,
 "MISSING": 9,
 "DEPRECATED": 2
 }

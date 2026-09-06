@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:11:56",
+ "generated": "2026-09-06T12:23:47",
  "modules": [
   {
    "file": "acquire.js",
@@ -1498,7 +1498,7 @@
   },
   {
    "file": "planetmenu.js",
-   "lines": 1000,
+   "lines": 1100,
    "classes": [
     {
      "name": "PLANETMENU",
@@ -1554,6 +1554,10 @@
     "doDepart",
     "pipsHtml",
     "renderHead",
+    "seedOf",
+    "rngOf",
+    "rgba",
+    "cityLights",
     "portraitHtml",
     "statusFallback",
     "intelRow",
@@ -1570,18 +1574,14 @@
     "barHtml",
     "scienceHtml",
     "contrabandHtml",
-    "marketHtml",
-    "probeHtml",
-    "terraformHtml",
-    "upCostEst",
-    "shopIcon",
-    "wStats",
-    "deltaChip",
-    "weaponCompareHtml",
-    "hullCompareHtml",
-    "compareForCmd"
+    "obsOf",
+    "ageOf",
+    "distFrom",
+    "knownBuyers",
+    "routesHtml",
+    "marketHtml"
    ],
-   "functionTotal": 82,
+   "functionTotal": 91,
    "cfg": [
     "Z_INDEX",
     "overlay",
@@ -2414,9 +2414,9 @@
   {
    "id": "UC-203",
    "epic": "E2",
-   "status": "PARTLY",
+   "status": "WORKS",
    "story": "Pilot sees where to sell what is held, from prices already seen",
-   "test": "FEATURE ATLAS burn-down 3"
+   "test": "TRADE ROUTES under the market: best two seen buyers per good with distance and per-unit gain, plus three runs from here"
   },
   {
    "id": "UC-204",
@@ -2679,8 +2679,8 @@
   }
  ],
  "tally": {
-  "WORKS": 34,
-  "PARTLY": 6,
+  "WORKS": 35,
+  "PARTLY": 5,
   "MISSING": 9,
   "DEPRECATED": 2
  }

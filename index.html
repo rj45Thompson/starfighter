@@ -307,7 +307,7 @@
 <script src="starmap.js?v=20260714c"></script>
 <script src="conquest.js?v=20260714c"></script>
 <script src="missions.js?v=20260906a"></script>
-<script src="planetmenu.js?v=20260906c"></script>
+<script src="planetmenu.js?v=20260906e"></script>
 <script src="textquests.js?v=20260714c"></script>
 <script>
 "use strict";
@@ -6227,6 +6227,7 @@ loadGameAssets();   // the ORIGINAL Starfighter2 FBX pack (ships/asteroids/gems)
 //  mutate goes through commands or their own per-planet state. Defensive on both sides.
 // =================================================================================================
 window.HOST={
+  get T0(){ return T0; },   // the game clock, so a UI can age an observation honestly (planetmenu trade routes, 2026-09-06)
   sb:(s)=>sbSnapshot(s), spendStat:(k)=>spendStat(ships[0],k), takeTierUp:(k)=>takeTierUp(ships[0],k), term:(h,c)=>term(h,c),   // STARBLAST LOOP (sbhud.js reads / spends through these)
   get ships(){ return ships; }, get planets(){ return planets; }, get systems(){ return systems; },
   get P(){ return ships[0]; }, get T0(){ return T0; }, get campaign(){ return campaign; },

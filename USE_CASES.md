@@ -45,7 +45,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 ### E2 RANGERS
 - UC-201 [E2] [WORKS] Pilot docks at a planet and sees its screen :: PLANETMENU.open, 7 tabs
 - UC-202 [E2] [WORKS] Pilot buys and sells goods at organic prices :: buy ore 5 −115c, sell +118c, +1 button −23c
-- UC-203 [E2] [PARTLY] Pilot sees where to sell what is held, from prices already seen :: FEATURE ATLAS burn-down 3
+- UC-203 [E2] [WORKS] Pilot sees where to sell what is held, from prices already seen :: TRADE ROUTES under the market: best two seen buyers per good with distance and per-unit gain, plus three runs from here
 - UC-204 [E2] [WORKS] Pilot buys a weapon with condition, weight and power :: weapon ballistic −193c
 - UC-205 [E2] [WORKS] Pilot compares a weapon against the fitted one before buying :: 20 comparison rows in the SHOP tab: dps, damage, rate, reach, barrels, homing, splash, damage type
 - UC-206 [E2] [WORKS] Pilot fits gear into hardpoints and gizmo slots on a ship board :: MOUNT BAYS slots: mount cost 220c, GUNS 1 to 2, DPS 66.7 to 128.7; unmount refunded 110c and reverted both
