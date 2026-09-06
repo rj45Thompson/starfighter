@@ -33,12 +33,24 @@ No leak found: scene children oscillate 469-572, ships plateau at 63, 0 runtime 
 
 ## Open
 
-- [ ] B3  Stop `scan` leaking a GPU texture per badge, and make the badge expire -> DONE WHEN: calling `scan` 10 times in a row leaves `renderer.info.memory.textures` flat (measured before/after with the harness), and a badge disappears on its own within ~8s as `_scanBadgeT` always intended.
-- [ ] B4  Keep the economy, autosave and SR module ticks running during an away mission -> DONE WHEN: with `AWAY.active()` true for 30 simulated seconds, a station's `made` count advances and a save is written, measured before/after; and the away mission itself still renders.
-- [ ] P2  Measure and re-tune the AI `think` stride -> DONE WHEN: a table of THINK_STRIDE vs (think ms/frame, ships whose behaviour visibly changes over 30s) exists, and either the stride changes with that evidence or the line closes `[-]` with the measurement saying why the current value is right.
-- [ ] V1  Re-verify the whole game after every change above -> DONE WHEN: a clean-page `SIM.run(18)` reports 0 unique errors and empty `nanShips`, run as the LAST action before the final report.
+(nothing open in this lane - see "For the other lane" below for verified findings handed over)
 
 ## Done
+
+- [x] B3  `scan` leaked a GPU texture per badge and the badges never expired -> REPRODUCED then FIXED. The terminal line already promised "badges painted over live contacts for 8s"; `o._scanBadgeT = T0+8` was written and NOTHING in the repo read it, and a re-scan detached the old sprite without disposing its CanvasTexture. Measured on the live game with six ships parked alongside the player: one scan takes textures 57 -> 63 (the six badges); **ten scans take it to 64, not ~117** - each rescan disposes the one it replaces. Expiry verified on the same run: at +4s still 6 badges / tex 64 (it keeps its stated life), at +10s **0 badges / tex 59** - the textures are actually freed, not just detached.
+- [x] B4  An away mission silently froze the empire and stopped saving -> FIXED. The `AWAY.active()` branch returns before the whole tail of `frame()`, which is right for the space sim and the space render but also skipped `ECONOMY.tick` and `saveTick` while `T0` kept advancing. Measured over 30 simulated away seconds with the branch forced: stations produced (Halcyon 160->164, Pallas 256->264, Cydon 0->4) and `AWAY.frame` still ran all 1,800 frames, so the mission itself is unaffected. Autosave proved separately: with `SF_SAVE_v1` deleted first, 19 away seconds wrote an 11,767-byte save; before the fix nothing was written for the entire mission. The WAR sim stays paused on purpose - an away mission can decide the battle conquest is arbitrating, which is a design question, not an oversight to quietly fix.
+- [-] P2  Re-tune the AI `think` stride -> DROPPED, and the measurement is why. At 62 ships:
+
+  | THINK_STRIDE | think ms/frame | think calls/frame |
+  |---|---|---|
+  | 1 | 14.45 | 62.5 |
+  | **4 (shipped)** | **4.54** | **16.5** |
+  | 16 | 2.68 | 4.8 |
+
+  Stride 4 already takes 69% of the cost out. Going to 16 saves a further 1.86 ms/frame while
+  quartering how often a pilot reacts - a bad trade for a game about AI pilots. The shipped value
+  is right; nothing changed.
+- [x] V1  Re-verify the whole game -> PASSED on a clean page after every change: two consecutive `SIM.run(9)` at 57 ships and 7,670 rocks report **0 unique errors** and **empty `nanShips`**, browser console clean of TypeError/ReferenceError, and a screenshot shows the asteroid field rendering normally with no LOD artifacts.
 
 - [x] H0  Build a measurement harness that works in a tab that never paints -> DONE: `sim_harness.js`, loaded only on `?harness=1`, drives the game's own `frame(now)` with a synthetic clock. `SIM.census() / run() / profile() / rockReport()`. Verified: `SIM.run(3)` returns real ms/frame on a hidden pane where `document.timeline` is frozen at 0 and rAF never fires.
 - [x] P1  Cull the per-frame asteroid instance-matrix rewrite by distance -> **DONE, but NOT to the number I first wrote.** Measured A/B in one page, three interleaved OFF/ON pairs at a matched 53-58 ships and ~7,740 rocks, using the real off-switch `CFG.ROCK_LOD_MAX=1`:
@@ -81,3 +93,6 @@ Each was verified by reading the cited line; the reproduction is stated so it ca
   Check `innerWidth` and `document.timeline.currentTime` before believing any layout reading.
 
 <!-- pass 1: 5 done, 0 blocked, 2 appended (B3, B4) -->
+
+<!-- pass 2: 4 done, 0 blocked, 1 dropped with measurement, 0 appended -->
+<!-- pass 3: 0 done, 0 blocked, 0 appended - STAGNANT, loop complete -->

@@ -793,6 +793,28 @@ function fxSprite(tex,pos,size,col,life,grow,opacity){ const m=new T.Sprite(new 
 function updateFx(dt){ for(let i=fxSprites.length-1;i>=0;i--){ const f=fxSprites[i]; f.life-=dt; const k=Math.max(0,f.life/f.max); f.m.material.opacity=f.op*k; const s=f.size*(1+(1-k)*(f.grow-1)); f.m.scale.set(s,s,1);
     if(f.life<=0){ scene.remove(f.m); f.m.material.dispose(); fxSprites.splice(i,1); } } }
 
+// ===== SCAN BADGES (leak + missing expiry, fixed 2026-09-06) =====
+// `scan` paints a stat badge over each contact, and the terminal line it prints says "badges painted
+// over live contacts for 8s". They never expired: the code set o._scanBadgeT = T0+8 and NOTHING in
+// the repo ever read that field, so every badge stayed for the rest of the session. Worse, a repeat
+// scan did `o.mesh.remove(o._scanBadge)` and then built a new one - the detached sprite's
+// CanvasTexture and SpriteMaterial were never disposed, so each scan of the same 6 contacts stranded
+// 6 more GPU textures. Scanning during a running fight leaked steadily and silently.
+// These two make the printed promise true and give every badge exactly one owner.
+const _scanBadged=[];   // the only list of live badges - a badge not in here cannot be reached to free it
+function dropScanBadge(o){
+  const sp=o&&o._scanBadge; if(!sp) return;
+  if(sp.parent) sp.parent.remove(sp);
+  const m=sp.material;
+  if(m){ if(m.map&&m.map.dispose) m.map.dispose(); if(m.dispose) m.dispose(); }   // the CanvasTexture is the part that was piling up
+  o._scanBadge=null; o._scanBadgeT=0;
+  const i=_scanBadged.indexOf(o); if(i>=0) _scanBadged.splice(i,1);
+}
+function addScanBadge(o,sp,until){ dropScanBadge(o); o._scanBadge=sp; o._scanBadgeT=until; o.mesh.add(sp); _scanBadged.push(o); }
+function scanBadgeTick(){ for(let i=_scanBadged.length-1;i>=0;i--){ const o=_scanBadged[i];
+  // gone from the world, or its 8s is up - either way the badge and its texture go with it
+  if(!o._scanBadge || !o.mesh || o._scanBadgeT<=T0) dropScanBadge(o); } }
+
 // ===== MINING BOTS (user 2026-09-06: "mining bots that shoot out of your ship just for a cool effect that are going
 // to get the gems and they also mine with little lasers that create a seam for your main guns to split the asteroids") =====
 // CFG.MINING_BOTS drones ride with the player. Each one: IDLE (station-keeping beside the hull, matching its velocity),
@@ -4561,7 +4583,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
           else if(o.role) roleTag=` · <span style="color:#ff9a9a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - this scan REFUTES the presumption">REFUTED: guessed ${pr.role}, is ${o.role}</span>`;
           else roleTag=` · <span style="color:#ffd27a" title="grow-learned rule ${pr.rule} (support ${pr.support}) - defeasible, a scan can refute it">PRESUMED ${pr.role}</span>`; } } }catch(e){}
       return `${threat} ${o.name} ${health} · W${(o.lvl&&o.lvl.weapon)||1} · ${Math.round(P.pos.distanceTo(o.pos))}u${roleTag}`; }).join('<br>&nbsp;&nbsp;')||'none';
-    if(window.HULLMODELS&&HULLMODELS.scanBadge){ for(const o of inrange.slice(0,6)){ try{ if(o._scanBadge){ o.mesh.remove(o._scanBadge); } o._scanBadge=HULLMODELS.scanBadge(T,o); o.mesh.add(o._scanBadge); o._scanBadgeT=(typeof T0!=='undefined'?T0:0)+8; }catch(e){} } }
+    if(window.HULLMODELS&&HULLMODELS.scanBadge){ for(const o of inrange.slice(0,6)){ try{ addScanBadge(o, HULLMODELS.scanBadge(T,o), (typeof T0!=='undefined'?T0:0)+8); }catch(e){} } }   // addScanBadge disposes whatever was there first and registers the new one for expiry
     if(window.SOUND) SOUND.play('ui');
     term('<b style="color:#8fd0ff">◈ SCAN</b> <span style="opacity:.55"> - the Passenger reads what your sensors touch; badges painted over live contacts for 8s</span>','sys');
     term('&nbsp;&nbsp;planets: '+ps,'sys'); term('&nbsp;&nbsp;contacts:<br>&nbsp;&nbsp;'+sh,'sys'); return; }
@@ -7402,13 +7424,30 @@ function ambientDeliberateTick(dt){
     if(!c0.convergence.converged) ACQUIRE.acquire(fromShip.name||'agent', decision, world, GAME_KNOW, {latent, seed:known});
   }catch(e){}
 }
+// THE PART OF THE WORLD THAT DOES NOT STOP (fix 2026-09-06).
+// The away-mission branch of frame() returns before the whole tail of the loop, which is right for
+// the space SIM and the space RENDER - ships must not fly and bullets must not move while you are
+// walking a planet, and AWAY does its own drawing. But two of the things it skipped are not part of
+// the space sim at all, and T0 keeps advancing while they are skipped:
+//   ECONOMY.tick - economy.js exists to run "while you fly somewhere else"; landing froze every
+//                  station's production clock and every hauler mid-route, so an away mission was a
+//                  silent, invisible pause on the empire the player built.
+//   saveTick     - nothing at all was written for the entire duration of an away mission, so a
+//                  crash or a closed tab during a ground battle lost everything since the last tick.
+// The WAR sim (CONQUEST and the other SR module ticks) is deliberately NOT resumed here: an away
+// mission can decide the battle for the very planet conquest is arbitrating (see onAwayVictory), so
+// running both at once is a real design question, not an oversight to quietly fix. It stays paused.
+function backgroundTick(dt){
+  if(window.ECONOMY) ECONOMY.tick(dt);
+  saveTick(dt);
+}
 let last=performance.now(), mktAcc=0, mlogAcc=0;
 function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=0.05;
   if(typeof SF_LOCK!=='undefined'&&SF_LOCK.paused){ requestAnimationFrame(frame); return; }   // singleton: another tab owns the sim
   T0+=dt;
-  if(AWAY.active()){ AWAY.frame(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering
+  if(AWAY.active()){ AWAY.frame(dt); backgroundTick(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering - but the empire it promised keeps running, see backgroundTick
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
