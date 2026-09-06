@@ -36,7 +36,8 @@ const CFG = {
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
   RESIZE_EDGE:9,               // thickness of the edge-resize strips (user 2026-07-10 'thicker border + resize cursor on hover, all windows') - bumped to 16 on touch in positionGrip()
   DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
-  EDGE_OFFSET:14,              // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
+  EDGE_OFFSET:14, TOP_RESERVE:38,   // TOP_RESERVE: the always-visible shell bar owns the top strip - top-docked panels start below it
+               // fixed distance from the screen edge a redocked panel sits at (matches the ~10-14px the hand-authored panel CSS already used)
   EDGE_HL_THICK:10,            // drag-feedback strip thickness along the candidate edge (6->10 2026-07-09: "docking is still weak" - the old strip was easy to miss entirely)
 };
 const COL={ cyan:'#46d6ff', ink:'#080a10', txt:'#cfe2f5', dim:'#6f88a4', border:'#22344a' };
@@ -162,7 +163,7 @@ function tabPosition(rec){
   // (top/bottom edge) position is a CONSTANT so it stays put even while its panel is slid off-screen; horizontal
   // (left/right edge) reads the panel's live top since that's unaffected by its own horizontal slide.
   const r=rec.el.getBoundingClientRect(); const s={};
-  if(rec.edge==='top'){ s.top='2px'; s.left=(r.left+r.width/2)+'px'; s.transform='translateX(-50%)'; }
+  if(rec.edge==='top'){ s.top=(2+CFG.TOP_RESERVE)+'px'; s.left=(r.left+r.width/2)+'px'; s.transform='translateX(-50%)'; }   // TOP_RESERVE: clear of the shell.js top bar (2026-09-06)
   else if(rec.edge==='bottom'){ s.bottom='2px'; s.left=(r.left+r.width/2)+'px'; s.transform='translateX(-50%)'; }
   else if(rec.edge==='left'){ s.left='2px'; s.top=Math.max(4,r.top)+'px'; }
   else { s.right='2px'; s.top=Math.max(4,r.top)+'px'; }
@@ -301,7 +302,7 @@ function setSide(el, side, val){ el.style.setProperty(side, val==null?'auto':val
 function applyDockPosition(rec, edge, pos){
   const el=rec.el;
   setSide(el,'top',null); setSide(el,'bottom',null); setSide(el,'left',null); setSide(el,'right',null);
-  if(edge==='top'){ setSide(el,'top',CFG.EDGE_OFFSET+'px'); setSide(el,'left',pos+'px'); }
+  if(edge==='top'){ setSide(el,'top',(CFG.EDGE_OFFSET+CFG.TOP_RESERVE)+'px'); setSide(el,'left',pos+'px'); }   // TOP_RESERVE keeps a redocked panel clear of the shell.js top bar (2026-09-06)
   else if(edge==='bottom'){ setSide(el,'bottom',CFG.EDGE_OFFSET+'px'); setSide(el,'left',pos+'px'); }
   else if(edge==='left'){ setSide(el,'left',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }
   else { setSide(el,'right',CFG.EDGE_OFFSET+'px'); setSide(el,'top',pos+'px'); }

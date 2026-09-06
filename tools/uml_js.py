@@ -133,6 +133,10 @@ def main():
     open(os.path.join(OUT, "classes.mmd"), "w", encoding="utf-8").write(mermaid_classes(model))
     open(os.path.join(OUT, "usecases.mmd"), "w", encoding="utf-8").write(mermaid_usecases(epics, cases))
     tally = {s: sum(1 for c in cases if c["status"] == s) for s in STATUS_FILL}
+    # status.json is what the GAME reads (shell.js DEPRECATED tab) - the same rows, without the module dump, so the
+    # in-game "what is broken" list cannot drift from the model this file renders.
+    json.dump({"generated": time.strftime("%Y-%m-%d"), "epics": epics, "useCases": cases, "tally": tally},
+              open(os.path.join(OUT, "status.json"), "w", encoding="utf-8"), indent=0)
     json.dump({"generated": time.strftime("%Y-%m-%dT%H:%M:%S"), "modules": model, "epics": epics, "useCases": cases, "tally": tally}, open(os.path.join(OUT, "model.json"), "w", encoding="utf-8"), indent=1)
     ncls = sum(len(m["classes"]) for m in model)
     print(f"classes.mmd: {ncls} exposed objects/classes over {len(model)} modules; usecases.mmd: {len(cases)} use cases, tally {tally}")
