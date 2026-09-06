@@ -1832,9 +1832,10 @@
     }
    },
    "ours": {
-    "v": "unknown",
+    "v": "partial",
     "uc": null,
-    "note": "missions.js exists but no use case covers a failure path or its consequence"
+    "note": "No mission-FAILURE state. Contracts (missions.js): the only non-success exits are abandon() and voidM(), both explicitly no-penalty (header :18, abandon :309, voidM :335 'No penalty'); an accepted contract has no deadline/timer (no expire/timeout/deadline in the file - initState :275 stores acceptedT but nothing reads it). index.html adds no mission-loss penalty (negative repAdd only at :1620 customs contraband and :2591 planet-bombing, neither a mission). BUT text quests (textquests.js) apply LASTING negative consequences on bad/declined outcomes via applyEffects (:64): declining costs standing (end_ignore rep -0.4 :93; the_debt end_decline rep -0.3 :136) and a greedy resolution costs standing (end_keep rep -1.5 :116); reputation persists via HOST.repAdd. Even so every quest terminal increments questsCompleted (:246) - a bad outcome still counts as resolved, there is no 'failed' state. Lasting consequence YES, failure state NO -> partial. Verified: 'node textquests.js' RESULT PASS 16/16 incl. 'resolving a quest changed at least one of credits/rep'.",
+    "settledFrom": "code read + node textquests.js self-test 2026-09-06"
    }
   },
   {
