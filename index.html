@@ -326,6 +326,7 @@
 <script src="economy.js?v=20260906f"></script>
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
+<script src="cybertron.js?v=20260906a"></script>
 <script src="empire.js?v=20260906c"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -4437,7 +4438,9 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if((a[1]||'').toLowerCase()!=='confirm'){ term('⚠ this ends your current campaign now and resets the war front/territory/your ship - the knowledge graphs (every shared+private fact the minds earned) are NOT affected. Type <b>newgame confirm</b> to proceed.','sys'); return; }
     if(window.HOST&&typeof HOST.onNewGeneration==='function') HOST.onNewGeneration();
     term('🌌 new campaign started on request.','sys'); return; }
-  if(c==='mute'){ if(window.SOUND){ const m=SOUND.toggleMute?SOUND.toggleMute():(SOUND.setMute(!SOUND.muted()),SOUND.muted()); term(`sound ${m?'muted':'on'}.`,'sys'); } return; }
+  if(c==='mute'||c==='unmute'){ if(window.SOUND){ const want=(c==='unmute')?false:(c==='mute'&&a[1]==null?null:false);   // SHADOW FIX 2026-09-06: `unmute` used to reach the VOICES handler two hundred lines below, so `mute` silenced SOUND and `unmute` switched CHATTER voices ON - the two were never inverses of each other. Both now mean sound, and `voices on|off` owns voices.
+    const m=(want===null)?(SOUND.toggleMute?SOUND.toggleMute():(SOUND.setMute(!SOUND.muted()),SOUND.muted())):(SOUND.setMute(want),SOUND.muted());
+    term(`sound ${m?'muted':'on'}.`,'sys'); } return; }
   if(c==='volume'||c==='vol'){ if(window.SOUND){ const v=Math.max(0,Math.min(1,parseFloat(a[1])||0.6)); SOUND.setVolume(v); SOUND.play('ui'); term(`volume ${Math.round(v*100)}%.`,'sys'); } return; }
   if(c==='mods'){ if(!window.GAMEMOD){ term('no mutation layer','err'); return; }
     const L=GAMEMOD.list();
@@ -4455,8 +4458,8 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`<b style="color:#8fd0ff">👁 RETINA - ${which.name}</b> <span style="opacity:.55">(arc3 eye + fog of war: · = never seen, lower = stale memory, UPPER = live on sensors, @ = ${which.name==='player'?'you':'ORION'})</span>`,'sys');
     which.ascii().forEach(r=>term('<span style="font-family:monospace;letter-spacing:1px;opacity:.9">'+r.replace(/</g,'&lt;')+'</span>',''));
     term(`&nbsp;&nbsp;explored <b>${Math.round(sees.explored*100)}%</b> · ${sees.objects.length} shapes (${sees.objects.filter(o=>o.live).length} live) · ${sees.sameGroups.length} kinships${sees.sameGroups[0]?` (largest: ${sees.sameGroups[0].n}x code ${sees.sameGroups[0].code})`:''} · ${sees.frontier.length} fog-edges <span style="opacity:.5">(vision orion - ORION's retina; codes are OPAQUE: what code 3 MEANS must be learned by acting on it)</span>`,'sys'); return; }
-  if(c==='voices'||c==='mute'||c==='unmute'){ if(!window.CHATTER){ term('no chatter module (chatter.js failed to load)','err'); return; }
-    const arg=c==='mute'?'off':(c==='unmute'?'on':(a[1]||'').toLowerCase());
+  if(c==='voices'){ if(!window.CHATTER){ term('no chatter module (chatter.js failed to load)','err'); return; }   // `mute`/`unmute` no longer land here - they are the SOUND pair; this is voices on|off
+    const arg=(a[1]||'').toLowerCase();
     if(arg==='on'||arg==='off') CHATTER.setVoices(arg==='on');
     else if(arg){ term('usage: <b>voices on</b> · <b>voices off</b> · <b>voice test &lt;pilot&gt;</b>','err'); return; }
     const st=CHATTER.status();
@@ -4506,7 +4509,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     P.shieldDivert=div;
     term(`Shields diverted - <b>${div==='fwd'?'FORWARD':div==='aft'?'AFT':'BALANCED'}</b> <span style="opacity:.6">(${div?('the other arc pauses, this one regens ~'+CFG.SHIELD_DIVERT_MULT+'x'):'both arcs regen normally toward their own 100%'})</span>.`,'sys');
     if(window.SOUND) SOUND.play('ui'); return; }
-  if(c==='think'||c==='reason'){ let t=P; if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot - try: scan')) return; t=o; }
+  if(c==='think'){ let t=P;   // SHADOW FIX: `reason` is claimed by the DELIBERATE branch above and never reached here if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase())); if(!need(o,'no such pilot - try: scan')) return; t=o; }
     term(`<b>${t.name}</b> reasoning chain (TDRE-style, grounded):`,'sys'); reasonChain(t).forEach(l=>term('&nbsp;&nbsp;'+l,'sys')); return; }
   if(c==='lang'||c==='language'){ if((a[1]||'').indexOf('abl')>=0){ const base=langScore(LANG.sig,LANG.resp); let acc=0; const N=60;   // A1: ablation - shuffle the learned symbol→response map (avg many shuffles)
       for(let t=0;t<N;t++){ const sh=LANG.resp.map(r=>r.slice()); for(const row of sh){ for(let k=row.length-1;k>0;k--){ const j=randi(0,k),tt=row[k]; row[k]=row[j]; row[j]=tt; } } acc+=langScore(LANG.sig,sh); }
@@ -4514,7 +4517,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term(`EMERGENT LANGUAGE · ${LANG.plays} plays · live accuracy ${(langAcc()*100)|0}% (chance ${(100/COMMK)|0}%)`,'sys');
     langLexicon().forEach(x=>term(`  sees "${x.sit}" → says <b>${x.sym}</b> → ally <b>${x.resp}</b> ${x.ok?'<span style="color:#7fdc8a">✓</span>':'<span style="color:#ffb454">…learning</span>'}`,'sys'));
     term('  (try: <b>lang ablate</b> - shuffles the code; accuracy should collapse to chance)','sys'); return; }
-  if(c==='tom'||c==='mind'){ const acc=tomAcc(), base=tomBase();
+  if(c==='tomacc'||c==='mindacc'){ const acc=tomAcc(), base=tomBase();   // SHADOW FIX: was `tom`||`mind`, both claimed earlier (tom = tom_test.js, mind = centroid_mind.js), so this whole readout could never run
     term(`THEORY OF MIND · ${TOM.preds} predictions · infer another ship's target from its motion alone:`,'sys');
     term(`  ToM accuracy <b>${(acc*100)|0}%</b> vs random baseline <b>${(base*100)|0}%</b> - ${acc-base>=0.2?'<span style="color:#7fdc8a">reads hidden intent well above chance.</span>':'gathering data…'}`, acc-base>=0.2?'sys':'err');
     if(TOM.last) term(`  last: read ${TOM.last.subject} → predicted "${TOM.last.pred}"; actual "${TOM.last.truth}" ${TOM.last.hit?'<span style="color:#7fdc8a">✓</span>':'<span style="color:#ff6a6a">✗</span>'}`,'sys');
@@ -4587,7 +4590,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       ['🔷 abstraction','abstract_vec','learn SAME-vs-DIFFERENT as a RELATION → transfers to NOVEL objects never seen (0.99); an identity-memoriser nails seen (1.0) but is chance on novel (0.54)']];
     A.forEach(([n,f,d])=>term(`  <b>${n}</b> <span style="opacity:.5">${f}</span> - ${d}${benchBadge(f)}`,'sys'));
     term('  <span style="opacity:.6">each learned from a black box, ablation/control-audited, 0-fabrication. Type <code>dynamics</code> for the open-endedness world, <code>society</code> for the multi-agent pillars.</span>','sys'); return; }
-  if(c==='worldmodel'||c==='deliberate'||c==='round7'){   // Z9: surface the WORLD MODELS & DELIBERATIVE AGENCY pillars (Round 7) - labeled visualizer of real audited bench numbers
+  if(c==='worldmodel'||c==='round7'){   // SHADOW FIX: `deliberate` is claimed by the DELIBERATE branch above   // Z9: surface the WORLD MODELS & DELIBERATIVE AGENCY pillars (Round 7) - labeled visualizer of real audited bench numbers
     term('<b style="color:#9fb8ff">WORLD MODELS & DELIBERATIVE AGENCY - imagine, predict, plan & learn from others</b> <span style="opacity:.6"> - LEARNED benches (run <code>node run_all.js</code>). The game is the visualizer; these numbers are the AGI.</span>'+suiteLine(),'sys');
     const W=[['🧠 world model','worldmodel_vec','learn the transition model and PLAN IN IMAGINATION → reach a sparse goal in 455 real steps vs model-free 3734 (8× fewer); a CORRUPTED model never solves'],
       ['🔬 active learning','active_vec','query the most INFORMATIVE (most-uncertain) point → learn a concept in 8.3 labels vs random 25.5 (3× fewer); the queries sit right on the decision boundary'],
@@ -5064,7 +5067,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='terraform'||c==='terra'){ if(!need(dockedP,'must be docked')) return; if(!need(dockedP.terraformable,`${dockedP.name} is not terraformable`)) return; const paid=terraformStep(dockedP,P); term(paid>0?`Terraforming ${dockedP.name}: now ${Math.round(dockedP.terra*100)}% (-${paid}c).`:'need credits / already earth-like.','sys'); return; }
   if(c==='bombard'||c==='siege'){ const p=nearestPlanet(P.pos); if(!need(p&&P.pos.distanceTo(p.pos)<p.radius+CFG.DEFEND_R,'no planet in weapons range')) return; P.obj={type:'bombard',planet:p}; term(`Bombarding ${p.name} - this is SLOW and its defenders will respond.`,'err'); return; }
   if(c==='assault'){ if(!need(stronghold,'no Hegemon stronghold active (they rise at high escalation - see: war)')) return; P.obj={type:'hunt',target:stronghold}; term(`Assaulting the HEGEMON STRONGHOLD in ${stronghold.system?stronghold.system.name:'the front'} - it is heavily armoured; bring the squad.`,'err'); return; }
-  if(c==='ask'||c==='talk'||c==='q'){ let s=ships[focus], q=a.slice(1).join(' ');   // TALK TO A SHIP - grounded answer or abstain
+  if(c==='ask'||c==='q'){ let s=ships[focus], q=a.slice(1).join(' ');   // SHADOW FIX: `talk` is the microphone handler above and never reached here   // TALK TO A SHIP - grounded answer or abstain
     if(a[1]){ const o=ships.find(x=>x.alive&&x.name.toLowerCase().startsWith(a[1].toLowerCase()));
       if(o){ s=o; q=a.slice(2).join(' '); }
       else { const rn=rosterNameLike(a[1]);   // puppet-audit fix: a KNOWN roster pilot that isn't a live ship must NOT silently answer as the focused ship
