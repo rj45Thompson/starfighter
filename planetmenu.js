@@ -51,7 +51,7 @@ var CFG = {
            base:     { n:'RANGER COMMAND',     c:'#9fd8ff' } }
 };
 var COL = { HEAD:'#8fd0ff', GOOD:'#7fd0b0', BAD:'#ff8a8a', AMBER:'#ffd27a', VIOLET:'#c9a0ff',
-            TEXT:'#cfe2f5', DIM:'#7d93ad', BORDER:'#24344a', BASE:'#9fd8ff',
+            TEXT:'#e2eefb', DIM:'#9db3ca', BORDER:'#24344a', BASE:'#9fd8ff',   // TEXT/DIM lifted 2026-09-06 (RJ: "the letters should be lit fairly well for legibility") - #cfe2f5/#7d93ad were thin over the dark portrait and panels
             PANEL:'rgba(9,15,25,.92)', PANEL2:'rgba(13,21,34,.94)' };
 
 /* ------------------------------------------------ STATE */
@@ -295,14 +295,51 @@ function renderHead(){
     + '<button class="pm-x" data-act="close" title="close (Esc) - stay docked">X</button>'; }
 
 /* ------------------------------------------------ RENDER: LEFT SIDE (portrait + status + how-it-works) */
+/* DARK WORLDS (RJ 2026-09-06: "the letters don't contrast to the planet. make the planet dark with emissive lights
+   like a Cybertron. dark and mysterious"). The portrait was a bright lit sphere, so the label sitting over it had
+   nothing to contrast against. It is now a night-side world: a near-black body carrying its own hue, a thin lit
+   limb where the star grazes it, and emissive settlement lights in the planet's own colour.
+   The lights are DERIVED, not decorative: the seed is the planet's name, so a world looks the same every time it
+   is opened and two worlds never look alike; the count follows its development level and the colour follows its
+   type, so a busy industrial world really is brighter than an empty rock. */
+function seedOf(str){ var h=2166136261, i; str=String(str||'world');
+  for(i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h*16777619)>>>0; } return h>>>0; }
+function rngOf(seed){ return function(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }; }
+function rgba(hx,a){ var n=parseInt(String(hx).replace('#',''),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+function cityLights(p, hx){
+  // how many lights this world has EARNED: development level, plus a floor so even a frontier rock shows a camp.
+  var lvl = (p && typeof p.dev==='number') ? p.dev : (p && typeof p.level==='number' ? p.level : 1);
+  var n = Math.max(6, Math.min(34, Math.round(6 + lvl*5)));
+  var rnd = rngOf(seedOf((p&&p.name)||'world')), out=[], i;
+  var lit = shade(hx, 0.62), core = shade(hx, 0.86);
+  for(i=0;i<n;i++){
+    // uniform-on-disc sampling, then pushed toward the NIGHT side (away from the lit limb at 32%,30%)
+    var t = rnd()*Math.PI*2, r = Math.sqrt(rnd())*0.86;
+    var x = 50 + Math.cos(t)*r*50, y = 50 + Math.sin(t)*r*50;
+    var night = Math.min(1, (Math.hypot(x-32, y-30)/70));          // 0 at the lit limb, 1 across the terminator
+    if(night < 0.34 && rnd() > night*2) continue;                   // the day side keeps its lights to itself
+    var size = 2.2 + rnd()*4.6, a = (0.30 + 0.62*night) * (0.55 + rnd()*0.45);
+    out.push('radial-gradient(circle '+size.toFixed(1)+'px at '+x.toFixed(1)+'% '+y.toFixed(1)+'%, '
+      + rgba(core, a.toFixed(2)) + ' 0%, ' + rgba(lit, (a*0.55).toFixed(2)) + ' 45%, rgba(0,0,0,0) 100%)');
+  }
+  return out;
+}
 function portraitHtml(){
   var p=S.planet;
   var colNum = S.isBase ? 0x9fd8ff : ((p&&p.type&&typeof p.type.col==='number') ? p.type.col : 0x37506a);
-  var hx=hex6(colNum), lite=shade(hx,0.55), mid=shade(hx,0.05), dark=shade(hx,-0.72), glow=shade(hx,0.15);
+  var hx=hex6(colNum);
+  var body = shade(hx,-0.86), deep = shade(hx,-0.94), limb = shade(hx,0.42), glow = shade(hx,0.20);
   var sz=CFG.PORTRAIT_PX;
+  var layers = cityLights(p, hx);
+  // two faint structure bands - the built-over look, not a texture
+  layers.push('linear-gradient(0deg, rgba(0,0,0,0) 41%, '+rgba(limb,0.07)+' 43%, rgba(0,0,0,0) 45%)');
+  layers.push('linear-gradient(0deg, rgba(0,0,0,0) 62%, '+rgba(limb,0.05)+' 63.5%, rgba(0,0,0,0) 65%)');
+  layers.push('radial-gradient(circle at 30% 26%, '+rgba(limb,0.16)+' 0%, rgba(0,0,0,0) 38%)');   // the grazed limb
+  layers.push('radial-gradient(circle at 32% 30%, '+body+' 0%, '+deep+' 62%, #04070c 100%)');     // the body itself
   return '<div class="pm-disc" style="width:'+sz+'px;height:'+sz+'px;'
-    + 'background:radial-gradient(circle at 32% 30%, '+lite+', '+mid+' 46%, '+dark+' 82%);'
-    + 'box-shadow:0 0 26px '+glow+'66, inset -16px -14px 36px rgba(0,0,0,.55)"></div>'; }
+    + 'background:'+layers.join(',')+';'
+    + 'box-shadow:0 0 30px '+glow+'3d, inset -14px -12px 34px rgba(0,0,0,.72), inset 8px 8px 22px '+rgba(limb,0.10)+'"></div>'; }
 
 function statusFallback(){
   var p=S.planet;
@@ -360,7 +397,8 @@ function renderSide(){
   var status = conquestLine(p) || statusFallback();
   S.el.side.innerHTML =
       portraitHtml()
-    + '<div style="text-align:center;color:'+COL.DIM+';font-size:11px;letter-spacing:.14em;margin:-4px 0 12px 0">'
+    + '<div style="text-align:center;color:#eaf6ff;font-size:13px;font-weight:600;letter-spacing:.20em;margin:-4px 0 12px 0;'
+    +   'text-shadow:0 0 12px '+COL.HEAD+'88, 0 0 3px rgba(0,0,0,.9), 0 1px 2px rgba(0,0,0,.95)">'
     +   esc(S.isBase?((p&&p.name)||'RANGER COMMAND'):((p&&p.name)||'?')).toUpperCase() + '</div>'
     + planetIntelHtml()
     + '<div class="pm-panel"><h4>STATUS</h4><div>'+status+'</div></div>'
