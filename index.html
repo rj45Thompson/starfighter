@@ -6362,7 +6362,12 @@ window.HOST={
       // a total restart, not a respawn. ONLY the minds' KNOWLEDGE (GAME_KNOW) and the cross-generation LEADERBOARD
       // persist - the run mattered (it is recorded), the ship starts over.
       P.credits=500; P.score=0; P.skills={}; P.skillPts=0;
-      P.lvl={weapon:1,engine:1,hull:1}; P.stat=null; P.gemBar=0; P.gemPts=0; P._tierOffered=null; ensureStat(P);   // STARBLAST LOOP: death restarts the ladder (SB10) P.weaponType='energy'; P.equip={}; P.contraband={}; P.cargo={};
+      // STARBLAST LOOP (SB10): a generation reset restarts the gem bar, the banked points and the eight stats
+      // with the rest of the ship. (2026-09-06: an inline comment added here once swallowed the four
+      // statements that followed it on this line - weaponType, equip, contraband and cargo stopped being
+      // reset at all. The comment now sits on its own line.)
+      P.lvl={weapon:1,engine:1,hull:1}; P.stat=null; P.gemBar=0; P.gemPts=0; P._tierOffered=null; ensureStat(P);
+      P.weaponType='energy'; P.equip={}; P.contraband={}; P.cargo={};
       P.artifacts=[]; P.artEquipped=[]; P.artifactsUnid=[]; P.cores=0; P.probesOwned=0;
       P.fuelCap=CFG.FUEL_CAP; P.senseR=CFG.SENSE_R; P.warpEff=1; P.regenBonus=0;
       P.engineType='standard'; P.gizmoSlots=new Array(CFG.GIZMO_SLOTS).fill(null);

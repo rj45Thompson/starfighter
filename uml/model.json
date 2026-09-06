@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T12:46:40",
+ "generated": "2026-09-06T12:51:42",
  "modules": [
   {
    "file": "acquire.js",
@@ -2630,9 +2630,9 @@
   {
    "id": "UC-304",
    "epic": "E3",
-   "status": "MISSING",
+   "status": "WORKS",
    "story": "Systems are separate bubbles joined by lanes; a contested system infects its neighbours",
-   "test": "SR-M16"
+   "test": "measured: a lane jump moved 1004u for 19 fuel, a non-lane jump moved 0 and cost 0; warTick halves the invade threshold for a lane neighbour of an already-contested system"
   },
   {
    "id": "UC-305",
@@ -2762,9 +2762,9 @@
   }
  ],
  "tally": {
-  "WORKS": 41,
+  "WORKS": 42,
   "PARTLY": 4,
-  "MISSING": 4,
+  "MISSING": 3,
   "DEPRECATED": 2
  }
 }

@@ -66,7 +66,7 @@ Status is one of WORKS / PARTLY / MISSING / DEPRECATED. The test is what decided
 - UC-301 [E3] [WORKS] Pilot builds a station on a held world and it produces goods :: economy.js chains; a Halcyon plant made 36 units, an Agri world picks pharma and a Mining world a smelter
 - UC-302 [E3] [WORKS] Pilot assigns AI ships to a trade route between two markets :: haulers fly real distance and trade at live prices; 8 runs, +460c, and they hold when a leg stops paying
 - UC-303 [E3] [WORKS] Pilot commands a wing: follow, attack, mine, trade, hold, defend a world, go dock :: EMPIRE board + wing command; 36 ships took DEFEND and all four sampled closed 65-141u on the world in 25s
-- UC-304 [E3] [MISSING] Systems are separate bubbles joined by lanes; a contested system infects its neighbours :: SR-M16
+- UC-304 [E3] [WORKS] Systems are separate bubbles joined by lanes; a contested system infects its neighbours :: measured: a lane jump moved 1004u for 19 fuel, a non-lane jump moved 0 and cost 0; warTick halves the invade threshold for a lane neighbour of an already-contested system
 - UC-305 [E3] [MISSING] Synod adapts its loadouts across generations :: SR-M15
 
 ### E4 GROUND
