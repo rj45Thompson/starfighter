@@ -2603,7 +2603,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-108",
-    "note": "gems and credits spill on death, then respawn"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, cost measured). The SC2/Space-Rangers 'real stakes' death (user 2026-07-07 'when you die you should lose everything all your money and ship'): death has a HEAVY resource cost, yet the campaign CONTINUES. COST (killShip index.html:2820-2839, player only): dropCargo spills the hold (:2824); dropCredits drops ALL your money and s.credits=0 (:2826); the ship resets to STOCK - lvl {weapon/engine/hull}->1, and weaponType / equip / artifacts / contraband / artifactsUnid / cores / probesOwned / engine / gizmoSlots / fuelTank / radar / scanner / shieldGen / droid / cargoHook / missiles / micromodules / grip / manufacturer / hullSeries / weaponSlots all wiped (:2832-2838); applyHull(s,'scout') downgrades the hull class to a stock Scout (:2839). (DEPLOYED probes are world infrastructure and survive; the dropped credits become a recoverable bounty-gem stash at the wreck.) CONTINUES: s.respawn=CFG.RESPAWN_DELAY 2.0 (:2822) -> step revives (F48 - not permadeath). Scoped to the human PLAYER only (AI gear untouched). OBSERVABLE: node scratchpad/f49_death_cost_replay.js -> PASS - slices the real player-reset block (:2831-2839) and runs it on a maxed player (dreadnought, 5000c, upgrades, full loadout) -> everything reset to stock/Scout; and asserts from source that credits are dropped+zeroed, cargo spills, and a respawn timer is set.",
+    "settledFrom": "index.html killShip() :2820-2839 - dropCargo :2824, dropCredits + s.credits=0 :2826, player ship reset to stock lvl/equip/artifacts/loadout :2832-2838, applyHull(s,'scout') :2839; campaign continues via s.respawn=CFG.RESPAWN_DELAY 2.0 :2822 (F48). Measured node scratchpad/f49_death_cost_replay.js PASS (maxed player -> full wipe to stock Scout, credits/cargo dropped, respawn set)"
    }
   },
   {
