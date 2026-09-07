@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T20:25:01",
+ "generated": "2026-09-07T00:38:28",
  "modules": [
   {
    "file": "acquire.js",
@@ -396,7 +396,7 @@
   },
   {
    "file": "conquest.js",
-   "lines": 442,
+   "lines": 464,
    "classes": [
     {
      "name": "CONQUEST",
@@ -454,7 +454,10 @@
     "DT_MAX_S",
     "destroyed",
     "it",
+    "threw",
+    "error",
     "DEFENSES",
+    "complete",
     "first",
     "maximum",
     "battery",
@@ -463,9 +466,10 @@
     "notify",
     "resolves",
     "paywall",
-    "describe"
+    "describe",
+    "surfaced"
    ],
-   "cfgTotal": 16
+   "cfgTotal": 20
   },
   {
    "file": "contradiction_ledger.js",
@@ -2147,7 +2151,7 @@
   },
   {
    "file": "sound.js",
-   "lines": 555,
+   "lines": 620,
    "classes": [
     {
      "name": "SOUND",
@@ -2160,18 +2164,26 @@
       "toggleMute",
       "setVolume",
       "volume",
+      "playMusic",
+      "stopMusic",
+      "setMusicVolume",
+      "musicVolume",
+      "musicPlaying",
+      "duck",
       "names",
       "aliases",
       "ready",
       "_voices"
      ],
-     "memberTotal": 12
+     "memberTotal": 18
     }
    ],
    "functions": [],
    "functionTotal": 0,
    "cfg": [
     "MASTER_VOL",
+    "MUSIC_VOL",
+    "MUSIC_DIR",
     "MUTED",
     "state",
     "MAX_VOICES",
@@ -2195,7 +2207,7 @@
     "SAMPLE_GAIN",
     "buzz"
    ],
-   "cfgTotal": 23
+   "cfgTotal": 25
   },
   {
    "file": "speech_gen.js",

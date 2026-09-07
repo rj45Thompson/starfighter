@@ -833,7 +833,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-204",
-    "note": "weapon bought with condition, weight and power; ITEMVAR.roll / QUALITY in model.json"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). item_variance.js ITEMVAR.roll(seed,cost,wt) returns a per-INSTANCE {quality,condition 55-100%,weight,powerMul,price}: powerMul=Q.mul(worn .80 / standard 1.00 / fine 1.15 / acrynic 1.32 / dominator 1.50)*jitter(.92-1.08)*conditionFactor(.6+.4*cond/100), deterministic per seed (planet+item+restock-epoch) so two of the SAME type differ and bestOf2 (index.html:2409) keeps the better of two rolls. CONSUMED in the sim (not cosmetic): weapon dmg index.html:2514, engine speed :2587 & vmax :2594, droid regen :2607, shieldgen absorb :3582, cargo-hook magnet :3605, fuel cap :3608, scanner pwr :3609, radar sense range :2250. Player rolls at the shop for 8 gear families (weapon :5104 / engine :5127 / tank :5149 / radar :5155 / droid :5161 / scanner :5167 / shieldgen :5173 / hook :5179; shop line shows quality/cond%/wt/pwr%/price). AI rolls symmetric instances (:2426 rollAIGear, IRON LAW). Persisted across save/load (:6485 gather / :6511 apply). node item_variance.js -> RESULT PASS 7/7 (determinism, variance >20 distinct prices, ranges, quality->power, wear->price, describe).",
+    "settledFrom": "item_variance.js (ITEMVAR.roll + QUALITY tiers, node self-test) + index.html consumption sites; anchors 4/8 (x_series/space_rangers_2/elite_dangerous/eve_online=yes)"
    }
   },
   {

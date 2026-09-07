@@ -1,8 +1,9 @@
 // module_selftests.js - run the node-safe module self-tests so the SCHEDULED watch_upgrades.cmd
 // enforces them, not just an interactive sweep. Each listed module has a `require.main === module`
 // harness that prints its results and `process.exit(1)` on any failure - so a regression (e.g. the
-// conquest.js T11 slow-tick-error guard, or power_panel's power/shield-arc contract) fails the pass
-// here instead of sitting unnoticed until someone happens to run the module by hand.
+// conquest.js T11 slow-tick-error guard, power_panel's power/shield-arc contract, or item_variance's
+// SR item-instance roll - the quality/condition/powerMul that 8 gear families + AI + save/load all
+// depend on, F15) fails the pass here instead of sitting unnoticed until someone runs the module by hand.
 //
 // EXCLUDED on purpose: inhabitant.js / speech_tier.js are browser-only (top-level addEventListener /
 // location.search) and crash under node BY DESIGN, not on a regression; knowledge.js has no exit-1
@@ -13,7 +14,7 @@
 const cp = require('child_process');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
-const MODULES = ['conquest', 'power_panel', 'textquests', 'kripke_mind', 'sober_gate', 'tom_test', 'centroid_mind'];
+const MODULES = ['conquest', 'power_panel', 'textquests', 'kripke_mind', 'sober_gate', 'tom_test', 'centroid_mind', 'item_variance'];
 
 function run(modPath, extraArgs) {
   const r = cp.spawnSync(process.execPath, [modPath].concat(extraArgs || []), { encoding: 'utf8', timeout: 60000 });
