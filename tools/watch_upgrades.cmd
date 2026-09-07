@@ -39,6 +39,8 @@ node tools\order_in_table.js
 set ORDER=%errorlevel%
 node tools\bareargs.js
 set BARE=%errorlevel%
+node tools\module_selftests.js
+set MODS=%errorlevel%
 
 echo.
 echo   upgrade_pass    exit %PASS%   (non-zero = an input was missing, report NOT rewritten)
@@ -49,6 +51,7 @@ echo   genre_selfcheck exit %GENRE%  (non-zero = a grep-proven "no" genre grade 
 echo   save_symmetry   exit %SYM%   (non-zero = a player field is SAVED but never RESTORED - silent reset on reload)
 echo   order_in_table  exit %ORDER% (non-zero = a *_ORDER key has no table entry - TABLE[key] undefined -^> crash on use)
 echo   bareargs        exit %BARE%  (non-zero = a matcher with an empty-defaulted a[N] arg - bare command hits the FIRST item)
+echo   module_selftests exit %MODS% (non-zero = a node-safe module self-test failed: conquest/power_panel/textquests/kripke/sober/tom/centroid)
 
 if not "%PASS%"=="0" exit /b %PASS%
 if not "%SHADOW%"=="0" exit /b %SHADOW%
@@ -58,5 +61,6 @@ if not "%GENRE%"=="0" exit /b %GENRE%
 if not "%SYM%"=="0" exit /b %SYM%
 if not "%ORDER%"=="0" exit /b %ORDER%
 if not "%BARE%"=="0" exit /b %BARE%
+if not "%MODS%"=="0" exit /b %MODS%
 echo   all clear
 exit /b 0
