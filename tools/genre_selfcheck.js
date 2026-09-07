@@ -10,9 +10,10 @@
 // This turns each of those three claims back into a re-checkable observable, the way cmd_shadow.js and
 // cfg_dupes.js do for their own regression classes.
 //
-// The cells it guards (all settled 2026-09-06):
-//   F68  the game supports a gamepad           -> no  (grep getGamepads|gamepadconnected|... = 0)
-//   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0)
+// The cells it guards:
+//   F68  the game supports a gamepad           -> no  (grep getGamepads|gamepadconnected|... = 0)   [2026-09-06]
+//   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0) [2026-09-06]
+//   F29  capture an enemy ship and keep it      -> no  (grep commandeer|hijack|capture-a-ship|board-enemy|... = 0) [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -38,6 +39,10 @@ const VENDORED = new Set(['three.min.js', 'fflate.min.js', 'fbxloader.js']);
 const GUARDS = [
   { id: 'F68', label: 'gamepad', re: /getGamepads|gamepadconnected|gamepaddisconnected|navigator\.getGamepads|new Gamepad/i },
   { id: 'F69', label: 'colourblind / accessibility options', re: /colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast/i },
+  // F29 (2026-09-07): capture an ENEMY SHIP and keep it. Tight patterns only, so it never trips on WORLD-capture
+  // (conquest.js "capture the planet", WARSCORE_PER_CAPTURE), on "aboard your ship", "mouse captured" (pointer lock),
+  // or "captured BEFORE generateHullRoster". Any hit means a board/commandeer/tow-a-ship mechanic has landed.
+  { id: 'F29', label: 'capture an enemy ship', re: /commandeer|hijack|capture[\sa-z]{0,10}(ship|vessel|craft|hull)|board(ing|ed)?\s+(an?\s+)?(enemy|hostile|pirate|ship|vessel)|tow\s+(the\s+)?(enemy\s+)?(ship|vessel|hull)|tractor\s+(the\s+)?(ship|vessel)|prize\s+(ship|crew|vessel|hull)|captured?\s+(enemy\s+)?(ship|vessel|craft)/i },
 ];
 
 function gameFiles() {
@@ -93,7 +98,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');

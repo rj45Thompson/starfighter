@@ -1549,7 +1549,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no use case or module covers boarding or capture"
+    "note": "SETTLED no, PROVEN (2026-09-07, THIN->anchors=2, adversarial absence grep; was the automated 'no UC/module' grade). Capturing an ENEMY SHIP and keeping it is genuinely absent. Grep over the game source (index.html + root .js minus 3 vendored) for commandeer|hijack|board-an-enemy|capture-a-ship/vessel/craft|tow-ship|tractor-ship|prize-ship|captured-enemy-ship = 0 hits. Every 'capture' in the codebase is WORLD-capture (conquest.js 'capture the planet', CAPTURE_REP_MIN, WARSCORE_PER_CAPTURE, onAwayVictory(planet)) or unrelated (pointer-lock 'the OS mouse is captured', HULL_ORDER_ORIGINAL 'captured BEFORE generateHullRoster', 'capture the flight keys'); 'aboard' is the player's OWN ship; 'defected from a Synod carrier' is a pilot BACKSTORY. Enemies are killed (killShip -> RESPAWN_DELAY respawn + dropCargo + dropCredits), never boarded/kept. The player OWNS ships by BUYING haulers (F24/F26) and HIRING named wingmen (F28), not by capturing enemies. yes-anchors 2/8 (x_series board+capture, ev_nova) - a distinctive feature those two have and we do not. GUARDED: tools/genre_selfcheck.js now re-runs a tight capture-mechanic grep each pass (3rd cell beside F68/F69) and fails if a board/commandeer/tow-a-ship mechanic ever lands, so the 'no' cannot silently rot. OBSERVABLE: node tools/genre_selfcheck.js -> '3 grep-proven no cells still hold ... 0 source hits each' exit 0.",
+    "settledFrom": "absence grep over index.html + root .js (0 ship-capture hits) + tools/genre_selfcheck.js guard (F29 added); capture in-code = world-capture (conquest) only; yes-anchors 2/8 (x_series, ev_nova)"
    }
   },
   {
