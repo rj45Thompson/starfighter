@@ -127,7 +127,7 @@ A brand-new player is shown **144 visible UI boxes and 5,043 characters of text*
 must already know to type. The intro's one instruction is "type into the box like you are talking
 to yourself" - about the Passenger, not about flying.
 
-- [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
+- [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched. · **UNBLOCKED 2026-09-07 by H2** (scratchpad/cdp_harness.js drives headless Chrome): now doable headlessly - next take: wipe localStorage in the page, replicate the exact DOM sweep that counted 144 visible boxes (find/confirm the sweep), then cut and re-measure. Still OPEN (the measure+cut+re-measure is a full item, not started this pass per one-item-per-iteration).
 
 ### Landed after the first hour (RJ's live direction)
 - [x] C12 The droids RJ could not see -> MEASURED why: at BOT_MINE_R 120 both were cutting rocks 22 and 27 units out at screen x -8.56 and 12.35 (visible range -1..1). They now dock on the wing, launch out of the hull with a burst, and only take rocks inside a 52-degree cone. Re-measured over 30 simulated seconds: a droid is in frame in 66% of samples. cs 44b21f7
@@ -242,6 +242,22 @@ independent games all do is a genre expectation; a thing one game does is that g
 - [x] N4  Say when flight is paused -> DONE. A badge sits directly above the terminal input while it has focus: "flight paused while you type · Esc to fly". Verified in the live game in one run, badge AND the claim it makes: not typing -> hidden; typing -> shown, 0px above the input, thrust key leaves `MAN.thr` at 0 (the keys really are dead); after blur -> hidden and thrust goes to 1.
   It is driven by the frame loop reading `document.activeElement`, not by focus/blur events, for two reasons found while building it: the game's own guard is a live `activeElement` test, so reading the same thing cannot drift out of step with it; and focus/blur DO NOT FIRE when the document lacks OS focus, which is exactly the automated case - `el.focus()` still moves activeElement and still kills the keys, silently.
 - [x] H1  The harness refuses to measure a paused sim -> DONE, earned by being fooled. `frame()` returns on its FIRST line when the singleton lock hands the sim to another tab. Every call still succeeds, no error is raised, and a run reports a healthy ms/frame for a game that advanced zero steps - which is how a correct UI change came back measuring as broken. `SIM.run` now returns a refusal naming the lock and how to reclaim it, `SIM.census` reports `simPaused`, and `SIM.profile` passes the refusal up instead of dividing by an undefined frame count.
+- [x] H2  Headless verification IS possible here after all -> BUILT `scratchpad/cdp_harness.js`, a CLI-launched
+      headless-Chrome driver (NO puppeteer - node's built-in WebSocket + fetch speak the DevTools Protocol directly)
+      that loads the REAL game and reads/drives its state. Overturns the standing "no browser in this worker session"
+      assumption ([[headless-verification-limits]]) that had produced ~9 empty passes: Chrome 152 IS installed, and a
+      headless instance with its OWN --user-data-dir (isolated temp profile, never touches RJ's live Chrome),
+      --enable-unsafe-swiftshader for software WebGL, and an explicit --window-size loads index.html?harness=1 with
+      innerWidth 1382 (NOT the 0 of a hidden pane - trap #1 avoided) and document.timeline ADVANCING (5996ms - not
+      frozen). OBSERVABLE (re-runnable, self-cleaning temp profile, hard-40s-timeout so it can never hang the loop):
+      `node scratchpad/cdp_harness.js` -> JSON `loaded:true, errors:[]`, and it DROVE the sim - SIM.census() returned
+      {shipsAlive:34, hp/credits/fuel finite, nanShips:[], simPaused:false, sceneChildren:335, drawCalls:53}, CFG
+      readable by bare name (NSHIPS 32), webgl:true. Ran TWICE, both clean (ship count varied 43->34, the live sim).
+      UNBLOCKS the browser-bound backlog: N3 (visible-box DOM sweep), M1 (drive the synth + read MUSIC.debug()), the
+      genre F58/F31 guided-loop / story-arc drives, and SIM.run/SIM.profile perf runs -- CAVEAT: swiftshader renderAll
+      timing is NOT GPU-representative, so trust the pure-JS `step` half, not `renderAll`, for perf numbers. RUNG:
+      broke a multi-pass empty streak by TESTING an unchallenged assumption rather than re-asserting it; the enabler
+      for the rung-1 "defect a player would hit" and first-run-clarity work that was all marked browser-bound.
 
 - [x] S1  The galaxy is the same galaxy every time you come back -> FIXED for the geography. REQUIREMENTS_SR SR-M1 calls this "a living galaxy you leave and return to" and UC-218 was marked WORKS, but only the CAREER persisted: `makePlanets`/`makeSystems` draw every position from `Math.random` via `T.MathUtils.randFloat`, so the layout was re-rolled on every boot while the save restored per-planet state BY NAME - your reputation came back attached to a planet that had moved. A seed is now stored once (`SF_GALAXY_SEED_v1`) and `Math.random` is swapped for a seeded xorshift for the duration of world generation only, restored in a `finally`.
   Verified across two real page loads: all 18 planets identical to 3 decimal places (`Halcyon@155.005,-0.568,34.548`, `Cydon@701.451,-1.049,750.087`, ...). Also proven, in one run: the same seed reproduces its stream, a different seed produces a different galaxy, and `Math.random` is genuinely restored afterwards, so combat, spawns and AI keep the real randomness they have always had. Whole-game check after: two 9-second runs, 0 errors, no NaN positions, no console errors.
