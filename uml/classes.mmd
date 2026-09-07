@@ -341,6 +341,28 @@ classDiagram
     +onStrongholdDown()
     +onDock()
   }
+  class MUSIC {
+    <<music.js>>
+    +CFG()
+    +start()
+    +stop()
+    +set()
+    +auto()
+    +isManual()
+    +situation()
+    +situations()
+    +detect()
+    +setVolume()
+    +volume()
+    +setMute()
+    +muted()
+    +toggleMute()
+    +started()
+    +observable()
+    +playing()
+    +now()
+    +... 1 more
+  }
   class PANELS {
     <<panels.js>>
     +register()
