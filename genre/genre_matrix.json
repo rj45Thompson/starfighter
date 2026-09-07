@@ -2653,7 +2653,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-218",
-    "note": "galaxy persists across reloads and generations (SR-M1, SR-M14); no save-slot UI"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, structure measured). ONE autosaved persistent world state, no save slots (SR-M1). SAVE_KEY='SF_SAVE_v1' (index.html:6454) is the single game-save key; saveGame() writes the WHOLE gatherSaveState() to it (:6535) and loadGame() restores it on boot (:6536). AUTOSAVE: saveTick() saves every CFG.SAVE_INTERVAL_S 15s (:6538), beforeunload saves on close/refresh (:7779), and a generation reset persists immediately (:6756); the `save` command is manual-on-demand only ('autosaves every 15s anyway' :4904). NO SLOTS: the only SF_ localStorage keys are SF_SAVE_v1 (the one save) plus non-save keys (SF_CONTROLS / SF_GALAXY_SEED / SF_LEADERBOARD / SF_WINDOWS / SF_LAST_ERROR / SF_SINGLETON); no numbered slots, no slot-selection UI. The galaxy SEED persists the same galaxy; the LEADERBOARD survives across generations. OBSERVABLE: node scratchpad/f50_save_replay.js -> PASS - asserts the single-key save/load, the 15s + beforeunload autosave, exactly one game-save key with no slot mechanism, and runs tools/save_symmetry.js (gatherSaveState<->applySaveState round-trip, 55 fields) -> PASS.",
+    "settledFrom": "index.html SAVE_KEY='SF_SAVE_v1' :6454, saveGame :6535 (setItem SAVE_KEY = gatherSaveState), loadGame :6536 (getItem -> applySaveState), autosave saveTick :6538 (SAVE_INTERVAL_S 15) + beforeunload :7779 + generation-reset persist :6756; single SF_ game-save key, no slot UI. Round-trip guarded by tools/save_symmetry.js. Measured node scratchpad/f50_save_replay.js PASS"
    }
   },
   {
