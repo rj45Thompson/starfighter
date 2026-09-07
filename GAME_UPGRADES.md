@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 15:24 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 18:14 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -12,11 +12,11 @@ rather than as a confident wrong number.
 | modules in the class model | 54 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 45 / 9 / 11 / 5 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 46 / 10 / 11 / 3 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
-16 done · 13 open · 0 blocked · 1 dropped with a reason
+18 done · 17 open · 0 blocked · 1 dropped with a reason
 
 - open **C1** Generate option A, the procedural machine-world skin
 - open **C2** Generate option B, a FLUX Cybertron skin through the seam repair
@@ -52,7 +52,7 @@ F58   8/8  7/8      partial     a guided tutorial or scripted opening teaches th
 F31   7/8  8/8      partial UC-212 there is an authored main storyline with scripted missions
 F67   7/7  3/7      no          music changes with the situation, for example combat versus travel
 F16   6/8  5/8      partial UC-217 some purchases are gated behind rank, licence or skill rather than money alone
-F35   6/8  2/8      unknown     missions can fail and the failure has a lasting consequence
+F35   6/8  2/8      partial     missions can fail and the failure has a lasting consequence
 F60   5/7  5/7      no          the player picks a difficulty or starting scenario before playing
 F44   5/8  2/8      no UC-304   there is an in-system fast-travel layer distinct from combat flight
 F40   4/8  6/8      no          the world is shared in real time with many other human players
@@ -60,7 +60,6 @@ F56   4/8  6/8      no          player can cooperate or fight with other human p
 F06   4/8  5/8      no          player can target and disable individual subsystems on an enemy ship
 F09   4/8  5/8      partial     flight is full 3D with pitch, yaw and roll rather than a fixed plane
 F17   4/8  4/8      partial UC-217 player unlocks new technology through research over time
-F19   4/8  4/8      unknown UC-202 the player's own buying and selling moves local prices
 F68   3/7  6/7      unknown     the game supports a gamepad
 F34   3/6  4/6      unknown     attacking one faction raises standing with its rival
 F69   3/7  4/7      unknown     the game offers colourblind or other accessibility options
@@ -68,11 +67,12 @@ F66   3/8  4/8      partial UC-506 NPC dialogue is voiced
 F45   3/8  3/8      partial UC-203 player can discover unvisited systems and record or sell the data
 F03   2/8  5/8      partial     player can divert ship power between weapons, engines and shields during flight
 F10   2/8  3/8      no          player manages internal crew and damage control aboard their own ship
+F29   2/8  3/8      no          player can capture an enemy ship and keep it
 
 == UNRESOLVED - not enough evidence to place these either way (0) ==
 These are NOT low-priority. They are unmeasured. Settling one is its own task.
 
-== ALREADY HAVE (45) ==
+== ALREADY HAVE (46) ==
   F02   7/8   -  ship movement carries momentum or inertia rather than instant-stop arcade handling
   F07   7/8   UC-101  player can mine asteroids or resource nodes for sellable material
   F12   7/8   UC-107  player advances mainly by buying larger hull classes rather than levelling one hull
@@ -83,7 +83,7 @@ These are NOT low-priority. They are unmeasured. Settling one is its own task.
   F61   7/8   UC-109  a radar or scanner shows nearby objects around the ship
   F01   6/8   UC-101  player directly pilots a single ship in real time
   F05   6/7   UC-110  firing drains a regenerating energy pool that limits sustained fire
-  ... and 35 more
+  ... and 36 more
 ```
 
 ## Ready-to-take task lines
@@ -97,7 +97,7 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F31  there is an authored main storyline with scripted missions -> DONE WHEN: <observable>   <!-- anchor 7/8 games, 8 grounded; ours=partial UC-212 -->
 - [ ] F67  music changes with the situation, for example combat versus travel -> DONE WHEN: <observable>   <!-- anchor 7/7 games, 3 grounded; ours=no  -->
 - [ ] F16  some purchases are gated behind rank, licence or skill rather than money alone -> DONE WHEN: <observable>   <!-- anchor 6/8 games, 5 grounded; ours=partial UC-217 -->
-- [ ] F35  missions can fail and the failure has a lasting consequence -> DONE WHEN: <observable>   <!-- anchor 6/8 games, 2 grounded; ours=unknown  -->
+- [ ] F35  missions can fail and the failure has a lasting consequence -> DONE WHEN: <observable>   <!-- anchor 6/8 games, 2 grounded; ours=partial  -->
 - [ ] F60  the player picks a difficulty or starting scenario before playing -> DONE WHEN: <observable>   <!-- anchor 5/7 games, 5 grounded; ours=no  -->
 - [ ] F44  there is an in-system fast-travel layer distinct from combat flight -> DONE WHEN: <observable>   <!-- anchor 5/8 games, 2 grounded; ours=no UC-304 -->
 - [ ] F40  the world is shared in real time with many other human players -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 6 grounded; ours=no  -->
@@ -105,8 +105,8 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F06  player can target and disable individual subsystems on an enemy ship -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 5 grounded; ours=no  -->
 - [ ] F09  flight is full 3D with pitch, yaw and roll rather than a fixed plane -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 5 grounded; ours=partial  -->
 - [ ] F17  player unlocks new technology through research over time -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 4 grounded; ours=partial UC-217 -->
-- [ ] F19  the player's own buying and selling moves local prices -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 4 grounded; ours=unknown UC-202 -->
 - [ ] F68  the game supports a gamepad -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 6 grounded; ours=unknown  -->
+- [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=unknown  -->
 ```
 
 ## Tool output this pass
