@@ -3328,7 +3328,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-205",
-    "note": "20 comparison rows in SHOP: dps, damage, rate, reach, barrels, homing, splash, damage type"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, sliced+driven - confirms AND exceeds the seed). The docked SHOP states a SIGNED DELTA against the FITTED item (planetmenu.js), not just a static table. wStats(w) :736 reads dmg/cd/rate(1/cd)/dps(dmg/cd)/reach(speed*life)/twin(barrels)/homing/splash/type from the WEAPONS registry the game flies on; weaponCompareHtml(key) :751 compares the on-sale weapon a=wStats(W[key]) against the FITTED weapon b=wStats(W[P.weaponType]) across dps/dmg/rate/reach/barrels/homing/splash/damage-type; deltaChip :741 prints the value + a signed delta (+X, +Y%) coloured up/dn/eq, and 'n/a' when the registry lacks the field (no fabricated number); hullCompareHtml :765 does the same for hulls (hull/hold/speed/mounts/gizmos vs P.hullClass); shopRow :780 tags the currently-fitted item FITTED with no compare (nothing to compare against) and shows compareForCmd(cmd) only on a BUY row (header comment :730). vs anchor 3/5 (Elite outfitting delta, EVE compare tool, X4). OBSERVABLE: node scratchpad/f63_itemcompare_replay.js -> PASS (14 asserts) - slices the real wStats/deltaChip and drives them on the real WEAPONS numbers (Pulse dps 66.67, Autocannon dps 62 = dmg/cd; reach 129.8 vs 202.5 = speed*life; worse=dn, better=up, eq, missing=n/a).",
+    "settledFrom": "planetmenu.js docked shop signed-delta compare vs fitted: wStats :736 (dps=dmg/cd, rate=1/cd, reach=speed*life, twin/homing/splash/type) + deltaChip :741 (value + signed delta + % coloured up/dn/eq, n/a for missing) + weaponCompareHtml :751 (a=W[key] vs b=W[P.weaponType], 8 stat rows) + hullCompareHtml :765 (vs P.hullClass) + shopRow :780 tags FITTED, compareForCmd only on BUY. Measured node scratchpad/f63_itemcompare_replay.js PASS on real WEAPONS numbers"
    }
   },
   {
