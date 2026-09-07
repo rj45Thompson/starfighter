@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 21:05 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 21:12 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
