@@ -368,7 +368,13 @@ const T = THREE;
 })();
 const CFG = {
   ARENA_R:2100, EDGE_STEER:0.9,           // the whole GALAXY bound; systems are clusters inside it (SR ramp: massive)
-  N_SYSTEMS:9, SYSTEM_R:290, SUN_R:34,    // a galaxy of star systems, Rise-of-the-Dominators scale; all travel is real-space
+  N_SYSTEMS:9, SYSTEM_R:290, SUN_R:34,
+  // THE SUNS (RJ 2026-09-06 "one planet ... solid white almost with a fire ring"). Measured: it is not a planet -
+  // every planet's skin was loaded and dark. The suns were nine radius-34 MeshBasicMaterial spheres of flat 0xffe0a0
+  // with NO map, inside their own orange glow sprite: a washed-out white ball wearing a fire ring, exactly as
+  // described. They now carry a generated photosphere (assets/gen_star.py) and a fresnel corona.
+  STAR_SKINS:true, STAR_CLASSES:['yellow','orange','white','red','blue'], STAR_EMIS:1.5, STAR_DARK:0.92,
+  CORONA:true, CORONA_SCALE:1.5, CORONA_POWER:2.6, CORONA_GAIN:0.85, STAR_SPIN:0.006,    // a galaxy of star systems, Rise-of-the-Dominators scale; all travel is real-space
   THRUST:44, DRAG:0.7, VMAX:34, PITCH_RATE:1.7, YAW_RATE:1.5, BANK_MAX:0.7, BANK_LERP:3.5, SHIP_R:2.6, IFRAME:1.1, SLOW_DUR:2.2,   // SR Treton: a slow-on-hit lasts SLOW_DUR seconds
   KP_YAW:1.5, KP_PITCH:1.5, ALIGN_FIRE:0.9, THR_TURN_EASE:0.55, GEM_EASE_R:16,
   STANDOFF_R:12, BRAKE_R:26, CRUISE_THR:0.5,   // CH7 fix: throttle brakes/coasts to a target's standoff range (was hardcoded always-on -> "full throttle, never stop")
@@ -1442,10 +1448,47 @@ const PNAMES=['Halcyon','Cydon','Ferrus','Vantor','Ludo','Sireth','Kova','Draxis
   'Veldt','Cauldron','Ithaca','Rimward'];   // 24 unique - go/planetByName are name-keyed, dups would break them
 const planets=[], systems=[];
 const SYSNAMES=['Sol','Vega','Antares','Rigel','Lyra','Draco','Cygnus','Perseus','Aquila','Corona','Hydrus','Tucana'];
+// A STAR, not a cream ball. The photosphere is a generated equirectangular map (granulation cells, spots in two
+// latitude bands, faculae along the cell walls) on an unlit material, so it needs no light of its own; the class is
+// picked from the system index so a galaxy has a mix rather than nine identical suns. The corona is a fresnel shell -
+// bright only where the surface turns away from the eye - which is what a limb actually does. A flat additive shell
+// would lay an even wash over the whole disc, the same mistake that had to be undone on the machine worlds.
+function starTex(cls, suffix){
+  const key='star_'+cls+(suffix||'');
+  starTex._c=starTex._c||{};
+  if(starTex._c[key]) return starTex._c[key];
+  const t=new T.TextureLoader().load('assets/planets/'+key+'.jpg');
+  t.wrapS=T.RepeatWrapping; t.encoding=T.sRGBEncoding;
+  starTex._c[key]=t; return t;
+}
+function makeStar(i, center){
+  const cls=CFG.STAR_CLASSES[i%CFG.STAR_CLASSES.length];
+  const g=new T.SphereGeometry(CFG.SUN_R,48,32);
+  const mat = CFG.STAR_SKINS
+    ? new T.MeshBasicMaterial({ map:starTex(cls), color:new T.Color(CFG.STAR_DARK,CFG.STAR_DARK,CFG.STAR_DARK) })
+    : new T.MeshBasicMaterial({ color:0xffe0a0 });
+  const sun=new T.Mesh(g, mat); sun.position.copy(center); sun.userData.starClass=cls;
+  if(CFG.CORONA){
+    const c=new T.Color(cls==='blue'?0x9fc4ff:cls==='red'?0xff6a3a:cls==='orange'?0xff9a4a:cls==='white'?0xfff0d8:0xffc46a);
+    const cor=new T.Mesh(new T.SphereGeometry(CFG.SUN_R*CFG.CORONA_SCALE,32,24), new T.ShaderMaterial({
+      uniforms:{ uC:{value:new T.Vector3(c.r,c.g,c.b)}, uP:{value:CFG.CORONA_POWER}, uG:{value:CFG.CORONA_GAIN} },
+      vertexShader:'varying vec3 vN; varying vec3 vV;'+
+        'void main(){ vN=normalize(normalMatrix*normal); vec4 mv=modelViewMatrix*vec4(position,1.0); vV=normalize(-mv.xyz);'+
+        ' gl_Position=projectionMatrix*mv; }',
+      fragmentShader:'uniform vec3 uC; uniform float uP; uniform float uG; varying vec3 vN; varying vec3 vV;'+
+        'void main(){ float f=pow(1.0-abs(dot(normalize(vN),normalize(vV))),uP); gl_FragColor=vec4(uC*f*uG,f); }',
+      transparent:true, blending:T.AdditiveBlending, depthWrite:false, side:T.BackSide }));
+    sun.add(cor);
+  }
+  starSpin.push(sun);
+  return sun;
+}
+const starSpin=[];
+function starSpinTick(dt){ for(let i=0;i<starSpin.length;i++) starSpin[i].rotation.y+=CFG.STAR_SPIN*dt; }
 function makeSystems(){ for(let i=0;i<CFG.N_SYSTEMS;i++){ const u=(i/CFG.N_SYSTEMS)*TAU+0.3, r=(i===0?0:CFG.ARENA_R*0.44), el=rand(-0.1,0.1);
   const center=new T.Vector3(Math.cos(u)*r, Math.sin(el)*r*0.3, Math.sin(u)*r);
   const sys={ id:i, name:SYSNAMES[i%SYSNAMES.length], center, planets:[], contested:false, clearT:0 };
-  const sun=new T.Mesh(new T.SphereGeometry(CFG.SUN_R,20,16), new T.MeshBasicMaterial({color:0xffe0a0})); sun.position.copy(center); scene.add(sun);
+  const sun=makeStar(i, center); scene.add(sun);
   const glow=new T.Sprite(new T.SpriteMaterial({map:FX_TEX?FX_TEX.sun:GLOW,color:FX_TEX?0xffffff:0xffd070,blending:T.AdditiveBlending,transparent:true,depthWrite:false,opacity:FX_TEX?0.85:0.85})); glow.scale.setScalar(CFG.SUN_R*(FX_TEX?4.6:7)); sun.add(glow);   // generated corona (flares + colour of its own) when GEN_FX; 9x drew the image's ring as a hoop across the system (measured 2026-09-06)
   const lt=new T.PointLight(0xffe0b0,0.75,CFG.SYSTEM_R*2.6); lt.position.copy(center); scene.add(lt);
   // NEBULA CLOUDS (GEN_FX): a couple of generated gas clouds far outside each system, additive, no depth so they never cut a ship
@@ -7661,7 +7704,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); backgroundTick(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering - but the empire it promised keeps running, see backgroundTick
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); starSpinTick(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
