@@ -1296,7 +1296,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-303",
-    "note": "EMPIRE board plus a wing; 36 ships took DEFEND"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). The player owns/commands MORE THAN ONE SHIP at once via TWO systems. (1) OWNED HAULERS (economy.js, HANDS-OFF - read to verify only): 'a ship you own' (economy.js:9); buyHauler :181-188 checks credits>=HAULER_COST(1600), deducts, and pushes a hauler {id,name,route,state,pos,cargo,runs,profit} to S.haulers - an UNBOUNDED owned fleet (own as many as you can afford); each flies a real BUY-at-A/SELL-at-B route at real speed using the SAME buy/sell arithmetic the player does, commanded from the EMPIRE board (empire.js). (2) HIRED WINGMEN (index.html): hirewing :4916-4922 gates on nW<CFG.WINGMAN_MAX(2) && credits>=WINGMAN_HIRE_COST(300), sets t.isWingman=true; they escort + engage your target, bill upkeep (wingmanTick :2069) and walk if unpaid; dismisswing :4923 releases. NOT over-graded (haulers are genuinely OWNED outright, not merely hired) nor under-graded. OBSERVABLE: node scratchpad/f24_ownships_replay.js -> RESULT PASS 11/11 (verbatim buyHauler + hirewing gates: buy 2 -> own 2 distinct haulers, a 3rd affordable = own 3, a 4th refused on credits; hire 2 wingmen concurrently, a 3rd refused at WINGMAN_MAX, a re-hire and an unaffordable hire refused; at once the flagship + 3 haulers + 2 wingmen = 6 ships).",
+    "settledFrom": "economy.js buyHauler :181-188 ('a ship you own') + index.html hirewing :4916-4922 + wingmanTick :2069 + empire.js EMPIRE board + node replay; anchors 4/8 (x_series, elite_dangerous, eve_online, ev_nova)"
    }
   },
   {
