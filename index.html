@@ -6808,6 +6808,10 @@ try{ SF_LOCK.ch=new BroadcastChannel('SF_SINGLETON');
 // 🔊 audio unlocks on the first user gesture (browsers block AudioContext until then)
 (function(){ const unlock=()=>{ if(window.SOUND){ try{ SOUND.init(); if(CFG.MUSIC_ON && SOUND.playMusic) SOUND.playMusic(CFG.MUSIC_TRACK); }catch(e){} } removeEventListener('keydown',unlock,true); removeEventListener('pointerdown',unlock,true); };   // audio still unlocks on the first gesture so EFFECTS work; only the music bed is gated
   addEventListener('keydown',unlock,true); addEventListener('pointerdown',unlock,true); })();
+// 🎵 the F67 adaptive SYNTH score (music.js) has its OWN gesture-starter (arm()->go()->start()) that never reads CFG.MUSIC_ON,
+// so "music OFF" still let it play on the first keypress (M1). Mirror the bed's gate: setMute is stored before start(), and
+// build() reads it (music.js:90 bus.gain = muted?0:vol), so the synth boots SILENT when off - a switch, not a removal.
+if(window.MUSIC && MUSIC.setMute) MUSIC.setMute(!CFG.MUSIC_ON);
 // ---- VISION: the arc3 eye + fog of war (vision.js) - two retinas, one per mind -------------------------------
 const VIS_CODE={asteroid:1,gem:2,planet:3,base:4,squad:5,pirate:6};   // game-side OPAQUE code table (agents never see these names)
 const VIS_EVERY=12;                                                   // retina tick every N frames (named const)
