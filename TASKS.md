@@ -43,12 +43,25 @@ card is never swept in. Everything else lives in new files.
 - [x] C3  The mesh -> REBUILT properly after RJ asked for "a high quality round mesh properly texture mapped": a 256-segment sphere displaced through displacementMap in the ALBEDO's UV space, 33,153 vertices, full PBR (roughness + AO), fresnel rim. The first hand-rolled vertex-colour version is gone. cs 44b21f7
 - [x] C4  "Still very bright" -> RJ was right and my first number was misleading: a whole-disc average of 45 hid how the LIT face reads close up. The pale disc beside the planets was the SUN, which had no texture at all - nine flat cream MeshBasicMaterial spheres. Fixed in cs 4b892ad
 - [ ] C5  Publish the three options side by side for RJ to pick -> DONE WHEN: an artifact URL renders the three renders with their measurements
-- [ ] C6  Fix the wing-order argument bug the other lane found (empire.js:126) -> DONE WHEN: FOLLOW issued from the board follows the PLAYER, verified in the page
+- [x] C6  Fixed. empire.js:126 now splits the third argument by verb: WORLD_VERBS={goto,dock,defend} pass
+      the world <select>'s value, every other verb passes null, and null is what the host reads as "the
+      player" - so FOLLOW means follow me again. Before, the board handed the world select to all of them,
+      so ATTACK and FOLLOW looked a planet name up in the ship list, found nothing, and issued with no target.
+      -> VERIFIED: node --check on all 46 non-vendored .js files, 0 parse failures; all 5 repo guards PASS.
 - [ ] C7  Make ground.js deterministic and drop its dead store (ground.js:109, :297) -> DONE WHEN: two builds of the same world produce identical terrain colour, measured
-- [ ] C8  Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42) -> DONE WHEN: a fresh hauler's name matches its id, and a failed localStorage write is reported not swallowed
+- [x] C8  Fixed, both halves. economy.js:184 takes the id BEFORE the post-increment (`var hid = S.nextId++`)
+      and names from it, so the hauler with id 3 is HAUL-3 and no longer HAUL-4. synod.js:42's empty catch is
+      gone: a blocked or full localStorage now prints "the Synod could not save its campaign (<error name>) -
+      this generation will not carry over" and latches _saveFailed so it says it once, instead of announcing
+      a refit having persisted nothing.
+      -> VERIFIED: 0 parse failures across 46 files; all 5 guards PASS.
 - [x] C10 Seven looks, switchable live with `cybertron <look>` - verified in the page, iron screenshotted at 3072
 - [x] C11 AAA channels -> measured present on the material: displacementMap, roughnessMap, aoMap, normalMap, emissive 1.25, 2 shells. The flat atmosphere shell was REPLACED by a fresnel shader after hiding the shells proved they were what put pale patches on the world
-- [ ] C9  Delete the dead code the other lane listed in my files -> DONE WHEN: planetmenu.js:885-907, missions.js:88/92 and power_panel.js:71 are gone and every file still parses
+- [x] C9  Done. All four are gone, each replaced by a one-line stub naming why: blackmarketFenceHtml
+      (planetmenu.js - a second live implementation of the same feature sits at :556-557), planetLive and
+      goodByKey (missions.js), tickMask (power_panel.js).
+      -> VERIFIED by the stated observable: node --check over every non-vendored .js file, 46 files,
+         0 parse failures; all 5 repo guards PASS.
 
 
 ### Produced from the first-run measurement (2026-09-06, measured on a wiped localStorage)
