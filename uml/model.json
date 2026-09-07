@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T08:25:29",
+ "generated": "2026-09-07T08:51:29",
  "modules": [
   {
    "file": "acquire.js",
@@ -2454,6 +2454,31 @@
     "screen"
    ],
    "cfgTotal": 33
+  },
+  {
+   "file": "storyline.js",
+   "lines": 258,
+   "classes": [
+    {
+     "name": "STORYLINE",
+     "members": [
+      "start",
+      "tick",
+      "view",
+      "onWarWin",
+      "reset",
+      "_state",
+      "_BEATS",
+      "BEATS",
+      "KEY"
+     ],
+     "memberTotal": 9
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
   },
   {
    "file": "synod.js",

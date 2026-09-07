@@ -322,6 +322,7 @@
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260906b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
+<script src="storyline.js?v=20260907a"></script><!-- F31: the authored MAIN STORY spine (The Iron Synod War) - 4 ordered beats polled via window.STORYLINE; advanced on war-win by warWin() -> STORYLINE.onWarWin() -->
 
 <script type="module" src="brain/brain.js?v=20260906e"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
 
@@ -2052,6 +2053,7 @@ function warWin(){ const P=ships[0]; const warFinal=warScore, endedCampaign=camp
   for(const sy of systems){ sy.contested=false; sy.clearT=0; }
   flashBanner('★ COALITION VICTORY ★<br><span style="font-size:17px;font-weight:600">the Hegemon front is broken - campaign '+campaign+'</span>','#8fffa8');
   term(`★ COALITION VICTORY - the Hegemon is routed. +${CFG.WIN_REWARD}c, +20 score. Campaign ${campaign} begins.`,'sys'); ev(`COALITION VICTORY - campaign ${campaign} begins.`);
+  if(window.STORYLINE&&STORYLINE.onWarWin) try{STORYLINE.onWarWin();}catch(e){}   // F31: a REAL coalition victory (never a loss) advances the main-story "Break the Front" beat
   renderCampaignScore(endedCampaign,P,warFinal,true); beginEndgame('win'); }   // decisive front win -> the death-match finale, NOT an immediate reset
 function warLose(){ const P=ships[0]; const warFinal=warScore, endedCampaign=campaign; campaign++; warScore=0;
   // HEGEMON CONQUEST (user 2026-07-07): when the Hegemon wins, the worlds of the front fall UNDER ITS CONTROL - their standing is forced HOSTILE, so you can no longer dock, refuel or repair there until they are liberated.
@@ -4877,6 +4879,16 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     if(!r.ok){ term(r.msg,'err'); return; }
     if(r.done){ term(`<b style="color:#c9a0ff">📜</b> ${r.msg}`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
     const q=r.view; term(`<b style="color:#c9a0ff">📜 ${q.title}</b> - ${q.text}<br>`+q.choices.map(c2=>`  <b>[${c2.n}]</b> ${c2.label}${c2.enabled?'':' <span style="opacity:.5">(unavailable)</span>'}`).join('<br>'),'sys'); return; }
+  // F31 MAIN STORY SPINE - the authored campaign arc "The Iron Synod War" (storyline.js / window.STORYLINE),
+  // distinct from the procedural text QUESTS above: FOUR ORDERED beats run in sequence start -> finish.
+  if(c==='saga'){ if(!window.STORYLINE) return void term('the main story is offline.','err');
+    if(a[1]==='start'){ if(STORYLINE.view().started){ term('<b style="color:#ffd257">★ The Iron Synod War</b> is already underway - type <b>saga</b> for your current objective.','sys'); }
+      else if(STORYLINE.start()){ /* storyline.js announces the opening beat via HOST.term */ }
+      else term('the Coalition\'s call has not reached you yet - try again in a moment.','sys'); return; }
+    const v=STORYLINE.view();
+    if(!v.started){ term('<b style="color:#ffd257">★ The Iron Synod War</b> - the Coalition\'s call to the line has not reached you yet. <span style="opacity:.6">(begin it with: saga start)</span>','sys'); return; }
+    if(v.done){ term('<b style="color:#ffd257">★ The Iron Synod War</b> - <span style="color:#7fdc8a">COMPLETE</span>. You held the line, Ranger.','sys'); return; }
+    term(`<b style="color:#ffd257">★ ${v.title}</b> · Beat <b>${v.beatNo}/${v.total}: ${v.beatTitle}</b><br>${v.brief}<br><span style="color:#9fd0ff">OBJECTIVE:</span> ${v.objective} <span style="opacity:.6">[${v.progress}]</span>`,'sys'); return; }
   if(c==='rank'){ const i=rankIdx(P.score||0), nx=RANKS[i+1]; term(`RANGER RANK: <b>${RANKS[i].n}</b> (${i+1}/${RANKS.length}) · score ${P.score|0}${nx?` · next <b>${nx.n}</b> at ${nx.pts} (${Math.max(0,nx.pts-(P.score|0))} to go)`:' · MAX'}`,'sys'); return; }
   if(c==='skills'||c==='skill'){   // SR-M17: pilot skill career - 1 pt per rank-up, spend on gunnery/handling/tech/trade/charisma/leadership
     if(!a[1]){ const rows=CFG.SKILL_KEYS.map(k=>`${k.toUpperCase()} <b>Lv${skillLvl(P,k)}</b>/${CFG.SKILL_MAX}`).join(' · ');
