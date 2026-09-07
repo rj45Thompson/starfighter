@@ -153,6 +153,7 @@ Each was verified by reading the cited line; the reproduction is stated so it ca
 - `synod.js:42` and `knowledge.js:29` - empty catches around localStorage; the Synod still announces "THE IRON SYNOD REFITS" when nothing persisted, and a corrupt knowledge blob silently restarts from empty and reports `0 shared + 0 private` as if true.
 - `planetmenu.js:885-907` - `blackmarketFenceHtml(p)` is defined and never called; a second live implementation of the same feature is at :556-557.
 - `missions.js:88/92` (`planetLive`, `goodByKey`) and `power_panel.js:71` (`tickMask`) are defined and never called.
+- `index.html:861` (STALE COMMENT, not a functional bug - the two later sites are correct and agree with each other) - the `miningBotsTick` header says "Bots never destroy a rock themselves: the split is the pilot's shot", but the 2026-09-06 drone-mining change at `:957` does `a.hp-=CFG.BOT_DPS*dt; if(a.hp<=0){ destroyAsteroidObj(a,P); }` - bots DO destroy rocks now. `CFG.BOT_DPS=3.5` (`:397`, whose own comment says drones "split rocks with you", a scale-4 rock's 26 hull cut in ~7.4s solo). The header describes the pre-mining seam-only behaviour and was not updated when BOT_DPS landed, so anyone reading `:861` gets the wrong model (that a rock only ever splits under player fire). Verified by reading `:861` vs `:397` vs `:950-957` in the same file.
 
 ## Notes
 - The game's main loop is `frame(now)` at the bottom of index.html; it is a global, which is what
