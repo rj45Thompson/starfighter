@@ -2235,7 +2235,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-211",
-    "note": "star map jumps between systems (starmap.js)"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, wiring asserted + fuel-cost measured). PICK: the star map (starmap.js) is a full-screen 2D galaxy overlay - 'click a system to set course' :349; onClick :444-458 issues runCmd('go <planet>') for your OWN system (free in-system course) or runCmd('jump <system>') for ANY OTHER system. TRAVEL between systems = the jump/hyperspace command (index.html:5009-5028): LANE-CONSTRAINED (refuses without a STARMAP.neighborsOf jump lane - 'no direct jump lane ... jump to an adjacent system first' :5018-5020, SR-M16), FUEL-GATED (cost = ceil((JUMP_FUEL_BASE 8 + d/JUMP_DIST_PER_FUEL 85) * engine/series fuelMult) :5022, refuses if P.fuel<cost :5023), and it RELOCATES the ship to the target system centre (P.pos.copy(sy.center) :5025) with an 'HYPERJUMP - arrived in <sys>' notify. (The 'hyperspace REMOVED' comments elsewhere are about NPC TRADERS no longer teleporting arbitrage routes, NOT the player's jump.) OBSERVABLE: node scratchpad/f42_starmap_travel_replay.js -> PASS - asserts the click->go/jump wiring + the lane/fuel/relocate mechanics from the real source, and computes the distance-scaled cost (300u->12, 600u->16, 1000u->20, 1600u->27 fuel; never free, min >= 8).",
+    "settledFrom": "starmap.js onClick :444-458 (click own system -> go, other -> jump); index.html jump command :5009-5028 lane-constrained (STARMAP.neighborsOf :5018-5020), fuel-gated (JUMP_FUEL_BASE 8 + d/JUMP_DIST_PER_FUEL 85 :5022, P.fuel>=cost :5023), relocates P.pos.copy(sy.center) :5025. Measured node scratchpad/f42_starmap_travel_replay.js PASS (wiring + distance-scaled fuel cost)"
    }
   },
   {
