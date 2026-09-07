@@ -2865,7 +2865,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-215",
-    "note": "TEXTQUESTS templates offered at planets; PLANETMENU barRumors/barPatrons"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). Ports offer self-contained text vignettes on TWO tracks (distinct from F53's dialogue-CHOICE mechanic). (1) BAR VIGNETTES (planetmenu.js barHtml :483): barRumors() :453-482 emits 5 self-contained mini-narratives, each '0-fab BY CONSTRUCTION' - read off live HOST state and carrying a check() so a rumor with no live backing is not generated: a hostile sighting ('<pirate> was sighted near <world> - Nu off the port'), a price whisper ('<good> going cheap here - Nc'), war intel ('stay out of <system> - the Synod runs those lanes'), the world's treasury, and the wing market. barPatrons() :432 + barLineFor() :442 give named patrons with histories/backstory. (2) SELF-CONTAINED STORIES: each TEXTQUESTS template (textquests.js, cf F53) is a complete interactive vignette. OBSERVABLE: node scratchpad/f54_vignettes_replay.js -> PASS - parses barRumors (5 vignettes, all 5 check()-gated), asserts barPatrons/barLineFor + the concrete rumor lines, and runs node textquests.js (self-contained stories) -> PASS.",
+    "settledFrom": "planetmenu.js BAR: barRumors :453-482 (5 self-contained mini-narratives, each check()-gated + read off live HOST state, 0-fab), barPatrons :432 / barLineFor :442 (named patron histories/backstory), rendered barHtml :483; + textquests.js self-contained interactive quests (cf F53). Measured node scratchpad/f54_vignettes_replay.js PASS (5 check-gated rumor vignettes + textquests self-test PASS)"
    }
   },
   {
