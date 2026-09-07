@@ -1193,7 +1193,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-203",
-    "note": "TRADE ROUTES panel: best two seen buyers per good with distance and per-unit gain"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). TWO surfaces show where held goods sell best. (1) the \"market\" command index.html:4966-4973 (GALAXY MARKET, \"best buy = cheapest ask, best sell = highest bid, dockable worlds only\"): for every good it scans the OPEN worlds (rep>REP_HOSTILE && !hegemon, :4968), names the best-SELL (highest bid) + best-BUY (cheapest ask) planet and the per-unit spread, and FLAGS the goods the player HOLDS (\"hold N\", :4971-4972). (2) planetmenu.js routesHtml TRADE ROUTES panel :591-630 (\"YOUR HOLD - best price seen elsewhere\"): iterates ONLY held goods (:596 if(have<=0) continue), lists the best two SEEN buyers per good with distance (b.dist \"u\", :605) and per-unit gain (+b.gain/unit, :606) + total gain (:611), plus a section-2 buy-low/sell-high \"run to make next\". OBSERVED-price gated (obsOf->p._obs :577, recordObservedPrices on dock index.html:1699 / :6085 - a world never docked at is not listed, no omniscience). NOT a mis-grade: the feature genuinely exists and is held-filtered, not just a generic local price readout. OBSERVABLE: node scratchpad/f22_market_replay.js -> RESULT PASS 10/10 (verbatim market loop: best-sell=highest OPEN bid, best-buy=cheapest, spread, held-flag; the hostile/Hegemon worlds that hold the true global price maxima are correctly EXCLUDED, so best-sell honours the open-world filter rather than picking a global max).",
+    "settledFrom": "index.html market cmd :4966-4973 (node replay) + planetmenu.js routesHtml :591-630 (read-only corroboration) + recordObservedPrices/_obs :6085; anchors 2/8 (x_series, elite_dangerous)"
    }
   },
   {
