@@ -29,6 +29,26 @@ Inside `step`, per frame: `writeRockInstance` **7,781 calls**, `think` 16, `flyS
 No leak found: scene children oscillate 469-572, ships plateau at 63, 0 runtime errors in 18s.
 ⚠ `renderAll`'s share may be inflated by the hidden browser pane; the `step` half is not.
 
+### Re-measured 2026-09-07 (H2 headless Chrome, post rock-LOD optimization) — `node scratchpad/perf_profile.js`
+The 2026-09-06 baseline above is now **STALE on its headline claim**: `writeRockInstance` is NO LONGER the
+dominant cost. The strided distance-LOD rewrite (CFG `ROCK_LOD_UNIT`/`ROCK_LOD_MAX` :439, applied at
+index.html:2741 — a rock's DRAWN pose is refreshed every Nth frame, N growing with distance, staggered by
+index; physics unstrided) LANDED and works. Fresh H2 measurement (isolated headless Chrome, innerWidth 1422,
+timeline advancing, sim NOT locked; 38 ships, **3,213 asteroids** — a smaller field than the baseline's 7,787,
+so the step *totals* are NOT apples-to-apples; the **calls/frame and per-fn shares are the clean faithful readings**):
+
+| step half = CPU (FAITHFUL); renderAll = software swiftshader (UNREPRESENTATIVE) | ms/frame |
+|---|---|
+| `step` (pure JS sim) | **2.9** |
+| `writeRockInstance` | 0.78 — **1,545 calls/frame (was 7,781); the striding cut it ~80%** |
+| `think` (AI) | 0.67 (11/frame) |
+| `flyStep` 0.26 (40/frame) · `astHitShip` 0.09 (35/frame) · shieldTick/capacitorTick | < 0.1 each |
+| `renderAll` | 5.1 headless — **IGNORE** (software GPU, not a real-GPU number) |
+
+**VERDICT: the `step` half is well-balanced with NO dominant hotspot** — the former 7,781-call hotspot is
+optimized and nothing replaced it. There is no bounded CPU optimization with a clear payoff right now;
+performance is healthy. Reproduce: `node scratchpad/perf_profile.js` (self-cleaning, ~15s, hard-timeout-bounded).
+
 ---
 
 ## Open
