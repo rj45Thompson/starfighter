@@ -370,7 +370,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no use case and no module in model.json names subsystem targeting"
+    "note": "No player-directed subsystem targeting or disabling. The closest mechanic is the TRETON weapon's slow-on-hit: it slows the TARGET'S ENGINES for CFG.SLOW_DUR (index.html:2696 's.slowT=T0+SLOW_DUR; s.slowMul=b.slow', applied in flight at :2586/:2593) - but that is a status DEBUFF on ANY hit, not a SELECTED subsystem, and it is temporary (:2421 'no ... ship is ever permanently disabled'). The player cannot cycle/aim at a specific subsystem the way the yes-anchors do (elite cycles power plant/thrusters/FSD; ftl aims at enemy rooms; freelancer targets individual turrets; x disables engines/turrets for boarding). Neither requirement of 'target AND disable individual subsystems' is met -> no. (The old recall note 'no module names subsystem targeting' missed the TRETON slow, but the conclusion stands.)",
+    "settledFrom": "code read - the TRETON slow-on-hit is a debuff, not subsystem targeting 2026-09-06"
    }
   },
   {
