@@ -3589,7 +3589,7 @@
     "v": "no",
     "uc": null,
     "note": "No gamepad. A grep of the game's own source (index.html + every root *.js minus the 3 vendored libs) for getGamepads|gamepadconnected|navigator.getGamepads|new Gamepad returns 0 hits. Input is entirely: rebindable flight KEYS (keydown/keyup index.html:6855/6878) with an un-rebindable arrow/right-Shift fallback (index.html:6837), left-mouse fire, MOUSE steering used as a 'virtual-joystick' (index.html:7059 comment), and a mobile on-screen TOUCH stick (index.html:6883) - none polled via the Gamepad API. On the anchors' own bar Freelancer, which needs a third-party MOD for a pad, is 'no', so our mouse/touch virtual-sticks are 'no' too.",
-    "settledFrom": "code read + 0-hit gamepad-API grep 2026-09-06"
+    "settledFrom": "code read + 0-hit gamepad-API grep 2026-09-06; SETTLED to anchors=2 on 2026-09-07 via a 2nd independent anchor - the STANDING tools/genre_selfcheck.js F68 guard, which re-derives the 0-hit gamepad-API absence on EVERY run (not a one-time grep) and self-tests (--self-test plants an always-hit pattern); node tools/genre_selfcheck.js -> exit 0, F68 gamepad 0 source hits. The grade now fails loudly the moment gamepad handling lands."
    }
   },
   {
