@@ -323,6 +323,7 @@
 <script src="shell.js?v=20260906b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
 <script src="storyline.js?v=20260907a"></script><!-- F31: the authored MAIN STORY spine (The Iron Synod War) - 4 ordered beats polled via window.STORYLINE; advanced on war-win by warWin() -> STORYLINE.onWarWin() -->
+<script src="survey.js?v=20260907a"></script><!-- F45: SELL exploration/survey data (P.discoveries) for a cartographics fee via window.SURVEY; the `survey` command files unfiled records at a dock -->
 
 <script type="module" src="brain/brain.js?v=20260906e"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
 
@@ -4881,6 +4882,14 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const q=r.view; term(`<b style="color:#c9a0ff">📜 ${q.title}</b> - ${q.text}<br>`+q.choices.map(c2=>`  <b>[${c2.n}]</b> ${c2.label}${c2.enabled?'':' <span style="opacity:.5">(unavailable)</span>'}`).join('<br>'),'sys'); return; }
   // F31 MAIN STORY SPINE - the authored campaign arc "The Iron Synod War" (storyline.js / window.STORYLINE),
   // distinct from the procedural text QUESTS above: FOUR ORDERED beats run in sequence start -> finish.
+  // F45: SELL survey/exploration data - file your unfiled discovery records (P.discoveries) at a dock for a
+  // cartographics fee (survey.js / window.SURVEY). The RECORD half (discoveries) already exists; this is the SELL half.
+  if(c==='survey'||c==='cartography'){ if(!window.SURVEY) return void term('survey system offline.','err');
+    const r=SURVEY.read();
+    if(a[1]==='sell'||a[1]==='file'){ if(!need(P.docked,'dock at a world/station first to file your survey records')) return;
+      const res=SURVEY.sell(); if(!res.ok){ term('No new survey data to file - chart derelicts, caches and distress signals out in the black first.','sys'); return; }
+      term(`🛰 Filed <b>${res.filed}</b> survey record${res.filed>1?'s':''} - <span style="color:#ffcf52">+${res.paid}c</span> cartographics fee. Career surveys logged: ${res.total}.`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
+    term(`🛰 <b>SURVEY LOG</b>: ${r.total} discoveries charted · <b>${r.unsold}</b> unfiled (worth ${r.unsold*r.price}c). ${r.unsold>0?'dock and <b>survey sell</b> to file them for a cartographics fee.':'all filed.'}`,'sys'); return; }
   if(c==='saga'){ if(!window.STORYLINE) return void term('the main story is offline.','err');
     if(a[1]==='start'){ if(STORYLINE.view().started){ term('<b style="color:#ffd257">★ The Iron Synod War</b> is already underway - type <b>saga</b> for your current objective.','sys'); }
       else if(STORYLINE.start()){ /* storyline.js announces the opening beat via HOST.term */ }

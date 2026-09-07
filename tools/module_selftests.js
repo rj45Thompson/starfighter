@@ -14,7 +14,7 @@
 const cp = require('child_process');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
-const MODULES = ['conquest', 'power_panel', 'textquests', 'storyline', 'kripke_mind', 'sober_gate', 'tom_test', 'centroid_mind', 'item_variance'];
+const MODULES = ['conquest', 'power_panel', 'textquests', 'storyline', 'survey', 'kripke_mind', 'sober_gate', 'tom_test', 'centroid_mind', 'item_variance'];
 
 function run(modPath, extraArgs) {
   const r = cp.spawnSync(process.execPath, [modPath].concat(extraArgs || []), { encoding: 'utf8', timeout: 60000 });

@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-07 09:39 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-07 09:59 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -9,10 +9,10 @@ rather than as a confident wrong number.
 | measure | value | what it does and does not tell you |
 |---|---|---|
 | use cases WORKS / PARTLY / MISSING / DEPRECATED | 49 / 1 / 0 / 1 | Work RECORDED, not work outstanding. A row is only ever added after the feature is built, so this can never show a gap. |
-| modules in the class model | 57 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
+| modules in the class model | 58 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 51 / 7 / 12 / 0 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 52 / 6 / 12 / 0 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
@@ -50,7 +50,6 @@ F68   3/7  6/7      no          the game supports a gamepad
 F34   3/6  4/6      partial     attacking one faction raises standing with its rival
 F69   3/7  4/7      no          the game offers colourblind or other accessibility options
 F66   3/8  4/8      partial UC-506 NPC dialogue is voiced
-F45   3/8  3/8      partial UC-203 player can discover unvisited systems and record or sell the data
 F10   2/8  3/8      no          player manages internal crew and damage control aboard their own ship
 F29   2/8  3/8      no          player can capture an enemy ship and keep it
 F08   2/8  2/8      no          player can pause or slow time in combat to issue orders
@@ -60,7 +59,7 @@ F70   1/8  2/8      no          the game supports VR headsets   <- single-game i
 == UNRESOLVED - not enough evidence to place these either way (0) ==
 These are NOT low-priority. They are unmeasured. Settling one is its own task.
 
-== ALREADY HAVE (51) ==
+== ALREADY HAVE (52) ==
   F58   8/8   -  a guided tutorial or scripted opening teaches the basics
   F02   7/8   -  ship movement carries momentum or inertia rather than instant-stop arcade handling
   F07   7/8   UC-101  player can mine asteroids or resource nodes for sellable material
@@ -71,7 +70,7 @@ These are NOT low-priority. They are unmeasured. Settling one is its own task.
   F42   7/8   UC-211  player picks a destination on a star map and travels between systems
   F52   7/8   UC-108  destroyed ships and cargo drop physical loot that anyone can collect
   F61   7/8   UC-109  a radar or scanner shows nearby objects around the ship
-  ... and 41 more
+  ... and 42 more
 ```
 
 ## Ready-to-take task lines
@@ -94,11 +93,11 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=partial  -->
 - [ ] F69  the game offers colourblind or other accessibility options -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 4 grounded; ours=no  -->
 - [ ] F66  NPC dialogue is voiced -> DONE WHEN: <observable>   <!-- anchor 3/8 games, 4 grounded; ours=partial UC-506 -->
-- [ ] F45  player can discover unvisited systems and record or sell the data -> DONE WHEN: <observable>   <!-- anchor 3/8 games, 3 grounded; ours=partial UC-203 -->
+- [ ] F10  player manages internal crew and damage control aboard their own ship -> DONE WHEN: <observable>   <!-- anchor 2/8 games, 3 grounded; ours=no  -->
 ```
 
 ## Tool output this pass
 
 ```
-classes.mmd: 53 exposed objects/classes over 57 modules; usecases.mmd: 51 use cases, tally {'WORKS': 49, 'PARTLY': 1, 'MISSING': 0, 'DEPRECATED': 1}
+classes.mmd: 54 exposed objects/classes over 58 modules; usecases.mmd: 51 use cases, tally {'WORKS': 49, 'PARTLY': 1, 'MISSING': 0, 'DEPRECATED': 1}
 ```
