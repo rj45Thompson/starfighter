@@ -299,7 +299,7 @@
 <script src="deliberate.js?v=20260714c"></script>
 <script src="knowledge.js?v=20260714c"></script>
 <script src="acquire.js?v=20260714c"></script>
-<script src="sound.js?v=20260906a"></script>
+<script src="sound.js?v=20260907a"></script>
 <script src="music.js?v=20260906a"></script>
 <script src="hullmodels.js?v=20260714c"></script>
 <script src="knowledge_hud.js?v=20260714c"></script>
@@ -439,6 +439,7 @@ const CFG = {
   // point on one of eight stats (each level a declared multiplier at the ONE site that already reads the quantity); all eight maxed plus
   // one banked point = the next hull tier, taken anywhere in space (applyHull's swap rule resets the old Lv1-10 ladder, same as before).
   KILL_FEED_MAX:60, KILL_CREDIT_S:8, KILL_FEED_SHOWN:5, KILL_FEED_S:22,
+  MUSIC_TRACK:'starfield',   // the bed that plays under flight (assets/audio/<name>.ogg, generated with MusicGen)
   GEM_BAR:true, GEM_BAR_MAX:48, GEM_BAR_RATE:1.0, GEM_PTS_CAP:64, STAT_MAX:8, TIER_UP:true,
   STAT_GAIN:{shieldCap:0.10, shieldRegen:0.12, energyCap:0.10, energyRegen:0.12, speed:0.05, agility:0.08, damage:0.07, fireRate:0.06},
   STAT_ORDER:['shieldCap','shieldRegen','energyCap','energyRegen','speed','agility','damage','fireRate'],
@@ -2832,7 +2833,7 @@ function killShip(s){ if(s.inhabitant) INH.onDamaged(null,0,true);   // I2: its 
     s.missileAmmo=CFG.MISSILE_AMMO_START; s.dmgMult=0; s.micromodules=[]; s.gripBonus=0;   // STANDARD GEAR SLOTS: real stakes wipes this loadout too (incl. SR-M23 gripper micro-module bonus)
     s.manufacturer='human'; s.hullSeries='standard'; s.weaponSlots=null; s.slotFire=null;   // WEAPON HARDPOINTS/HULL SERIES/MANUFACTURER: same real-stakes wipe
     applyHull(s,'scout'); }   // recomputes holdCap/maxHp/hp/hullSpeed/visual model from the reset lvl+equip - player respawns as a stock SCOUT (user 2026-07-13 "start at scout")
-  if(window.SOUND) SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'});
+  if(window.SOUND){ SOUND.play('explode',{variant:s.role==='player'?'player':'enemy'}); if(SOUND.duck) SOUND.duck(s.role==='player'?0.75:0.4, s.role==='player'?1.1:0.45); }
   burst(s.pos,0xff5a6e,34,28,5); burst(s.pos,0xffcf52,18,18,4); sgSay(s,'die',{},'Hull breach! Punching out.');
   if(s.team==='pirate' && rand(0,1) < CFG.ART_DROP_BASE+(s.tier||0)*CFG.ART_DROP_PER_TIER) spawnArtifactDrop(s.pos, ARTIFACT_KEYS[randi(0,ARTIFACT_KEYS.length-1)]);   // M6: Hegemon wrecks drop artifacts
   if(s.team==='pirate' && (s.tier||0)>=2 && rand(0,1)<CFG.MICROMOD_DROP_CHANCE) spawnMicromoduleDrop(s.pos, MICROMOD_KEYS[randi(0,MICROMOD_KEYS.length-1)]);   // STANDARD GEAR SLOTS: only the toughest (Warlord-tier) kills drop micro-modules
@@ -2868,7 +2869,7 @@ function killByShip(victim,killer){ const wasPirate=victim.team==='pirate';
     term(`★★ You destroyed the ${CFG.FINALE_NAME}. The galaxy will be reborn - a fresh ship, the minds keep everything they learned.`,'sys'); endgameConclude(); } }   // the boss falling is the ONLY reset trigger now (never a bare warWin, which would spawn a second titan)
 function destroyAsteroid(i,owner){ const a=asteroids[i]; if(!a) return; a.gone=true; if(owner) owner.score+=a.level;   // gone flag: any stale spatial-hash ref to this rock is skipped by _astNear
   if(a.seamLine){ scene.remove(a.seamLine); a.seamLine=null; seamRocks.delete(a); if(a.seam>0) burst(a.pos,0xffa040,6,14,a.scale*0.3); }   // the seam splits with the rock (mining bots, 2026-09-06)
-  if(window.SOUND) SOUND.play('explode',{variant:'asteroid'});
+  if(window.SOUND){ SOUND.play('explode',{variant:'asteroid'}); if(SOUND.duck) SOUND.duck(0.22,0.3); }
   burst(a.pos,0xff9a52,12+Math.round(a.scale*1.4),18,a.scale*0.55); burst(a.pos,0xffd890,4,24,a.scale*0.38); spawnGem(a.pos,a.scale);
   if(FX_TEX) fxSprite(FX_TEX.explosion,a.pos,a.scale*4.5,0xffffff,0.55,1.9,0.95);   // generated fireball over the spark burst (GEN_FX)
   if(a.scale>=CFG.AST_NOSPLIT && asteroids.length<CFG.AST_MAX){ const n=randi(CFG.AST_SPLIT_MIN,CFG.AST_SPLIT_MAX),cs=a.scale*CFG.AST_CHILD_FRAC;
@@ -6767,7 +6768,7 @@ try{ SF_LOCK.ch=new BroadcastChannel('SF_SINGLETON');
   SF_LOCK.ch.onmessage=(m)=>{ if(m.data&&m.data.t==='claim'&&m.data.id>SF_LOCK.myClaim) sfPause(true); };
   SF_LOCK.ch.postMessage({t:'claim',id:SF_LOCK.myClaim}); }catch(e){}
 // 🔊 audio unlocks on the first user gesture (browsers block AudioContext until then)
-(function(){ const unlock=()=>{ if(window.SOUND){ try{ SOUND.init(); }catch(e){} } removeEventListener('keydown',unlock,true); removeEventListener('pointerdown',unlock,true); };
+(function(){ const unlock=()=>{ if(window.SOUND){ try{ SOUND.init(); if(SOUND.playMusic) SOUND.playMusic(CFG.MUSIC_TRACK); }catch(e){} } removeEventListener('keydown',unlock,true); removeEventListener('pointerdown',unlock,true); };
   addEventListener('keydown',unlock,true); addEventListener('pointerdown',unlock,true); })();
 // ---- VISION: the arc3 eye + fog of war (vision.js) - two retinas, one per mind -------------------------------
 const VIS_CODE={asteroid:1,gem:2,planet:3,base:4,squad:5,pirate:6};   // game-side OPAQUE code table (agents never see these names)

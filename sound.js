@@ -28,7 +28,8 @@
 
   // ---- CONFIG: no magic numbers buried in logic; every tunable lives here.
   var CFG = {
-    MASTER_VOL: 0.5,          // default master volume 0..1
+    MASTER_VOL: 0.5,
+    MUSIC_VOL: 0.34, MUSIC_DIR: 'assets/audio/',   // the bed sits well under the effects; ducked further when something loud fires          // default master volume 0..1
     MUTED: false,             // default mute state
     MAX_VOICES: 14,           // polyphony cap - rapid shots past this are dropped (no clip)
     RAMP: 0.006,              // click-free attack/decay ramp floor (s)
@@ -462,11 +463,75 @@
   function names() { return Object.keys(BANK); }
   function ready() { return !!ctx; }
 
+  // ---- MUSIC ------------------------------------------------------------------------------------------
+  // RJ 2026-09-06: "fix all the music it's terrible". There was no music at all - this engine synthesises SFX
+  // and nothing else, so the game ran in silence between explosions. A generated loop now plays underneath
+  // (assets/audio/*.ogg, MusicGen), on its OWN gain node so it can sit well below the effects and duck when
+  // something loud happens. It is an <audio> element rather than a decoded buffer: a 10-second loop does not
+  // need the scheduler, and an element can start streaming before it has fully downloaded.
+  var musicEl = null, musicGain = null, musicSrc = null, musicName = null, duckT = 0;
+
+  function musicInit() {
+    if (!ctx) init();
+    if (!ctx || musicGain) return musicGain;
+    musicGain = ctx.createGain();
+    musicGain.gain.value = CFG.MUSIC_VOL;
+    musicGain.connect(master || ctx.destination);
+    return musicGain;
+  }
+  function playMusic(name, opts) {
+    opts = opts || {};
+    if (!musicInit()) return false;
+    if (musicName === name && musicEl && !musicEl.paused) return true;
+    stopMusic();
+    try {
+      musicEl = new Audio(CFG.MUSIC_DIR + name + '.ogg');
+      musicEl.loop = true;
+      musicEl.crossOrigin = 'anonymous';
+      musicEl.volume = 1;
+      musicSrc = ctx.createMediaElementSource(musicEl);
+      musicSrc.connect(musicGain);
+      var pr = musicEl.play();
+      if (pr && pr.catch) pr.catch(function () { });   // a browser that blocks autoplay retries on the next gesture
+      musicName = name;
+      setMusicVolume(opts.vol != null ? opts.vol : CFG.MUSIC_VOL);
+      return true;
+    } catch (e) { musicEl = null; musicName = null; return false; }
+  }
+  function stopMusic() {
+    try { if (musicEl) { musicEl.pause(); musicEl.src = ''; } } catch (e) { }
+    try { if (musicSrc) musicSrc.disconnect(); } catch (e) { }
+    musicEl = null; musicSrc = null; musicName = null;
+  }
+  function setMusicVolume(v) {
+    CFG.MUSIC_VOL = clamp((typeof v === 'number' && isFinite(v)) ? v : CFG.MUSIC_VOL, 0, 1);
+    if (musicGain && ctx) {
+      try { musicGain.gain.setTargetAtTime(CFG.MUSIC_VOL, now(), 0.08); }
+      catch (e) { try { musicGain.gain.value = CFG.MUSIC_VOL; } catch (e2) { } }
+    }
+    savePrefs();
+    return CFG.MUSIC_VOL;
+  }
+  // DUCK: a loud effect pulls the bed down for a moment instead of fighting it. Without this the music and the
+  // explosions simply add up and the mix turns to mud, which is most of what "the music is terrible" means.
+  function duck(amount, seconds) {
+    if (!musicGain || !ctx) return;
+    var a = clamp(amount == null ? 0.45 : amount, 0, 1), t = now();
+    try {
+      musicGain.gain.cancelScheduledValues(t);
+      musicGain.gain.setTargetAtTime(CFG.MUSIC_VOL * (1 - a), t, 0.03);
+      musicGain.gain.setTargetAtTime(CFG.MUSIC_VOL, t + (seconds || 0.5), 0.25);
+    } catch (e) { }
+  }
+
   var API = {
     CFG: CFG,
     init: init, play: play,
     setMute: setMute, muted: muted, toggleMute: function () { return setMute(!CFG.MUTED); },
     setVolume: setVolume, volume: volume,
+    playMusic: playMusic, stopMusic: stopMusic, setMusicVolume: setMusicVolume,
+    musicVolume: function () { return CFG.MUSIC_VOL; }, musicPlaying: function () { return musicName; },
+    duck: duck,
     names: names, aliases: function () { return Object.keys(ALIAS); }, ready: ready,
     _voices: function () { return voices; }
   };
