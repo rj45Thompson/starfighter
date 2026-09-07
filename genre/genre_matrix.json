@@ -2391,7 +2391,8 @@
    "ours": {
     "v": "partial",
     "uc": "UC-203",
-    "note": "the game records what has been seen (starmap knowCounts, seen prices) but nothing sells survey data"
+    "note": "SETTLED partial (2026-09-07, THIN->anchors=2, boundary measured; the seed was right). TWO halves. RECORD (yes): 'discoveries' are a tracked, scored career stat - P.discoveries++ when the player resolves a derelict/cache/distress signal (index.html:1761), contributing discoveries * CAMPAIGN_SCORE_W_DISCOVERY (10) to the end-of-campaign score (campaignScore :2014-2018); and the game models visited-vs-unvisited knowledge (per-ship price memory; NPCs 'EXPLORE the nearest UNVISITED market' :1860-1863, the same epistemic limit the player lives under). SELL (no): nothing sells survey/exploration data - there is no Universal-Cartographics-style buyer (the yes-games elite_dangerous / space_rangers_2 have one). So the player RECORDS discoveries but cannot SELL survey data -> partial. OBSERVABLE: node scratchpad/f45_discovery_replay.js -> PASS - slices the real campaignScore formula and measures +5 discoveries -> +50 score (5 * W_DISCOVERY), asserts the P.discoveries increment + the unvisited-market model, and grep-proves the sell-data half absent (a first regex FALSE-POSITIVED on contraband's 'sell dear ... scan risk' :3994 and was tightened to require exploration DATA).",
+    "settledFrom": "index.html discovery career stat: P.discoveries++ on a resolved derelict/cache/distress :1761, scored via campaignScore discoveries*CAMPAIGN_SCORE_W_DISCOVERY 10 :2014-2018; visited/unvisited knowledge model :1860-1863; NO survey-data sale (grep-proven absent - contraband selling :3994 is a different mechanic). Measured node scratchpad/f45_discovery_replay.js PASS. partial = record yes, sell no"
    }
   },
   {
