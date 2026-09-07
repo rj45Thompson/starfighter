@@ -781,7 +781,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-206",
-    "note": "MOUNT BAYS hardpoints and gizmo slots; mount 220c, GUNS 1 to 2, DPS 66.7 to 128.7"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). TWO ENFORCED limited-slot bays, both hull+series dependent: (1) ELECTRONICS/GIZMO bay - gizmoSlotsFor(s)=max(0, hullMounts(s).gizmoPoints.length + seriesOf(s).gizmoDelta) index.html:3876 (default CFG.GIZMO_SLOTS 2 :501 \"a real 2-slot electronics bay, not an uncapped bag\"); mountGizmo :3451-3455 refuses a FULL bay (\"no free gizmo slot - unmount one first\") and a duplicate (\"already mounted\"). (2) WEAPON HARDPOINTS - hardpointCountFor(s)=max(0, hullMounts(s).weaponPoints.length + seriesOf(s).hardpointDelta) :3677; mountHardpoint :3679-3683 refuses when full (\"no free hardpoint\"). Per-hull HULL_MOUNTS :3853 = 0..5 weapon hardpoints + 1..6 gizmo slots (scout/fighter 1/2, interceptor 2/3, freighter 0/1, cruiser 3/4, dreadnought 4/5, capital 5/6). HULL SERIES is a real slot TRADEOFF: Fast gizmoDelta -1 / hardpointDelta -1 (\"sacrifices one weapon hardpoint and one gizmo slot\" for +25% speed). Downsizing hull/series unmounts+refunds overflow (resizeGizmoBay :1793 / resizeWeaponBay :3685). The gizmo/hardpoint commands show \"X/Y slots used\" (:5132/:5212). node scratchpad/f14_slots_replay.js -> RESULT PASS 15/15 (verbatim mount fns + real HULL_MOUNTS: cap enforced on the 3rd gizmo, the 2nd fighter hardpoint, and the freighter 0-hardpoint first mount; fast-series slot sacrifice measured 1->0 & 2->1).",
+    "settledFrom": "index.html mount/slot system (mountGizmo :3451 / mountHardpoint :3679 / gizmoSlotsFor :3876 / hardpointCountFor :3677 / HULL_MOUNTS :3853 / HULL_SERIES fast delta) + node replay; anchors 7/8 (all but starblast)"
    }
   },
   {
