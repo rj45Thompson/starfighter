@@ -2494,7 +2494,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-201",
-    "note": "PLANETMENU.open with 7 tabs"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, structure measured). Docking OPENS a port interior: the dock flow hands off to the SR planet screen - PLANETMENU.open(p,{isBase}) (index.html:3234, 'the SR planet screen owns docking now') with a dock sound; while docked the `menu` command re-opens it (:4968). The interior (planetmenu.js) is a TABBED UI with its OWN SCREENS - CFG.TABS :30-37 = MARKET, SHOP(hangar), MISSIONS, QUESTS, GROUND, BAR, SCIENCE (Athenaeum-only, filtered elsewhere), NEWS(log): 8 tabs (7 default + science station-only); renderBody() :1043-1050 dispatches each S.tab to its own renderer (marketHtml / shopHtml / missionsHtml / questsHtml / groundHtml / barHtml / scienceHtml / logHtml). OBSERVABLE: node scratchpad/f47_port_tabs_replay.js -> PASS - parses CFG.TABS (8 screens), asserts every tab is dispatched to its OWN *Html renderer, and that docking calls PLANETMENU.open with a dock sound.",
+    "settledFrom": "index.html dock flow -> PLANETMENU.open(p,{isBase}) :3234 ('the SR planet screen owns docking now') + dock sound; re-open when docked :4968; planetmenu.js CFG.TABS :30-37 (8 screens market/hangar/missions/quests/ground/bar/science/log), renderBody :1043-1050 dispatches each to its own *Html renderer. Measured node scratchpad/f47_port_tabs_replay.js PASS"
    }
   },
   {
