@@ -400,7 +400,10 @@ const CFG = {
   MARKER_EDGE_PAD:56,                              // mission marker: how far inside the frame the edge-pinned pointer sits (px)
   MISSION_AUTO:true, MISSION_AUTO_S:5,             // user 2026-09-06: with no contract held, accept the first posting the rank allows every MISSION_AUTO_S seconds, so the tracker always points somewhere
   SHOP_AUTO:true, SHOP_SNOOZE_S:60,                // user 2026-09-06: the SHOP panel opens itself when an upgrade is affordable (no docking); closing it by hand snoozes it this long
-  THROTTLE_IN_POWER:true, THROTTLE_BAR_H:88,       // the dock's height budget for the lever row (measured 2026-09-06: the dials already filled the old budget to within 2 px; 46 clipped the lever by 38)                          // user 2026-09-06 "the throttle bar is not obvious what it does, label it and move it to the power section": the lever becomes a labelled horizontal bar at the foot of the POWER panel. false = the old unlabelled vertical bar on the right edge.                               // GRAPHICS PASS 2026-09-06: per-economy planet surface maps generated with FLUX (assets/planets/*.jpg, provenance in assets/planets/manifest.json) instead of one shared planet_skin.jpg tinted six ways. false = the old single skin.
+  // THROTTLE (RJ 2026-09-06 "maybe remove throttle bar and make it a key or something"): the lever is now OFF by
+  // default and cruise speed is on the keys - [ and ] step it, \ cuts to zero, and a digit-free HUD readout says
+  // what it is. THROTTLE_BAR:true brings the old lever back for anyone who preferred dragging it.
+  THROTTLE_BAR:false, THROTTLE_STEP:0.1, THROTTLE_IN_POWER:true, THROTTLE_BAR_H:88,       // the dock's height budget for the lever row (measured 2026-09-06: the dials already filled the old budget to within 2 px; 46 clipped the lever by 38)                          // user 2026-09-06 "the throttle bar is not obvious what it does, label it and move it to the power section": the lever becomes a labelled horizontal bar at the foot of the POWER panel. false = the old unlabelled vertical bar on the right edge.                               // GRAPHICS PASS 2026-09-06: per-economy planet surface maps generated with FLUX (assets/planets/*.jpg, provenance in assets/planets/manifest.json) instead of one shared planet_skin.jpg tinted six ways. false = the old single skin.
   ARENA_WIRE:false,                                // GRAPHICS PASS 2026-09-05 (user "fix the background"): the 2100-unit wireframe sphere that marked the arena edge drew polygon lines across the whole sky at every zoom. Off; the edge still bounces you (step) and EDGE_STEER turns the AI back.
   REAR_GUN:false,                                  // user 2026-09-05 "remove rear gun for now": no ball turret on the hull, no aft camera, no manual or AI rear beam, no rear shield. REAR_GUNNER_WINDOW below is moot while this is false. Flip to bring the whole mechanic back.
   FBX_HULLS:true,                                  // GRAPHICS PASS 2026-09-05 ("make the ship look better"): every ship renders the real Starfighter2 Spaceship.fbx with its palette + emissive maps, tinted per side, instead of the 6-vertex hullmodels.js darts. false = the old procedural silhouettes.
@@ -6603,7 +6606,8 @@ if(window.POWERPANEL){ POWERPANEL.CFG.BAR_H=92; POWERPANEL.CFG.BAR_GAP=10; POWER
   POWERPANEL.mount(document.getElementById('powerdock')||undefined, {docked:true});
   // THROTTLE INTO THE POWER SECTION (user 2026-09-06): the lever is appended under the dials and re-laid out by the
   // .inpower rules; the drag code reads that class, so nothing else changes. The dock grows by the lever's height below.
-  if(CFG.THROTTLE_IN_POWER){ const th=document.getElementById('throttle'), pd=document.getElementById('powerdock'); if(th&&pd){ pd.insertBefore(th,pd.firstChild); th.classList.add('inpower'); if(window.__thrRender) __thrRender();   // at the TOP of the dock: the bottom row sits level with the chat's mic/voice buttons, which covered the lever's label (measured 2026-09-06)
+  { const th=document.getElementById('throttle'); if(th&&!CFG.THROTTLE_BAR) th.style.display='none'; }   // the lever is off by default; the keys are the control
+  if(CFG.THROTTLE_BAR&&CFG.THROTTLE_IN_POWER){ const th=document.getElementById('throttle'), pd=document.getElementById('powerdock'); if(th&&pd){ pd.insertBefore(th,pd.firstChild); th.classList.add('inpower'); if(window.__thrRender) __thrRender();   // at the TOP of the dock: the bottom row sits level with the chat's mic/voice buttons, which covered the lever's label (measured 2026-09-06)
     // the docked dial panel is height:100% of the dock (power_panel.js mount), so it must yield the lever's row or the lever is clipped - measured 2026-09-06: 38 px over, at any dock height
     const pp=document.getElementById('powerpanel'); if(pp) pp.style.height='calc(100% - '+Math.max(37,th.offsetHeight)+'px)'; } } }
 if(window.ENGBAY){ ENGBAY.mount(); }   // SHIP LAYOUT: starts unmounted-from-view (defaultOpen:false below) - open via the E key or the HANGAR tab's "Open Engineering Bay" link, same discovery pattern as khud/`agi`
@@ -6858,6 +6862,15 @@ addEventListener('keydown',e=>{ if(window._rebindCapture){ window._rebindCapture
   if(e.code==='KeyE'){ if(window.ENGBAY) ENGBAY.toggle(); return; }   // SHIP LAYOUT: open/close the fullscreen Engineering Bay (self-managed, not a PANELS edge panel - see registration comment above)
   if(e.code==='Backquote'){ if(window.PANELS) PANELS.clearSize('ticker'); document.getElementById('ticker').classList.toggle('big'); return; }   // BUGFIX 2026-07-08: clear any manual grip-resize first, or .big's max-width/height rules are silently outranked by the leftover inline width/height
   if(CFG.GEM_BAR && /^Digit[1-8]$/.test(e.code) && !e.ctrlKey && !e.altKey && !e.metaKey){ const k=CFG.STAT_ORDER[+e.code.slice(5)-1]; const r=spendStat(ships[0],k); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }   // STARBLAST LOOP: 1-8 spend a banked point on that stat
+  // THROTTLE KEYS: [ down a notch, ] up a notch, \ all stop. Setting a cruise level takes manual control, same
+  // as dragging the old lever did, so the ship holds the speed instead of the AI resuming its own throttle.
+  if(e.code==='BracketLeft'||e.code==='BracketRight'||e.code==='Backslash'){
+    const cur=MAN.throttle||0;
+    MAN.throttle = e.code==='Backslash' ? 0 : Math.max(0,Math.min(1, cur + (e.code==='BracketRight'?CFG.THROTTLE_STEP:-CFG.THROTTLE_STEP)));
+    if(typeof manOn==='function') manOn();   // same call the old lever made: setting a cruise level takes manual control
+    if(window.__thrRender) window.__thrRender();
+    term(`◆ THROTTLE <b>${Math.round(MAN.throttle*100)}%</b> <span style="opacity:.6">[ slower · ] faster · \ stop · Space still boosts</span>`,'sys');
+    if(window.SOUND) SOUND.play('ui'); return; }
   if(e.code==='KeyP'){ const on=PERIPH.toggle(); term(`🐟 peripheral lens <b>${on?'ON':'OFF'}</b> - the outer strips curve so you see the sides when you turn hard`,'sys'); if(window.SOUND) SOUND.play('ui'); return; }   // PERIPHERAL wide-angle lens (user 2026-07-10) - flip mid-turn to feel the difference
   // ROOT CAUSE of user 2026-07-07 "holding shift does not boost speed": ShiftLeft/ShiftRight were missing from
   // this whitelist, so keysDown never actually recorded Shift during real flight - MAN.nitro could never turn
