@@ -869,7 +869,7 @@ function scanBadgeTick(){ for(let i=_scanBadged.length-1;i>=0;i--){ const o=_sca
 // FETCH (the nearest plain credit gem within BOT_GEM_R - artifacts, cores and modules are left for the pilot, whose pickup
 // path names them), MINE (the nearest rock within BOT_MINE_R: hold off at BOT_STANDOFF and cut; the rock's `seam` fills at
 // BOT_SEAM_RATE and a glowing crack is drawn on it; the bullet-vs-rock code multiplies gun damage by 1 + SEAM_DMG_MULT x seam).
-// Bots never destroy a rock themselves: the split is the pilot's shot. They are launched out of the hull with a burst.
+// Bots ALSO destroy rocks directly now (2026-09-06 drone-mining): a bot's beam eats BOT_DPS hull/sec off the rock it cuts and destroys it at 0 hull (see miningBotsTick) - a rock splits from the pilot's seam-boosted shot OR from a bot finishing one. Bots are launched out of the hull with a burst.
 const miningBots=[], seamRocks=new Set(); let _botsAnnounced=false;
 function botMesh(hue){ const g=new T.Group(), S=CFG.BOT_SIZE;
   // VISIBLE (2026-09-06): a 1-unit cone with no glow was a couple of pixels from the chase camera. Now BOT_SIZE units of
