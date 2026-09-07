@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 20:07 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 20:14 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -16,7 +16,7 @@ rather than as a confident wrong number.
 
 ## The live list (TASKS.md)
 
-35 done · 11 open · 0 blocked · 1 dropped with a reason
+36 done · 11 open · 0 blocked · 1 dropped with a reason
 
 - open **C5** Publish the three options side by side for RJ to pick
 - open **C6** Fix the wing-order argument bug the other lane found (empire.js:126)
