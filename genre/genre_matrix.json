@@ -574,7 +574,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no use case or module covers internal crew stations"
+    "note": "No internal crew or damage-control management - damage is one hull HP pool + shields (F04), repaired at dock, not by an onboard crew. A grep of all source (index.html + every root *.js minus the 3 vendored libs) for crewMember|assignCrew|crew station/slot/skill|damage-control|repair team/crew|hull-breach finds only FLAVOR, no mechanics: 'rescued the crew' (a distress-call reward, index.html:1759), a squadmate death-bark 'Hull breach! Punching out.' (:2836), and 'crew' as a chat synonym for the squad roster (:5710). No crew assigned to stations, no firefighting/repair teams. The yes-anchors manage a crew (ftl: crew assigned to rooms, fight fires + breaches; x_series: service-crew skill + repair drones). (Old note was the recall 'no UC or module covers internal crew stations'.)",
+    "settledFrom": "grep-confirmed no (crew/damage-control terms are flavor-only) 2026-09-06"
    }
   },
   {
