@@ -2917,7 +2917,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-216",
-    "note": "BAR tab lists four pilots with their histories"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). Individual NPCs (pilots) have PERSISTENT NAMES + READABLE HISTORIES - distinct from F28 (named-with-backstory): this is the fixed name pool + the live-accumulated interaction CHRONICLE. PERSISTENT NAMES: PILOTS (index.html:633+) is a fixed pool of 48 distinct named individuals (VEGA/ORION/LYRA/...); the RANGER LEADERBOARD (SR-M14 :6456, SF_LEADERBOARD_v1) persists every pilot's name+score ACROSS GENERATIONS. READABLE HISTORY: the CHRONICLE (:2978) - noteLog(s,text,val) :2989 is a per-pilot interaction ledger (capped 40) accumulating 'killed by X' / 'I destroyed Y' / 'X opened fire on me' notes; noteHarm :2990-2993 records first-contact ONCE and deepens an accumulating grudge (s.rel, -0.03/hit); renderChronicle :2994 shows a pilot's last-8 notes + top grudges + chronicle facts ('click a pilot in the roster to read its notes'). OBSERVABLE: node scratchpad/f55_pilots_replay.js -> PASS - parses the 48-name pool (all distinct), and drives the REAL noteLog/noteHarm: 2 hits + a kill build a 2-entry readable ledger, the grudge accumulates to -0.06, first-contact fires once, the ledger caps at 40.",
+    "settledFrom": "index.html PILOTS pool :633 (48 distinct named pilots) + RANGER LEADERBOARD across generations :6456 (SF_LEADERBOARD_v1); CHRONICLE noteLog :2989 (per-pilot ledger capped 40), noteHarm :2990-2993 (first-contact note + accumulating grudge s.rel), renderChronicle :2994 (readable last-8 + grudges). Distinct from F28 static backstory. Measured node scratchpad/f55_pilots_replay.js PASS"
    }
   },
   {
