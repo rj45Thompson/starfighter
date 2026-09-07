@@ -108,9 +108,19 @@
   // the SAME context (so they share master volume/mute/compressor with the FM voices). A sample that hasn't
   // finished loading yet (or 404s / decode-fails, e.g. running from file:// or node) silently falls through to
   // its FM twin below - the game must never depend on these files existing.
+  // GENERATED EFFECTS (RJ 2026-09-06: "replace all sounds that were from this slop thing"). Five of these keys
+  // were already real recordings from the Starfighter2 pack; the other eight sounds in BANK were still FM
+  // oscillators, which is the character RJ was calling slop. They are recordings now too, generated with
+  // AudioLDM2-large on a GPU and trimmed to their transient (audio/sfx/*.ogg, 7-15 KB each).
+  //
+  // The FM voices stay exactly where they are. This table is a PREFERENCE, not a replacement: anything that
+  // 404s or fails to decode falls through to its oscillator twin, so the game never depends on these files.
   var SAMPLE_FILES = {
     weapon_player: 'weapon_player.wav', weapon_enemy: 'weapon_enemy.wav',
-    explosion_player: 'explosion_player.wav', explosion_enemy: 'explosion_enemy.wav', explosion_asteroid: 'explosion_asteroid.wav'
+    explosion_player: 'explosion_player.wav', explosion_enemy: 'explosion_enemy.wav', explosion_asteroid: 'explosion_asteroid.wav',
+    gen_shoot: 'audio/sfx/shoot.ogg', gen_hit: 'audio/sfx/hit.ogg', gen_explode: 'audio/sfx/explode.ogg',
+    gen_pickup: 'audio/sfx/pickup.ogg', gen_dock: 'audio/sfx/dock.ogg', gen_warp: 'audio/sfx/warp.ogg',
+    gen_ui: 'audio/sfx/ui.ogg', gen_alarm: 'audio/sfx/alarm.ogg', gen_beam: 'audio/sfx/beam.ogg', gen_lockon: 'audio/sfx/lockon.ogg'
   };
   var samples = {};        // key -> AudioBuffer once decoded (absent/undefined = not ready or failed)
   var samplesLoading = false;
@@ -314,11 +324,13 @@
     shoot: function (opt) {
       var key = (opt.variant === 'enemy') ? 'weapon_enemy' : 'weapon_player';
       if (playSample(key, opt.vol)) return;
+      if (playSample('gen_shoot', opt.vol)) return;   // the generated one, if the pack sample has not decoded
       voice({ wave: 'square', freq: 620, f2: 1100, mWave: 'square', mRatio: 1.5, mDepth: 180, mDepthEnd: 0,
               a: 0.004, d: 0.02, r: 0.06, dur: 0.1, gain: 0.18 }, opt.vol, opt.when);   // softened 2026-09-06: lower sweep, half the gain (only the fallback when the sample is not decoded)
     },
     // Bullet-on-hull: dull, short, downward - a body thud, not a ring.
     hit: function (opt) {
+      if (playSample('gen_hit', opt.vol)) return;
       voice({ wave: 'triangle', freq: 300, f2: 120, mWave: 'sine', mRatio: 0.5, mDepth: 90,
               a: 0.003, d: 0.06, r: 0.07, dur: 0.16, gain: 0.4, lp: 1200, lpEnd: 340 }, opt.vol, opt.when);
       voice({ type: 'noise', a: 0.002, d: 0.04, r: 0.05, dur: 0.1, gain: 0.16, lp: 900, lpEnd: 200 }, opt.vol, opt.when);
@@ -328,12 +340,14 @@
     explode: function (opt) {
       var key = opt.variant === 'player' ? 'explosion_player' : opt.variant === 'asteroid' ? 'explosion_asteroid' : 'explosion_enemy';
       if (playSample(key, opt.vol)) return;
+      if (playSample('gen_explode', opt.vol)) return;
       voice({ type: 'noise', a: 0.004, d: 0.18, r: 0.4, dur: 0.62, gain: 0.5, lp: 2600, lpEnd: 120 }, opt.vol, opt.when);
       voice({ wave: 'sawtooth', freq: 340, f2: 46, mWave: 'square', mRatio: 0.5, mDepth: 200, mDepthEnd: 10,
               a: 0.005, d: 0.12, r: 0.3, dur: 0.6, gain: 0.32, lp: 1400, lpEnd: 200 }, opt.vol, opt.when);
     },
     // Pickup / gem: bright two-note "coin" - the classic up-a-fifth blip.
     pickup: function (opt) {
+      if (playSample('gen_pickup', opt.vol)) return;
       seq([
         { freq: 494, dur: 0.06, r: 0.04 },
         { freq: 659, when: 0.05, dur: 0.11, r: 0.08 }
@@ -341,6 +355,7 @@
     },
     // Dock: warm 3-note major arpeggio (a soft "you have arrived" chord).
     dock: function (opt) {
+      if (playSample('gen_dock', opt.vol)) return;
       seq([
         { freq: 523.25, when: 0.0,  dur: 0.16 },
         { freq: 659.25, when: 0.09, dur: 0.16 },
@@ -349,15 +364,18 @@
     },
     // Warp / hyperspace: long rising pitch sweep with deepening FM.
     warp: function (opt) {
+      if (playSample('gen_warp', opt.vol)) return;
       voice({ wave: 'sawtooth', freq: 120, f2: 1700, mWave: 'sine', mRatio: 1.01, mDepth: 30, mDepthEnd: 400,
               a: 0.05, d: 0.0, s: 0.8, r: 0.3, dur: 0.9, gain: 0.28, lp: 400, lpEnd: 4000 }, opt.vol, opt.when);
     },
     // UI: tiny high click.
     ui: function (opt) {
+      if (playSample('gen_ui', opt.vol)) return;
       voice({ wave: 'triangle', freq: 900, f2: 820, a: 0.001, d: 0.008, r: 0.02, dur: 0.035, gain: 0.05 }, opt.vol, opt.when);   // softened 2026-09-06 (was a 1500 Hz square at 0.16)
     },
     // Alarm: urgent two-tone (hi/lo) square siren - for threats.
     alarm: function (opt) {
+      if (playSample('gen_alarm', opt.vol)) return;
       seq([
         { freq: 880, dur: 0.12, r: 0.03 },
         { freq: 620, when: 0.13, dur: 0.14, r: 0.04 }
@@ -366,12 +384,14 @@
     // Rear BEAM: a short sustained saw "hum" - replayed every ~0.11s while the beam is held for a continuous cutting
     // tone. Pitch rises with opt.rate (fed the ramp), so a beam that's been on target longer SOUNDS hotter.
     beam: function (opt) {
+      if (playSample('gen_beam', opt.vol)) return;
       var f = 150 * (opt.rate && isFinite(opt.rate) ? opt.rate : 1);
       voice({ wave: 'sawtooth', freq: f, f2: f * 1.28, mWave: 'square', mRatio: 2.01, mDepth: 130, mDepthEnd: 55,
               a: 0.008, d: 0.0, s: 0.9, r: 0.05, dur: 0.15, gain: 0.15, lp: 2400 }, opt.vol, opt.when);
     },
     // Missile/gun LOCK: a scary rising three-note warble - fires when an enemy gets a firing solution on you.
     lockon: function (opt) {
+      if (playSample('gen_lockon', opt.vol)) return;
       seq([
         { freq: 1180, dur: 0.06, r: 0.02 },
         { freq: 1430, when: 0.075, dur: 0.06, r: 0.02 },
