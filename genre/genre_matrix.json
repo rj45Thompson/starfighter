@@ -939,7 +939,8 @@
    "ours": {
     "v": "partial",
     "uc": "UC-217",
-    "note": "artifacts analysed and probes deployed at the science station; not a persistent tech tree"
+    "note": "PARTIAL: a research-flavoured artifact-ID loop, not a tech tree. PRESENT (more than the 4 no-games plain shops): the Athenaeum SCIENCE STATION (makeScienceStation index.html:1567); analyze (:4929) spends CORES to identify unidentified artifacts (they refuse to equip until analyzed), the command aliasing identify/research/the lab (:3140); plus SR-M19 mineral probes as passive infrastructure (:4942-4959). ABSENT (why not yes, unlike x4 research menu / EVE invention->Tech2 blueprints / Elite tech broker): NO persistent tech tree - grep of all source for techtree|blueprint|invention|researchtree|unlockTech = 0 game hits (acquire.js is the AI knowledge-acquisition cascade, agent cognition, not player research).",
+    "settledFrom": "index.html:1567/4929/3140/4942 (science station+analyze+probes); grep-proven 0 tech-tree hits; graph claim source=index.html (2026-09-06)"
    }
   },
   {
