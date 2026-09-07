@@ -1347,7 +1347,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-303",
-    "note": "follow, attack, mine, trade, hold, defend a world, go dock"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). The wing ORDER set produces REAL, DISTINCT in-sim behaviour, not a stub. Issued via the 'wing' command (index.html:5052: wing follow|hunt|mine|collect|hold|trade|defend <world>|goto|release) -> HOST.wingOrder -> the SAME dispatch() the typed English orders use -> s.cmd (a STANDING order, CMD_STANDING_S 1e9 :475), consumed each think tick by applyCommand at :2455. applyCommand :2368-2398 branches per order type to a distinct flight MODE + target: hunt/attack -> HUNT the target (or nearestRival) :2369; follow -> ESCORT :2370; wingman (the default contract) -> escort the player but ENGAGE (HUNT) their locked pirate, HOLD if the player is dead :2374-2379; defend <world> -> HUNT any hostile inside WING_DEFEND_R (260) else SEEK back to / HOLD over the world :2382-2388; mine -> MINE an asteroid in range :2389; collect -> COLLECT a gem :2390; hold -> HOLD :2392; flee -> EVADE :2391; trade -> doTrade :2395. The flight loop then executes r.mode/target. OBSERVABLE: node scratchpad/f25_wingorders_replay.js -> RESULT PASS 16/16 (VERBATIM applyCommand: hunt->HUNT+target, dead target falls back to nearestRival, follow->ESCORT, hold->HOLD, defend->HUNT the in-range foe / SEEK / HOLD by distance, mine->MINE, collect->COLLECT, flee->EVADE, trade->doTrade, wingman->ESCORT/HUNT/HOLD by player state; the 6 core orders yield 6 DISTINCT modes HUNT/ESCORT/HOLD/MINE/COLLECT/EVADE - not one stubbed behaviour).",
+    "settledFrom": "index.html applyCommand :2368-2398 (per-order mode dispatch) + wing command :5052 + wingOrder->dispatch->s.cmd + node replay; anchors 6/8 (all but starblast, ftl)"
    }
   },
   {
