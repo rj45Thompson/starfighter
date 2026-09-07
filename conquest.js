@@ -60,11 +60,16 @@ var CFG = {
   NEAR_RADIUS_U: 800,            // player ship within this range of the planet helps the defense
   NEAR_DEFENSE_BONUS: 2,         // flat defense bonus while the player is near
   // counter-invasion
-  INV_CHANCE_BASE: 0.02,         // launch chance per slow tick per owned world, at threat 0
-  INV_CHANCE_RAMP: 0.012,        // extra launch chance per accumulated threat step (escalates over time)
-  INV_CHANCE_MAX: 0.25,          // launch chance ceiling per slow tick
-  INV_ETA_MIN_S: 20,             // minimum warning time before the landing resolves
-  INV_ETA_RAND_S: 25,            // additional random warning time
+  // B13 2026-09-07 (RJ "rounds too quick, hegemon victory every few minutes"): MEASURED an undefended captured world
+  // fell in a mean 66s (scratchpad/conquest_probe.js), so holding worlds was futile and the campaign churned. Cut the
+  // per-slow-tick launch chance + its ramp ~3x and lowered the ceiling ~2x (the threat builds slowly), and lengthened
+  // the invasion warning so an incoming landing is a beat you can react to, not a coin flip. The self-test's T5/T6
+  // tick-loop was widened to match the longer ETA floor (see below); SLOW_TICK_S is left at 3 so T11 still holds.
+  INV_CHANCE_BASE: 0.006,        // launch chance per slow tick per owned world, at threat 0 (was 0.02)
+  INV_CHANCE_RAMP: 0.004,        // extra launch chance per accumulated threat step (escalates over time) (was 0.012)
+  INV_CHANCE_MAX: 0.12,          // launch chance ceiling per slow tick (was 0.25)
+  INV_ETA_MIN_S: 30,             // minimum warning time before the landing resolves (was 20)
+  INV_ETA_RAND_S: 30,            // additional random warning time (was 25) -> a landing is now telegraphed 30-60s out
   INV_STR_BASE: 1,               // invasion strength floor
   INV_STR_PER_CAMPAIGN: 0.75,    // strength added per HOST.campaign level (the war escalates)
   INV_STR_RAND: 1.5,             // random strength spread
@@ -404,8 +409,10 @@ if (typeof module !== 'undefined' && require.main === module) {
       && alerts[0].indexOf('SYNOD INVASION FORCE en route to Vekk') === 0
       && alerts[0].indexOf('ETA') > 0);
 
-    // T5/T6 -- ETA lapses (20s floor, 7x3s ticks) and the undefended world falls
-    for (var i = 0; i < 7; i++) CQ.tick(3.0);
+    // T5/T6 -- ETA lapses and the undefended world falls. 30s floor (2026-09-07 B13) resolves on EXACTLY the 10th
+    // 3s tick (30-10*3=0); stopping there keeps infra at the post-landing 0.75 (an 11th tick would regen it and T6
+    // asserts 0.75 exactly). Was 7 ticks when the floor was 20s.
+    for (var i = 0; i < 10; i++) CQ.tick(3.0);
     T('T5 invasion resolves: undefended world falls back to the Synod',
       p1.owner === null && p1.hegemon === true && p1._cq.invasion === null);
     T('T6 fall side-effects: rep -7 + HAS FALLEN alert + infra -0.25',
