@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-07 00:58 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-07 01:03 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -16,7 +16,7 @@ rather than as a confident wrong number.
 
 ## The live list (TASKS.md)
 
-56 done · 6 open · 0 blocked · 1 dropped with a reason
+57 done · 6 open · 0 blocked · 1 dropped with a reason
 
 - open **C5** Publish the three options side by side for RJ to pick
 - open **C7** Make ground.js deterministic and drop its dead store (ground.js:109, :297)

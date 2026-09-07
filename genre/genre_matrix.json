@@ -1246,7 +1246,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-302",
-    "note": "haulers fly real distance and trade at live prices; 8 runs, +460c"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; the automated seed conflated ambient NPC traders with the player's empire haulers - this grounds the AMBIENT traders). 62% of AI ships spawn role='trader' (index.html:1258, TRADER_FRAC 0.62), fly freighters, thin armor (TRADER_HP_MULT 0.7) + light guns (TRADER_GUN_MULT 0.6). PHYSICALLY MOVE GOODS: doTrade :1890-1902 plans a run (planTrade :1872 picks the best REMEMBERED good+market for its cargo), flies REAL-SPACE to the market (warp REMOVED :1878/:1902 - no teleport arbitrage), then buy(s,p,gk,TRADE_QTY) :1898/:1847 at the cheap world (goods leave p.stock into s.cargo) or sell(s,p,gk,HOLD_CAP) :1899/:1850 at the dear one (goods enter p.stock, leave s.cargo) - a conserved A->B stock transfer at LIVE prices, learned only by docking (observePlanetPrices :1894, no omniscience). CAN BE ATTACKED: a trader is a combat target; on death killShip :2816 spills its whole hold via dropCargo :2820/:1911 as scoopable cargo pods (chunked by POD_CHUNK 8), which the PLAYER loots for credits (scoopPod :1913 val=qty*base*SALVAGE 0.6) or a passing trader re-holds. OBSERVABLE: node scratchpad/f23_trader_replay.js -> RESULT PASS 11/11 (buy depletes market A 100->80 into the hold; sell adds market B 100->120; 20 units conserved A->B; +300c run; killing the trader spills 20 units as 3 pods and empties the hold; the player loots 168c; another trader re-scoops to cargo not credits).",
+    "settledFrom": "index.html trader economy (role='trader' :1258, doTrade :1890-1902, buy/sell :1847-1851, killShip->dropCargo :2820/:1911, scoopPod :1913-1915) + node replay; anchors 5/8 (all but starblast, eve_online, ftl)"
    }
   },
   {
