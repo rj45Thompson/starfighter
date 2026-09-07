@@ -4980,7 +4980,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     const medical=baseTypeOf(dockedP)==='medical'; const rate=atBase(P)?CFG.REPAIR_RATE_BASE:(medical?CFG.REPAIR_RATE_MEDICAL:CFG.REPAIR_RATE_ALLIED); const cost=Math.round((P.maxHp-P.hp)*rate); if(P.hp>=P.maxHp){ term('Hull already full.','sys'); return; } if(!need(P.credits>=cost,`repair costs ${cost}c`)) return;   // SR BASE TYPES: a Medical Center undercuts a normal allied world
     P.credits-=cost; P.hp=P.maxHp; term(`${medical?'✚ Medical Center surgeons seal the hull - discounted rate':'Repair bots seal the hull'} - full (-${cost}c).`,'sys'); if(window.SOUND) SOUND.play('levelup'); return; }
   if(c==='signals'||c==='encounters'){ if(!encounters.length){ term('No active signals - derelicts/caches/distress calls appear over time. Fly to them to claim.','sys'); return; } term('ACTIVE SIGNALS (fly to them):','sys'); encounters.forEach(e=>term(`  ✦ ${e.kind} · ${Math.round(P.pos.distanceTo(e.pos))}u`,'sys')); return; }
-  if(c==='hull'){ if(!need(atBase(P),'hull swaps are at Ranger Command (go base)')) return; const k=HULL_ORDER.find(x=>x.startsWith((a[1]||'').toLowerCase()));
+  if(c==='hull'){ if(!need(atBase(P),'hull swaps are at Ranger Command (go base)')) return; const _q=(a[1]||'').toLowerCase(), k=_q?HULL_ORDER.find(x=>x.startsWith(_q)):null;   // B5: empty arg -> null so the no-arg branch below LISTS instead of silently picking HULL_ORDER[0]
     if(!k){ const hullLine=x=>{ const H=HULLS[x], M=HULL_MOUNTS[x]; return `  ${x} - <b>${H.n}</b> · hull ${H.hp} · hold ${H.hold} · speed ×${H.speed} · role ${H.role} · ${M.gizmoPoints.length} gizmo + ${M.weaponPoints.length} hardpoint mounts · E${H.res.energy} S${H.res.frag} M${H.res.missile}${H.pd?' · PD '+Math.round(H.pd*100)+'%':''} · ${H.desc} · ${H.cost?H.cost+'c':'free'}${P.hullClass===x?' [current]':''}`; };
       term('STANDARD HULLS (hull &lt;class&gt; [manufacturer] at base):','sys'); HULL_ORDER_ORIGINAL.forEach(x=>term(hullLine(x),'sys'));
       term(`IN STOCK TODAY <span style="opacity:.6">(${SHOP_HULL_ROTATE_N} of ${GENERATED_HULL_KEYS.length} generated hulls, rotates - buy by full name if you know a different one)</span>:`,'sys');
@@ -4999,7 +4999,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       if((a[0]||'')&&cargoTotal(P)+qty>P.holdCap){ term('not enough hold.','err'); return; } if(!need(P.credits>=cost,`need ${cost}c`)) return; P.credits-=cost; P.contraband[k]=(P.contraband[k]||0)+qty; term(`Bought ${qty} ${CONTRABAND[k].n} (-${cost}c). Sell at HOSTILE worlds - but coalition docks may SCAN you.`,'sys'); return; }
     term('BLACK MARKET (blackmarket &lt;good&gt; &lt;qty&gt;):','sys'); CONTRA_KEYS.forEach(x=>term(`  ${x} - <b>${CONTRABAND[x].n}</b> · ${CONTRABAND[x].base}c${P.contraband[x]?(' · holding '+P.contraband[x]):''}`,'sys')); return; }
   if(c==='fence'||c==='sellcontra'){ const p=dockedP; if(!need(p,'must be docked at a HOSTILE world to fence')) return; if(!need(p.rep<=CFG.REP_HOSTILE,`${p.name} is lawful - fence contraband at HOSTILE worlds only`)) return;
-    const k=CONTRA_KEYS.find(x=>x.startsWith((a[1]||'').toLowerCase())); if(!need(k,'fence &lt;good&gt; &lt;qty&gt;')) return; const have=P.contraband[k]||0, qty=Math.min(have,parseInt(a[2])||have); if(!need(qty>0,'none of that to fence')) return;
+    const _q=(a[1]||'').toLowerCase(), k=_q?CONTRA_KEYS.find(x=>x.startsWith(_q)):null; if(!need(k,'fence &lt;good&gt; &lt;qty&gt;')) return; const have=P.contraband[k]||0, qty=Math.min(have,parseInt(a[2])||have); if(!need(qty>0,'none of that to fence')) return;
     const rev=Math.round(CONTRABAND[k].base*CFG.CONTRA_MARKUP)*qty; P.contraband[k]-=qty; if(P.contraband[k]<=0) delete P.contraband[k]; P.credits+=rev; term(`Fenced ${qty} ${CONTRABAND[k].n} for <span style="color:#ffcf52">+${rev}c</span>.`,'sys'); return; }
   if(c==='dock'){ const p=nearestPlanet(P.pos); if(!need(p,'no planet')) return; P.obj={type:'goto',planet:p}; term(`Approaching ${p.name} to dock…`,'sys'); return; }
   if(c==='jump'||c==='hyperspace'||c==='hyperjump'){   // HYPERSPACE (user 2026-07-07): the fuel-gated way to CROSS systems - free real-space flight still covers your own system
@@ -5026,7 +5026,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='flee'){ P.obj={type:'flee'}; term('Evasive - breaking off.','sys'); return; }
   if(c==='mine'){ P.obj={type:'mine'}; term('Mining nearby rocks.','sys'); return; }
   if(c==='trade'){ P.obj={type:'trade'}; term('Auto-trading best routes.','sys'); return; }
-  if(c==='attack'||c==='hunt'){ const o=ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith(a[1]||'')); if(!need(o,'no such ship - try: scan')) return; P.obj={type:'hunt',target:o}; term(`Engaging ${o.name}.`,'sys'); return; }
+  if(c==='attack'||c==='hunt'){ const _q=(a[1]||'').toLowerCase(), o=_q?ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith(_q)):null; if(!need(o,'no such ship - try: scan')) return; P.obj={type:'hunt',target:o}; term(`Engaging ${o.name}.`,'sys'); return; }
   if(c==='buy'){ if(!need(dockedP,'must be docked (go &lt;planet&gt; then dock)')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const q=buy(P,dockedP,g.k,parseInt(a[2])||CFG.TRADE_QTY); if(q>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(q>0?`Bought ${q} ${g.n} @ ${Math.round(priceOf(dockedP,g.k))}c/u.`:'buy failed (credits/hold/stock).',q>0?'sys':'err'); return; }
   if(c==='sell'){ if(!need(dockedP,'must be docked')) return; const g=findGood(a[1]); if(!need(g,'unknown good')) return; const r=sell(P,dockedP,g.k,parseInt(a[2])||CFG.HOLD_CAP); if(r>0&&window.PASSENGER){ PASSENGER.onEvent('trade',{good:g.n,price:Math.round(priceOf(dockedP,g.k))}); if(window.GAMEMOD) GAMEMOD.emit('trade'); } term(r>0?`Sold ${g.n} for +${r}c.`:'nothing to sell.',r>0?'sys':'err'); return; }
   if(c==='refuel'){ if(!need(dockedP,'must be docked')) return; const q=refuel(P,dockedP); term(q>0?`Refueled +${q} gas.`:'tanks full / no gas.','sys'); return; }
@@ -5131,7 +5131,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       (P.gizmoSlots||[]).forEach((k,i)=>term(`&nbsp;&nbsp;slot ${i+1}: ${k?GIZMOS[k].n:'<span style="opacity:.5">-empty-</span>'}`,'sys'));
       term('SHOP:','sys'); GIZMO_KEYS.forEach(k=>term(`&nbsp;&nbsp;${k} - ${GIZMOS[k].n} · ${GIZMOS[k].desc} · ${GIZMOS[k].cost}c${hasGizmo(P,k)?'  [mounted]':''}`,'sys'));
       term('&nbsp;&nbsp;<span style="opacity:.6">try: gizmo mount targeting · gizmo unmount 1</span>','sys'); return; }
-    if(sub==='mount'){ const k=GIZMO_KEYS.find(kk=>kk.startsWith((a[2]||'').toLowerCase())); if(!need(k,'gizmo mount targeting|ecm|shieldboost')) return;
+    if(sub==='mount'){ const _q=(a[2]||'').toLowerCase(), k=_q?GIZMO_KEYS.find(kk=>kk.startsWith(_q)):null; if(!need(k,'gizmo mount targeting|ecm|shieldboost')) return;
       if(!need(P.credits>=GIZMOS[k].cost,`need ${GIZMOS[k].cost}c`)) return;
       const r=mountGizmo(P,k); if(!need(r.ok,r.why)) return; P.credits-=GIZMOS[k].cost;
       term(`Mounted ${GIZMOS[k].n} in slot ${r.slot+1} (-${GIZMOS[k].cost}c) · ${GIZMOS[k].desc}.`,'sys'); return; }
@@ -5142,37 +5142,37 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   // STANDARD GEAR SLOTS (user 2026-07-08: "Engine/Fuel Tank/Radar/Scanner/Shield Generator/Repair Droid/Cargo
   // Hook... buy different types... that help your ship with special things like a targeting computer") - six more
   // single-slot fits, same pattern as `engine` above (list when bare, fit-by-prefix-match when given a key).
-  if(c==='tank'){ if(!need(dockedP,'must be docked')) return; const key=FUEL_TANK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='tank'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?FUEL_TANK_KEYS.find(kk=>kk.startsWith(_q)):null;   // B5: bare `tank` LISTS, never downgrades an upgraded fit
     if(!key){ term('FUEL TANKS (fit at dock - per-planet stock varies):','sys'); FUEL_TANK_KEYS.forEach(kk=>{ const E=FUEL_TANKS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'tank',kk,E.cost,20):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.fuelTankType||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.fuelTankType||'standard')===key){ term(`Already fitted: ${FUEL_TANKS[key].n}.`,'sys'); return; }
     const iv=(FUEL_TANKS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'tank',key,FUEL_TANKS[key].cost,20):null; const price=iv?iv.price:(FUEL_TANKS[key].cost||0);
     if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitFuelTank(P,key); P.fuelTankInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
     term(`Fitted ${FUEL_TANKS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - fuel cap now ${Math.round(fuelCapOf(P))}.`,'sys'); return; }
-  if(c==='radar'){ if(!need(dockedP,'must be docked')) return; const key=RADAR_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='radar'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?RADAR_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term('RADARS (fit at dock - per-planet stock varies):','sys'); RADAR_KEYS.forEach(kk=>{ const E=RADARS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'radar',kk,E.cost,8):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.radarType||'basic')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.radarType||'basic')===key){ term(`Already fitted: ${RADARS[key].n}.`,'sys'); return; }
     const iv=(RADARS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'radar',key,RADARS[key].cost,8):null; const price=iv?iv.price:(RADARS[key].cost||0);
     if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitRadar(P,key); P.radarInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
     term(`Fitted ${RADARS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - sensor range now ${Math.round(senseRangeOf(P))}.`,'sys'); return; }
-  if(c==='droid'){ if(!need(dockedP,'must be docked')) return; const key=REPAIR_DROID_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='droid'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?REPAIR_DROID_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term('REPAIR DROIDS (fit at dock - per-planet stock varies):','sys'); REPAIR_DROID_KEYS.forEach(kk=>{ const E=REPAIR_DROIDS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'droid',kk,E.cost,10):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.droidType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.droidType||'none')===key){ term(`Already fitted: ${REPAIR_DROIDS[key].n}.`,'sys'); return; }
     const iv=(REPAIR_DROIDS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'droid',key,REPAIR_DROIDS[key].cost,10):null; const price=iv?iv.price:(REPAIR_DROIDS[key].cost||0);
     if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; fitDroid(P,key); P.droidInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
     term(`Fitted ${REPAIR_DROIDS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - regen now +${((P.regenBonus||0)*((P.droidInst&&P.droidInst.powerMul)||1)).toFixed(1)}/s.`,'sys'); return; }
-  if(c==='scanner'){ if(!need(dockedP,'must be docked')) return; const key=SCANNER_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='scanner'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?SCANNER_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term('SCANNERS (fit at dock - per-planet stock varies):','sys'); SCANNER_KEYS.forEach(kk=>{ const E=SCANNERS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'scanner',kk,E.cost,6):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.scannerType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.scannerType||'none')===key){ term(`Already fitted: ${SCANNERS[key].n}.`,'sys'); return; }
     const iv=(SCANNERS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'scanner',key,SCANNERS[key].cost,6):null; const price=iv?iv.price:(SCANNERS[key].cost||0);
     if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.scannerType=key; P.scannerInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
     term(`Fitted ${SCANNERS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - ${SCANNERS[key].desc} · scan pwr ${Math.round(scannerPowerOf(P))}.`,'sys'); return; }
-  if(c==='shieldgen'){ if(!need(dockedP,'must be docked')) return; const key=SHIELD_GEN_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='shieldgen'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?SHIELD_GEN_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term('SHIELD GENERATORS (fit at dock - per-planet stock varies):','sys'); SHIELD_GEN_KEYS.forEach(kk=>{ const E=SHIELD_GENS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'shieldgen',kk,E.cost,14):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.shieldGenType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.shieldGenType||'none')===key){ term(`Already fitted: ${SHIELD_GENS[key].n}.`,'sys'); return; }
     const iv=(SHIELD_GENS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'shieldgen',key,SHIELD_GENS[key].cost,14):null; const price=iv?iv.price:(SHIELD_GENS[key].cost||0);
     if(!need(P.credits>=price,`need ${price}c`)) return; P.credits-=price; P.shieldGenType=key; P.shieldGenInst=iv?{powerMul:iv.powerMul,condition:iv.condition,weight:iv.weight,quality:iv.quality,price:iv.price}:null;
     term(`Fitted ${SHIELD_GENS[key].n}${iv?' ['+iv.quality+']':''} (-${price}c) - absorbs ${Math.round(shieldGenPctFor(P)*100)}% of each hit to hull.`,'sys'); return; }
-  if(c==='hook'){ if(!need(dockedP,'must be docked')) return; const key=CARGO_HOOK_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='hook'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?CARGO_HOOK_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term('CARGO HOOKS (fit at dock - per-planet stock varies):','sys'); CARGO_HOOK_KEYS.forEach(kk=>{ const E=CARGO_HOOKS[kk]; const iv=(E.cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'hook',kk,E.cost,12):null; term(`  ${kk} - ${E.n} · ${E.desc} · ${iv?ITEMVAR.describe(iv):'free'}${(P.cargoHookType||'none')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.cargoHookType||'none')===key){ term(`Already fitted: ${CARGO_HOOKS[key].n}.`,'sys'); return; }
     const iv=(CARGO_HOOKS[key].cost>0&&window.ITEMVAR)?gearInst(dockedP.name,'hook',key,CARGO_HOOKS[key].cost,12):null; const price=iv?iv.price:(CARGO_HOOKS[key].cost||0);
@@ -5184,7 +5184,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       const total=qty*cost; if(!need(P.credits>=total,`need ${total}c`)) return; P.credits-=total; P.missileAmmo=(P.missileAmmo||0)+qty;
       term(`Restocked ${qty} missiles (-${total}c) - ${P.missileAmmo}/${CFG.MISSILE_AMMO_MAX}.`,'sys'); return; }
     term(`Missile ammo: ${P.missileAmmo||0}/${CFG.MISSILE_AMMO_MAX} · ${cost}c/unit · try: ammo buy &lt;n&gt;`,'sys'); return; }
-  if(c==='probe'){ const o=ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith((a[1]||'').toLowerCase())); if(!need(o,'no such ship - try: scan')) return;
+  if(c==='probe'){ const _q=(a[1]||'').toLowerCase(), o=_q?ships.find(s=>s!==P&&s.alive&&s.name.toLowerCase().startsWith(_q)):null; if(!need(o,'no such ship - try: scan')) return;
     if(!need(P.pos.distanceTo(o.pos)<=P.senseR*1.6,`${o.name} is out of scanner range`)) return;
     const needPct=scanBlockPct(o), have=Math.round(scannerPowerOf(P));
     if(have<needPct){ term(`◈ PROBE ${o.name} - scan resisted, their shields block it (need ${needPct} scan power, you have ${have}) - try: scanner`,'err'); return; }
@@ -5192,7 +5192,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
   if(c==='micromods'||c==='mm'){ const inv=P.micromodules||[]; if(!inv.length){ term('No micro-modules recovered. Destroy Warlord-tier Hegemon ships (or the Stronghold) with a Cargo Hook fitted to recover them.','sys'); return; }
     term('MICRO-MODULES (permanently applied on pickup):','sys'); inv.forEach(k=>term(`  ${MICROMODULES[k].n} - ${MICROMODULES[k].desc}`,'sys')); return; }
   // HULL SERIES (user, SR "Acrynic" notes): single-slot fit, same pattern as `engine`/`tank` above.
-  if(c==='series'){ if(!need(dockedP,'must be docked')) return; const key=HULL_SERIES_KEYS.find(kk=>kk.startsWith((a[1]||'').toLowerCase()));
+  if(c==='series'){ if(!need(dockedP,'must be docked')) return; const _q=(a[1]||'').toLowerCase(), key=_q?HULL_SERIES_KEYS.find(kk=>kk.startsWith(_q)):null;
     if(!key){ term(`HULL SERIES (fit at dock)${P.seriesLocked?' - <span style="color:#ff9a9a">PERMANENTLY FITTED to this hull, buy a new hull to pick again</span>':''}:`,'sys'); HULL_SERIES_KEYS.forEach(kk=>{ const E=HULL_SERIES[kk]; term(`  ${kk} - ${E.n} · ${E.desc} · ${E.cost?E.cost+'c':'free'}${(P.hullSeries||'standard')===kk?'  [fitted]':''}`,'sys'); }); return; }
     if((P.hullSeries||'standard')===key){ term(`Already fitted: ${HULL_SERIES[key].n}.`,'sys'); return; }
     // PERMANENT SLOTS: series is a one-pick-per-hull slot (see applyHull's seriesLocked reset) - locks the instant
@@ -5213,7 +5213,7 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
       (P.weaponSlots||[]).forEach((k,i)=>term(`&nbsp;&nbsp;slot ${i+1}: ${k?WEAPONS[k].n:'<span style="opacity:.5">-empty-</span>'}`,'sys'));
       term('SHOP:','sys'); WEAPON_ORDER.forEach(k=>term(`&nbsp;&nbsp;${k} - ${WEAPONS[k].n} · ${WEAPONS[k].cost}c${hasHardpoint(P,k)?'  [mounted]':''}`,'sys'));
       term('&nbsp;&nbsp;<span style="opacity:.6">try: hardpoint mount missile · hardpoint unmount 1</span>','sys'); return; }
-    if(sub==='mount'){ const k=WEAPON_ORDER.find(kk=>kk.startsWith((a[2]||'').toLowerCase())); if(!need(k,'hardpoint mount energy|ballistic|missile')) return;
+    if(sub==='mount'){ const _q=(a[2]||'').toLowerCase(), k=_q?WEAPON_ORDER.find(kk=>kk.startsWith(_q)):null; if(!need(k,'hardpoint mount energy|ballistic|missile')) return;
       if(!need(P.credits>=WEAPONS[k].cost,`need ${WEAPONS[k].cost}c`)) return;
       const r=mountHardpoint(P,k); if(!need(r.ok,r.why)) return; P.credits-=WEAPONS[k].cost;
       term(`Mounted ${WEAPONS[k].n} in hardpoint ${r.slot+1} (-${WEAPONS[k].cost}c).`,'sys'); return; }
