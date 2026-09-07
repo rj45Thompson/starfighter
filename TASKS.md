@@ -42,7 +42,21 @@ card is never swept in. Everything else lives in new files.
 - [x] C2  FLUX skin -> the honest answer is it CANNOT make one: four prompts, four compositions, measured centre/edge luminance 1.47 where a flat texture is 1.00. It composes subjects, not surfaces. Option B is now its plating art high-passed into a detail layer over C1's structure. Recorded in gen_painted_cybertron.py
 - [x] C3  The mesh -> REBUILT properly after RJ asked for "a high quality round mesh properly texture mapped": a 256-segment sphere displaced through displacementMap in the ALBEDO's UV space, 33,153 vertices, full PBR (roughness + AO), fresnel rim. The first hand-rolled vertex-colour version is gone. cs 44b21f7
 - [x] C4  "Still very bright" -> RJ was right and my first number was misleading: a whole-disc average of 45 hid how the LIT face reads close up. The pale disc beside the planets was the SUN, which had no texture at all - nine flat cream MeshBasicMaterial spheres. Fixed in cs 4b892ad
-- [ ] C5  Publish the three options side by side for RJ to pick -> DONE WHEN: an artifact URL renders the three renders with their measurements
+- [x] C5  **DONE (2026-09-07).** Artifact published for RJ to pick: https://claude.ai/code/artifact/5c7cec4a-c3b3-4dc6-8875-6ea65eb2cbd6
+      Three machine-world options rendered side by side through ONE offline pipeline (real albedo+emissive maps on a
+      sphere, one fixed light) so they compare honestly, each with luminance MEASURED off the produced pixels:
+      A procedural surface (assets/gen_cybertron.py) disc 46.1/255, centre/edge 1.09 (flat, ~1.00);
+      B generator-art hybrid (assets/gen_painted_cybertron.py) disc 55.3, centre/edge 1.17 - FLUX composes SUBJECTS not
+      surfaces (a direct equirect attempt measured centre/edge 1.47), so its plating is high-passed into a detail layer;
+      C displaced PBR mesh (cybertron.js, SHIPPED) disc 54.7, centre/edge 0.82 - the ionised-atmosphere limb brightens
+      the edge below 1.0, the signature A and B lack. Plus the real in-engine seven-look zoo render, and a "picked -> C"
+      verdict tying it to RJ's "high quality round mesh properly texture mapped".
+      -> VERIFIED by the stated observable, on the PUBLISHED page not just the local file: Artifact action:read pulled
+         the live artifact back from the server (saved copy) and grep confirmed 4 image data URIs embedded, all three
+         disc-means (46.1/55.3/54.7) AND centre/edge ratios (1.09/1.17/0.82) rendered, plus the option names, the FLUX
+         1.47 rationale, the Picked->C verdict and the reproduce line. The three render images were also each opened and
+         LOOKED AT (proper lit machine-world spheres; C's blue atmospheric limb visible). Renders REPRODUCE from the
+         committed tools/render_cybertron_options.py: re-running gives byte-for-byte the same measurements; ast.parse OK.
 - [x] C6  Fixed. empire.js:126 now splits the third argument by verb: WORLD_VERBS={goto,dock,defend} pass
       the world <select>'s value, every other verb passes null, and null is what the host reads as "the
       player" - so FOLLOW means follow me again. Before, the board handed the world select to all of them,
