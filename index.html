@@ -5967,7 +5967,8 @@ if(window.PANELS){
   // #rosterWrap (never touched) instead of #roster itself (which buildRoster() wipes wholesale with
   // innerHTML='' on every rebuild - ship deaths, Tab-cycling focus, etc.) so the pin/opacity chrome survives.
   const rwEl=document.getElementById('rosterWrap'); if(rwEl) PANELS.register('roster', rwEl, { title:'ROSTER', edge:'left', rgb:[10,18,28],
-    defaultOpacity:0.40, resizable:true });   // 2026-09-06: was 0.9 behind a forced 0.34 rule; now the real default   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel
+    defaultOpacity:0.40, resizable:true,
+    defaultOpen:false });   // 2026-09-06: was 0.9 behind a forced 0.34 rule; now the real default   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel   // N3 (2026-09-07): CLOSED by default for a FIRST-TIME player - the roster listed 30+ AI ships (~211 on-screen boxes, the single biggest first-load clutter, measured via scratchpad/n3b_verify.js) before a newcomer had even flown. One click on its left-edge tab (or the WINDOWS menu) opens it, and a saved SF_PANELS_v3 open state still wins so returning players are unaffected. Same reasoning as missionlog above (task #66: don't pile open-by-default panels on the left edge). NOT bumping STORE_KEY - that would wipe saved layouts.
   { const shopEl=document.getElementById('shop'); if(shopEl) PANELS.register('shop', shopEl, { title:'SHOP', edge:'right', rgb:[12,22,34],
       defaultOpacity:0.62, defaultOpen:false, defaultPinned:true, resizable:false }); }   // opened/closed by shopTick, see there (2026-09-06)
   PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
