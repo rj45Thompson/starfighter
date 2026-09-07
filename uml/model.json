@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T15:24:42",
+ "generated": "2026-09-06T19:56:07",
  "modules": [
   {
    "file": "acquire.js",
@@ -526,7 +526,7 @@
   },
   {
    "file": "cybertron.js",
-   "lines": 263,
+   "lines": 251,
    "classes": [
     {
      "name": "CYBERTRON",
@@ -538,10 +538,9 @@
       "compare",
       "ready",
       "pathsFor",
-      "saved",
-      "shells"
+      "looks"
      ],
-     "memberTotal": 9
+     "memberTotal": 8
     }
    ],
    "functions": [],
@@ -605,7 +604,7 @@
   },
   {
    "file": "economy.js",
-   "lines": 308,
+   "lines": 311,
    "classes": [
     {
      "name": "ECONOMY",
@@ -665,7 +664,7 @@
   },
   {
    "file": "empire.js",
-   "lines": 171,
+   "lines": 179,
    "classes": [
     {
      "name": "EMPIRE",
@@ -898,7 +897,7 @@
   },
   {
    "file": "ground.js",
-   "lines": 363,
+   "lines": 368,
    "classes": [
     {
      "name": "GROUND",
@@ -1146,7 +1145,7 @@
   },
   {
    "file": "knowledge.js",
-   "lines": 78,
+   "lines": 81,
    "classes": [
     {
      "name": "KNOWLEDGE",
@@ -1752,7 +1751,7 @@
   },
   {
    "file": "planetmenu.js",
-   "lines": 1147,
+   "lines": 1125,
    "classes": [
     {
      "name": "PLANETMENU",
@@ -1835,7 +1834,7 @@
     "routesHtml",
     "marketHtml"
    ],
-   "functionTotal": 93,
+   "functionTotal": 92,
    "cfg": [
     "Z_INDEX",
     "overlay",
@@ -1868,7 +1867,7 @@
   },
   {
    "file": "power_panel.js",
-   "lines": 779,
+   "lines": 775,
    "classes": [
     {
      "name": "POWERPANEL",
@@ -1892,7 +1891,6 @@
     }
    ],
    "functions": [
-    "tickMask",
     "doc",
     "win",
     "el",
@@ -1935,7 +1933,7 @@
     "visible",
     "setShown"
    ],
-   "functionTotal": 42,
+   "functionTotal": 41,
    "cfg": [
     "UPDATE_MS",
     "PANEL_W",
@@ -2375,7 +2373,7 @@
   },
   {
    "file": "synod.js",
-   "lines": 117,
+   "lines": 121,
    "classes": [
     {
      "name": "SYNOD",

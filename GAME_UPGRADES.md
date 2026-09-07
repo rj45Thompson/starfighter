@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 18:26 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 19:56 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -12,24 +12,23 @@ rather than as a confident wrong number.
 | modules in the class model | 54 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 46 / 11 / 11 / 2 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 46 / 11 / 13 / 0 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
-19 done · 17 open · 0 blocked · 1 dropped with a reason
+34 done · 11 open · 0 blocked · 1 dropped with a reason
 
-- open **C1** Generate option A, the procedural machine-world skin
-- open **C2** Generate option B, a FLUX Cybertron skin through the seam repair
-- open **C3** Build option C, a displaced machine MESH (not a textured ball)
-- open **C4** Answer "still very bright" with a number, not an opinion
 - open **C5** Publish the three options side by side for RJ to pick
 - open **C6** Fix the wing-order argument bug the other lane found (empire.js:126)
 - open **C7** Make ground.js deterministic and drop its dead store (ground.js:109, :297)
 - open **C8** Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42)
-- open **C10** More LOOKS, not one: named machine-world presets RJ can flip between
-- open **C11** AAA the planet render: roughness/AO maps, an atmosphere rim, a smog layer, terminator city
 - open **C9** Delete the dead code the other lane listed in my files
 - open **N3** Cut what a first-time player is shown at once
+- open **F58** A guided opening that teaches the basics
+- open **F31** An authored main storyline with scripted missions
+- open **F67** Music that changes with the situation
+- open **F16** Purchases gated by rank or licence, not money alone
+- open **F60** Pick a difficulty or starting scenario before playing
 
 ## Genre gaps, ranked by anchor count
 
@@ -60,9 +59,9 @@ F56   4/8  6/8      no          player can cooperate or fight with other human p
 F06   4/8  5/8      no          player can target and disable individual subsystems on an enemy ship
 F09   4/8  5/8      partial     flight is full 3D with pitch, yaw and roll rather than a fixed plane
 F17   4/8  4/8      partial UC-217 player unlocks new technology through research over time
-F68   3/7  6/7      unknown     the game supports a gamepad
+F68   3/7  6/7      no          the game supports a gamepad
 F34   3/6  4/6      partial     attacking one faction raises standing with its rival
-F69   3/7  4/7      unknown     the game offers colourblind or other accessibility options
+F69   3/7  4/7      no          the game offers colourblind or other accessibility options
 F66   3/8  4/8      partial UC-506 NPC dialogue is voiced
 F45   3/8  3/8      partial UC-203 player can discover unvisited systems and record or sell the data
 F03   2/8  5/8      partial     player can divert ship power between weapons, engines and shields during flight
@@ -105,7 +104,7 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F06  player can target and disable individual subsystems on an enemy ship -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 5 grounded; ours=no  -->
 - [ ] F09  flight is full 3D with pitch, yaw and roll rather than a fixed plane -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 5 grounded; ours=partial  -->
 - [ ] F17  player unlocks new technology through research over time -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 4 grounded; ours=partial UC-217 -->
-- [ ] F68  the game supports a gamepad -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 6 grounded; ours=unknown  -->
+- [ ] F68  the game supports a gamepad -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 6 grounded; ours=no  -->
 - [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=partial  -->
 ```
 
