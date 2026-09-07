@@ -1101,8 +1101,8 @@
    "ours": {
     "v": "yes",
     "uc": "",
-    "note": "index.html:1691 s.holdCap = hull's base hold + 15 per Cargo Pod fitted; :1752 a buy is clamped by (holdCap - cargoTotal), so the cap really binds; EQUIP.cargo at :3277 is the purchasable enlargement ('+15 hold', 120c).",
-    "settledFrom": "code read 2026-09-06"
+    "note": "SETTLED yes anchors=2 (2026-09-07, 2nd independent read + RUN; was a single code read, line numbers refreshed). LIMIT: s.holdCap = hull base hold + 15 per Cargo Pod fitted (index.html:1794 s.holdCap=H.hold+((s.equip&&s.equip.cargo)||0)*15); a buy is CLAMPED by the remaining room, qty=Math.min(qty,...,(s.holdCap||CFG.HOLD_CAP)-cargoTotal(s),...) (:1855, cargoTotal :1852), so the cap really binds; a full hold refuses ('hold full ... sell or jettison' :4975; 'not enough hold' :5017). ENLARGE: bigger hull classes carry a bigger base hold (H.hold ranges 10..100), and fittable gear raises holdCap - the Cargo Pod (EQUIP.cargo :3406, '+15 hold', 120c) plus hold-freeing micromodules (optimator +15 :3624, microsize +18 :3663, clip +25 :3664, turing +35 :3665). OBSERVABLE: node scratchpad/f20_hold_replay.js -> RESULT PASS 12/12 (replicates the buy-quantity clamp with the real amounts: asked 20 into a 12 hold -> got 12 full; a full hold refuses 5 more -> 0; fitting a Cargo Pod +15 -> a further buy takes 15 (27/27); a Turing micromodule +35 -> takes the new room 35; + source-asserts the holdCap formula, the buy clamp, cargoTotal, the hold-full refusals, and the cargo gear).",
+    "settledFrom": "2nd independent read + RUN (was code read 2026-09-06, anchors=1; line numbers refreshed): replicated the real buy-quantity clamp - a buy caps at (holdCap - cargoTotal), a full hold refuses, and fitting a Cargo Pod (+15) or hold-freeing micromodule (+35) enlarges the cap so more fits. node scratchpad/f20_hold_replay.js PASS 12/12. yes confirmed."
    }
   },
   {
