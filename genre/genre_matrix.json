@@ -3125,7 +3125,8 @@
    "ours": {
     "v": "yes",
     "uc": null,
-    "note": "browser page: model.json modules are all window/document/canvas/localStorage; no install step in any use case"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, structure measured). A self-contained browser page - zero install, boots straight to flight. NO INSTALL: index.html loads 50 <script src> tags, ALL local .js (three.min / fflate.min / starnest_sky / passenger / ... - no external CDN, no scheme); there is NO bundler/build manifest at the game root (no package.json / webpack / vite / rollup) so it runs UNBUILT; the modules use only browser APIs (window/document/canvas/localStorage). PLAYABLE WITHIN A MINUTE: the frame loop starts at top level on load (requestAnimationFrame(frame) :7778) and START_IN_BELT (:395, :6578) spawns the player straight into the Ceres Belt - no login/signup/paywall/license gate before play. OFFLINE-TOLERANT: the only network fetches (brain world tier, dataset facts) soft-fail ('Offline = the Passenger says so; nothing substituted'), so no download is REQUIRED to play. This is the browser-game genre position vs the multi-GB installs of Elite/X. OBSERVABLE: node scratchpad/f59_zeroinstall_replay.js -> PASS - asserts all 50 scripts are local, no build manifest, the top-level frame-loop start + START_IN_BELT boot, no login/paywall gate, and the offline-tolerant fetch.",
+    "settledFrom": "index.html self-contained page: 50 local <script src> .js (no external CDN), no bundler/build manifest at root (no package.json/webpack/vite/rollup), browser APIs only; boots to flight on load - requestAnimationFrame(frame) top-level :7778 + START_IN_BELT :395/:6578, no login/paywall gate; offline-tolerant fetches. Measured node scratchpad/f59_zeroinstall_replay.js PASS"
    }
   },
   {
