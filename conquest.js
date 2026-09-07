@@ -89,6 +89,7 @@ var CFG = {
 var G = (typeof window !== 'undefined' && window) ? window
       : (typeof globalThis !== 'undefined' ? globalThis : {});
 var acc = 0;                     // accumulated dt toward the next slow tick
+var _tickErr = false;            // latch: surface a swallowed slow-tick error to the player ONCE, not every frame
 
 function host() {
   try {
@@ -202,7 +203,7 @@ function slowTick(H, elapsed) {
 var API = {
   CFG: CFG,
 
-  init: function () { acc = 0; return true; },
+  init: function () { acc = 0; _tickErr = false; return true; },
 
   tick: function (dt) {
     try {
@@ -216,7 +217,12 @@ var API = {
       var elapsed = acc;
       acc = 0;
       slowTick(H, elapsed);
-    } catch (e) {}
+    } catch (e) {                                          // was silently swallowed -> a throw stopped the war with no trace
+      if (!_tickErr) { _tickErr = true;
+        try { console.warn('CONQUEST.tick: slow tick threw, war paused this tick - ' + (e && e.message || e)); } catch (_) {}
+        try { var HE = host(); if (HE && typeof HE.term === 'function') HE.term('⚠ the conquest sim hit an error (' + (e && e.name || 'error') + ') - see console', 'err'); } catch (_) {}
+      }
+    }
   },
 
   onAwayVictory: function (p) {
@@ -233,7 +239,10 @@ var API = {
       notify(nameOf(p) + ' SECURED - ground team cleared it. It fights for you now. '
            + 'Land again to add DEFENSES (defend cmd); expect a Synod counter-landing.', 'flag');
       sound('levelup');
-    } catch (e) {}
+    } catch (e) {                                          // was silently swallowed -> capture could half-complete with no SECURED message
+      try { console.warn('CONQUEST.onAwayVictory: capture threw - ' + (e && e.message || e)); } catch (_) {}
+      try { var HV = host(); if (HV && typeof HV.term === 'function') HV.term('⚠ capture of ' + nameOf(p) + ' did not fully complete (' + (e && e.name || 'error') + ')', 'err'); } catch (_) {}
+    }
   },
 
   addDefense: function (p) {
@@ -433,10 +442,23 @@ if (typeof module !== 'undefined' && require.main === module) {
       && d2.indexOf('\u25a0') >= 0
       && d2.indexOf('land + win the ground battle') >= 0);
 
+    // T11 -- a throw inside the slow tick is SURFACED (console.warn + term err), not swallowed, and latched to once
+    var termErrs = [], warnCalls = 0, realWarn = console.warn;
+    g.HOST = { get planets() { throw new Error('boom-in-slowtick'); }, P: { pos: {} }, T0: 0, campaign: 10, CFG: {},
+               notify: function () {}, sound: function () {}, term: function (m, k) { if (k === 'err') termErrs.push(String(m)); } };
+    CQ.init();
+    console.warn = function () { warnCalls++; };
+    CQ.tick(3.0);                 // slowTick reads HOST.planets -> throws -> caught by the tick catch
+    var firstErrs = termErrs.length, firstWarns = warnCalls;
+    CQ.tick(3.0);                 // persistent throw: the latch must NOT re-surface it
+    console.warn = realWarn;
+    T('T11 slow-tick throw surfaced (term err + console.warn) and latched to once',
+      firstErrs === 1 && firstWarns === 1 && termErrs.length === 1 && warnCalls === 1);
+
     Math.random = realRandom;
     var fails = 0;
     for (var k = 0; k < results.length; k++) if (!results[k]) fails++;
-    console.log(fails === 0 ? 'ALL 10 PASS' : (fails + ' of ' + results.length + ' FAILED'));
+    console.log(fails === 0 ? ('ALL ' + results.length + ' PASS') : (fails + ' of ' + results.length + ' FAILED'));
     if (fails > 0 && typeof process !== 'undefined') process.exit(1);
   })();
 }
