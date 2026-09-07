@@ -998,7 +998,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-202",
-    "note": "buy and sell goods at organic prices; buy ore 5 -115c, sell +118c"
+    "note": "SETTLED yes anchors=2 (2026-09-07, was yes on this genre_matrix SEED only - now a 2nd independent read + RUN; the last seed-only cell). PER-LOCATION: priceOf(p,gk) index.html:1804 = base*clamp((eq/p.stock[gk])^PRICE_ELAST, MIN, MAX) prices a good off the PER-PLANET stock, so the SAME good has a different price at every world. DRIVEN BY LOCAL SUPPLY/DEMAND: each world TYPE carries its own recipe (PTYPES :1453-1457 - Mining makes ore+gas & needs food/tech/med; Agri makes food; Refinery makes alloy+gas & needs ore/food; Hi-Tech makes tech+med; Luxury makes lux) and stationTick (economy.js:146) runs it every cycle - PRODUCES the world's exports (stock up -> supply up -> price down) and CONSUMES its imports (stock down -> price up). So ore is cheap where mined, dear where refined; the player buys/sells against the LOCAL priceOf at the docked world (buy :1856 / sell :1857). OBSERVABLE: node scratchpad/f18_local_prices_replay.js -> RESULT PASS 11/11 (slices the real priceOf + GOODS bases + PTYPES recipes and drives a producer vs consumer world: ore 9.04 @Mining vs 31.49 @Refinery from the same base 14; food 7.11 @Agri vs 18.46 @Mining; the price gap WIDENS over ticks 5.27 -> 22.45 as supply/demand diverge). Distinct from F19 (the player MOVING prices) - F18 is the per-location supply/demand that makes prices differ in the first place.",
+    "settledFrom": "2nd independent read + RUN (was genre_matrix seed only): per-location prices proven by slicing the real priceOf (reads per-planet p.stock[gk]) and driving the real PTYPES recipes - a mined good is cheap at the producer, dear at the consumer, and the gap widens with supply/demand. node scratchpad/f18_local_prices_replay.js PASS 11/11. Not a mis-grade."
    }
   },
   {
