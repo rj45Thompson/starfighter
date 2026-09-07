@@ -1145,7 +1145,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-213",
-    "note": "reputation, customs, contraband and a fence, verified SR-M4"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). Illegal goods EXIST and are DETECTED by customs with a real consequence. CONTRABAND {relics 120, Spice 90, arms 150} index.html:3991, bought at the base blackmarket / pirate station (:4997-5000) and fenced at pirate stations (:5001-5003, CONTRA_MARKUP 2.3). DETECTION: completeDock :1701 - on a PLAYER dock, if contraCount>0 && !p.isPirateStation && rand<SCAN_CHANCE (0.5) -> scanBust. Hostile worlds already REFUSE docking (:1695), so the scan only reaches LAWFUL/coalition worlds; pirate stations (the fence's own home) are exempted - coherent smuggling loop. CONSEQUENCE (scanBust :1714-1716): SEIZES all contraband (s.contraband={}), FINES value*SCAN_FINE (0.6)*(1-SKILL_CHARISMA_FINE 0.12*charismaLvl) [SR-M17 charisma talks the fine down], DROPS standing repAdd(-REP_BOMB*2 = -1.0), and flags a CUSTOMS SCAN notice. NOT a mis-grade and not a cosmetic flag: a real 50% detection gamble with seizure + fine + rep loss. OBSERVABLE: node scratchpad/f21_customs_replay.js -> RESULT PASS 11/11 (verbatim :1701 gate + scanBust: a HIT seizes all + fines 216c + rep -1.0; a MISS keeps the load; pirate-station exempt; a clean hold is never busted; charisma 5 cuts the 216c fine to 86; credits floored at 0).",
+    "settledFrom": "index.html contraband+customs (CONTRABAND :3991, completeDock scan gate :1701, scanBust :1714-1716, hostile-dock refusal :1695) + node replay; anchors 6/8 (all but starblast, ftl)"
    }
   },
   {
