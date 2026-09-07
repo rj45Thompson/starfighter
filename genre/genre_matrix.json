@@ -316,7 +316,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-110",
-    "note": "shooting drains energy and it regenerates (capLaser)"
+    "note": "A regenerating laser CAPACITOR gates sustained fire. capMaxFor(s)=LASER_CAP_MAX*energyCap (index.html:2187; LASER_CAP_MAX:100 :496). Every shot drains LASER_CAP_PER_SHOT=8 (:496) - player :6832, AI :2511 - and the rear beam burns REAR_BEAM_CAP_DRAIN=55/s (:6338). It regenerates LASER_CAP_REGEN=10/s scaled by weapons power (:1655; the F03 power triad raises it). Firing is GATED on capLaser>0 (player :6830, AI :2506): 'hits 0 -> next fire is blocked until it regens' (:6832), rear beam stops at 0 (:6337). Quantified (node replay): a full cap gives a 13-shot burst, then sustained fire is capped at regen/shot = 1.25 shots/s (2.0 with power routed to weapons). power_panel.js reads it independently via readCapLaser()->HOST.capLaserOf (power_panel.js:166-170, LASER dial :328). Prior note was just 'shooting drains energy and it regenerates'.",
+    "settledFrom": "code read + node numeric replay of the laser capacitor 2026-09-06"
    }
   },
   {
