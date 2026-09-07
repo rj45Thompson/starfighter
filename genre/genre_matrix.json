@@ -423,7 +423,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-101",
-    "note": "shoot rock, it splits and spills gems; UC-103 drone cuts seams"
+    "note": "SETTLED yes anchors=2 (2026-09-07, was yes on this genre_matrix SEED only - now a 2nd independent read + RUN). TWO mining mechanisms. PATH 1 asteroids: shoot a rock, it splits and spills GEMS worth credits (spawnGem index.html:1352 credits=max(1,round(scale*GEM_CREDIT_PER_SCALE))); scooping one adds P.credits + fills the gem bar (:964), tracked as miningStats.rocksMined (:905); UC-103 drone cuts seams. PATH 2 resource nodes (the exact 'sellable material' clause): buyprobe (cores from Hegemon wrecks) -> deployprobe on a WORLD mines PROBE_RATE_ORE_PER_MIN ore/min on the REAL clock (:4970) -> collectprobe deposits ORE into the capacity-limited cargo HOLD (:4976 P.cargo.ore+=take) -> ore is a market GOODS good base 14 (:1449) SOLD for credits via sell() (:1857-1858) at a supply/demand priceOf (:1804). OBSERVABLE: node scratchpad/f07_mining_replay.js -> RESULT PASS 17/17 (sliced+ran the real priceOf - ore 14 at equilibrium, 37.63 scarce, 4.74 glutted; selling 30 mined ore paid +420c and emptied the hold; real spawnGem credit formula; probe accrual capped at PROBE_STASH_CAP; all 5 wiring links source-asserted). Anchor 7/8.",
+    "settledFrom": "2nd independent read (was genre_matrix seed only): mined ore is genuinely SELLABLE MATERIAL - collectprobe :4976 puts ore in the hold, sell() :1857-1858 sells it at priceOf :1804 (sliced+ran, PASS 17/17 in node scratchpad/f07_mining_replay.js). Plus the asteroid->gem->credit loop (spawnGem :1352, scoop :964). Not a mis-grade."
    }
   },
   {
