@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T20:14:01",
+ "generated": "2026-09-06T20:25:01",
  "modules": [
   {
    "file": "acquire.js",
@@ -1513,6 +1513,58 @@
     "SUPPLY_N_MAX"
    ],
    "cfgTotal": 61
+  },
+  {
+   "file": "music.js",
+   "lines": 373,
+   "classes": [
+    {
+     "name": "MUSIC",
+     "members": [
+      "CFG",
+      "start",
+      "stop",
+      "set",
+      "auto",
+      "isManual",
+      "situation",
+      "situations",
+      "detect",
+      "setVolume",
+      "volume",
+      "setMute",
+      "muted",
+      "toggleMute",
+      "started",
+      "observable",
+      "playing",
+      "now",
+      "debug"
+     ],
+     "memberTotal": 19
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [
+    "VOL",
+    "purpose",
+    "FADE",
+    "situations",
+    "LOOKAHEAD_MS",
+    "wakes",
+    "SCHEDULE_AHEAD",
+    "advance",
+    "HOSTILE_NEAR",
+    "units",
+    "combat",
+    "HOSTILE_SEEN",
+    "tension",
+    "POLL_MS",
+    "game",
+    "LS_KEY"
+   ],
+   "cfgTotal": 16
   },
   {
    "file": "panels.js",

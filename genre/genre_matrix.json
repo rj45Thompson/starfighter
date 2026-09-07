@@ -261,9 +261,10 @@
     }
    },
    "ours": {
-    "v": "partial",
+    "v": "yes",
     "uc": null,
-    "note": "ENGBAY.shieldArcSvg / POWERPANEL.readShieldArcs + CFG.ARCS in model.json; no use case covers per-facing damage"
+    "note": "Real fore/aft directional shields, tracked per facing - and NONE of the 8 anchors have it (all 'no': elite 'one unified bubble', x_series 'per-component not facings', ftl 'omnidirectional', eve 'resistance by damage type'), so ours exceeds the genre here. drainShield(s,dmg,fromPos) (index.html:1628-1645) routes the hit to an arc by DIRECTION: isFront = (fromPos-s.pos).normalize().dot(shipForward) > 0 (:1636), arcKey = isFront?'shieldFwd':'shieldAft' (:1637); that arc absorbs from ITS OWN pool only (:1639-1640) and the leftover spills to hull (:1645). It NEVER bleeds into the other arc - 'a depleted front shield doesn't borrow from a full rear shield' (:1632-1634). shieldFwd/shieldAft are separate tracked values (total kept in sync :1627), each capped at shieldArcMaxFor = shieldMaxFor/2 (:1610), regen concentratable fwd/aft at SHIELD_DIVERT_MULT (:1618-1626). The old 'partial' was 'shield-arc symbols exist in model.json but no UC covers per-facing damage' - a code read + node replay settles it. Player controls it via 'shield fwd|aft|even' (:4653).",
+    "settledFrom": "code read + node numeric replay of drainShield arc-routing 2026-09-06"
    }
   },
   {
@@ -3476,10 +3477,10 @@
     }
    },
    "ours": {
-    "v": "no",
+    "v": "yes",
     "uc": "",
-    "note": "ABSENT, proven not present: grep for music|soundtrack|bgm across every .js and .html in the repo (excluding the three vendored libraries) returns zero hits. sound.js plays one-shot effects and one looping noise source; there is no track system to change with the situation.",
-    "settledFrom": "code read 2026-09-06"
+    "note": "BUILT 2026-09-06: music.js / window.MUSIC, a five-layer adaptive score (pad, sub, arp, perc, shimmer) mixed by vertical remixing - the layers play continuously in one key and the SITUATION only changes their gains, so travel becomes combat by cross-fade rather than by swapping a track. Five situations with their own tempo: calm 70, docked 62, tension 96, combat 132, boss 144 bpm. detect() reads the game every 900 ms (P.docked; hostile distance against HOSTILE_NEAR 260 / HOSTILE_SEEN 900; a hostile at 2x the player's maxHp is boss; hull loss latches combat for 6 s). Fully procedural - oscillators and shaped noise on the AudioContext SOUND already owns - so it downloads nothing. MEASURED in the live page: all five situations reached their layer targets and their tempos (e.g. combat sub 0.515/0.52 perc 0.437/0.44 at 132 bpm; boss 0.619/0.62 at 144; calm sub 0 perc 0 at 70), ctx.state running, MUSIC.auto() handing control back to the detector.",
+    "settledFrom": "built + driven in the live page 2026-09-06"
    }
   },
   {

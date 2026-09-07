@@ -10,10 +10,15 @@
 // This turns each of those three claims back into a re-checkable observable, the way cmd_shadow.js and
 // cfg_dupes.js do for their own regression classes.
 //
-// The three cells it guards (all settled 2026-09-06):
-//   F67  music that changes with the situation -> no  (grep music|soundtrack|bgm = 0)
+// The cells it guards (all settled 2026-09-06):
 //   F68  the game supports a gamepad           -> no  (grep getGamepads|gamepadconnected|... = 0)
 //   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0)
+//
+// F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
+// working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
+// from 0 hits to 11, and the guard refused to pass until the grade was re-settled. Once ours.v is
+// "yes" the cell is no longer a grep-proven "no" and there is nothing here left to protect - the
+// thing that protects it now is MUSIC.debug() reporting live layer gains per situation.
 // A hit does not by itself prove the capability now works - it proves the "no, proven by grep" basis is gone,
 // so the cell must be re-settled against the source. That is exactly when a grade silently goes wrong.
 //
@@ -29,9 +34,8 @@ const ROOT = path.join(__dirname, '..');
 const VENDORED = new Set(['three.min.js', 'fflate.min.js', 'fbxloader.js']);
 
 // id -> the grep that DEFINES the settlement. Kept identical to the grep quoted in each TASKS.md line so the
-// guard argues from the same evidence the human did; the expected grade for all three is "no".
+// guard argues from the same evidence the human did; the expected grade for every entry is "no".
 const GUARDS = [
-  { id: 'F67', label: 'adaptive music', re: /music|soundtrack|bgm/i },
   { id: 'F68', label: 'gamepad', re: /getGamepads|gamepadconnected|gamepaddisconnected|navigator\.getGamepads|new Gamepad/i },
   { id: 'F69', label: 'colourblind / accessibility options', re: /colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast/i },
 ];
@@ -89,7 +93,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F67 music, F68 gamepad, F69 accessibility) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');

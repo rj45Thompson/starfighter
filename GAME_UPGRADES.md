@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 20:14 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 20:25 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -9,24 +9,20 @@ rather than as a confident wrong number.
 | measure | value | what it does and does not tell you |
 |---|---|---|
 | use cases WORKS / PARTLY / MISSING / DEPRECATED | 49 / 1 / 0 / 1 | Work RECORDED, not work outstanding. A row is only ever added after the feature is built, so this can never show a gap. |
-| modules in the class model | 54 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
+| modules in the class model | 55 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 47 / 10 / 13 / 0 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 49 / 9 / 12 / 0 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
-36 done · 11 open · 0 blocked · 1 dropped with a reason
+41 done · 7 open · 0 blocked · 1 dropped with a reason
 
 - open **C5** Publish the three options side by side for RJ to pick
-- open **C6** Fix the wing-order argument bug the other lane found (empire.js:126)
 - open **C7** Make ground.js deterministic and drop its dead store (ground.js:109, :297)
-- open **C8** Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42)
-- open **C9** Delete the dead code the other lane listed in my files
 - open **N3** Cut what a first-time player is shown at once
 - open **F58** A guided opening that teaches the basics
 - open **F31** An authored main storyline with scripted missions
-- open **F67** Music that changes with the situation
 - open **F16** Purchases gated by rank or licence, not money alone
 - open **F60** Pick a difficulty or starting scenario before playing
 
@@ -49,7 +45,6 @@ probability - see the module docstring for why that line is not crossed.
 id    anch grounded ours        capability
 F58   8/8  7/8      partial     a guided tutorial or scripted opening teaches the basics
 F31   7/8  8/8      partial UC-212 there is an authored main storyline with scripted missions
-F67   7/7  3/7      no          music changes with the situation, for example combat versus travel
 F16   6/8  5/8      partial UC-217 some purchases are gated behind rank, licence or skill rather than money alone
 F35   6/8  2/8      partial     missions can fail and the failure has a lasting consequence
 F60   5/7  5/7      no          the player picks a difficulty or starting scenario before playing
@@ -67,11 +62,12 @@ F45   3/8  3/8      partial UC-203 player can discover unvisited systems and rec
 F10   2/8  3/8      no          player manages internal crew and damage control aboard their own ship
 F29   2/8  3/8      no          player can capture an enemy ship and keep it
 F08   2/8  2/8      no          player can pause or slow time in combat to issue orders
+F48   1/8  4/8      no UC-108   player death ends the run permanently   <- single-game idea, weak anchor
 
 == UNRESOLVED - not enough evidence to place these either way (0) ==
 These are NOT low-priority. They are unmeasured. Settling one is its own task.
 
-== ALREADY HAVE (47) ==
+== ALREADY HAVE (49) ==
   F02   7/8   -  ship movement carries momentum or inertia rather than instant-stop arcade handling
   F07   7/8   UC-101  player can mine asteroids or resource nodes for sellable material
   F12   7/8   UC-107  player advances mainly by buying larger hull classes rather than levelling one hull
@@ -80,9 +76,9 @@ These are NOT low-priority. They are unmeasured. Settling one is its own task.
   F42   7/8   UC-211  player picks a destination on a star map and travels between systems
   F52   7/8   UC-108  destroyed ships and cargo drop physical loot that anyone can collect
   F61   7/8   UC-109  a radar or scanner shows nearby objects around the ship
+  F67   7/7   -  music changes with the situation, for example combat versus travel
   F01   6/8   UC-101  player directly pilots a single ship in real time
-  F05   6/7   UC-110  firing drains a regenerating energy pool that limits sustained fire
-  ... and 37 more
+  ... and 39 more
 ```
 
 ## Ready-to-take task lines
@@ -94,7 +90,6 @@ Paste into TASKS.md and give each one an observable before starting it.
 
 - [ ] F58  a guided tutorial or scripted opening teaches the basics -> DONE WHEN: <observable>   <!-- anchor 8/8 games, 7 grounded; ours=partial  -->
 - [ ] F31  there is an authored main storyline with scripted missions -> DONE WHEN: <observable>   <!-- anchor 7/8 games, 8 grounded; ours=partial UC-212 -->
-- [ ] F67  music changes with the situation, for example combat versus travel -> DONE WHEN: <observable>   <!-- anchor 7/7 games, 3 grounded; ours=no  -->
 - [ ] F16  some purchases are gated behind rank, licence or skill rather than money alone -> DONE WHEN: <observable>   <!-- anchor 6/8 games, 5 grounded; ours=partial UC-217 -->
 - [ ] F35  missions can fail and the failure has a lasting consequence -> DONE WHEN: <observable>   <!-- anchor 6/8 games, 2 grounded; ours=partial  -->
 - [ ] F60  the player picks a difficulty or starting scenario before playing -> DONE WHEN: <observable>   <!-- anchor 5/7 games, 5 grounded; ours=no  -->
@@ -106,10 +101,11 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F17  player unlocks new technology through research over time -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 4 grounded; ours=partial UC-217 -->
 - [ ] F68  the game supports a gamepad -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 6 grounded; ours=no  -->
 - [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=partial  -->
+- [ ] F69  the game offers colourblind or other accessibility options -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 4 grounded; ours=no  -->
 ```
 
 ## Tool output this pass
 
 ```
-classes.mmd: 50 exposed objects/classes over 54 modules; usecases.mmd: 51 use cases, tally {'WORKS': 49, 'PARTLY': 1, 'MISSING': 0, 'DEPRECATED': 1}
+classes.mmd: 51 exposed objects/classes over 55 modules; usecases.mmd: 51 use cases, tally {'WORKS': 49, 'PARTLY': 1, 'MISSING': 0, 'DEPRECATED': 1}
 ```
