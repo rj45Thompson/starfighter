@@ -531,8 +531,9 @@ const CFG = {
   REP_HOSTILE:-6, REP_ALLIED:6, REP_TRADE:0.12, REP_TERRA:0.6, REP_BOMB:0.5, REP_MAX:12, REP_DISCOUNT:0.15,
   REP_KILL_HEG:0.4, REP_LIBERATE:3,          // M2: coalition standing - fight the Hegemon, planets warm to you
   // ---- weak enemy pirates (farm targets) + inter-agent communication ----
-  PIRATE_MAX:11, PIRATE_HP:62, PIRATE_DMG:9, PIRATE_HUNT_R:170, PIRATE_SPAWN_CD:6, PIRATE_LOOT:14, FLAME_CRUISER_CHANCE:0.3,
+  PIRATE_MAX:13, PIRATE_HP:62, PIRATE_DMG:9, PIRATE_HUNT_R:170, PIRATE_SPAWN_CD:3, PIRATE_LOOT:14, FLAME_CRUISER_CHANCE:0.3,   // B10/B11 2026-09-07: SPAWN_CD 6->3 (the ramp reached cap only at ~65s - a near-dead first minute; and post-kill replacement was slow) + MAX 11->13
   LAWLESS_SPAWN_BIAS:0.4,   // user 2026-07-08 "pirate space not owned" - odds a new pirate spawns in the lawless system specifically, vs uniform-random across the galaxy
+  PIRATE_NEAR_PLAYER_BIAS:0.4,   // B10/B11 2026-09-07: share of new pirates that spawn in the player's OWN neighbourhood. Was 0 (uniform galaxy-wide) -> 0 hostiles within 400u of the player for 130s straight = "nothing to fight" AND "can't die"
   COMM_R:190, COMM_CD:3.5,          // radio range for agent-to-agent messages + per-agent cooldown
   COMM_EPS:0.12, COMM_LR:0.5, COMM_LEARN_CD:0.22,   // A1: Lewis-game exploration ε, learning rate, episode cadence
   CHAIN_SPEAK_CD:7.5,                                // A0: how often the focused pilot narrates its full reasoning chain to radio
@@ -1954,8 +1955,17 @@ function addPirate(force){ if(!force && ships.filter(s=>s.team==='pirate').lengt
   const _ppool=systems.filter(sy=>!sy.peaceful);   // pirates never spawn in the peaceful CERES BELT
   const sys=(lawlessSys && rand(0,1)<CFG.LAWLESS_SPAWN_BIAS) ? lawlessSys : (_ppool.length?_ppool[randi(0,_ppool.length-1)]:(systems.length?systems[randi(0,systems.length-1)]:{center:new T.Vector3()}));
   const off=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(CFG.SYSTEM_R*rand(0.8,1.15));
+  // LOCAL DENSITY (B10/B11 2026-09-07): pirates spawned ~1 per system galaxy-wide, so the player flew for minutes with
+  // ZERO hostiles in range - MEASURED 0 pirates within 400u of the player across 130s (scratchpad/combat_probe.js).
+  // That is BOTH "nothing to fight" (B11) AND "can't die" (B10 - no incoming fire ever reaches you; the immortality was
+  // never the shield, it was that nothing was shooting). Bias a share of spawns into the player's OWN neighbourhood
+  // (near sensor range so they close and engage), except inside the peaceful belt where combat is forbidden.
+  const _P0=ships[0];
+  const _pos=(_P0 && _P0.alive && !inPeaceful(_P0.pos) && rand(0,1)<CFG.PIRATE_NEAR_PLAYER_BIAS)
+    ? _P0.pos.clone().add(new T.Vector3(rand(-1,1),rand(-0.5,0.5),rand(-1,1)).setLength(rand(CFG.PIRATE_HUNT_R*0.8,CFG.PIRATE_HUNT_R*1.6)))
+    : sys.center.clone().add(off);
   const rosterName=novelPirateName();   // N3: synod roster canon name when the novel roster is loaded; else legacy HEG tier name
-  const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:sys.center.clone().add(off),
+  const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:_pos,
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:HT.hp, maxHp:HT.hp, credits:0, score:0,
     lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
     huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:rand(0,CFG.COMM_CD), role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty,   // SR (was 99 = permanently silent - pirates never coordinated at all; now ready-soon like every other ship, so wolf-pack calls actually happen)
