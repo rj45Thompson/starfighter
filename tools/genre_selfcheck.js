@@ -18,6 +18,7 @@
 //   F44  in-system fast-travel layer             -> no  (grep supercruise|fast-travel|cruise mode|time-accel|... = 0) [2026-09-07]
 //   F48  permadeath (death ends the run)         -> no  (grep permadeath|ironman|hardcore|permanent death|... = 0)   [2026-09-07]
 //   F56  co-op / PvP with other humans           -> no  (grep PvP|player-vs-player|multiplayer|matchmak|... = 0)     [2026-09-07]
+//   F60  pick a difficulty or start scenario      -> no  (grep choose/select difficulty|scenario picker|hard mode|... = 0) [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -71,6 +72,15 @@ const GUARDS = [
   // "human player only" death-wipe comment (index.html:2830, which means the SINGLE human player, not others).
   // Any hit means a PvP/co-op-multiplayer mode has landed (which F40's networking guard would also catch).
   { id: 'F56', label: 'co-op / PvP with other humans', re: /\bPvP\b|player.?vs.?player|versus (another |a )?player|\bco-?op mode\b|\bmultiplayer\b|matchmak(e|ing)|human.?vs.?human|\bother human players?\b|invite (a )?friend|join (a )?(friend|multiplayer|lobby)/i },
+  // F60 (2026-09-07): the player picks a DIFFICULTY or a STARTING SCENARIO before playing (Elite's ship/start,
+  // X's game-start scenarios - 5 of 7 surveyed games do). Graded "no" - there is ONE fixed start: START_IN_BELT
+  // (index.html:395) drops every boot AND every generation-reset into the same Ceres Belt (:6578, :6753);
+  // difficulty is DEV-TUNED constants (ESC_RATE/HEG_TIERS, the "DIFFICULTY PASS 4/5" balance comments), never a
+  // player choice; the `newgame`/`restart` command (:4592) is a confirm-gated reset to that SAME start, offering
+  // no options. Tight PICKER patterns only, so it never trips on those balance comments, the AI auto-curriculum
+  // "difficulty in the ZONE" (:4729), the empire/engbay mid-game pickers, or the choice-less `newgame`. Any hit
+  // means a difficulty / scenario / game-mode picker has landed. Verified 0 hits across the 48 scanned files.
+  { id: 'F60', label: 'difficulty / start-scenario picker', re: /(choose|select|pick|set)\s+(a\s+|your\s+|the\s+)?(difficulty|game.?mode|starting scenario|start scenario|scenario)\b|difficulty\s*(select|picker|slider|setting|option|level|menu|screen|chooser)|scenario\s*(select|picker|menu|screen|chooser|choice|list|preset)|\b(easy|normal|hard|casual|iron ?man|hard ?core)\s+(mode|difficulty)\b|game.?mode\s*(select|picker|menu|option)|choose your (difficulty|scenario|start)/i },
 ];
 
 function gameFiles() {
@@ -126,7 +136,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath, F56 co-op/PvP) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath, F56 co-op/PvP, F60 difficulty/scenario picker) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');

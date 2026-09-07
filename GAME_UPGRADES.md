@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-07 05:28 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-07 05:37 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -16,12 +16,11 @@ rather than as a confident wrong number.
 
 ## The live list (TASKS.md)
 
-95 done · 4 open · 1 blocked · 1 dropped with a reason
+96 done · 3 open · 1 blocked · 1 dropped with a reason
 
 - open **N3** Cut what a first-time player is shown at once
 - open **F58** A guided opening that teaches the basics
 - open **F31** An authored main storyline with scripted missions
-- open **F60** Pick a difficulty or starting scenario before playing
 - BLOCKED **M1** **"Music OFF by default" (commit 1abbd66) does not actually silence all music - the F67 ad
 
 ## Genre gaps, ranked by anchor count

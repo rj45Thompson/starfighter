@@ -3182,7 +3182,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no use case or module covers difficulty or a start-scenario picker"
+    "note": "SETTLED no (2026-09-07, THIN->anchors=2, grep-proven absence + guarded). There is ONE fixed start and no player choice before play. NO PICKER: a tight difficulty/scenario/game-mode PICKER regex has 0 hits across all 48 scanned files (index.html + root *.js minus 3 vendored libs); every 'difficulty' in the source is a DEV-TUNED balance constant (ESC_RATE/HEG_TIERS, the 'DIFFICULTY PASS 4/5' comments index.html:547,1233-1238,3975) or the AI auto-curriculum (:4729), never a chooser; 'scenario' is 0 hits outright. ONE FIXED START: START_IN_BELT:true (:395) drops every boot (:6578) AND every generation-reset rebirth (:6753) into the same Ceres Belt as a stock Scout - no branch. The `newgame`/`restart` command (:4592) is a confirm-gated ('newgame confirm') RESET to that same start (war front/territory/ship), offering no options - a reset, not a picker. vs the anchor 5/7: X4 scenario choice, Space Rangers 2 race/occupation/4 difficulties, FTL difficulty modes, EV Nova char-resource scenarios, EVE race/bloodline. OBSERVABLE: node scratchpad/f60_startchoice_replay.js -> PASS (0 picker hits + single-start facts); GUARDED as the 8th cell in tools/genre_selfcheck.js so the grade fails loudly the moment a picker lands.",
+    "settledFrom": "grep-proven absence: difficulty/scenario/game-mode PICKER regex 0 hits across 48 scanned files (difficulty = dev-tuned ESC_RATE/HEG_TIERS 'DIFFICULTY PASS' constants + AI auto-curriculum only; scenario 0 hits); ONE fixed start START_IN_BELT:true :395 used by boot :6578 + rebirth :6753; newgame :4592 is a confirm-gated reset, not a picker. Guarded tools/genre_selfcheck.js (8th no-cell). Measured node scratchpad/f60_startchoice_replay.js PASS"
    }
   },
   {
