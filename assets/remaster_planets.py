@@ -43,6 +43,26 @@ def load(path, mode='RGB'):
     return np.asarray(Image.open(path).convert(mode), dtype=np.float32)
 
 
+def wide_to(sheet, W, H, repeats):
+    """lay a 2:1 planet-scale sheet `repeats` times around the equator, mirroring alternate copies.
+
+    The square close-up tiles are surface DETAIL; a 2:1 sheet generated at planet scale is a LAYOUT - big plates
+    with ports and vents that should read as features of the world, not as a repeating pattern. So it is laid out
+    whole rather than cut into squares, and at a low repeat count.
+    """
+    from PIL import Image as _I
+    tw = max(2, W // max(1, repeats))
+    th = max(1, tw // 2)
+    t = _I.fromarray(sheet.astype('uint8')).resize((tw, th), _I.LANCZOS)
+    tf = t.transpose(_I.FLIP_LEFT_RIGHT)
+    out = _I.new('RGB', (W, H))
+    for x in range(0, W, tw):
+        for y in range(0, H, th):
+            use = t if ((x // tw) + (y // th)) % 2 == 0 else tf
+            out.paste(use, (x, y))
+    return np.asarray(out, dtype=np.float32)
+
+
 def tile_to(sheet, W, H, repeats, flip_alternate=True):
     """lay a square tile repeats times around the equator, mirroring alternate copies so the joins match"""
     tw = max(1, W // repeats)
@@ -62,7 +82,7 @@ def high_pass(a, radius):
     return a - lo
 
 
-def remaster(look, repeats, strength, relief):
+def remaster(look, repeats, strength, relief, wide=None):
     stem = os.path.join(OUT, 'machine_' + look)
     need = [stem + '.jpg', stem + '_e.jpg', stem + '_h.jpg']
     for p in need:
@@ -78,11 +98,18 @@ def remaster(look, repeats, strength, relief):
     H, W = alb.shape[:2]
 
     tiles = {}
-    for k in TILES:
-        p = os.path.join(OUT, 'tile_%s.jpg' % k)
-        if not os.path.exists(p):
-            raise SystemExit('missing %s - generate the SDXL tiles first' % os.path.basename(p))
-        tiles[k] = tile_to(load(p), W, H, repeats)
+    if wide:
+        wp = wide if os.path.exists(wide) else os.path.join(OUT, wide)
+        if not os.path.exists(wp):
+            raise SystemExit('no such wide sheet: %s' % wide)
+        sheet = wide_to(load(wp), W, H, repeats)
+        tiles = {k: sheet for k in TILES}          # one layout everywhere; the sheet carries its own variety
+    else:
+        for k in TILES:
+            p = os.path.join(OUT, 'tile_%s.jpg' % k)
+            if not os.path.exists(p):
+                raise SystemExit('missing %s - generate the SDXL tiles first' % os.path.basename(p))
+            tiles[k] = tile_to(load(p), W, H, repeats)
 
     # WHERE each tile belongs, read from the structure maps rather than invented:
     #   the height map's low ground is trench, its high ground is plate, and the emissive marks the districts.
@@ -143,12 +170,13 @@ def main():
     ap.add_argument('--repeats', type=int, default=8, help='how many times the detail tiles wrap the equator')
     ap.add_argument('--strength', type=float, default=0.85)
     ap.add_argument('--relief', type=float, default=0.30)
+    ap.add_argument('--wide', help='a 2:1 planet-scale sheet to use instead of the three square detail tiles')
     a = ap.parse_args()
     looks = ([f[len('machine_'):-len('.jpg')] for f in os.listdir(OUT)
               if f.startswith('machine_') and f.endswith('.jpg') and '_' not in f[len('machine_'):-len('.jpg')]]
              if a.all else [a.look])
     for look in sorted(looks):
-        remaster(look, a.repeats, a.strength, a.relief)
+        remaster(look, a.repeats, a.strength, a.relief, a.wide)
 
 
 if __name__ == '__main__':
