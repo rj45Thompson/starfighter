@@ -2288,7 +2288,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-211",
-    "note": "jumps pay fuel; UC-304 measured a lane jump at 1004u for 19 fuel"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, both sides measured). CONSUMPTION: the jump/hyperspace command charges cost = ceil((JUMP_FUEL_BASE 8 + d/JUMP_DIST_PER_FUEL 85) * engine/series fuelMult) and does P.fuel -= cost (index.html:5022-5024), refusing if P.fuel<cost (this is F42's measured jump). Fuel is FINITE (FUEL_CAP 60, FUEL_START 60, :494); a tank can be raised via fuel-tank gear (tank standard/extended/reserve :3117, F14). REPLENISHMENT: fuel is the traded good 'gas' - refuel(s,p) :1856-1857 buys it at the docked planet's MARKET price priceOf(p,'gas'), q = min(need, floor(credits/price), floor(stock.gas-4)) - so a refuel is LIMITED by BOTH your credits AND the planet's gas stock, costs credits, and draws the stock down (ties into F18/F19). NPC traders refuel too (planTrade :1874 when fuel<FUEL_LOW 18). A Hegemon-held world bars docking/refuel/repair until liberated (:2055), so fuel pressure is a real strategic constraint. OBSERVABLE: node scratchpad/f43_fuel_replay.js -> PASS - slices the real refuel()/fuelCapOf() and drives them: normal fill (40 units, -200c, stock -40), CREDIT-limited (50c -> only 10 units), STOCK-limited (gas 8 -> only 4, keeps a floor of 4), full tank (0), price-scaling (12/u -> 120c).",
+    "settledFrom": "index.html fuel economy: FINITE cap FUEL_CAP 60 :494; CONSUMED by jump cost ceil((JUMP_FUEL_BASE 8 + d/JUMP_DIST_PER_FUEL 85)*fuelMult), P.fuel-=cost :5022-5024 (F42); REPLENISHED via refuel(s,p) :1856-1857 buying 'gas' at priceOf(p,'gas'), limited by credits + planet stock; refuel command NL alias -> cmd:'refuel' :3059/:3113; can't refuel at Hegemon worlds :2055. Measured node scratchpad/f43_fuel_replay.js PASS (real refuel/fuelCapOf sliced + driven)"
    }
   },
   {
