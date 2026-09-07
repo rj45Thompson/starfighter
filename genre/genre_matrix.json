@@ -1597,7 +1597,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-208",
-    "note": "cards from HOST.missionCandidates; missions.js has BOARD_N and REFRESH_S"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). Ports offer a REFRESHING board of GENERATED jobs. missions.js (HANDS-OFF - read to verify) BOARD_N 4 (:26), REFRESH_S 120 (:27 'board regenerates every this many game-seconds'). GENERATED: genBoard :224-246 runs 6 procedural generators (genPatrol :128 / genEscort :148 / genBounty :166 / genLiberate :180 / genSupply :192 / genAssault :214 - each building random targets/rewards via ri() :67 over live systems/ships/planets) across 10 passes, filters by player rank (m.rank<=pr unlocked / >pr locked), shuffles, guarantees MIN_UNLOCKED_ON_BOARD 2 within-rank, fills to BOARD_N, sorts by rank. REFRESHING: ensureBoard :248-254 regenerates the board (board=genBoard()) once now() (HOST.T0) >= nextRefreshT and reschedules nextRefreshT = now()+REFRESH_S. accept() :289-302 pulls a posting off the board; validateFresh :257-273 voids a posting whose target is gone. The board is shown at the port via board()/boardHtml :466. OBSERVABLE: node scratchpad/f30_board_replay.js -> RESULT PASS 12/12 (VERBATIM genBoard+ensureBoard: a board appears on first visit capped at 4, sorted by rank, >=2 within-rank; stable before nextRefreshT; crossing nextRefreshT REGENERATES a freshly-generated board [all-new posting ids] and reschedules now()+REFRESH_S; rank-gating - a Legend surfaces the high-rank LIBERATE/ASSAULT, a Recruit still gets a full board with the unlocked ones first).",
+    "settledFrom": "missions.js genBoard :224-246 (procedural generators + rank-gate + BOARD_N cap) + ensureBoard :248-254 (REFRESH_S regen timer) + board()/boardHtml + node replay; anchors 6/8 (all but starblast, ftl)"
    }
   },
   {
