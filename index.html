@@ -439,7 +439,11 @@ const CFG = {
   // point on one of eight stats (each level a declared multiplier at the ONE site that already reads the quantity); all eight maxed plus
   // one banked point = the next hull tier, taken anywhere in space (applyHull's swap rule resets the old Lv1-10 ladder, same as before).
   KILL_FEED_MAX:60, KILL_CREDIT_S:8, KILL_FEED_SHOWN:5, KILL_FEED_S:22,
-  MUSIC_TRACK:'starfield',   // the bed that plays under flight (assets/audio/<name>.ogg, generated with MusicGen)
+  MUSIC_ON:false,            // MUSIC OFF (RJ 2026-09-07: "just disable music sound okay music OFF"). The bed, the
+                             // ducking and the tracks all stay wired and working - this is the switch, not a
+                             // removal, so turning it back on is one value and nothing has to be rebuilt.
+                             // Sound EFFECTS are unaffected: `mute`/`unmute` still own those.
+  MUSIC_TRACK:'starfield',   // the bed that WOULD play under flight (assets/audio/<name>.ogg, generated with MusicGen)
   GEM_BAR:true, GEM_BAR_MAX:48, GEM_BAR_RATE:1.0, GEM_PTS_CAP:64, STAT_MAX:8, TIER_UP:true,
   STAT_GAIN:{shieldCap:0.10, shieldRegen:0.12, energyCap:0.10, energyRegen:0.12, speed:0.05, agility:0.08, damage:0.07, fireRate:0.06},
   STAT_ORDER:['shieldCap','shieldRegen','energyCap','energyRegen','speed','agility','damage','fireRate'],
@@ -6768,7 +6772,7 @@ try{ SF_LOCK.ch=new BroadcastChannel('SF_SINGLETON');
   SF_LOCK.ch.onmessage=(m)=>{ if(m.data&&m.data.t==='claim'&&m.data.id>SF_LOCK.myClaim) sfPause(true); };
   SF_LOCK.ch.postMessage({t:'claim',id:SF_LOCK.myClaim}); }catch(e){}
 // 🔊 audio unlocks on the first user gesture (browsers block AudioContext until then)
-(function(){ const unlock=()=>{ if(window.SOUND){ try{ SOUND.init(); if(SOUND.playMusic) SOUND.playMusic(CFG.MUSIC_TRACK); }catch(e){} } removeEventListener('keydown',unlock,true); removeEventListener('pointerdown',unlock,true); };
+(function(){ const unlock=()=>{ if(window.SOUND){ try{ SOUND.init(); if(CFG.MUSIC_ON && SOUND.playMusic) SOUND.playMusic(CFG.MUSIC_TRACK); }catch(e){} } removeEventListener('keydown',unlock,true); removeEventListener('pointerdown',unlock,true); };   // audio still unlocks on the first gesture so EFFECTS work; only the music bed is gated
   addEventListener('keydown',unlock,true); addEventListener('pointerdown',unlock,true); })();
 // ---- VISION: the arc3 eye + fog of war (vision.js) - two retinas, one per mind -------------------------------
 const VIS_CODE={asteroid:1,gem:2,planet:3,base:4,squad:5,pirate:6};   // game-side OPAQUE code table (agents never see these names)
