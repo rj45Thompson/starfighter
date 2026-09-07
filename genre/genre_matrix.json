@@ -3531,9 +3531,10 @@
     }
    },
    "ours": {
-    "v": "unknown",
+    "v": "no",
     "uc": null,
-    "note": "no use case or module names an input device other than keys and pointer"
+    "note": "No gamepad. A grep of the game's own source (index.html + every root *.js minus the 3 vendored libs) for getGamepads|gamepadconnected|navigator.getGamepads|new Gamepad returns 0 hits. Input is entirely: rebindable flight KEYS (keydown/keyup index.html:6855/6878) with an un-rebindable arrow/right-Shift fallback (index.html:6837), left-mouse fire, MOUSE steering used as a 'virtual-joystick' (index.html:7059 comment), and a mobile on-screen TOUCH stick (index.html:6883) - none polled via the Gamepad API. On the anchors' own bar Freelancer, which needs a third-party MOD for a pad, is 'no', so our mouse/touch virtual-sticks are 'no' too.",
+    "settledFrom": "code read + 0-hit gamepad-API grep 2026-09-06"
    }
   },
   {
@@ -3581,9 +3582,10 @@
     }
    },
    "ours": {
-    "v": "unknown",
+    "v": "no",
     "uc": null,
-    "note": "UC-602 panel opacity is a layout control, not an accessibility option; nothing else applies"
+    "note": "No accessibility options in the visual sense this cell tests. A grep of the game's own source for colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast returns 0 hits: no colourblind palette, no high-contrast mode, no reduced-motion toggle, no gamma/brightness slider, no captions, no ARIA. The only display control is per-panel transparency (UC-602 [WORKS], panels.js 0.25-1.0) - a layout/declutter control, weaker than Elite Dangerous's gamma slider which is graded 'no' HERE ('gamma slider only, no colourblind mode'). Remappable flight controls DO exist (index.html:6835 'make all the keys optional', rebind 6906-6911, persisted SF_CONTROLS_v1) - a real motor-accessibility affordance - but every anchor with remappable-but-no-colourblind (Freelancer, EV Nova, Elite) is graded 'no', so grading ours 'partial' for them would apply a softer bar to ourselves than to the anchors.",
+    "settledFrom": "code read + 0-hit colourblind/contrast grep, graded on the anchors' bar 2026-09-06"
    }
   },
   {
