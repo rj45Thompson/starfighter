@@ -422,3 +422,41 @@ FIXED and confirmed correct by reading each fix — `empire.js:126` wing-order (
 
 <!-- pass 2: 4 done, 0 blocked, 1 dropped with measurement, 0 appended -->
 <!-- pass 3: 0 done, 0 blocked, 0 appended - STAGNANT, loop complete -->
+
+## Combat re-measured CONFOUND-FREE (2026-09-07, worker) - trustworthy numbers + ⚠ CONCURRENT WORKER
+The B10-B13 lines at the TOP carry the FIRST (crude) combat measurement; two harness confounds made
+three of the four numbers wrong. Re-measured clean: `node scratchpad/combat_probe.js
+scratchpad/combat_jobs_clean.json` -> `scratchpad/combat_clean.json`, every job **isolate:true** (banish
+the 35 squad ships so the player's fire-control cannot lock a far target) + **stubHud:true** (null
+window.SBHUD so killShip->killFeed->SBHUD.refresh does not throw innerHTML-null and abort the death).
+Findings are in the shared graph, topic `defects` (subjects B10, B12, killship-sbhud-innerhtml-throw).
+
+- **B12 is NOT a defect - the player CAN kill, in ~4.25s.** Isolated point-blank Drone (260hp) died in
+  **4.25s** of connected fire (4.27s with capacitor pre-drained) = the design intent "a scout's 66dps
+  kills a Drone in ~4s" (HEG_TIERS index.html:1253). The crude "260hp / ~14s TTK / tanky" was the same
+  ~2% confound: with the squad present, computePlayerSolution (index.html:2924 locks the NEAREST hostile
+  ahead) converged the shots onto a far squad ship. "Can't kill enemies" is shots not CONNECTING in
+  sparse play, not a weapon problem.
+- **B10 immortality is REAL but its stated CAUSE is FALSE.** Player is MORTAL under sustained fire: 4
+  point-blank Drones kill in **2.98s**; 22dps continuous kills in **5.32s**. So "SHIELD_REGEN
+  out-regenerates FOUR continuous attackers" (the B10 line) is wrong. True cause: the 11-degree
+  HUNT_FIRE cone (CFG index.html:470) + sparse/scattered pop make incoming fire INTERMITTENT, and any
+  >2.5s lull lets SHIELD_REGEN_DELAY:2.5 (index.html:503,1624) + hull regen FULLY reset - PROVEN: 30dps
+  at 1s-on/3s-off is survived 40s (minHp 19.7->48.5) while the same energy delivered continuously kills
+  in 5.3s. Fix lever = engagement DENSITY (B11) and/or SHIELD_REGEN_DELAY - ⚠ regen-delay is GLOBAL and
+  would speed AI-vs-AI kills, WORSENING B13; density is the safer lever.
+- **B11 steady-state pop is AT cap (11), not "far below."** The crude "2 pirates vs cap 11" was a
+  ramp-phase snapshot: pop starts ~1 (pirateCd=0 index.html:1950, no world-gen seeding) and trickles in
+  1 per PIRATE_SPAWN_CD:6s (index.html:534,2780), reaching cap 11 at ~60s then holding. Real gaps = the
+  slow RAMP (near-dead first minute) + GALAXY-WIDE spread (~1 pirate/system locally, spawn index.html:1955).
+  Fix lever = lower PIRATE_SPAWN_CD (ramp + post-kill replacement) and/or local density (cap/bias/seed).
+
+⚠⚠ **CONCURRENT COMBAT WORKER IN THIS TREE (2026-09-07 ~15:56).** A SECOND agent is live on B10-B13:
+`node scratchpad/combat_probe.js scratchpad/jobs_F.json` (PID 152452) was running, and combat_probe.js
+was edited by it (added noRender/playerCredits) mid-iteration. combat_probe.js hardcodes Chrome debug
+PORT 9334, so two concurrent probe runs COLLIDE (my B11 population run hung at 0 bytes; I killed it).
+Per the collision rule I did NOT edit index.html (leave the CFG fix to the other worker) and yielded the
+code change; my findings are in the graph so the other worker need not re-derive. RJ: two workers on one
+lane = double token burn + collision risk - likely a keep-alive spawned a duplicate; kill one.
+
+<!-- pass 4 (worker): 0 status-flips (yielded to concurrent worker), 1 appended; combat re-measured confound-free, graph claims B10/B12/throw recorded; index.html CFG fix YIELDED to concurrent combat worker (jobs_F.json PID 152452, shared port 9334) to avoid a game-file collision -->
