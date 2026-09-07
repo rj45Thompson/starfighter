@@ -14,6 +14,7 @@
 //   F68  the game supports a gamepad           -> no  (grep getGamepads|gamepadconnected|... = 0)   [2026-09-06]
 //   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0) [2026-09-06]
 //   F29  capture an enemy ship and keep it      -> no  (grep commandeer|hijack|capture-a-ship|board-enemy|... = 0) [2026-09-07]
+//   F40  real-time multiplayer (many humans)     -> no  (grep WebSocket|RTCPeer|socket.io|multiplayer|... = 0)     [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -43,6 +44,12 @@ const GUARDS = [
   // (conquest.js "capture the planet", WARSCORE_PER_CAPTURE), on "aboard your ship", "mouse captured" (pointer lock),
   // or "captured BEFORE generateHullRoster". Any hit means a board/commandeer/tow-a-ship mechanic has landed.
   { id: 'F29', label: 'capture an enemy ship', re: /commandeer|hijack|capture[\sa-z]{0,10}(ship|vessel|craft|hull)|board(ing|ed)?\s+(an?\s+)?(enemy|hostile|pirate|ship|vessel)|tow\s+(the\s+)?(enemy\s+)?(ship|vessel|hull)|tractor\s+(the\s+)?(ship|vessel)|prize\s+(ship|crew|vessel|hull)|captured?\s+(enemy\s+)?(ship|vessel|craft)/i },
+  // F40 (2026-09-07): the world is shared in REAL TIME with many other human players (multiplayer). Tight networking
+  // transports only, so it never trips on the BroadcastChannel('SF_SINGLETON') SINGLETON LOCK (same-machine tab
+  // coordination that FREEZES older tabs - the OPPOSITE of shared play, "No server, no races" index.html:6761) or on
+  // GAMEMOD.emit (gamemod.js, a local mod event bus). Any hit means a real-time-multiplayer transport (WebSocket /
+  // WebRTC / socket.io / peer) has landed. Verified 0 hits across the 48 scanned files at settlement.
+  { id: 'F40', label: 'real-time multiplayer', re: /new WebSocket|WebSocket\s*\(|RTCPeerConnection|RTCDataChannel|createDataChannel|socket\.io|\bio\.connect\b|\bmultiplayer\b|matchmak(e|ing)|\bnetcode\b|peer(js|-to-peer)|\bMMO\b|co-?op (session|multiplayer)|other human players?/i },
 ];
 
 function gameFiles() {
@@ -98,7 +105,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');

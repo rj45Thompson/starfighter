@@ -2122,7 +2122,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no networking or multiplayer module appears in model.json"
+    "note": "SETTLED no, PROVEN BY GREP (2026-09-07, THIN->anchors=2). Star Fighter is single-player: the 'other players' are AI/NPC ships (pirates / coalition / named pilots), not humans, and there is no real-time transport. Zero hits across the 48 scanned game files (index.html + every root *.js minus the 3 vendored libs) for WebSocket / RTCPeerConnection / RTCDataChannel / socket.io / io.connect / multiplayer / matchmaking / netcode / peer / MMO / co-op session. The only cross-instance mechanism is BroadcastChannel('SF_SINGLETON') index.html:6761-6771 - the SINGLETON LOCK that FREEZES older tabs on the SAME machine ('No server, no races'), the OPPOSITE of a shared world. GAMEMOD.emit (gamemod.js) is a LOCAL mod event bus; every fetch() loads a LOCAL static .json asset; the tami-wasm/_framework XHR is vendored .NET runtime (a subdir, not scanned, not game net). GUARDED: tools/genre_selfcheck.js 4th cell (0-hit regex) - flips to FAIL the moment a real-time-multiplayer transport lands.",
+    "settledFrom": "grep-proven absence over the 48 scanned game files (index.html + root *.js minus three.min/fflate.min/fbxloader): 0 hits for WebSocket/RTCPeerConnection/socket.io/multiplayer/matchmaking/netcode/peer/MMO. Only cross-instance code is the BroadcastChannel singleton lock index.html:6761 (same-machine, freezes other tabs - opposite of shared play). Guarded by tools/genre_selfcheck.js F40. Game-anchor: shared-world games (x_series/elite_dangerous/eve_online) yes, ours no"
    }
   },
   {
