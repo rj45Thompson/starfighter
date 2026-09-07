@@ -2709,7 +2709,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-108",
-    "note": "respawns as a Scout at no cost"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured) - via the FREE-STARTER path (the OR's second branch), NOT insurance. On player death killShip applies a stock SCOUT (applyHull(s,'scout') index.html:2839, the F49 real-stakes wipe) and the respawn block (:2669-2677) brings the ship back with NO credit charge - the replacement Scout is FREE (credits were already wiped to 0 on death, F49). There is NO insurance/rebuy/premium/payout mechanic: the only 'insurance' tokens tree-wide are a pilot-SPEECH temperament regex (index.html:4045 TEMPER_DOWN_RE, speech_gen.js:40 SOFT_RE) and a quest-gambling comment (textquests.js:8 'delayed payout') - neither is a ship-replacement cost. So the destroyed ship is replaced by a free starter (Scout), the SC2/roguelike-lite floor you fall back to after F49 strips everything. OBSERVABLE: node scratchpad/f51_replacement_replay.js -> PASS - asserts the death handler applies a stock Scout, the respawn deducts no credits, and that no insurance/rebuy appears in the death/respawn path (the insurance tokens are only the speech regex).",
+    "settledFrom": "index.html killShip player death -> applyHull(s,'scout') :2839 (free stock Scout), respawn :2669-2677 no credit charge; no insurance/rebuy/premium mechanic (the 'insurance' tokens are speech-temperament regexes index.html:4045 / speech_gen.js:40, not a ship cost). Complement of F49 (lose everything) -> F51 free-starter floor. Measured node scratchpad/f51_replacement_replay.js PASS"
    }
   },
   {
