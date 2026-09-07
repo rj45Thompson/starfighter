@@ -155,8 +155,8 @@
    "ours": {
     "v": "yes",
     "uc": "",
-    "note": "index.html:2456 flyStep integrates velocity: s.vel.addScaledVector(fwd, THRUST*...*dt) and position follows vel. Thrust adds to momentum; there is no instant-stop.",
-    "settledFrom": "code read 2026-09-06"
+    "note": "SETTLED yes anchors=2 (2026-09-07, 2nd independent read + RUN; was a single code read, line number refreshed). flyStep (index.html:2585-2603) is a real momentum integrator: thrust ACCUMULATES into velocity only while thrusting (:2595 s.vel.addScaledVector(fwd, CFG.THRUST*...*s.ctrl.thr*dt)), DRAG decays velocity EXPONENTIALLY every frame (:2601 s.vel.multiplyScalar(Math.exp(-CFG.DRAG*dt))), VMAX clamps top speed (:2602), and position INTEGRATES from velocity (:2603 s.pos.addScaledVector(s.vel,dt)). So releasing thrust does NOT stop the ship - velocity persists and decays smoothly (drag half-life ln2/DRAG ~ 0.99s) while the hull keeps coasting forward: momentum/inertia, the opposite of instant-stop arcade handling. OBSERVABLE: node scratchpad/f02_inertia_replay.js -> RESULT PASS 12/12 (replicates the real integration with the real constants THRUST 44 / DRAG 0.7 / VMAX 34, stock ship = all multipliers 1): thrust builds to VMAX 34; after releasing thrust the ship COASTS - velocity persists at 16.88 after 1s (matches exp(-0.7*1)=0.497, ~50% remains vs 0% for an arcade instant-stop), travels 24.3 units forward in that second, velocity monotonically decreasing; + source-asserts the accumulate/drag/vmax/position structure.",
+    "settledFrom": "2nd independent read + RUN (was code read 2026-09-06, anchors=1; line number refreshed): replicated flyStep's real velocity integration with the real THRUST/DRAG/VMAX - thrust accumulates, drag decays velocity exponentially (~50% remains 1s after release, 24.3u coast), position follows velocity. node scratchpad/f02_inertia_replay.js PASS 12/12. Not instant-stop; yes confirmed."
    }
   },
   {
