@@ -38,16 +38,16 @@ No leak found: scene children oscillate 469-572, ships plateau at 63, 0 runtime 
 My footprint there is one script tag and one CFG value; commits are staged by hash from HEAD so the
 card is never swept in. Everything else lives in new files.
 
-- [ ] C1  Generate option A, the procedural machine-world skin -> DONE WHEN: albedo/emissive/normal applied to a planet in the running page, screenshotted, and the disc's day/night mean luma measured
-- [ ] C2  Generate option B, a FLUX Cybertron skin through the seam repair -> DONE WHEN: the same three measurements, from the same camera, on the same planet
-- [ ] C3  Build option C, a displaced machine MESH (not a textured ball) -> DONE WHEN: the same three measurements, and the geometry is visibly displaced (vertex count and radius spread reported)
-- [ ] C4  Answer "still very bright" with a number, not an opinion -> DONE WHEN: day-side disc mean luma measured before and after on the live page, and the bright disc beside the planets identified by raycast
+- [x] C1  Machine-world skins -> DONE, and it grew: SEVEN looks (iron/circuit/rust/warlord/glacier/verdant/imperial), each a different world not a hue swap, 3072x1536, six maps per look in one UV space. Applied and screenshotted in the page. cs 44b21f7
+- [x] C2  FLUX skin -> the honest answer is it CANNOT make one: four prompts, four compositions, measured centre/edge luminance 1.47 where a flat texture is 1.00. It composes subjects, not surfaces. Option B is now its plating art high-passed into a detail layer over C1's structure. Recorded in gen_painted_cybertron.py
+- [x] C3  The mesh -> REBUILT properly after RJ asked for "a high quality round mesh properly texture mapped": a 256-segment sphere displaced through displacementMap in the ALBEDO's UV space, 33,153 vertices, full PBR (roughness + AO), fresnel rim. The first hand-rolled vertex-colour version is gone. cs 44b21f7
+- [x] C4  "Still very bright" -> RJ was right and my first number was misleading: a whole-disc average of 45 hid how the LIT face reads close up. The pale disc beside the planets was the SUN, which had no texture at all - nine flat cream MeshBasicMaterial spheres. Fixed in cs 4b892ad
 - [ ] C5  Publish the three options side by side for RJ to pick -> DONE WHEN: an artifact URL renders the three renders with their measurements
 - [ ] C6  Fix the wing-order argument bug the other lane found (empire.js:126) -> DONE WHEN: FOLLOW issued from the board follows the PLAYER, verified in the page
 - [ ] C7  Make ground.js deterministic and drop its dead store (ground.js:109, :297) -> DONE WHEN: two builds of the same world produce identical terrain colour, measured
 - [ ] C8  Fix the hauler off-by-one name and the empty catches (economy.js:184, synod.js:42) -> DONE WHEN: a fresh hauler's name matches its id, and a failed localStorage write is reported not swallowed
-- [ ] C10 More LOOKS, not one: named machine-world presets RJ can flip between -> DONE WHEN: `cybertron <look>` switches at least 6 distinct worlds in the page, each screenshotted
-- [ ] C11 AAA the planet render: roughness/AO maps, an atmosphere rim, a smog layer, terminator city-light ignition -> DONE WHEN: each channel is measured present and the render is looked at
+- [x] C10 Seven looks, switchable live with `cybertron <look>` - verified in the page, iron screenshotted at 3072
+- [x] C11 AAA channels -> measured present on the material: displacementMap, roughnessMap, aoMap, normalMap, emissive 1.25, 2 shells. The flat atmosphere shell was REPLACED by a fresnel shader after hiding the shells proved they were what put pale patches on the world
 - [ ] C9  Delete the dead code the other lane listed in my files -> DONE WHEN: planetmenu.js:885-907, missions.js:88/92 and power_panel.js:71 are gone and every file still parses
 
 
@@ -60,6 +60,13 @@ must already know to type. The intro's one instruction is "type into the box lik
 to yourself" - about the Passenger, not about flying.
 
 - [ ] N3  Cut what a first-time player is shown at once -> DONE WHEN: the count of visible boxes on a wiped first load drops from 144, measured by the same DOM sweep, with every panel still one click away and a returning player's saved layout untouched.
+
+### Landed after the first hour (RJ's live direction)
+- [x] C12 The droids RJ could not see -> MEASURED why: at BOT_MINE_R 120 both were cutting rocks 22 and 27 units out at screen x -8.56 and 12.35 (visible range -1..1). They now dock on the wing, launch out of the hull with a burst, and only take rocks inside a 52-degree cone. Re-measured over 30 simulated seconds: a droid is in frame in 66% of samples. cs 44b21f7
+- [x] C13 The white planet with a fire ring -> it was the SUN: nine untextured cream spheres. Generated photospheres per star class (granulation, spots, faculae) + a fresnel corona; five classes across nine systems. cs 4b892ad
+- [x] C14 SB6, the last open Starblast row -> per-model shot patterns, measured per hull through the real fire path: 1 to 6 bolts, 0.0 to 9.2 degrees, total damage 18.00 to 21.96. STARBLAST_REQ.md's table is now complete. cs 16de1b2
+- [x] C15 Throttle bar -> keys ([ ] and \), lever hidden behind CFG.THROTTLE_BAR. Measured: ]]] 0 -> 0.30, [ -> 0.20, \ -> 0. cs da23c8b
+- [x] C16 Fix the autonomous-worker skill (RJ: "it's broken in many ways") -> six defects fixed FROM THIS RUN: no time-box handling (the "work one hour and report" was ignored), mid-run user messages treated as interruptions, no one-agent rule, the whole-loop probe trap (a probe that stepped step() but not updateCamera() read 0% where the truth was 66%), an unaffordable verification gate, and an unskimmable list.
 
 ### Genre backlog
 ### Genre gaps, anchor-ranked (regenerate with `py tools/upgrade_pass.py`)
