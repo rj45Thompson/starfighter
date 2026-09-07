@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T02:10:11",
+ "generated": "2026-09-07T02:34:27",
  "modules": [
   {
    "file": "acquire.js",
@@ -2151,7 +2151,7 @@
   },
   {
    "file": "sound.js",
-   "lines": 620,
+   "lines": 640,
    "classes": [
     {
      "name": "SOUND",
