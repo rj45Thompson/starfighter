@@ -2445,7 +2445,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-403",
-    "note": "first-person surface walk: seeded heightfield, 53 solids, pointer-lock look, jump rise 1.18m"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). LEAVE: dock, then the land/disembark/surface command (index.html:4788) -> AWAY.enter(pl) puts the player ON FOOT ('Landed ... on foot. W A S D walk / Shift run / Space jump / F interact' :7678); launch returns to the ship. MOVE: ground.js is a real first-person walker - update() :282-317 reads WASD/arrows into a yaw-relative wish direction, accelerates S.vel (WALK 6.2 / RUN 11.5 with Shift; ACCEL 34 / FRICTION 11), jumps (Space -> vel.y=JUMP 7.4 while onGround), applies GRAVITY 22, moves cam.position with blocked() collision against ~53 solids, clamps to the arena, and ground-clamps to the seeded heightfield at EYE 1.7; pointer-lock drives yaw/pitch. OBSERVABLE: node scratchpad/f46_surface_walk_replay.js -> PASS - slices the real update() movement (282-317) and drives it on flat open ground: KeyW walks 5.18m in 1s, Shift runs 7.98m (faster), Space jumps to apex 1.18m (matching this note's figure EXACTLY; analytic JUMP^2/2G = 1.24m) then lands onGround, and a wall stops the walk. Distinct from F45 (this is the on-foot layer, not exploration data).",
+    "settledFrom": "index.html land command :4788 -> AWAY.enter (on foot; launch returns), 'Landed ... W A S D walk' :7678; ground.js first-person update() :282-317 (WASD->yaw-relative wish, WALK 6.2/RUN 11.5, JUMP 7.4/GRAVITY 22, blocked() collision, heightfield ground-clamp EYE 1.7). Measured node scratchpad/f46_surface_walk_replay.js PASS (walk 5.18m / run 7.98m / jump apex 1.18m / wall stop)"
    }
   },
   {
