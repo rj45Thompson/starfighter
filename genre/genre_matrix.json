@@ -206,9 +206,10 @@
     }
    },
    "ours": {
-    "v": "partial",
+    "v": "yes",
     "uc": null,
-    "note": "POWERPANEL.setPower / readDivert / COL_WEAPONS-ENGINES-SHIELDS exist in model.json but no use case claims it works"
+    "note": "Full X-Wing power triad, wired into the sim - not just a UI panel. shipPower(s)={weapons,engines,shields}, default 50 each (index.html:1597; POWER_DEFAULT:50 at :492). powerMult(level)=0.4+(level/100)*1.2 -> 0.4@0 / 1.0@50 / 1.6@100 (:1598; POWER_MULT_MIN/MAX :492). setPower(s,sys,target) (:1600-1608) sets ONE system and the other two absorb the difference proportionally, keeping the sum == POWER_TOTAL:150 (slack re-clamped :1607 'the pool always stays honest'). The multiplier is CONSUMED every frame: weapons -> fire cooldown W.cd/(...*powerMult(weapons)) (player :6830, AI :2509, slot :2536) + laser-cap regen (:1654); engines -> real speed engMult (:2580) + engine-cap regen (:1655); shields -> shieldMax (:1609) + regen rate (:1616). Player reroutes IN FLIGHT via 'power weapons|engines|shields <0-100>' (:4636, alias pwr); the passenger auto-reroutes too (passengerPowerTick :3178, setPower :3184). The old 'partial' was 'setPower symbols exist in model.json but no UC claims it works' - a direct code read + node replay settles it yes. Matches the anchor bar (elite_dangerous=yes, ftl=yes).",
+    "settledFrom": "code read + node numeric replay of powerMult/setPower 2026-09-06"
    }
   },
   {

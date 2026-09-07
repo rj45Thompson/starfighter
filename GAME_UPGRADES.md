@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 19:56 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 20:07 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -12,11 +12,11 @@ rather than as a confident wrong number.
 | modules in the class model | 54 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 46 / 11 / 13 / 0 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 47 / 10 / 13 / 0 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
-34 done · 11 open · 0 blocked · 1 dropped with a reason
+35 done · 11 open · 0 blocked · 1 dropped with a reason
 
 - open **C5** Publish the three options side by side for RJ to pick
 - open **C6** Fix the wing-order argument bug the other lane found (empire.js:126)
@@ -64,14 +64,14 @@ F34   3/6  4/6      partial     attacking one faction raises standing with its r
 F69   3/7  4/7      no          the game offers colourblind or other accessibility options
 F66   3/8  4/8      partial UC-506 NPC dialogue is voiced
 F45   3/8  3/8      partial UC-203 player can discover unvisited systems and record or sell the data
-F03   2/8  5/8      partial     player can divert ship power between weapons, engines and shields during flight
 F10   2/8  3/8      no          player manages internal crew and damage control aboard their own ship
 F29   2/8  3/8      no          player can capture an enemy ship and keep it
+F08   2/8  2/8      no          player can pause or slow time in combat to issue orders
 
 == UNRESOLVED - not enough evidence to place these either way (0) ==
 These are NOT low-priority. They are unmeasured. Settling one is its own task.
 
-== ALREADY HAVE (46) ==
+== ALREADY HAVE (47) ==
   F02   7/8   -  ship movement carries momentum or inertia rather than instant-stop arcade handling
   F07   7/8   UC-101  player can mine asteroids or resource nodes for sellable material
   F12   7/8   UC-107  player advances mainly by buying larger hull classes rather than levelling one hull
@@ -82,7 +82,7 @@ These are NOT low-priority. They are unmeasured. Settling one is its own task.
   F61   7/8   UC-109  a radar or scanner shows nearby objects around the ship
   F01   6/8   UC-101  player directly pilots a single ship in real time
   F05   6/7   UC-110  firing drains a regenerating energy pool that limits sustained fire
-  ... and 36 more
+  ... and 37 more
 ```
 
 ## Ready-to-take task lines
