@@ -101,7 +101,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-101",
-    "note": "pilot shoots a rock in flight; E1 loop is direct real-time control"
+    "note": "The player DIRECTLY pilots a SINGLE ship in REAL TIME. Single ship: ships[0] alone is the player - (function(){ const P=ships[0]; P.role='player'; P.name='YOU'; ... })() (index.html:6579); the other 62 ships run think() AI (:2667). Direct analog piloting: a flight keydown (:6896) does keysDown.add(code) then applyKeys() (:6865-6872), mapping the rebindable KEYBIND (thrust=Space, WASD flies, F fires, :6857) plus always-on arrow/right-shift fallbacks to the analog MAN intents thr/yaw/pitch/fire/nitro and arming manOn() (MAN.active=true). Real time: frame(now) is requestAnimationFrame-driven (:7766, re-armed :7776, kicked off :7778) and calls step(dt) (:7771); step hands ONLY ships[0] && MAN.active to manualControl (:2663), which writes s.ctrl={thr,pitch,yaw} from MAN (:6808) and fires the gun; flyStep integrates EVERY ship EVERY frame for smooth motion (:2668, comment :2665) - not turn-based, not click-to-move orders. Matches the anchor bar (Starblast/Elite/Freelancer/EV Nova direct-pilot; vs Space Rangers 2 click-to-move and FTL never steers).",
+    "settledFrom": "code read + node scratchpad/f01_pilot_replay.js (19/19 PASS, adversarially teeth-checked) 2026-09-07"
    }
   },
   {
