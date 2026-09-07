@@ -2179,9 +2179,10 @@
     }
    },
    "ours": {
-    "v": "yes",
+    "v": "partial",
     "uc": "UC-218",
-    "note": "galaxy persists across reloads AND generations; starmap.js galaxySig/rebuildLayout, ground.js seeded heightfield per world"
+    "note": "RE-GRADED yes -> PARTIAL (2026-09-07, MEASURED; the seed conflated 'seeded/persistent' with 'procedurally generated'). The galaxy IS built under a seeded PRNG (withSeed(galaxySeed()) index.html:6565) and persists across reloads/generations - but only the PLACEMENT is procedural; the IDENTITY is HAND-AUTHORED. Every galaxy has the SAME 9 named systems (SYSNAMES[0..8] = Sol/Vega/Antares/Rigel/Lyra/Draco/Cygnus/Perseus/Aquila :1472) holding the SAME 16 named planets (PNAMES :1468) of the SAME types (PTYPES cycled i%5 :1449) in the SAME home systems (i%9), with the SAME per-name specialties (name-hash :1467) and the SAME nearest-2 jump lanes (starmap NEIGHBORS 2). Those assignments use i%len with NO rand (makeSystems :1515, makePlanets :1525/:1529); the game's own comment says 'planets regenerate in a fixed order, NO rng' :1456-1459. Only orbital positions/radii/elevations/nebulae vary with the seed (rand at :1513/:1526/:1527). So the sector LAYOUT is identical across game-starts (exactly the x_series genre 'no'); the seeded placement is what makes it PARTIAL rather than no. OBSERVABLE: node scratchpad/f41_galaxy_replay.js -> PASS (parses the authored tables, prints the invariant 9-system/16-planet skeleton, asserts identity is rand-free while placement is rand-driven).",
+    "settledFrom": "index.html galaxy build: withSeed(galaxySeed()) :6565 wraps makePlanets/makeSystems, but IDENTITY is authored constants cycled i%len with no rand - SYSNAMES :1472 (9 used), PNAMES :1468 (16 used), PTYPES :1449 (i%5), BASE_TYPES name-hash :1460/:1467 (comment 'fixed order, NO rng' :1456), starmap nearest-2 lanes; only positions/radii/elevations use rand (:1513/:1526/:1527). Measured node scratchpad/f41_galaxy_replay.js PASS. Re-grade yes->partial: procedural PLACEMENT on a hand-authored skeleton"
    }
   },
   {
