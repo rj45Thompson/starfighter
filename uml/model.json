@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T05:21:01",
+ "generated": "2026-09-07T08:25:29",
  "modules": [
   {
    "file": "acquire.js",
@@ -1005,6 +1005,26 @@
     "PRNG"
    ],
    "cfgTotal": 20
+  },
+  {
+   "file": "guide.js",
+   "lines": 73,
+   "classes": [
+    {
+     "name": "GUIDE",
+     "members": [
+      "hit",
+      "boot",
+      "finish",
+      "_state"
+     ],
+     "memberTotal": 4
+    }
+   ],
+   "functions": [],
+   "functionTotal": 0,
+   "cfg": [],
+   "cfgTotal": 0
   },
   {
    "file": "hullmodels.js",

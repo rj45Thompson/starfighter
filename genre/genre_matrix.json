@@ -3074,10 +3074,10 @@
     }
    },
    "ours": {
-    "v": "partial",
+    "v": "yes",
     "uc": null,
-    "note": "A scripted opening teaches the CONTROLS, but there is no guided gameplay opening. The FIRST FLIGHT card (index.html:3297+, from N1) is GENERATED FROM KEYBIND (:3304) and shown before the lore on a first run - it teaches thrust/turn/pitch/fire/nitro plus a first objective (:3320-3324) and stays reachable via the '?' button (N2). That is why partial, not no. But it is a static key card, NOT the guided opening MISSION the anchors have (Freelancer's scripted escort mission, Elite's tutorial mission, EV Nova's mentor-guided opening, X's guided start scenarios); nothing walks a new player through the mine->sell->upgrade loop. The old note ('PASSENGER.INTRO/introLines symbols exist in model.json but no UC covers a tutorial') was STALE - it predated the card and implied nothing existed.",
-    "settledFrom": "code read of the FIRST FLIGHT card vs the anchor tutorials 2026-09-06"
+    "note": "BUILT 2026-09-07 (F58): a live GUIDED OPENING now walks a first-time player through the core loop. guide.js (a self-contained module loaded by index.html) shows a first-run-only, dismissible HUD banner that advances step-by-step as the player DOES each action: STEP 1 'shoot a rock, scoop the gems' -> STEP 2 'fill the GEM BAR to bank a point' -> STEP 3 'press 1-8 to spend it on an upgrade' -> done. Driven by the REAL loop functions via window.GUIDE.hit: gemBarAdd (index.html:2197, collect + bank) and spendStat (:2205, upgrade) - the same already-player-gated hooks, no fuzzy detection. Shown ONLY to a brand-new player (no SF_SAVE_v1 save AND not SF_GUIDE_v1-seen); sets SF_GUIDE_v1 on finish/skip and never reappears; an existing player with a save never sees it. This is the guided gameplay opening the 8/8 anchors have (Freelancer escort / Elite tutorial / EV Nova mentor / X scenarios) that the earlier static FIRST FLIGHT card (still there, teaches the keys) lacked - so partial -> yes.",
+    "settledFrom": "BUILT guide.js + verified live via H2: node scratchpad/guide_verify.js RESULT PASS (boots step 1; advances collect/bank/upgrade through the real hooks; seen-flag + save-gate both suppress replay) 2026-09-07"
    }
   },
   {

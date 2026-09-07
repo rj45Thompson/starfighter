@@ -321,6 +321,8 @@
 <script src="panels.js?v=20260906e"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260906b"></script>
+<script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
+
 <script type="module" src="brain/brain.js?v=20260906e"></script><!-- THE PASSENGER'S BRAIN (2026-09-06): the anchor reasoning engine over the novel, the lore, the live game and the world shards; a module, so it runs after every classic script here -->
 
 <script src="item_icons.js?v=20260714c"></script>
@@ -2194,15 +2196,15 @@ function hullTierIdx(key){ const H=HULLS[key]; let i=HULL_ORDER_ORIGINAL.indexOf
 function nextTierHull(s){ const i=hullTierIdx(s.hullClass); return (i>=0&&i<HULL_ORDER_ORIGINAL.length-1)?HULL_ORDER_ORIGINAL[i+1]:null; }
 function statsMaxed(s){ ensureStat(s); return CFG.STAT_ORDER.every(k=>s.stat[k]>=CFG.STAT_MAX); }
 function tierUpReady(s){ return !!(CFG.TIER_UP && s && s.role==='player' && s.alive && statsMaxed(s) && s.gemPts>=1 && nextTierHull(s)); }
-function gemBarAdd(s,credits){ if(!CFG.GEM_BAR||!s||s.role!=='player'||!(credits>0)) return 0; ensureStat(s); s.gemBar+=credits*CFG.GEM_BAR_RATE; let banked=0;
+function gemBarAdd(s,credits){ if(!CFG.GEM_BAR||!s||s.role!=='player'||!(credits>0)) return 0; ensureStat(s); if(window.GUIDE) GUIDE.hit('collect');   /* F58 guided loop: player scooped a gem */ s.gemBar+=credits*CFG.GEM_BAR_RATE; let banked=0;
   while(s.gemBar>=CFG.GEM_BAR_MAX && s.gemPts<CFG.GEM_PTS_CAP){ s.gemBar-=CFG.GEM_BAR_MAX; s.gemPts++; banked++; }
   if(s.gemPts>=CFG.GEM_PTS_CAP) s.gemBar=Math.min(s.gemBar,CFG.GEM_BAR_MAX);   // at the cap the bar just sits full - nothing is silently lost into a counter nobody can read
-  if(banked){ term(`◆ GEM BAR full - <b>${banked}</b> upgrade point${banked>1?'s':''} banked (<b>${s.gemPts}</b> ready) - keys <b>1-8</b> spend one`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.flash(); }
+  if(banked){ term(`◆ GEM BAR full - <b>${banked}</b> upgrade point${banked>1?'s':''} banked (<b>${s.gemPts}</b> ready) - keys <b>1-8</b> spend one`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.flash(); if(window.GUIDE) GUIDE.hit('bank'); }
   if(tierUpReady(s)) offerTierUp(s); return banked; }
 function spendStat(s,k){ if(!s) return {ok:false,msg:'no ship'}; ensureStat(s); if(!CFG.STAT_GAIN[k]) return {ok:false,msg:`no such stat - ${CFG.STAT_ORDER.join(' / ')}`};
   if(s.gemPts<1) return {ok:false,msg:`no upgrade point yet - the gem bar is ${Math.round(100*s.gemBar/CFG.GEM_BAR_MAX)}% full`};
   if(s.stat[k]>=CFG.STAT_MAX) return {ok:false,msg:`${CFG.STAT_LABEL[k]} is already at the max level (${CFG.STAT_MAX})`};
-  s.gemPts--; s.stat[k]++;
+  s.gemPts--; s.stat[k]++; if(window.GUIDE) GUIDE.hit('upgrade');   /* F58 guided loop: player spent a point on an upgrade */
   term(`▲ <b>${CFG.STAT_LABEL[k]}</b> Lv${s.stat[k]}/${CFG.STAT_MAX} (×${statMult(s,k).toFixed(2)}) · ${s.gemPts} point${s.gemPts===1?'':'s'} left`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.refresh();
   if(tierUpReady(s)) offerTierUp(s); return {ok:true, lvl:s.stat[k], mult:statMult(s,k)}; }
 function offerTierUp(s){ const n=nextTierHull(s); if(!n) return; if(!s._tierOffered||s._tierOffered!==n){ s._tierOffered=n; term(`⬆ <b>TIER UP READY</b> - every stat maxed and a point banked: take the <b>${HULLS[n].n}</b> from the UPGRADES window (or <b>tierup</b>)`,'sys'); if(window.SOUND) SOUND.play('ui'); }
