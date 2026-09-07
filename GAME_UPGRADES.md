@@ -1,6 +1,6 @@
 # Star Fighter - upgrade report
 
-Generated 2026-09-06 18:14 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
+Generated 2026-09-06 18:26 by `py tools/upgrade_pass.py`. Every number here is produced by a tool in
 this repo; nothing is typed in by hand, so a stale figure shows up as a failed pass
 rather than as a confident wrong number.
 
@@ -12,11 +12,11 @@ rather than as a confident wrong number.
 | modules in the class model | 54 | Regex-extracted from source. A module that exposes its API through a parameter alias instead of `window.NAME` is invisible to it. |
 | genre capabilities surveyed | 70 across 8 games | The missing denominator: what published space games do, whether or not we do it. |
 | genre cells decided / grounded with a source | 537 of 560 decided, 274 grounded | `unknown` is kept as `unknown`. Ungrounded cells are recall and are counted apart from evidence. |
-| ours: yes / partial / no / unknown | 46 / 10 / 11 / 3 | Against the genre list, not against our own use cases. |
+| ours: yes / partial / no / unknown | 46 / 11 / 11 / 2 | Against the genre list, not against our own use cases. |
 
 ## The live list (TASKS.md)
 
-18 done · 17 open · 0 blocked · 1 dropped with a reason
+19 done · 17 open · 0 blocked · 1 dropped with a reason
 
 - open **C1** Generate option A, the procedural machine-world skin
 - open **C2** Generate option B, a FLUX Cybertron skin through the seam repair
@@ -61,7 +61,7 @@ F06   4/8  5/8      no          player can target and disable individual subsyst
 F09   4/8  5/8      partial     flight is full 3D with pitch, yaw and roll rather than a fixed plane
 F17   4/8  4/8      partial UC-217 player unlocks new technology through research over time
 F68   3/7  6/7      unknown     the game supports a gamepad
-F34   3/6  4/6      unknown     attacking one faction raises standing with its rival
+F34   3/6  4/6      partial     attacking one faction raises standing with its rival
 F69   3/7  4/7      unknown     the game offers colourblind or other accessibility options
 F66   3/8  4/8      partial UC-506 NPC dialogue is voiced
 F45   3/8  3/8      partial UC-203 player can discover unvisited systems and record or sell the data
@@ -106,7 +106,7 @@ Paste into TASKS.md and give each one an observable before starting it.
 - [ ] F09  flight is full 3D with pitch, yaw and roll rather than a fixed plane -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 5 grounded; ours=partial  -->
 - [ ] F17  player unlocks new technology through research over time -> DONE WHEN: <observable>   <!-- anchor 4/8 games, 4 grounded; ours=partial UC-217 -->
 - [ ] F68  the game supports a gamepad -> DONE WHEN: <observable>   <!-- anchor 3/7 games, 6 grounded; ours=unknown  -->
-- [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=unknown  -->
+- [ ] F34  attacking one faction raises standing with its rival -> DONE WHEN: <observable>   <!-- anchor 3/6 games, 4 grounded; ours=partial  -->
 ```
 
 ## Tool output this pass
