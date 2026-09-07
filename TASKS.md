@@ -1,5 +1,21 @@
 # Star Fighter - work list
 
+## ▸ LANE STATUS 2026-09-07 (STARFIGHTER-WORKER) — IDLE, list complete
+**0 open · 0 blocked · 121 done · 1 dropped.** Every RJ-reported defect is fixed AND verified against a
+re-runnable observable: combat **B10** (immortal), **B11** (nothing to fight), **B12** (confirmed NOT a defect),
+**B13** (campaign resolves in minutes), and audio **M1** ("music OFF" now truly silences the F67 synth —
+`node scratchpad/m1_music_off_verify.js` → 8/8, live headless-Chrome CDP). Final capstone pass:
+`node scratchpad/stability_check.js` → **PASS** (real game, 5.57 ms/frame, 0 errors, no NaN, bounded growth).
+Graph settled — genre **52 yes / 6 partial / 12 no / 0 unknown** (~all anchors≥2); defects topic clean (the
+stale `MUSIC.set stomped by poller` claim was corrected to `no` — current music.js:281 already guards it via
+`if(manual) return`, and it has 0 game callers).
+**STOP file set** (`STOP_autobot-breakout`) — the keep-alive will not respawn this lane. To resume, delete that file.
+**Waiting on RJ (needs a steer, NOT a reflexive worker pick):** F60 difficulty/starting-scenario picker (5/7),
+F17 research tech tree (4/8), F06 target/disable enemy subsystems (4/8) — each a product-shaping build. Off the
+table without infrastructure: F40/F56 multiplayer, F66 voiced dialogue, F41 procedural-galaxy identity rewrite.
+Hands-off (reported to the other lane, in their files): sbhud.js UPGRADES-panel-defaults-open clutter, F35
+mission-failure state.
+
 ## Open - RJ played it and combat does not work (2026-09-07)
 
 RJ: *"I don't seem to take damage, or can't die easy at all, also I can't kill other enemies"* and
