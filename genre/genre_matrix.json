@@ -2339,7 +2339,8 @@
    "ours": {
     "v": "no",
     "uc": "UC-304",
-    "note": "lanes join systems, not points inside one; no in-system fast-travel layer is described"
+    "note": "SETTLED no, PROVEN BY GREP (2026-09-07, THIN->anchors=2). Star Fighter has ONE in-system flight layer - real-space combat flight - and no separate high-speed 'supercruise'-style layer. Zero hits across the 48 scanned game files (index.html + root *.js minus the 3 vendored libs) for supercruise / fast-travel / cruise mode|layer|drive / time-accel|warp / instant travel / warp-to-planet / frame-shift. The go/warp autopilot sets P.obj={type:'goto',planet} and flies REAL-SPACE at the ship's normal speed ('hyperspace REMOVED (balance): the player flies real-space too' index.html:2449) - it steers, it does not fast-travel. The THROTTLE 'cruise speed / cruise level' (:231-232,:405) is a SPEED control within that one layer, not a distinct travel mode. Between-system travel is the fuel-gated JUMP (F42/F43), a different capability. GUARDED: tools/genre_selfcheck.js 5th cell (0-hit regex that excludes the throttle 'cruise', the 'Cruiser' hull, and conquest's 'fast-forward the war') - flips to FAIL the moment a supercruise/cruise-mode/time-accel layer lands.",
+    "settledFrom": "grep-proven absence over the 48 scanned game files: 0 hits for supercruise/fast-travel/cruise-mode/time-accel/instant-travel/warp-to-planet/frame-shift. In-system = real-space flight only (go/goto autopilot at normal speed, hyperspace removed in-system :2449); throttle is a speed control :231-232; between-system = fuel jump (F42/F43). Guarded by tools/genre_selfcheck.js F44"
    }
   },
   {

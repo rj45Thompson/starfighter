@@ -15,6 +15,7 @@
 //   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0) [2026-09-06]
 //   F29  capture an enemy ship and keep it      -> no  (grep commandeer|hijack|capture-a-ship|board-enemy|... = 0) [2026-09-07]
 //   F40  real-time multiplayer (many humans)     -> no  (grep WebSocket|RTCPeer|socket.io|multiplayer|... = 0)     [2026-09-07]
+//   F44  in-system fast-travel layer             -> no  (grep supercruise|fast-travel|cruise mode|time-accel|... = 0) [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -50,6 +51,12 @@ const GUARDS = [
   // GAMEMOD.emit (gamemod.js, a local mod event bus). Any hit means a real-time-multiplayer transport (WebSocket /
   // WebRTC / socket.io / peer) has landed. Verified 0 hits across the 48 scanned files at settlement.
   { id: 'F40', label: 'real-time multiplayer', re: /new WebSocket|WebSocket\s*\(|RTCPeerConnection|RTCDataChannel|createDataChannel|socket\.io|\bio\.connect\b|\bmultiplayer\b|matchmak(e|ing)|\bnetcode\b|peer(js|-to-peer)|\bMMO\b|co-?op (session|multiplayer)|other human players?/i },
+  // F44 (2026-09-07): an in-system FAST-TRAVEL LAYER distinct from combat flight (Elite-style supercruise). Tight
+  // patterns only, so it never trips on the THROTTLE's "cruise SPEED / cruise level" (a speed control, not a travel
+  // layer, index.html:231-232/:405), the "Cruiser" HULL, or conquest.js's "does not fast-forward the war" :52. In-
+  // system travel is real-space flight (go/goto autopilot at normal speed; hyperspace is BETWEEN systems, F42/F43).
+  // Any hit means a supercruise / cruise-mode / time-accel / instant-travel layer has landed.
+  { id: 'F44', label: 'in-system fast-travel layer', re: /supercruise|super-cruise|\bfast.?travel\b|cruise (mode|layer|drive|state|lane)|time.?(accel|warp|dilation)|instant(aneous)? (travel|transit|arrival|jump)|jump.?to.?point|warp.?to.?(planet|point|world)|autotravel|frame.?shift/i },
 ];
 
 function gameFiles() {
@@ -105,7 +112,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');
