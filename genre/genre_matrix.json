@@ -3689,7 +3689,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no VR module or use case; the renderer is a browser three.js canvas"
+    "note": "SETTLED no (2026-09-07, THIN->anchors=2, grep-proven + guarded). The renderer is a FLAT browser three.js canvas - no VR. NO WebXR/VR API: 0 hits across all 48 scanned files (index.html + root *.js minus 3 vendored) for webxr / navigator.xr / renderer.xr / VRButton / VRDisplay / getVRDisplays / XRSession / XRWebGLLayer / immersive-vr / WebVR / oculus / openxr (deliberately NOT a bare 'VR' token, which false-positives on the 'vr' verdict variable in tom_test.js). FLAT RENDERER: a normal new T.WebGLRenderer, renderer.xr never enabled, no setAnimationLoop (the loop a WebXR session requires), the frame loop is a plain top-level requestAnimationFrame(frame) that does not run inside an immersive XR session; no VRButton / enter-VR entry point. Low-anchor no (Elite Dangerous / X4 ship VR; Starblast/SR2/Freelancer/EVE/FTL/EV Nova do not). OBSERVABLE: node scratchpad/f70_vr_replay.js -> PASS (5 asserts); GUARDED as the 9th 'no' cell in tools/genre_selfcheck.js (0-hit WebXR regex + --self-test) so the grade fails loudly the moment a VR/WebXR path lands.",
+    "settledFrom": "grep-proven absence: WebXR/VR API 0 hits across 48 scanned files (webxr/navigator.xr/renderer.xr/VRButton/VRDisplay/XRSession/immersive-vr/WebVR/oculus/openxr; not a bare VR token); flat three.js WebGLRenderer, no renderer.xr, no setAnimationLoop, plain requestAnimationFrame(frame) boot. Guarded tools/genre_selfcheck.js (9th no-cell). Measured node scratchpad/f70_vr_replay.js PASS"
    }
   }
  ],

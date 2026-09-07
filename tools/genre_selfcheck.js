@@ -19,6 +19,7 @@
 //   F48  permadeath (death ends the run)         -> no  (grep permadeath|ironman|hardcore|permanent death|... = 0)   [2026-09-07]
 //   F56  co-op / PvP with other humans           -> no  (grep PvP|player-vs-player|multiplayer|matchmak|... = 0)     [2026-09-07]
 //   F60  pick a difficulty or start scenario      -> no  (grep choose/select difficulty|scenario picker|hard mode|... = 0) [2026-09-07]
+//   F70  supports VR headsets                      -> no  (grep webxr|navigator.xr|VRButton|VRDisplay|XRSession|... = 0) [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -81,6 +82,12 @@ const GUARDS = [
   // "difficulty in the ZONE" (:4729), the empire/engbay mid-game pickers, or the choice-less `newgame`. Any hit
   // means a difficulty / scenario / game-mode picker has landed. Verified 0 hits across the 48 scanned files.
   { id: 'F60', label: 'difficulty / start-scenario picker', re: /(choose|select|pick|set)\s+(a\s+|your\s+|the\s+)?(difficulty|game.?mode|starting scenario|start scenario|scenario)\b|difficulty\s*(select|picker|slider|setting|option|level|menu|screen|chooser)|scenario\s*(select|picker|menu|screen|chooser|choice|list|preset)|\b(easy|normal|hard|casual|iron ?man|hard ?core)\s+(mode|difficulty)\b|game.?mode\s*(select|picker|menu|option)|choose your (difficulty|scenario|start)/i },
+  // F70 (2026-09-07): the game supports VR headsets. Graded "no" - the renderer is a flat browser three.js canvas;
+  // 0 hits for the WebXR/VR API surface across the 48 scanned files. Deliberately NO bare \bVR\b (it false-positives
+  // on the `vr` verdict variable in tom_test.js) - matches only real VR/WebXR APIs (navigator.xr, renderer.xr,
+  // VRButton, VRDisplay/getVRDisplays, XRSession/XRWebGLLayer, immersive-vr, WebVR, oculus/openxr). Any hit means a
+  // VR/WebXR render path has landed. Verified 0 hits + fires on a planted navigator.xr.requestSession('immersive-vr').
+  { id: 'F70', label: 'VR headset support', re: /webxr|navigator\.xr\b|renderer\.xr\b|\.xr\.(enabled|setSession|getSession|isPresenting|setReferenceSpaceType)|\bVRButton\b|\bXRButton\b|VRDisplay|getVRDisplays|requestSession|isSessionSupported|immersive-vr|\bWebVR\b|XRSession|XRWebGLLayer|XRReferenceSpace|XRControllerModel|stereoscopic|\boculus\b|openxr|cardboard vr/i },
 ];
 
 function gameFiles() {
@@ -136,7 +143,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath, F56 co-op/PvP, F60 difficulty/scenario picker) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath, F56 co-op/PvP, F60 difficulty/scenario picker, F70 VR headsets) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');
