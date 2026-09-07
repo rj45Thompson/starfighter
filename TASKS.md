@@ -1,5 +1,21 @@
 # Star Fighter - work list
 
+## Open - RJ played it and combat does not work (2026-09-07)
+
+RJ: *"I don't seem to take damage, or can't die easy at all, also I can't kill other enemies"* and
+*"the rounds are going way too quick, hegemon victory every few minutes."*
+
+All four measured in the live game with the harness before writing this, so each item changes a
+known number. Direction is RJ's; the numbers are yours to derive and then MEASURE.
+
+- [ ] B10 The player is effectively immortal -> **MEASURED: 30 simulated seconds under continuous fire from FOUR point-blank pirates left hp at 70/70 - exactly where it started.** The shield dipped 34 -> 27.3 -> 17 and fully regenerated every time; hull touched 68.4 once and healed back. `SHIELD_REGEN_BASE:3`/s with `SHIELD_REGEN_DELAY:2.5` out-regenerates four attackers. DONE WHEN: the same four-pirate test kills the player, the time-to-death is reported in seconds, and a solo pirate still does NOT kill a competent player quickly - report both numbers.
+- [ ] B11 There is almost nothing to fight -> **MEASURED: 2 pirates alive against `enemyCap()` = 11, in a galaxy of 35 squad ships.** The population sits far below its own ceiling, so "I can't kill other enemies" is mostly "there are no enemies". DONE WHEN: the steady-state pirate count is measured over several simulated minutes and sits near the cap, not near zero - report the before and after counts.
+- [ ] B12 Enemies are tanky relative to player damage -> **MEASURED: a pirate has 260 hp against the player's 70. Three seconds of point-blank continuous fire removed 56 hp (21%)**, i.e. roughly 14 seconds of sustained fire to kill one. DONE WHEN: time-to-kill for a single pirate is reported before and after and lands somewhere a player would call a fight rather than a chore. ⚠ This interacts with B10 - do not fix both by making everything fragile; the goal is a fight with stakes on both sides.
+- [ ] B13 The campaign resolves in minutes -> **MEASURED from conquest.js: `SLOW_TICK_S 3`, `INV_CHANCE_BASE 0.02` per owned world per tick ramping to `INV_CHANCE_MAX 0.25`, `INV_ETA_MIN_S 20` + up to 25s random.** At base rate with ~9 coalition worlds that is several invasions launching per minute, each resolving inside a minute - which is exactly "hegemon victory every few minutes". DONE WHEN: a generation takes a length of time RJ would call a campaign, measured by running the war forward and reporting minutes-to-Hegemon-victory before and after. ⚠ conquest.js is the other lane's file - check `git status` first.
+
+⚠ Verify all four with the harness (`?harness=1`), not by reading. The exact reproductions are above;
+re-run them after the change and report the new numbers beside the old ones.
+
 Owner of this list: the "make it better" lane (performance, runtime defects, first-run clarity).
 A SECOND session is building features in this same tree at the same time (economy / empire /
 ground / synod / shell / sbhud, ~1 commit per 4 min on 2026-09-06). **Files that lane owns are
