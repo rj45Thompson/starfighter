@@ -3018,7 +3018,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-503",
-    "note": "the Passenger advises unprompted (UC-502), gets angry when ignored across 4 tiers, calms when obeyed"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). The Passenger (passenger.js), a symbiont AI companion, comments UNPROMPTED on the player's situation. UNPROMPTED: S.advice_on=true by default (:89, 'the worm advises by default'); it reacts to the player's situation via onEvent (:138) - docked/damaged/kill_seen (PASSENGER.onEvent calls across index.html). ANGER MACHINE (noteAdvice :107-118, user 'make the parasite shock your screen and get angry if you do not listen'): re-speaking the SAME urgent advice (the pilot hasn't acted) raises the mood one tier every 2 repeats across 4 moodTier levels (:99), each with a screen SHOCK (PARASITE_SHOCK index.html:400, scaled by the tier); a cleared condition drops it to calm (level 0) with an 'obeyed' line. Speech uses the Qwen sidecar when alive, else a grounded composer (:260-269). OBSERVABLE: node scratchpad/f57_passenger_replay.js -> PASS - slices the real moodTier/noteAdvice and drives them: ignoring the same advice escalates 0->1->2->3 (capped), each angry tier returns {shock,text}, a cleared condition calms to 0 with an 'obeyed' line, and a new advice key resets to calm.",
+    "settledFrom": "passenger.js Passenger companion: advice_on=true by default :89 (unprompted), onEvent :138 reacts to docked/damaged/kill_seen; anger machine noteAdvice :107-118 (same ignored advice -> +1 mood tier per 2 repeats across 4 moodTier :99 levels + screen shock), calms to level 0 with an 'obeyed' line; PARASITE_SHOCK scaled by tier index.html:400. Measured node scratchpad/f57_passenger_replay.js PASS (escalate 0->1->2->3 capped, calm-on-obey, new-key reset)"
    }
   },
   {
