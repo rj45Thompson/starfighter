@@ -62,7 +62,21 @@ card is never swept in. Everything else lives in new files.
       player" - so FOLLOW means follow me again. Before, the board handed the world select to all of them,
       so ATTACK and FOLLOW looked a planet name up in the ship list, found nothing, and issued with no target.
       -> VERIFIED: node --check on all 46 non-vendored .js files, 0 parse failures; all 5 repo guards PASS.
-- [ ] C7  Make ground.js deterministic and drop its dead store (ground.js:109, :297) -> DONE WHEN: two builds of the same world produce identical terrain colour, measured
+- [x] C7  **DONE (2026-09-07) - the code change already landed in bd80334 ("the six findings the other lane handed
+      me"); this pass MEASURED the observable and closed the stale line.** No edit to ground.js (hands-off, and it was
+      already correct). (a) DETERMINISM: the whole world is seeded from the planet NAME - `S.seed = hashSeed(name)`
+      (ground.js:242) feeds `rngOf` (LCG, :54), `vnoise` (:55) and `buildHeight` (:78); the single unseeded
+      `Math.random()` that used to speckle terrain colour was already replaced by a seeded hash
+      `sp = fract(sin(i*12.9898 + S.seed*0.017)*43758.5453)` (:112). grep confirms ZERO live `Math.random(` in the file
+      (the only match is the `// was Math.random()` comment at :109). (b) DEAD STORES: both gone - the :109 unseeded
+      call became the seeded speckle above; the :297 per-frame height sample was removed (documented dead at :301-302,
+      "overwritten below after the move ... 4-5 octave noise per frame").
+      -> MEASURED, not just read: `node tools/ground_determinism.js` -> RESULT PASS (exit 0). It slices the REAL
+         deterministic core (ground.js lines 52-96) out of the file and evals those exact bytes, then builds the terrain
+         colour array (mirrors :102-114) TWICE per world: same world -> byte-IDENTICAL all 77,763 colour components
+         (Mining/Agri/Hi-Tech); controls -> two different worlds differ (all 77,763), and same type + different NAME
+         differs (proves the colour is seed-driven off the name, not trivially constant). The guard also fails loudly on
+         any future live `Math.random(` in ground.js, so it now GUARDS the property. Committed as tools/ground_determinism.js.
 - [x] C8  Fixed, both halves. economy.js:184 takes the id BEFORE the post-increment (`var hid = S.nextId++`)
       and names from it, so the hauler with id 3 is HAUL-3 and no longer HAUL-4. synod.js:42's empty catch is
       gone: a blocked or full localStorage now prints "the Synod could not save its campaign (<error name>) -
