@@ -49,6 +49,14 @@ so the step *totals* are NOT apples-to-apples; the **calls/frame and per-fn shar
 optimized and nothing replaced it. There is no bounded CPU optimization with a clear payoff right now;
 performance is healthy. Reproduce: `node scratchpad/perf_profile.js` (self-cleaning, ~15s, hard-timeout-bounded).
 
+### Runtime-stability regression check 2026-09-07 (H2) — `node scratchpad/stability_check.js`
+A #1-rung defect hunt over this run's additions (storyline.js, survey.js, the `saga`/`survey` commands, the
+`warWin`->`onWarWin` hook — each verified in ISOLATION but never in a COMBINED sustained run). Drove the real
+game ~25 simulated seconds -> **RESULT PASS**: **0 runtime errors**, **no NaN ships**, a **30-command surface
+sweep** (incl. `saga`/`survey` + the B5 bare-arg gear commands `hull`/`tank`/`radar`/… bare) **all executed
+without throwing**, no unbounded growth, ships 39->50 (bounded). No player-hit defect surfaced; the additions
+are runtime-stable in the current game. Reproduce: `node scratchpad/stability_check.js`.
+
 ---
 
 ## Open
