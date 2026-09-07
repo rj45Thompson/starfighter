@@ -1704,7 +1704,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-207",
-    "note": "rank-gated contract taken from the board; missions.js RANK_PATROL..RANK_ASSAULT"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent code read; was the automated symbol seed). Missions are LOCKED BEHIND A RANK threshold (the rank half of 'rank OR reputation'). missions.js (HANDS-OFF - read to verify): per-type rank gates :36-38 (RANK_PATROL 0, RANK_ESCORT/BOUNTY 1, RANK_LIBERATE/SUPPLY 2, RANK_ASSAULT 3), each stamped on the mission by mkMission :113-122 (m.rank = the type's gate; reward/score/rep also scale by (1+rank)). accept(idx) :286-302 is a REAL LOCK, not just board ordering: :293-294 var pr=playerRankIdx(); if(m.rank>pr) return {ok:false, msg:'requires '+rankName(m.rank)+' rank (you are '+rankName(pr)+')'} - it REFUSES a posting above your rank (RANKS index.html:3994 = Recruit 0 .. Legend 5) and NAMES the rank needed, WITHOUT consuming the posting. genBoard still SHOWS locked postings (deprioritized, F30) so you see what to aim for. REPUTATION is a mission REWARD (REP_BASE :32, m.rep :122 = rep gained at the target world), not an accept-gate - so the 'rank OR reputation' capability is met by the rank lock. 2nd source to F16 (which rank-gates PURCHASES; this rank-gates MISSIONS). OBSERVABLE: node scratchpad/f32_rankgate_replay.js -> RESULT PASS 10/10 (VERBATIM accept+playerRankIdx: PATROL is rank 0 / ASSAULT rank 3; score->rank idx maps on the real RANKS; a Recruit is REFUSED the ASSAULT posting 'requires Ace rank (you are Recruit)' and the posting STAYS on the board, but accepts the at-rank PATROL; at Legend rank the ASSAULT unlocks).",
+    "settledFrom": "missions.js per-type rank gates :36-38 + mkMission :113-122 + accept rank-lock :293-294 (refuses over-rank, names the rank, keeps the posting) + node replay; reputation is a mission reward not a gate; anchors 6/8 (all but starblast, ftl)"
    }
   },
   {
