@@ -3377,8 +3377,8 @@
    "ours": {
     "v": "yes",
     "uc": "",
-    "note": "index.html:6729 KB_ACTIONS lists 7 rebindable actions; window._rebindCapture (index.html:6742) grabs the next keypress from the options panel; loadControls/saveControls persist to SF_CONTROLS_v1. Arrow keys + right-Shift are a deliberate un-rebindable fallback so a bad rebind cannot lock you out.",
-    "settledFrom": "code read 2026-09-06"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, sliced+driven - a 2nd read confirming + extending the 2026-09-06 code read). 7 rebindable FLIGHT actions: KB_ACTIONS index.html:6860 (thrust/pitchDown/pitchUp/yawLeft/yawRight/nitro/fire); defaults KB_DEFAULT :6857 (thrust=Space, WASD, fire=KeyF, boost=ShiftLeft). CAPTURE: the keydown handler routes the next keypress to window._rebindCapture :6873 while a rebind is armed; the options panel lists FLIGHT KEYS 'click to rebind' :248 with a red .awaiting state :78, Esc cancels. PERSISTS across sessions: saveControls :6862 writes localStorage SF_CONTROLS_v1, loadControls :6861 merges the saved keybind over KB_DEFAULT at boot :6863 - ROUND-TRIP VERIFIED (rebind fire->KeyJ, save, clobber in memory, load restores KeyJ; unchanged thrust stays Space). Un-rebindable FALLBACK: flightBound :6864 treats the ARROW keys + ShiftRight as always-bound and applyKeys :6866-6871 reads arrows in parallel, so a bad rebind cannot lock you out (VERIFIED: rebind every action onto one key, arrows still fly). The FIRST FLIGHT help card is generated from the live KEYBIND :3325-3329 so the prose never drifts. Anchor 6/6 (every surveyed game with a known answer has it). OBSERVABLE: node scratchpad/f64_rebind_replay.js -> PASS (14 asserts). [Prior note cited :6729/:6742 - line numbers drifted, now :6860/:6873.]",
+    "settledFrom": "code read 2026-09-06; RE-READ 2026-09-07 (anchors=2): sliced KB_DEFAULT/KEYBIND/loadControls/saveControls/flightBound from index.html:6857-6864 and drove them - localStorage SF_CONTROLS_v1 round-trip (rebind persists), arrow/ShiftRight fallback survives rebinding every action. Measured node scratchpad/f64_rebind_replay.js PASS"
    }
   },
   {
