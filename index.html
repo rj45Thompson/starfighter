@@ -434,6 +434,10 @@ const CFG = {
   GEM_BAR:true, GEM_BAR_MAX:48, GEM_BAR_RATE:1.0, GEM_PTS_CAP:64, STAT_MAX:8, TIER_UP:true,
   STAT_GAIN:{shieldCap:0.10, shieldRegen:0.12, energyCap:0.10, energyRegen:0.12, speed:0.05, agility:0.08, damage:0.07, fireRate:0.06},
   STAT_ORDER:['shieldCap','shieldRegen','energyCap','energyRegen','speed','agility','damage','fireRate'],
+  // SB6 - per-model shot pattern: [bolts, half-spread in degrees, damage bonus for splitting the shot]
+  SHOT_PATTERNS:true, SHOT_SPREAD_GAIN:1.0,
+  SHOT_BY_CLASS:{ scout:[1,0,1.0], fighter:[2,1.2,1.06], interceptor:[3,2.2,1.10], freighter:[2,3.4,1.04],
+                  cruiser:[4,3.0,1.14], dreadnought:[5,3.8,1.18], capital:[6,4.6,1.22] },
   STAT_LABEL:{shieldCap:'SHIELD CAP', shieldRegen:'SHIELD REGEN', energyCap:'ENERGY CAP', energyRegen:'ENERGY REGEN', speed:'SPEED', agility:'AGILITY', damage:'DAMAGE', fireRate:'FIRE RATE'},
   GEM_CREDIT_PER_SCALE:2, GEM_FOOD:9, GEM_PICK_R:8.5, GEM_LIFE:26, GEM_MAGNET:26, GEM_GRAB_R:55,
   HP_BASE:100, HP_PER_HULL:0.20, REGEN:2.2, WEAPON_FIRE:0.16, WEAPON_DMG:0.24, ENGINE_GAIN:0.15,
@@ -2138,6 +2142,31 @@ function canUpgradeLvl(s,k){ return (s.lvl[k]||1)<CFG.UP_LVL_CAP; }   // BALANCE
 // shieldTick's rate, capMaxFor + the capacitor regen, flyStep's thrust / vmax / pitch / yaw, the three weapon-damage
 // sites and the two fire-cooldown sites). A ship with no stat block (every AI pilot) reads 1.0 everywhere.
 function statMult(s,k){ return 1+(CFG.STAT_GAIN[k]||0)*((s&&s.stat&&s.stat[k])||0); }
+// SB6: the shot pattern of the ship you are flying. A generated hull inherits its size tier's pattern through
+// visualClass, so all 57 hulls answer this, not just the seven hand-authored ones.
+function shotPattern(s){
+  if(!CFG.SHOT_PATTERNS) return [1,0,1];
+  const H=HULLS[s&&s.hullClass]||null;
+  const key=(s&&CFG.SHOT_BY_CLASS[s.hullClass])?s.hullClass:((H&&H.visualClass&&CFG.SHOT_BY_CLASS[H.visualClass])?H.visualClass:'fighter');
+  return CFG.SHOT_BY_CLASS[key];
+}
+// fire the pattern: n bolts fanned about `aim` in the plane the ship is banked into, damage already divided
+function spawnPattern(s,origin,aim,spec,fwd,side){
+  const pat=shotPattern(s), n=pat[0], half=pat[1]*CFG.SHOT_SPREAD_GAIN*Math.PI/180;
+  if(n<=1){ spawnBullet(origin,aim,s.id,spec); return 1; }
+  const up=UPL.clone().applyQuaternion(s.quat);
+  const axis=up.clone().normalize();
+  for(let i=0;i<n;i++){
+    const t=(n===1)?0:((i/(n-1))*2-1);            // -1 .. 1 across the fan
+    const q=new T.Quaternion().setFromAxisAngle(axis, t*half);
+    const dir=aim.clone().applyQuaternion(q).normalize();
+    // NOTE: no shared scratch vector here - spawnBullet keeps the position it is handed, and the caller's own
+    // _v2 is already holding `origin`. Cloning per bolt is a handful of vectors per shot, not a per-frame cost.
+    const muzzle=origin.clone().addScaledVector(side, t*1.15);
+    spawnBullet(muzzle,dir,s.id,spec);
+  }
+  return n;
+}
 function ensureStat(s){ if(!s.stat){ s.stat={}; CFG.STAT_ORDER.forEach(k=>s.stat[k]=0); } if(s.gemBar==null) s.gemBar=0; if(s.gemPts==null) s.gemPts=0; return s.stat; }
 function capMaxFor(s){ return CFG.LASER_CAP_MAX*statMult(s,'energyCap'); }
 function hullTierIdx(key){ const H=HULLS[key]; let i=HULL_ORDER_ORIGINAL.indexOf(key); if(i<0&&H&&H.visualClass) i=HULL_ORDER_ORIGINAL.indexOf(H.visualClass); return i; }   // generated hulls sit at their size tier's rank
@@ -6791,8 +6820,12 @@ function manualControl(s,dt){ s.obj=null; s.cmd=null; s.mode='MANUAL'; s.target=
     // world point updateTargetingReticle draws - so what you see is what you hit. Nothing ahead -> straight boresight.
     let aim; if(_playerSol && _playerSol.target && _playerSol.target.alive){ aim=_solAim.copy(_playerSol.lead).sub(s.pos).normalize(); s.autoAimId=_playerSol.target.id; }   // forward gun CONVERGES on the fire-control lead box - what you see is what you hit; the jammer/computer error is already baked into sol.lead
     else { aim=fwd; s.autoAimId=null; }   // no target ahead -> fire straight down the nose (matches the boresight crosshair)
-    if(W.twin){ spawnBullet(_v2.copy(s.pos).add(side).addScaledVector(fwd,2),aim,s.id,spec); spawnBullet(_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),aim,s.id,spec); }
-    else spawnBullet(_v2.copy(s.pos).addScaledVector(fwd,2.2),aim,s.id,spec); }
+    // SB6: the hull's pattern decides how many bolts leave the nose and how wide they fan. `twin` weapons keep
+    // their own two barrels by doubling the pattern's count, so a twin cannon on a cruiser is still a twin cannon.
+    const pat=shotPattern(s); spec.dmg=spec.dmg/Math.max(1,pat[0])*pat[2];
+    if(W.twin){ spawnPattern(s,_v2.copy(s.pos).add(side).addScaledVector(fwd,2),aim,spec,fwd,side);
+                spawnPattern(s,_v2.copy(s.pos).sub(side).addScaledVector(fwd,2),aim,spec,fwd,side); }
+    else spawnPattern(s,_v2.copy(s.pos).addScaledVector(fwd,2.2),aim,spec,fwd,side); }
   s.brain={ mode:'MANUAL', target:null, dot:0, ctrl:s.ctrl, threat:false, autoAim:s.autoAimId||null }; }
 const keysDown=new Set();
 // CONFIGURABLE CONTROLS (user 2026-07-13 "make all the keys optional ... options panel"): rebindable FLIGHT keys + mouse

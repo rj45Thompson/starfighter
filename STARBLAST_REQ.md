@@ -18,7 +18,7 @@ Status legend: **HAVE** · **HAVE-partial** · **MISSING**. Test = how the statu
 | SB3 | A GEM BAR: mined gems fill it; a full bar = one upgrade point, spent on a stat | **HAVE** | `gemBarAdd` at both gem sites; 60 s drone run banked 2 points (102c, bar 13%) |
 | SB4 | Stat upgrades in flight by number keys: shield capacity, shield regen, energy capacity, energy regen, ship speed, agility, damage, fire rate (8 levels each) | **HAVE** | `statMult` at 19 sites; keys 1-8 spend; shield max 40→44 and capacitor 100→110 read back after Lv1 |
 | SB5 | Ship TIERS (1-7): when the ship is maxed, choose the next tier's ship from a few models, anywhere in space | **HAVE** | tier-up card at 8/8 stats + 1 point; Scout→Fighter taken in flight, hull 70→100, stats reset; credit purchases at base unchanged |
-| SB6 | Each ship model has its own stats + weapon pattern (lasers per shot, spread) | **HAVE-partial** | HULLS hp/hold/speed/res/pd; weapons per hull mount count (SR-M12); no per-model shot pattern |
+| SB6 | Each ship model has its own stats + weapon pattern (lasers per shot, spread) | **HAVE** | `SHOT_BY_CLASS` + `spawnPattern`; fired through the real player path per hull: scout 1 bolt / 0.0 deg, fighter 2 / 2.4, interceptor 3 / 4.4, cruiser 4 / 6.0, dreadnought 5 / 7.6, capital 6 / 9.2 - total damage 18.0 -> 21.96 across the six tiers, so the tier changes the FEEL, not the power |
 | SB7 | Energy: shooting drains it, it regenerates; empty = cannot fire | **HAVE** | `capLaser`, `LASER_CAP_PER_SHOT/REGEN` |
 | SB8 | Shields absorb before hull, regenerate after a delay | **HAVE** | fore/aft arcs, `SHIELD_REGEN_DELAY` |
 | SB9 | Radar / minimap with rocks, gems, ships | **HAVE** | top-down inset + blips (drones added 2026-09-06) |
@@ -33,7 +33,9 @@ Status legend: **HAVE** · **HAVE-partial** · **MISSING**. Test = how the statu
 ## Milestones (this wave)
 
 **SB-M1 through SB-M4 all landed 2026-09-06** - measured in the page, not asserted: see the Ours column above.
-SB6 (per-model shot patterns) is the one Starblast row still open; everything else in the reference loop now runs.
+**Every row of the reference loop now runs.** SB6 landed 2026-09-06 (per-model shot patterns, measured per hull
+through the real fire path). The Starblast copy is complete; REQUIREMENTS_SR.md's open rows and the Egosoft
+layer (stations, fleets, trade automation, lanes) are what remain.
 
 - **SB-M1 · The gem bar and upgrade points.** Mined gems (and the drones' take) fill `P.gemBar` up to `GEM_BAR_MAX`; a full bar
   banks one upgrade point and empties; points are spent on SB4's stats. Credits stay the SR2 currency for trade and shops; the
