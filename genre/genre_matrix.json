@@ -1909,7 +1909,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-304",
-    "note": "warTick and conquest.js slowTick run per-system; UC-301/302 produce and haul unattended"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, independent read + cited measurement). The economy sim (NPCs and markets) keeps running whether the player is present OR away. ECONOMY.tick (economy.js:260) = stationTick(dt) [markets: consume inputs / produce output / margin] + haulerTick(dt) [NPC traders: autonomous buy->fly->sell A->B]. It runs in frame()'s normal branch (index.html:7771) AND - the 'while away' part - via backgroundTick(dt) (:7761 = ECONOMY.tick + saveTick), which frame() calls at :7769 while AWAY.active() (a ground mission): 'AWAY MISSION takes over rendering - but the empire it promised keeps running.' warTick / conquest.js slowTick advance the front per-system on the same idea. HONEST SCOPE: real-time while the game is OPEN; economy.js has NO offline/elapsed-time catch-up, so a CLOSED game does not fast-forward. OBSERVABLE: node scratchpad/f36_awaysim_replay.js -> PASS (asserts the full wiring chain backgroundTick -> ECONOMY.tick -> stationTick + haulerTick, the AWAY branch, frame's normal branch, and the no-offline-catch-up scope); the BEHAVIOR that the same tick actually moves haulers + produces at stations is measured by the committed sibling replays scratchpad/f26_routes_replay.js + f27_station_replay.js (both PASS).",
+    "settledFrom": "index.html backgroundTick :7761 (ECONOMY.tick + saveTick) called at :7769 while AWAY.active() ('the empire keeps running'); frame() normal branch :7771 also runs ECONOMY.tick; ECONOMY.tick economy.js:260 = stationTick (markets) :146 + haulerTick (NPCs) :214; warTick / conquest slowTick per-system. No offline catch-up (real-time only). Measured node scratchpad/f36_awaysim_replay.js PASS + sibling f26/f27 economy replays PASS"
    }
   },
   {
