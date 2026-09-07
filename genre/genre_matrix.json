@@ -3032,7 +3032,8 @@
    "ours": {
     "v": "partial",
     "uc": null,
-    "note": "PASSENGER.INTRO / introLines / markIntroShown exist in model.json but no use case covers a tutorial"
+    "note": "A scripted opening teaches the CONTROLS, but there is no guided gameplay opening. The FIRST FLIGHT card (index.html:3297+, from N1) is GENERATED FROM KEYBIND (:3304) and shown before the lore on a first run - it teaches thrust/turn/pitch/fire/nitro plus a first objective (:3320-3324) and stays reachable via the '?' button (N2). That is why partial, not no. But it is a static key card, NOT the guided opening MISSION the anchors have (Freelancer's scripted escort mission, Elite's tutorial mission, EV Nova's mentor-guided opening, X's guided start scenarios); nothing walks a new player through the mine->sell->upgrade loop. The old note ('PASSENGER.INTRO/introLines symbols exist in model.json but no UC covers a tutorial') was STALE - it predated the card and implied nothing existed.",
+    "settledFrom": "code read of the FIRST FLIGHT card vs the anchor tutorials 2026-09-06"
    }
   },
   {
