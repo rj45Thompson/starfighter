@@ -725,7 +725,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-214",
-    "note": "pilot ranks up and spends skill points (SR-M17); ENGBAY.skillsHtml"
+    "note": "Pilot-skill career - a DISTINCT axis from ship stats (not F11). SKILL_KEYS=[gunnery,handling,tech,trade,charisma,leadership] index.html:507 (SKILL_MAX 5, 1pt/rank :508), stored on the pilot (s.skills/s.skillPts), earned per rank :3997, spent via the skill command :4874-4882, AI self-allocates autoAllocateSkill :4003. skillLvl(s,k) :4009 is consumed in play: tech->shield regen :1617, trade->buy/sell price :1846/:1849 (per-skill %/lv constants :509-510). Separateness proof: at :1617 statMult(s,'shieldRegen') (ship stat) and (1+SKILL_TECH_REGEN*skillLvl(s,'tech')) (pilot skill) multiply as two INDEPENDENT terms. ENGBAY.skillsHtml (engbay.js:346) is only the panel. node scratchpad/f13_replay.js RESULT PASS.",
+    "settledFrom": "index.html:507-510,4009 + gameplay consumption :1617/:1846/:1849; node f13_replay.js PASS (2026-09-06)"
    }
   },
   {
