@@ -2969,7 +2969,8 @@
    "ours": {
     "v": "no",
     "uc": null,
-    "note": "no networking or multiplayer module appears in model.json"
+    "note": "SETTLED no, PROVEN BY GREP (2026-09-07, THIN->anchors=2). A corollary of F40: with NO real-time multiplayer transport (F40 proved 0 WebSocket / RTCPeer / socket.io / ... hits), the player CANNOT cooperate or fight with other HUMAN players - the 'others' in the game are AI/NPC ships (pirates / coalition / named pilots). Zero hits across the 48 scanned game files for PvP / player-vs-player / versus-a-player / co-op mode / multiplayer / matchmaking / human-vs-human / other-human-players / invite-friend / join-lobby. (The only 'human player' token, index.html:2830, means the SINGLE human player - scoping the death-wipe vs AI - not others.) The 'co-op' in the game is the AI coalition squad (AI wingmen), not human co-op. GUARDED: tools/genre_selfcheck.js 7th cell (0-hit regex on the co-op/PvP LABELS, excluding the AI-squad co-op and the 'human player only' comment) - flips to FAIL the moment a PvP / co-op-multiplayer mode lands (F40's networking guard would also catch it).",
+    "settledFrom": "corollary of F40 (no real-time multiplayer transport, grep-proven 0 networking); 0-hit grep over the 48 scanned game files for PvP / player-vs-player / co-op mode / multiplayer / matchmaking / human-vs-human / other-human-players / invite-friend. Only 'human player' token index.html:2830 = the single player (death-wipe scope), not others; the game's co-op is the AI squad. Guarded by tools/genre_selfcheck.js F56"
    }
   },
   {

@@ -17,6 +17,7 @@
 //   F40  real-time multiplayer (many humans)     -> no  (grep WebSocket|RTCPeer|socket.io|multiplayer|... = 0)     [2026-09-07]
 //   F44  in-system fast-travel layer             -> no  (grep supercruise|fast-travel|cruise mode|time-accel|... = 0) [2026-09-07]
 //   F48  permadeath (death ends the run)         -> no  (grep permadeath|ironman|hardcore|permanent death|... = 0)   [2026-09-07]
+//   F56  co-op / PvP with other humans           -> no  (grep PvP|player-vs-player|multiplayer|matchmak|... = 0)     [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -64,6 +65,12 @@ const GUARDS = [
   // generations" starmap.js - a soft territory-loss reset that KEEPS the minds' knowledge, not a death end) or the
   // AGI "no single lifetime" culture text (:4726). Any hit means a permadeath / ironman / hardcore mode has landed.
   { id: 'F48', label: 'permadeath (death ends the run)', re: /permadeath|perma-death|iron ?man|hard ?core|permanent(ly)? (dead|death)|death is permanent|\bno[ -]?respawn\b|run ends (on|at|with) death|final death|one life to live/i },
+  // F56 (2026-09-07): cooperate or FIGHT with other HUMAN players (co-op / PvP). A corollary of F40 (no
+  // real-time multiplayer transport exists) - human co-op/PvP is impossible without a network. Tight patterns
+  // for the player-facing LABELS a co-op/PvP mode would use, so it never trips on the AI-squad "co-op" or on the
+  // "human player only" death-wipe comment (index.html:2830, which means the SINGLE human player, not others).
+  // Any hit means a PvP/co-op-multiplayer mode has landed (which F40's networking guard would also catch).
+  { id: 'F56', label: 'co-op / PvP with other humans', re: /\bPvP\b|player.?vs.?player|versus (another |a )?player|\bco-?op mode\b|\bmultiplayer\b|matchmak(e|ing)|human.?vs.?human|\bother human players?\b|invite (a )?friend|join (a )?(friend|multiplayer|lobby)/i },
 ];
 
 function gameFiles() {
@@ -119,7 +126,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath, F56 co-op/PvP) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');
