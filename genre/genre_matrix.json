@@ -3640,7 +3640,7 @@
     "v": "no",
     "uc": null,
     "note": "No accessibility options in the visual sense this cell tests. A grep of the game's own source for colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast returns 0 hits: no colourblind palette, no high-contrast mode, no reduced-motion toggle, no gamma/brightness slider, no captions, no ARIA. The only display control is per-panel transparency (UC-602 [WORKS], panels.js 0.25-1.0) - a layout/declutter control, weaker than Elite Dangerous's gamma slider which is graded 'no' HERE ('gamma slider only, no colourblind mode'). Remappable flight controls DO exist (index.html:6835 'make all the keys optional', rebind 6906-6911, persisted SF_CONTROLS_v1) - a real motor-accessibility affordance - but every anchor with remappable-but-no-colourblind (Freelancer, EV Nova, Elite) is graded 'no', so grading ours 'partial' for them would apply a softer bar to ourselves than to the anchors.",
-    "settledFrom": "code read + 0-hit colourblind/contrast grep, graded on the anchors' bar 2026-09-06"
+    "settledFrom": "code read + 0-hit colourblind/contrast grep, graded on the anchors' bar 2026-09-06; SETTLED to anchors=2 on 2026-09-07 via a 2nd independent anchor - the STANDING tools/genre_selfcheck.js F69 guard, which re-derives the 0-hit colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast absence on EVERY run (not a one-time grep) and self-tests; node tools/genre_selfcheck.js -> exit 0, F69 accessibility 0 source hits. The grade now fails loudly the moment a colourblind/high-contrast/reduced-motion option lands."
    }
   },
   {
