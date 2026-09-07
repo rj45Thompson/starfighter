@@ -3232,7 +3232,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-109",
-    "note": "top-down inset showing rocks, gems, ships and drones"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, mechanism measured - a 2nd read confirming the seed's look). TOP-DOWN RADAR INSET: topCam is an overhead OrthographicCamera with the BLIP layer (1) enabled (index.html:692-693), drawn each frame into the VIEW.top viewport in the screen corner via renderView(VIEW.top, scene, topCam) :6441, gated by HUD_WIN.top so the WINDOWS menu can hide it; because topCam also sees layer 0 the inset shows the real rock/gem/planet meshes PLUS blips. BLIPS: topBlip() :5291 makes a layer-1 sprite - 14 call sites (base, player/other-ship markers, encounters, stronghold, mining drones). RANGE-LIMITED (not omniscient): objects register within CFG.SENSE_R and RADAR_ROCK_CAP:24 caps rock blips so a dense belt cannot starve the ship/gem blips. FITTABLE SENSOR GEAR: radar is a gear slot (radarType basic/long-range/deep-scan; fitRadar :3503 adjusts senseR by the tier bonus) and a separate SCANNER reveals enemy health/cargo gated by its power (scannerOf, SCAN_HEALTH_R_BASE :614). INTERACTIVE: topClick :7118 unprojects a click on the inset through topCam to target the object under it. Anchor 7/8 (only FTL lacks it). OBSERVABLE: node scratchpad/f61_radar_replay.js -> PASS (13 asserts).",
+    "settledFrom": "index.html top-down radar inset: topCam overhead + blip layer 1 :692-693, rendered to VIEW.top corner viewport (renderView :6441, HUD_WIN.top gate); topBlip() :5291 = 14 blip call sites (base/ships/encounters/stronghold/drones) + real meshes; range-limited by CFG.SENSE_R + RADAR_ROCK_CAP:24; fittable radar gear (radarType, fitRadar :3503) + scanner (scannerOf, SCAN_HEALTH_R_BASE); topClick :7118 targets a blip. Measured node scratchpad/f61_radar_replay.js PASS"
    }
   },
   {
