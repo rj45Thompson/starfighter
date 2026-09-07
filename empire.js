@@ -123,7 +123,15 @@
     else if (b.dataset.wingOrder) {
       var h3 = H(); var sel = b.parentNode.querySelector('[data-world]');
       var who = (wingPick && wingPick !== '*') ? [wingPick] : null;
-      r = h3 && h3.wingOrder ? h3.wingOrder(who, b.dataset.wingOrder, sel ? sel.value : null) : { ok: false, msg: 'wing orders unavailable' };
+      // wingOrder's third argument is not one kind of thing: goto/dock/defend take a WORLD, hunt/follow take a
+      // SHIP, and the rest take nothing. The board used to hand the world <select> to all of them, so ATTACK and
+      // FOLLOW looked up a planet name in the ship list, found nothing, and issued the order with no target -
+      // FOLLOW in particular silently stopped meaning "follow me". Passing null for those two is what the host
+      // reads as "the player", which is the whole point of a FOLLOW button.
+      var verb = b.dataset.wingOrder;
+      var WORLD_VERBS = { goto: 1, dock: 1, defend: 1 };
+      var arg = WORLD_VERBS[verb] ? (sel ? sel.value : null) : null;
+      r = h3 && h3.wingOrder ? h3.wingOrder(who, verb, arg) : { ok: false, msg: 'wing orders unavailable' };
       if (r && r.ok) { wingPick = null; if (window.HOST && HOST.term) HOST.term('&#9670; ' + r.msg, 'sys'); }
     }
     else if (b.dataset.cancel) { pick = null; wingPick = null; }

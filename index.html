@@ -333,7 +333,7 @@
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
 <script src="cybertron.js?v=20260906g"></script>
-<script src="empire.js?v=20260906c"></script>
+<script src="empire.js?v=20260907a"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
 <!-- MEASUREMENT ONLY, opt-in: ?harness=1 loads sim_harness.js, which drives frame() with a synthetic
@@ -425,7 +425,11 @@ const CFG = {
   REAR_EDGE_WARN:0.82, REAR_LOCK_SENS:0.003,       // gunner HUD: a side glows once |yaw|/|pitch| passes this frac of max (about to run out of gun / off the panel); pointer-lock mouse sensitivity in rad/pixel
   REAR_BARREL_LEN:2.6, REAR_BARREL_RAD:0.3, REAR_BALL_R:0.55,   // a SMALL EXTERNAL ball-turret on the ship's back (user 2026-07-13 "make the ball smaller ... it just shows which way the gunner is pointing"); unlit, external-view-only layer (chase/top, NOT the rear gunner's own view)
 
-  AST_KEEP:7600, AST_MAX:9200, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // user 2026-07-13 "MAKE 100X MORE ASTEROIDS ... go off and mine and level up without battling" + 2026-07-14 "can't you instance the rocks?": a literal ~100x field (was 76), 75% packed into the peaceful CERES BELT. Rocks are now GPU-INSTANCED (buildRockPools) - a few draw calls for the whole field - and both the collision loops AND the AI rock scans go through the spatial hash (astGrid), so CPU + GPU both scale.
+  // FIELD SIZE + DRAW CALLS (RJ 2026-09-06: "we can reduce the asteroids by significant factor and try to speed
+  // them up by not using different models"). Measured before: 7,600 rocks over 8 instanced pools (4 shapes x 2
+  // shades = 8 draw calls and 8 matrix uploads a frame) at 29.1 ms/frame. ONE shape and ONE shade collapses that
+  // to a single pool; the count comes down with it. Both are config, so the field can be tuned back up.
+  AST_KEEP:3200, AST_MAX:4200, ROCK_GEO_VARIANTS:1, ROCK_SHADES:1, AST_SCALE_MIN:2.4, AST_SCALE_MAX:7.0, AST_HP_PER_SCALE:6.5,   // user 2026-07-13 "MAKE 100X MORE ASTEROIDS ... go off and mine and level up without battling" + 2026-07-14 "can't you instance the rocks?": a literal ~100x field (was 76), 75% packed into the peaceful CERES BELT. Rocks are now GPU-INSTANCED (buildRockPools) - a few draw calls for the whole field - and both the collision loops AND the AI rock scans go through the spatial hash (astGrid), so CPU + GPU both scale.
   AST_SPLIT_MIN:3, AST_SPLIT_MAX:5, AST_CHILD_FRAC:0.52, AST_NOSPLIT:2.0, AST_DRIFT:3, AST_SPLIT_KICK:12, AST_DMG:20,
   ROCK_LOD_UNIT:77, ROCK_LOD_MAX:8,   // ROCK DRAW BUDGET (measured 2026-09-06). writeRockInstance ran 7,781 times PER FRAME - once per rock in the field, every frame - and each call composes a Matrix4, whose Euler->quaternion step alone is 6 trig calls. It was the largest single cost inside step(). Now a rock's instance matrix is rewritten every Nth frame, N growing with distance from the player, staggered by index so no frame carries a spike. PHYSICS IS NOT STRIDED: position, spin, the bounce test and the collision grid still run every frame for every rock, so mining, hits and the AI rock-scans are bit-for-bit unchanged. Only how often a rock's DRAWN pose is refreshed changes. Why 77: AST_DRIFT caps rock speed at 3 u/s, so a rock strided at N frames is at most 3N/60 = N/20 units stale; that is under half a pixel (~0.00065 rad at this FOV) once distance exceeds N*77. Each tier is therefore sub-pixel BY CONSTRUCTION, and the error shrinks with distance because it scales as staleness/distance. Set ROCK_LOD_MAX to 1 to turn the whole thing off.
 
@@ -1311,7 +1315,7 @@ function _astCollect(pos, radius, out){ out.length=0;
 // Thousands of rocks rendered as a handful of GPU draw calls. Pools = ROCK_GEO_VARIANTS shapes x 2 shades. Each
 // rock owns a (pool,slot); its matrix is rewritten every frame from pos/scale/tumble. Freed slots go on a free-
 // list and are hidden (zero-scale) until reused. Collision + AI never touch these - they read a.pos/a.scale.
-const ROCK_GEO_VARIANTS=4, ROCK_SHADES=2;
+const ROCK_GEO_VARIANTS=CFG.ROCK_GEO_VARIANTS, ROCK_SHADES=CFG.ROCK_SHADES;   // one pool by default: see the CFG note
 let ROCK_POOLS=null, _rockProcGeos=null;
 const _rm4=new T.Matrix4(), _rq=new T.Quaternion(), _re=new T.Euler(), _rsv=new T.Vector3(), _rzero=new T.Matrix4().makeScale(0,0,0);
 function _procRockGeo(seed){ const g=new T.IcosahedronGeometry(1,1), p=g.attributes.position, v=new T.Vector3();

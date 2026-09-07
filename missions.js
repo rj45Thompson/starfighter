@@ -85,11 +85,11 @@
     var ps = arr(h.planets); for (var i = 0; i < ps.length; i++) if (ps[i] && ps[i].name === n) return ps[i];
     return null;
   }
-  function planetLive(p) { var h = H(); return !!(h && p && arr(h.planets).indexOf(p) >= 0); }
+// removed planetLive (never called) - it was defined and never called; the audit that found it is in TASKS.md
   function shipLive(s) { var h = H(); return !!(h && s && s.alive !== false && arr(h.ships).indexOf(s) >= 0); }
   function isPlayer(s) { var p = player(); return !!(s && (s === p || s.role === 'player')); }
   function sysName(p) { return (p && p.system && str(p.system.name)) ? p.system.name : ''; }
-  function goodByKey(k) { var h = H(); var gs = h ? arr(h.GOODS) : []; for (var i = 0; i < gs.length; i++) if (gs[i] && gs[i].k === k) return gs[i]; return null; }
+// removed goodByKey (never called) - it was defined and never called; the audit that found it is in TASKS.md
 
   // ranks: contract says HOST.RANKS = [{n,score}...]; the game source uses {n,pts}. Read both.
   function ranks() { var h = H(); return h ? arr(h.RANKS) : []; }

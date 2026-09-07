@@ -106,7 +106,11 @@
       var x = pos.getX(i), z = pos.getZ(i), y = S.height(x, z);
       pos.setY(i, y);
       var t = Math.max(0, Math.min(1, (y + 2) / 16));
-      c.copy(soil).lerp(high, t).lerp(rock, Math.random() * 0.18);
+      // was Math.random(): the single unseeded call in a builder that is otherwise driven by rngOf(S.seed),
+      // so the same world speckled differently every time you landed on it. Hashed from the vertex index
+      // instead - same world, same speckle, and no extra state to thread through.
+      var sp = Math.sin(i * 12.9898 + S.seed * 0.017) * 43758.5453; sp -= Math.floor(sp);
+      c.copy(soil).lerp(high, t).lerp(rock, sp * 0.18);
       colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
     }
     g.setAttribute('color', new T.BufferAttribute(colors, 3));
@@ -294,7 +298,8 @@
     S.vel.z += (wishZ * speed - S.vel.z) * Math.min(1, CFG.ACCEL * dt / speed);
     if (!moving) { var f = Math.max(0, 1 - CFG.FRICTION * dt); S.vel.x *= f; S.vel.z *= f; }
 
-    var gy = S.height(cam.position.x, cam.position.z);
+    // (the height sample that used to sit here was a dead store: it was overwritten below after the move, and
+    //  every read of it costs a 4-5 octave noise evaluation per frame)
     if (S.onGround && k.has('Space')) { S.vel.y = CFG.JUMP; S.onGround = false; }
     S.vel.y -= CFG.GRAVITY * dt;
 
@@ -307,7 +312,7 @@
     cam.position.z = Math.max(-lim, Math.min(lim, cam.position.z));
 
     cam.position.y += S.vel.y * dt;
-    gy = S.height(cam.position.x, cam.position.z);
+    var gy = S.height(cam.position.x, cam.position.z);
     if (cam.position.y <= gy + CFG.EYE) { cam.position.y = gy + CFG.EYE; S.vel.y = 0; S.onGround = true; }
     else S.onGround = false;
 

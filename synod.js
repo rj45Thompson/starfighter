@@ -39,7 +39,11 @@
     if (!D.tally.hitsTakenBy) D.tally = blankTally();
     return D;
   }
-  function save() { try { localStorage.setItem(CFG.KEY, JSON.stringify(D)); } catch (e) { } }
+  // An empty catch here made a full or blocked localStorage invisible: the Synod would announce "THE IRON
+  // SYNOD REFITS" having persisted nothing, and the next load quietly started the war over.
+  function save() { try { localStorage.setItem(CFG.KEY, JSON.stringify(D)); D._saveFailed = false; return true; }
+    catch (e) { if (!D._saveFailed && window.HOST && HOST.term) HOST.term('&#9670; the Synod could not save its campaign (' + ((e && e.name) || 'storage error') + ') - this generation will not carry over', 'err');
+      D._saveFailed = true; return false; } }
   function say(t, c) { if (window.HOST && HOST.term) HOST.term(t, c || 'sys'); }
 
   // ---- what the game reports into the tally ---------------------------------------------------------------

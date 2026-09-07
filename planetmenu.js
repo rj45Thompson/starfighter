@@ -882,29 +882,7 @@ var GEAR_SLOTS = [   // [slotKind, label, tableProp, keysProp, field, defKey, cm
    Command or a pirate station (matching the terminal command's own gate, extended to stations 2026-07-08); fence
    needs a HOSTILE dock, which in practice is only reachable at a pirate station now that regular hostile worlds
    refuse docking outright. */
-function blackmarketFenceHtml(p){
-  var h=H(); var CB=h&&h.CONTRABAND, CK=h&&h.CONTRA_KEYS, P=player();
-  if(!CB || !Array.isArray(CK) || !CK.length) return '';
-  var repHostile = num(h&&h.CFG&&h.CFG.REP_HOSTILE,-6);
-  var showBuy = S.isBase || (p && p.isPirateStation);
-  var showSell = !!(p && num(p.rep,0)<=repHostile);
-  if(!showBuy && !showSell) return '';
-  var out='<div class="pm-panel" style="margin-top:8px"><h4>BLACK MARKET'+(p&&p.isPirateStation?' - '+esc(p.name):'')+'</h4>', i;
-  if(showBuy){
-    out+='<div class="pm-sub" style="margin-bottom:4px">Buy illegal goods here - fence them at a hostile world for a markup.</div>';
-    for(i=0;i<CK.length;i++){ var k=CK[i], g=CB[k]; if(!g) continue; var have=num(P&&P.contraband&&P.contraband[k],0);
-      out+='<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.VIOLET+'">'+esc(g.n)+'</b>'+(have?' <span class="pm-sub">holding '+have+'</span>':'')+'</div>'
-        + '<div style="color:'+COL.AMBER+'">'+fmtC(g.base)+'</div>'
-        + '<button class="pm-b" data-act="cmd" data-cmd="blackmarket '+k+' 1">BUY 1</button></div>'; } }
-  if(showSell){
-    var any=false, j;
-    out+='<div class="pm-sub" style="margin:6px 0 4px">Fence what you\'re holding - this world looks the other way.</div>';
-    for(j=0;j<CK.length;j++){ var k2=CK[j], g2=CB[k2]; if(!g2) continue; var q=num(P&&P.contraband&&P.contraband[k2],0); if(q<=0) continue; any=true;
-      out+='<div class="pm-row"><div class="pm-grow"><b style="color:'+COL.GOOD+'">'+esc(g2.n)+'</b> <span class="pm-sub">holding '+q+'</span></div>'
-        + '<button class="pm-b pm-go" data-act="cmd" data-cmd="fence '+k2+' '+q+'">SELL ALL</button></div>'; }
-    if(!any) out+='<div class="pm-note">nothing to fence right now.</div>'; }
-  out+='</div>';
-  return out; }
+// removed blackmarketFenceHtml (a second live implementation of the same feature sits at :556-557; this one was never called) - it was defined and never called; the audit that found it is in TASKS.md
 
 /* ------------------------------------------------ TAB: MISSIONS */
 /* MISSION CARDS (RJ 2026-09-06: "and missions"). The board was a wall of monospace text plus a four-column table

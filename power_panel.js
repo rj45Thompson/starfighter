@@ -68,11 +68,7 @@ var CFG = {
 };
 
 // CSS tick mask (the TechSlider segment look) for a gauge fill - `dir` is 'to top' (vertical) or 'to right'
-function tickMask(dir, seg, gap) {
-  var stop = '#000 0 ' + seg + 'px, transparent ' + seg + 'px ' + (seg + gap) + 'px';
-  return ';-webkit-mask-image:repeating-linear-gradient(' + dir + ', ' + stop + ');' +
-         'mask-image:repeating-linear-gradient(' + dir + ', ' + stop + ')';
-}
+// removed tickMask (never called) - it was defined and never called; the audit that found it is in TASKS.md
 
 var SYSTEMS = [
   { key: 'weapons', label: 'WEAPONS', col: CFG.COL_WEAPONS },

@@ -28,7 +28,10 @@ function createStore(opts){
     load: opts.load || (()=>{ if(fs&&path&&fs.existsSync(path)){ try{ return JSON.parse(fs.readFileSync(path,'utf8')); }catch(e){} }
                               if(typeof localStorage!=='undefined'){ try{ const r=localStorage.getItem(opts.key||'KNOWLEDGE_v1'); if(r) return JSON.parse(r); }catch(e){} } return null; }),
     save: opts.save || ((data)=>{ if(fs&&path){ try{ fs.writeFileSync(path, JSON.stringify(data)); return; }catch(e){} }
-                                 if(typeof localStorage!=='undefined'){ try{ localStorage.setItem(opts.key||'KNOWLEDGE_v1', JSON.stringify(data)); }catch(e){} } }),
+                                 if(typeof localStorage!=='undefined'){ try{ localStorage.setItem(opts.key||'KNOWLEDGE_v1', JSON.stringify(data)); }
+                                   // not silent: a knowledge store that cannot write is a store that forgets, and the
+                                   // caller has no other way to find out.
+                                   catch(e){ if(typeof console!=='undefined'&&console.warn) console.warn('knowledge: save failed -', (e&&e.name)||e); if(typeof window!=='undefined'&&window.HOST&&HOST.term) HOST.term('&#9670; the knowledge store could not save ('+((e&&e.name)||'storage error')+') - what the pilots learn this session will not persist','err'); } } }),
   };
   // state: shared = {edgeKey: provenance}; priv = {agent: {edgeKey: provenance}}
   let S = { version:VERSION, shared:{}, priv:{} };

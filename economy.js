@@ -181,7 +181,10 @@
     var p = P(); if (!p) return { ok: false, msg: 'no ship' };
     if ((p.credits || 0) < CFG.HAULER_COST) return { ok: false, msg: 'a hauler costs ' + CFG.HAULER_COST + 'c - you hold ' + Math.round(p.credits || 0) + 'c' };
     p.credits -= CFG.HAULER_COST;
-    var h = { id: S.nextId++, name: name || ('HAUL-' + S.nextId), from: null, to: null, good: null, state: 'idle', t: 0, pos: 0, cargo: 0, runs: 0, profit: 0, note: 'no route assigned' };
+    // S.nextId++ post-increments, so 'HAUL-' + S.nextId read the NEXT id: the hauler with id 3 was named
+    // HAUL-4. Take the id first and name from that.
+    var hid = S.nextId++;
+    var h = { id: hid, name: name || ('HAUL-' + hid), from: null, to: null, good: null, state: 'idle', t: 0, pos: 0, cargo: 0, runs: 0, profit: 0, note: 'no route assigned' };
     S.haulers.push(h);
     log('hauler', 'bought ' + h.name);
     say('&#9670; hauler <b>' + h.name + '</b> bought (-' + CFG.HAULER_COST + 'c) - assign it a route to put it to work.');
