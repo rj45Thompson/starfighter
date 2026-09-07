@@ -882,9 +882,10 @@
     }
    },
    "ours": {
-    "v": "partial",
+    "v": "yes",
     "uc": "UC-217",
-    "note": "science-station purchases refuse with a named requirement; the explicit rank gates are on contracts (UC-207), not on goods"
+    "note": "Purchases ARE gated behind rank, not money alone - the old note ('rank gates on contracts, not goods') is refuted by the WEAPON buy. `weapon <type>` checks the rank gate BEFORE the credit check: req = the weapon's position scaled across the 6 RANKS tiers, refusing '${W.n} requires ${RANKS[req].n} rank (see: rank)' (index.html:5099) before P.credits is touched (:5102). RANKS = Recruit/Ranger/Veteran/Ace/Commander/Legend (:3993), rankIdx :3994; WEAPON_ORDER is 21 cost-sorted weapons (:3777) so reqs spread 0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5 - the apex Vertix needs Legend. Independent 2nd source: missions.js rank-gates CONTRACTS by type (:3 'contracts gated by your ranger rank'; :36-38 RANK_PATROL:0..RANK_ASSAULT:3). Science-station purchases also refuse with a named requirement, and skill spending needs earned points (:4879). Matches the anchor bar (x_series licences for wares, freelancer weapons by level, ev_nova Require on outfits).",
+    "settledFrom": "code read + node numeric replay of the weapon rank gate 2026-09-06"
    }
   },
   {
