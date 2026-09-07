@@ -2814,7 +2814,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-215",
-    "note": "text quests at a planet, self-test 16/16; UC-501 free-text ask to the Passenger"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). Dialogue choices via the TEXTQUESTS interactive-fiction system (textquests.js, SR-M9). A quest is a directed graph of NODES, each with flavor text and 2-3 CHOICES: choice shape { label, require(ctx,P)->bool, effects:[rep/credits/score], next:key|null } (:80) - so choices BRANCH (to the next node) and carry consequences, some gated by a requirement, some costing up front. TEXTQUESTS.active() returns the {title,text,choices[]} scene view; TEXTQUESTS.choose(idx) (1-based) picks a choice -> {ok,msg,done,view} (:18-19). Player-facing: the `choose <n>` command (index.html:4874) renders the scene + numbered [n] choices (gated ones shown 'unavailable') and advances/resolves; `quest` shows the active scene. Quests are offered at planets (bar/board); the free-text ask to the Passenger (UC-501) is a separate conversational modality. OBSERVABLE: node textquests.js -> 16/16 PASS (enrolled in tools/module_selftests.js) - it walks EVERY template along every path: salvage_rights has >=2 distinct terminal endings, choose() walks to done:true, resolving changes credits/rep, active() is null after resolve, and choose() with nothing active returns ok:false safely.",
+    "settledFrom": "textquests.js interactive-fiction dialogue: node graph, each node 2-3 choices {label,require,effects,next} :80, branching + rep/credits/score effects; TEXTQUESTS.active()/choose(idx) :18-19; player cmd choose <n> index.html:4874 (numbered choices, gated marked unavailable). Node-safe self-test node textquests.js 16/16 PASS (>=2 endings, choose-walk to done, resolving changes credits/rep), enrolled in module_selftests. Passenger free-text (UC-501) is a separate modality"
    }
   },
   {
