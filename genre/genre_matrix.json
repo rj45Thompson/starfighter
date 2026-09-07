@@ -2759,7 +2759,8 @@
    "ours": {
     "v": "yes",
     "uc": "UC-108",
-    "note": "gems and credits spill into the belt; UC-103 drone fetches loose gems"
+    "note": "SETTLED yes (2026-09-07, THIN->anchors=2, measured). A destroyed ship spills PHYSICAL loot that ANY ship can pick up. DROP (killShip index.html:2824-2826): dropCargo(s) splits the hold into salvage PODS of <= POD_CHUNK 8 (:1915, real Box meshes in the scene :1911-1914); dropCredits scatters the full credits as a persistent gem STASH (:1358); spawnGem drops scrap. PICKUP: updateCargoPods :1920-1923 loops EVERY ship (for(const s of ships)) and, within GEM_PICK_R 8 (with a GEM_MAGNET 26 pull), scoopPod(s,c) :1917-1919 - a TRADER stows it in its hold, ANY OTHER ship (player/pirate) LOOTS it for credits (qty*base*SALVAGE 0.6). Gems the same: RAY_COLLECT (:537) 'all units should want to pick up gems'; UC-103 mining drones fetch loose gems (:961). The drop is symmetric - 'the SAME floating drop is the SAME item for whoever scoops it' (:1363). OBSERVABLE: node scratchpad/f52_loot_replay.js -> PASS - slices the real dropCargo/scoopPod and drives them: {raw:25} -> 4 pods [8,8,8,1] + hold emptied; a trader scoops into cargo, the player loots for +48c; source-asserts the on-death drop + the all-ships proximity pickup.",
+    "settledFrom": "index.html killShip drop :2824-2826 (dropCargo :1915 -> salvage pods <= POD_CHUNK 8, dropCredits :1358 -> gem stash, spawnGem :1349); pickup updateCargoPods :1920-1923 (loops all ships, GEM_PICK_R 8) -> scoopPod :1917-1919 (trader->hold, else->credits*SALVAGE 0.6); gems: RAY_COLLECT :537 'all units pick up gems', drone fetch :961; symmetric drop :1363. Measured node scratchpad/f52_loot_replay.js PASS"
    }
   },
   {
