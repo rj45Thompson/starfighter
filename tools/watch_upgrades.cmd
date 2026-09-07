@@ -24,19 +24,23 @@ echo [%date% %time%] Star Fighter upgrade pass
 py -3.13 tools\upgrade_pass.py
 set PASS=%errorlevel%
 
-REM the two guards that catch a whole class of regression rather than one bug
+REM the guards that catch a whole class of regression rather than one bug
 node tools\cmd_shadow.js
 set SHADOW=%errorlevel%
 node tools\cfg_dupes.js
 set DUPES=%errorlevel%
+node tools\genre_selfcheck.js
+set GENRE=%errorlevel%
 
 echo.
-echo   upgrade_pass  exit %PASS%   (non-zero = an input was missing, report NOT rewritten)
-echo   cmd_shadow    exit %SHADOW% (non-zero = a terminal command can never run)
-echo   cfg_dupes     exit %DUPES%  (non-zero = a CFG key is defined twice, the later one silently wins)
+echo   upgrade_pass    exit %PASS%   (non-zero = an input was missing, report NOT rewritten)
+echo   cmd_shadow      exit %SHADOW% (non-zero = a terminal command can never run)
+echo   cfg_dupes       exit %DUPES%  (non-zero = a CFG key is defined twice, the later one silently wins)
+echo   genre_selfcheck exit %GENRE%  (non-zero = a grep-proven "no" genre grade no longer matches the source)
 
 if not "%PASS%"=="0" exit /b %PASS%
 if not "%SHADOW%"=="0" exit /b %SHADOW%
 if not "%DUPES%"=="0" exit /b %DUPES%
+if not "%GENRE%"=="0" exit /b %GENRE%
 echo   all clear
 exit /b 0

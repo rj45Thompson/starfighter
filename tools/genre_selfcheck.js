@@ -1,0 +1,105 @@
+// genre_selfcheck.js - re-derive the grep-PROVEN "no" genre grades from the game's own source, so a
+// settled "no, proven" cell fails a pass the moment the capability it denies actually lands - instead of
+// standing as a stale, confident wrong grade nobody re-checks.
+//
+// Why this exists: three genre_matrix.json cells were each settled ours="no" by a ZERO-HIT grep over the
+// game's own source (index.html + every root *.js minus the 3 vendored libs), and the settlement's proof is
+// a one-time manual grep recorded in prose. upgrade_pass.py TRUSTS the recorded ours.v - it reads the grade
+// as input and never re-derives it - so if someone adds gamepad handling, a music bed, or a colourblind mode
+// next month, the matrix keeps reporting "no", the anchor-ranked backlog misranks, and nothing complains.
+// This turns each of those three claims back into a re-checkable observable, the way cmd_shadow.js and
+// cfg_dupes.js do for their own regression classes.
+//
+// The three cells it guards (all settled 2026-09-06):
+//   F67  music that changes with the situation -> no  (grep music|soundtrack|bgm = 0)
+//   F68  the game supports a gamepad           -> no  (grep getGamepads|gamepadconnected|... = 0)
+//   F69  colourblind or other accessibility    -> no  (grep colou?rblind|deuteran|...|prefers-* = 0)
+// A hit does not by itself prove the capability now works - it proves the "no, proven by grep" basis is gone,
+// so the cell must be re-settled against the source. That is exactly when a grade silently goes wrong.
+//
+//   node tools/genre_selfcheck.js              # exit 1 if any proven-"no" cell now has source hits
+//   node tools/genre_selfcheck.js --self-test  # prove the check works by planting a pattern that DOES hit
+//
+// Deliberately a TEXT scan, like cmd_shadow.js and cfg_dupes.js: no JS parser, because index.html is a
+// 7,400-line inline script and the grep patterns here are the very ones the settlements were argued from.
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.join(__dirname, '..');
+const VENDORED = new Set(['three.min.js', 'fflate.min.js', 'fbxloader.js']);
+
+// id -> the grep that DEFINES the settlement. Kept identical to the grep quoted in each TASKS.md line so the
+// guard argues from the same evidence the human did; the expected grade for all three is "no".
+const GUARDS = [
+  { id: 'F67', label: 'adaptive music', re: /music|soundtrack|bgm/i },
+  { id: 'F68', label: 'gamepad', re: /getGamepads|gamepadconnected|gamepaddisconnected|navigator\.getGamepads|new Gamepad/i },
+  { id: 'F69', label: 'colourblind / accessibility options', re: /colou?rblind|deuteran|protan|tritan|daltoniz|high-contrast|prefers-reduced-motion|prefers-contrast/i },
+];
+
+function gameFiles() {
+  const js = fs.readdirSync(ROOT).filter(f => f.endsWith('.js') && !VENDORED.has(f));
+  return ['index.html', ...js].filter(f => fs.existsSync(path.join(ROOT, f)));
+}
+
+function hitsFor(re) {
+  const out = [];
+  for (const f of gameFiles()) {
+    const lines = fs.readFileSync(path.join(ROOT, f), 'utf8').split(/\r?\n/);
+    lines.forEach((ln, i) => { if (re.test(ln)) out.push(`${f}:${i + 1}: ${ln.trim().slice(0, 100)}`); });
+  }
+  return out;
+}
+
+function loadGrades() {
+  const m = JSON.parse(fs.readFileSync(path.join(ROOT, 'genre', 'genre_matrix.json'), 'utf8'));
+  const g = {};
+  for (const feat of m.features) g[feat.id] = feat.ours && feat.ours.v;
+  return g;
+}
+
+// A grep-proven "no" cell is consistent iff its grade is "no" AND the grep finds nothing. Any hit, or any
+// grade other than "no", means the grep basis no longer holds and the cell must be re-settled.
+function check(guards, grades) {
+  const problems = [];
+  for (const g of guards) {
+    const grade = grades[g.id];
+    const hits = hitsFor(g.re);
+    if (grade === undefined) { problems.push({ ...g, grade, hits: [], note: 'no such feature id in genre_matrix.json' }); continue; }
+    if (grade === 'no') {
+      if (hits.length > 0) problems.push({ ...g, grade, hits });
+    } else {
+      problems.push({ ...g, grade, hits, note: 'settled "no, proven by grep"; a non-"no" grade needs re-checking against the source' });
+    }
+  }
+  return problems;
+}
+
+function main() {
+  if (process.argv.includes('--self-test')) {
+    // Plant a guard whose pattern DEFINITELY hits every source file, and assert its cell is "no". A working
+    // checker must flag the contradiction; if it does not, this checker proves nothing.
+    const planted = [{ id: 'F68', label: 'PLANTED always-hits', re: /function|const |CFG/ }];
+    const problems = check(planted, { F68: 'no' });
+    const caught = problems.length === 1 && problems[0].hits.length > 0;
+    console.log(caught
+      ? `self-test PASS - the guard flagged a planted "no" cell that has ${problems[0].hits.length} source hits`
+      : 'self-test FAIL - a planted contradiction went unnoticed, this checker proves nothing');
+    process.exit(caught ? 0 : 1);
+  }
+
+  const problems = check(GUARDS, loadGrades());
+  if (problems.length === 0) {
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F67 music, F68 gamepad, F69 accessibility) - 0 source hits each.`);
+    process.exit(0);
+  }
+  console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');
+  for (const p of problems) {
+    console.log(`  ${p.id} (${p.label}): recorded ours="${p.grade}"${p.note ? ' - ' + p.note : ''}; ${p.hits.length} hit(s)` + (p.hits.length ? ':' : ''));
+    for (const h of p.hits.slice(0, 6)) console.log(`     ${h}`);
+    if (p.hits.length > 6) console.log(`     ... and ${p.hits.length - 6} more`);
+    console.log(`  -> re-settle genre_matrix.json ${p.id} against the source, then re-run py -3.13 tools/upgrade_pass.py.`);
+  }
+  process.exit(1);
+}
+
+main();
