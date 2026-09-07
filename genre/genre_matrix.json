@@ -2548,7 +2548,8 @@
    "ours": {
     "v": "no",
     "uc": "UC-108",
-    "note": "pilot respawns as a Scout in the belt"
+    "note": "SETTLED no, PROVEN BY CODE+GREP (2026-09-07, THIN->anchors=2). NO permadeath - player death is NON-TERMINAL. On death (killByShip's death path index.html:2822): s.alive=false; s.respawn=CFG.RESPAWN_DELAY; s.deaths++; then step() :2669-2677 counts the timer down and REVIVES (s.alive=true; s.hp=s.maxHp; full shields/caps), and the PLAYER respawns as a stock SCOUT (applyHull(s,'scout') :2839, 'start at scout'); gems/credits spill at the wreck (UC-108) but the run continues. The ONLY run-level 'game over' is the GENERATION end (starmap.js:571) - triggered by losing EVERY system, not by death, and it is a soft reset that KEEPS the minds' knowledge, not a permanent end (cf F39). Zero hits across the 48 scanned game files for permadeath|ironman|hardcore|permanent death|no-respawn|final death. GUARDED: tools/genre_selfcheck.js 6th cell (0-hit regex, excludes the 'game over/generations' reset and the AGI 'no single lifetime' text) - flips to FAIL if a permadeath/ironman/hardcore mode lands.",
+    "settledFrom": "index.html death path :2822 (s.respawn=RESPAWN_DELAY, deaths++) -> step revive :2669-2677 (alive=true, hp=maxHp) -> player respawns as Scout :2839; the only 'game over' is the generation reset starmap.js:571 (territory loss, knowledge persists, not death). 0-hit permadeath grep over the 48 scanned files. Guarded by tools/genre_selfcheck.js F48"
    }
   },
   {

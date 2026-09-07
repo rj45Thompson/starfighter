@@ -16,6 +16,7 @@
 //   F29  capture an enemy ship and keep it      -> no  (grep commandeer|hijack|capture-a-ship|board-enemy|... = 0) [2026-09-07]
 //   F40  real-time multiplayer (many humans)     -> no  (grep WebSocket|RTCPeer|socket.io|multiplayer|... = 0)     [2026-09-07]
 //   F44  in-system fast-travel layer             -> no  (grep supercruise|fast-travel|cruise mode|time-accel|... = 0) [2026-09-07]
+//   F48  permadeath (death ends the run)         -> no  (grep permadeath|ironman|hardcore|permanent death|... = 0)   [2026-09-07]
 //
 // F67 (adaptive music) WAS guarded here and has been RETIRED from the list, which is this guard
 // working rather than failing: music.js was built on 2026-09-06, the grep that defined the cell went
@@ -57,6 +58,12 @@ const GUARDS = [
   // system travel is real-space flight (go/goto autopilot at normal speed; hyperspace is BETWEEN systems, F42/F43).
   // Any hit means a supercruise / cruise-mode / time-accel / instant-travel layer has landed.
   { id: 'F44', label: 'in-system fast-travel layer', re: /supercruise|super-cruise|\bfast.?travel\b|cruise (mode|layer|drive|state|lane)|time.?(accel|warp|dilation)|instant(aneous)? (travel|transit|arrival|jump)|jump.?to.?point|warp.?to.?(planet|point|world)|autotravel|frame.?shift/i },
+  // F48 (2026-09-07): player death ends the run PERMANENTLY (permadeath). Graded "no" - death is non-terminal:
+  // killByShip sets s.respawn=RESPAWN_DELAY (index.html:2822), step revives at s.respawn<=0 (:2669), the player
+  // respawns as a stock Scout (:2839). Tight patterns only, so it never trips on the GENERATION reset ("game over /
+  // generations" starmap.js - a soft territory-loss reset that KEEPS the minds' knowledge, not a death end) or the
+  // AGI "no single lifetime" culture text (:4726). Any hit means a permadeath / ironman / hardcore mode has landed.
+  { id: 'F48', label: 'permadeath (death ends the run)', re: /permadeath|perma-death|iron ?man|hard ?core|permanent(ly)? (dead|death)|death is permanent|\bno[ -]?respawn\b|run ends (on|at|with) death|final death|one life to live/i },
 ];
 
 function gameFiles() {
@@ -112,7 +119,7 @@ function main() {
 
   const problems = check(GUARDS, loadGrades());
   if (problems.length === 0) {
-    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel) - 0 source hits each.`);
+    console.log(`genre_selfcheck: ${GUARDS.length} grep-proven "no" cells still hold (F68 gamepad, F69 accessibility, F29 ship capture, F40 real-time multiplayer, F44 in-system fast-travel, F48 permadeath) - 0 source hits each.`);
     process.exit(0);
   }
   console.log('genre_selfcheck: FAIL - a grep-proven "no" grade no longer matches the source:');
