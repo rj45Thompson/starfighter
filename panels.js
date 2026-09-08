@@ -542,6 +542,28 @@ function mobileStack(){
   if(!IS_TOUCH) return;
   if(!stackEl){
     stackEl=document.createElement('div'); stackEl.id='panelStack';
+    /* Panel CONTENT is desktop-shaped too, not just the boxes: measured inside the column, roster ran 4582px
+       past its own width and market 608px, because both are wide tables laid out for a monitor. Scoped to the
+       stack so the desktop layout is untouched. Tables are made to FIT rather than left to scroll sideways - a
+       horizontal swipe inside a vertically scrolling column is a fight, not a feature. */
+    const css=document.createElement('style');
+    css.textContent='#panelStack{font-size:12px}'
+      +'#panelStack table{width:100%!important;table-layout:fixed;border-collapse:collapse}'
+      +'#panelStack td,#panelStack th{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0}'
+      +'#panelStack button{min-height:34px}'
+      // The roster is a 32-child flex ROW running 4581px wide: no single child is too big, the row just runs
+      // on. It is NOT a direct child of the stack either - the registered panel is #rosterWrap and the row
+      // lives inside it, which is why a `>` selector missed it. A descendant selector only affects elements
+      // that are flex containers in the first place, so this is narrower than it looks.
+      +'#panelStack *{flex-wrap:wrap!important}'
+      +'#panelStack > * > *{max-width:100%}'
+      // Not panels, but the same phone problem and the same touch-only sheet: the nav bar is 773px wide and
+      // CENTRED, so on a 375px screen it runs from -199 to 574 and loses its first two items off the left;
+      // the mute button sits at left 375, entirely off the right edge. Measured, both.
+      +'#shellBar{left:0!important;right:0!important;width:auto!important;transform:none!important;'
+        +'max-width:100vw;overflow-x:auto;white-space:nowrap;justify-content:flex-start;font-size:12px}'
+      +'#voiceBtn{left:auto!important;right:8px!important}';
+    document.head.appendChild(css);
     const st=stackEl.style;
     st.position='fixed'; st.left='0'; st.right='0';
     st.top=CFG.STACK_TOP+'px'; st.bottom=CFG.STACK_BOTTOM+'px';
