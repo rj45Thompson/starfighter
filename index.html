@@ -338,6 +338,7 @@
 <script src="synod.js?v=20260906a"></script>
 <script src="ground.js?v=20260906d"></script>
 <script src="cybertron.js?v=20260907a"></script>
+<script src="backdrop.js?v=20260907e"></script>
 <script src="empire.js?v=20260907a"></script>
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
@@ -492,7 +493,9 @@ const CFG = {
   // comfortably outside a 25-unit planet - at 46 it would have put the docking ring, the dock test and the
   // undock push INSIDE the world. Docking distance is therefore per-planet now: DOCK_R is the floor, and
   // dockR(p) = max(that, radius * DOCK_MULT).
-  N_PLANETS:16, PLANET_R:[34,50], DOCK_R:44, DOCK_MULT:1.85, TRADE_COOLDOWN:0.5, HOLD_CAP:40, TRADE_QTY:20, TRADER_FRAC:0.62, CREDIT_RESERVE:12,
+  // PLANET_MIN_GAP is the clear space between two planets' SURFACES, not their centres - crowding is wanted,
+  // contact is not. At PLANET_R up to 50 a gap of 30 keeps a visible lane between neighbours.
+  N_PLANETS:16, PLANET_R:[34,50], PLANET_MIN_GAP:30, PLANET_PLACE_TRIES:40, SEPARATE_PASSES:6, DOCK_R:44, DOCK_MULT:1.85, TRADE_COOLDOWN:0.5, HOLD_CAP:40, TRADE_QTY:20, TRADER_FRAC:0.62, CREDIT_RESERVE:12,
   TRADER_EQUIP_CD:26, TRADER_EQUIP_RESERVE:320,   // user 2026-07-08 "the other agi don't ever update their ships": doTrade() never spent a trader's accumulated wealth on anything - now they periodically invest surplus into gear
   AMBIENT_DELIBERATE_CD:22, AMBIENT_DELIBERATE_FIRST:8,   // user 2026-07-08 "the knowledge graph viewer seemed blank": deliberate/acquire only ever ran from the manually-typed `deliberate` command - nothing ambient ever fed GAME_KNOW, so the AGI-test HUD stayed 0/0/0 forever unless you knew the hidden command. A random living mind now silently runs one cycle on this cadence.
   FUEL_CAP:60, FUEL_START:60, FUEL_LOW:18,
@@ -1526,10 +1529,66 @@ function makeSystems(){ for(let i=0;i<CFG.N_SYSTEMS;i++){ const u=(i/CFG.N_SYSTE
     const nb=new T.Sprite(new T.SpriteMaterial({map:FX_TEX.nebula[(i+k)%FX_TEX.nebula.length],color:0xffffff,blending:T.AdditiveBlending,transparent:true,depthWrite:false,depthTest:false,opacity:CFG.NEBULA_OPACITY,rotation:rand(0,TAU)}));
     nb.position.copy(center).addScaledVector(dir,CFG.SYSTEM_R*rand(CFG.NEBULA_DIST[0],CFG.NEBULA_DIST[1])); const sz=CFG.SYSTEM_R*rand(CFG.NEBULA_SIZE[0],CFG.NEBULA_SIZE[1]); nb.scale.set(sz,sz,1); nb.renderOrder=-5; scene.add(nb); }
   sys.sun=sun; systems.push(sys); } }
+// SEPARATION, run once after everything is placed. Rejecting overlaps inside makePlanets only protects PLANETS
+// from each other; the base, the pirate station and the science station are each placed at a fixed offset from
+// their system centre and knew nothing about what was already there. Measured before this existed: Kestrel's
+// Reach sat 26.2 units INSIDE Orwell.
+//
+// This pushes any overlapping pair apart along the line between them, a few passes so a chain of three settles,
+// and it moves the body's whole retinue - the docking ring, the label, the halo are separate scene objects that
+// would otherwise stay behind and float where the planet used to be.
+function separateBodies(){
+  const bodies = planets.slice();
+  if(base) bodies.push(base);
+  let moved = 0;
+  for(let pass=0; pass<CFG.SEPARATE_PASSES; pass++){
+    let touched = 0;
+    for(let i=0;i<bodies.length;i++) for(let j=i+1;j<bodies.length;j++){
+      const a=bodies[i], b=bodies[j];
+      if(!a || !b || !a.pos || !b.pos) continue;
+      if(a.system && b.system && a.system!==b.system) continue;      // different systems cannot overlap
+      const need = (a.radius||0) + (b.radius||0) + CFG.PLANET_MIN_GAP;
+      const d = a.pos.distanceTo(b.pos);
+      if(d >= need || d < 1e-4) continue;
+      const push = (need - d) / 2 + 0.5;
+      _v.copy(b.pos).sub(a.pos).normalize();
+      moveBody(a, _v.clone().multiplyScalar(-push));
+      moveBody(b, _v.clone().multiplyScalar(push));
+      touched++; moved++;
+    }
+    if(!touched) break;
+  }
+  if(moved) console.info('separateBodies: resolved', moved, 'overlap(s)');
+  return moved;
+}
+// a body is a mesh plus whatever was parented to the SCENE beside it; all of it moves together
+function moveBody(p, delta){
+  p.pos.add(delta);
+  if(p.mesh) p.mesh.position.copy(p.pos);
+  if(p.ring) p.ring.position.copy(p.pos);
+  if(p.label && p.label.position) p.label.position.add(delta);
+  if(p.lab && p.lab.position) p.lab.position.add(delta);
+  if(p.sp && p.sp.position) p.sp.position.add(delta);
+}
 function makePlanets(){ makeSystems();
   for(let i=0;i<CFG.N_PLANETS;i++){ const type=PTYPES[i%PTYPES.length], sys=systems[i%systems.length];
-  const u=rand(0,TAU), r=CFG.SYSTEM_R*rand(0.35,0.85), el=rand(-0.3,0.3), cs=Math.cos(el);
-  const pos=sys.center.clone().add(new T.Vector3(Math.cos(u)*r*cs, Math.sin(el)*r*0.5, Math.sin(u)*r*cs)), radius=rand(CFG.PLANET_R[0],CFG.PLANET_R[1]);
+  // SPACING (RJ 2026-09-07: "don't let two planets form near each other" then, on seeing it, "it's actually fun
+  // when they are close together just sometimes they are touching.. that's TOO close"). So this is not a solar
+  // system's orderly orbits - it keeps the crowding, and only rejects an ACTUAL overlap. A position is re-rolled
+  // while any existing planet in the system is closer than the two radii plus CFG.PLANET_MIN_GAP. After
+  // PLANET_PLACE_TRIES the last candidate is taken anyway: a galaxy that fails to build is worse than two
+  // planets that sit closer than intended, and the console says when it happened rather than hiding it.
+  const radius=rand(CFG.PLANET_R[0],CFG.PLANET_R[1]);
+  let pos=null, tries=0;
+  for(; tries<CFG.PLANET_PLACE_TRIES; tries++){
+    const u=rand(0,TAU), r=CFG.SYSTEM_R*rand(0.35,0.85), el=rand(-0.3,0.3), cs=Math.cos(el);
+    const cand=sys.center.clone().add(new T.Vector3(Math.cos(u)*r*cs, Math.sin(el)*r*0.5, Math.sin(u)*r*cs));
+    let clash=false;
+    for(const q of sys.planets){ if(cand.distanceTo(q.pos) < radius + q.radius + CFG.PLANET_MIN_GAP){ clash=true; break; } }
+    if(!clash){ pos=cand; break; }
+    pos=cand;   // keep the last one in case every try clashes
+  }
+  if(tries>=CFG.PLANET_PLACE_TRIES) console.warn('planet placement: no clear spot after', tries, 'tries in', sys.name, '- placed anyway');
   const stock={}; GOODS.forEach(g=>stock[g.k]=CFG.EQ_STOCK);
   const p={ name:PNAMES[i%PNAMES.length], type, pos, radius, baseRadius:radius, baseType:BASE_TYPES[_baseTypeHash(PNAMES[i%PNAMES.length])%BASE_TYPES.length], stock, system:sys, rep:0,   // SR BASE TYPES: deterministic specialty per planet-name
     wealth:CFG.PLANET_WEALTH0, dev:1, eq:CFG.EQ_STOCK, underThreat:false, defCd:0, boomT:0,   // SR-M13: post-liberation trade boom timer, set by warTick on liberation, consumed by econTick
@@ -6601,6 +6660,8 @@ withSeed(galaxySeed(), ()=>{
   makeBase();   // M8: the Ranger Command hub
   makePirateStation();   // user 2026-07-08: "add pirate space stations and pirate space not owned"
   makeScienceStation();   // SR-M19: the Athenaeum - artifact analysis + mineral probes, paid in CORES
+  separateBodies();   // the stations are placed at fixed offsets and can land ON a planet - see below
+  if(window.BACKDROP){ const b=BACKDROP.build({scene:scene, renderer:renderer}); if(b) console.info('backdrop:', b.cards, 'cards over', b.layers, 'parallax layers,', b.stars, 'stars @', b.starSizes.join('/'), 'world units, proj', b.projPx); }
   makeMiningBelt();   // user 2026-07-14: the peaceful CERES BELT - dense rocks, no pirates (must run BEFORE the initial spawnAtShell loop so the belt gets its share)
 });
 for(let i=0;i<CFG.NSHIPS;i++) makeShip(i);
@@ -7806,7 +7867,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); backgroundTick(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering - but the empire it promised keeps running, see backgroundTick
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); starSpinTick(dt); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); starSpinTick(dt); if(window.BACKDROP) BACKDROP.tick(dt, chaseCam.position); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }

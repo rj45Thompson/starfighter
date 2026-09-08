@@ -23,7 +23,7 @@ var CSOFF = /[?&]csoff=1(&|$)/.test(location.search);
 // facts ∪ the pilot's corpus, so the no-fabrication guarantee survives the paraphrase. Soft-fail like TAMI_CS:
 // sidecar absent (public site) -> the verbatim composer answers exactly as before. `?csoff=1` skips this probe too.
 var SPEAK_CFG={ TIMEOUT_MS:8000, MAX_FACTS:8, MAX_HISTORY:4,   // named tunables (contract limits) - no magic numbers below. TIMEOUT_MS 6000→8000 (speech-verifier wave-0 backlog: guard-retry latency 4.7–7s exceeded the old 6s timeout on ~2/7 turns)
-  REPROBE_MS:20000 };   // LATE-SIDECAR FIX (NOVEL_SOCIETY backlog, puppet audit tick-1): while the sidecar is DOWN, re-probe /health on this cadence so a sidecar started AFTER page load is picked up automatically (composer→LLM without a reload). Named constant, no magic number.
+  REPROBE_MS:20000, REPROBE_BACKOFF_AFTER:15, REPROBE_MAX_MS:300000 };   // LATE-SIDECAR FIX (NOVEL_SOCIETY backlog, puppet audit tick-1): while the sidecar is DOWN, re-probe /health on this cadence so a sidecar started AFTER page load is picked up automatically (composer→LLM without a reload). Named constant, no magic number.
 var TAMI_SPEAK=(()=>{ const BASE='http://localhost:7876'; let alive=false, info=null; let probed;
   if(CSOFF){ probed=Promise.resolve(); console.log('TAMI_SPEAK probe SKIPPED (?csoff=1) - pilot speech stays on the retrieval composer'); }
   else probed=fetch(BASE+'/health').then(r=>r.ok?r.json():null).then(j=>{ alive=!!(j&&j.ok); info=j||null;
@@ -33,7 +33,18 @@ var TAMI_SPEAK=(()=>{ const BASE='http://localhost:7876'; let alive=false, info=
   // LATE-SIDECAR re-probe timer: only polls WHILE down (once alive, it stops - no ongoing network spam) and never
   // under ?csoff=1 (composer-tier testing stays deterministic). This is the timer arm of the backlog fix; loreSpeak
   // also drives an every-Nth-ask re-probe via ensureFresh() so a late sidecar is caught on the next question too.
-  if(!CSOFF){ const iv=setInterval(()=>{ if(alive){ clearInterval(iv); return; } health(); }, SPEAK_CFG.REPROBE_MS); }
+  // BACKOFF (2026-09-07): the re-probe was a FIXED 20s forever. On a tab left open for a working day that is
+  // ~2000 failed /health fetches, and every one logs a red ERR_CONNECTION_REFUSED - which is not a cosmetic
+  // complaint: it buried a real rendering bug's diagnostics under 160 identical lines. A sidecar that has not
+  // appeared in five minutes is not appearing in the next twenty seconds, so after REPROBE_BACKOFF_AFTER
+  // consecutive failures the interval doubles up to REPROBE_MAX_MS. The FAST window is preserved exactly, which
+  // is the part the late-sidecar fix actually needed; the first success clears the timer as before.
+  if(!CSOFF){ let miss=0, wait=SPEAK_CFG.REPROBE_MS, tid=null;
+    const again=()=>{ tid=setTimeout(async()=>{ if(alive) return; await health();
+      if(alive){ if(tid) clearTimeout(tid); return; }
+      if(++miss>=SPEAK_CFG.REPROBE_BACKOFF_AFTER) wait=Math.min(wait*2, SPEAK_CFG.REPROBE_MAX_MS);
+      again(); }, wait); };
+    again(); }
   let sinceProbe=0;   // ask-driven re-probe counter (the "every Nth ask" arm)
   return { get alive(){return alive;}, get info(){return info;}, probed,
     // live re-probe (mirror of TAMI_CS.health): the speech sidecar may (re)start after page load

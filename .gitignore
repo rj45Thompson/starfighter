@@ -1,3 +1,12 @@
 __pycache__/
 *.pyc
 .upgrade_pass.log
+
+# probe output and one-shot measurement dumps - written by tools/, never source
+scratchpad/
+.autobot-topics
+
+# remaster_planets.py keeps a .orig beside every sheet it composites onto, so a bad
+# pass can be undone locally. They are byte-identical copies of committed art; 35 of
+# them is ~200 MB of duplicate history for nothing.
+*.orig

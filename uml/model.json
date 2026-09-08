@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T17:45:29",
+ "generated": "2026-09-07T19:29:02",
  "modules": [
   {
    "file": "acquire.js",
@@ -550,7 +550,7 @@
   },
   {
    "file": "cybertron.js",
-   "lines": 251,
+   "lines": 286,
    "classes": [
     {
      "name": "CYBERTRON",
@@ -558,13 +558,15 @@
       "CFG",
       "CFGX",
       "apply",
+      "applyAll",
+      "lookFor",
       "measure",
       "compare",
       "ready",
       "pathsFor",
       "looks"
      ],
-     "memberTotal": 8
+     "memberTotal": 10
     }
    ],
    "functions": [],
