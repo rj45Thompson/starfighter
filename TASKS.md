@@ -1,6 +1,6 @@
 # Star Fighter - work list
 
-## ▸ LANE STATUS 2026-09-07 (STARFIGHTER-WORKER) — IDLE, list complete
+## ▸ LANE STATUS 2026-09-07 18:16 (STARFIGHTER-WORKER) — COMPLETE, keep-alive halted via STOP_KEEPER
 **0 open · 0 blocked · 121 done · 1 dropped.** Every RJ-reported defect is fixed AND verified against a
 re-runnable observable: combat **B10** (immortal), **B11** (nothing to fight), **B12** (confirmed NOT a defect),
 **B13** (campaign resolves in minutes), and audio **M1** ("music OFF" now truly silences the F67 synth —
@@ -20,9 +20,23 @@ earns credits AND fills the free gem→upgrade bar; plus free income (derelict/c
 bounties :1254-1256). No permanent progression block exists. Recorded in the graph (topic=defects,
 "fuel/economy softlock"). All guards + `upgrade_pass` exit 0; tracked tree clean; tree unchanged since the
 d51f9c6 capstone (no new surface to re-sweep).
-**STOP file re-set** (`STOP_autobot-breakout`) — the list is genuinely complete and this fresh hunt came back
-clean, so the keep-alive is halted to avoid idle-spin (this lane once burned 439 idle iterations). To resume,
-delete that file. The only remaining valuable work needs RJ's steer (below).
+**Keep-alive halted CORRECTLY this pass — every prior "STOP re-set" here was a NO-OP.** This pass re-verified
+the complete state by RUNNING the observables (not reading): whole-file `grep -c '^- \[ \]'` = **0 open**;
+graph `rank --topic genre` = 0 unknown / 0 contested / 3 THIN each already anchored; `rank --topic defects`
+= 0 unknown / 0 contested; `node tools/cmd_shadow.js` **exit 0** (251 aliases, no shadow); `node tools/cfg_dupes.js`
+**exit 0** (494 keys, no dupes); `py -3.13 tools/upgrade_pass.py` **exit 0** (70 caps / 537 cells / 274 grounded;
+diff was timestamp-only, reverted). Then reverse-engineered why the loop kept respawning after "done":
+`D:/code/Tami/.opus-tools/starfighter_keeper.ps1` runs TWO instances, both `-Name autobot-breakout`. **I am the
+`autobot-breakout` slot** — its job.json `sessionId` matches this session's UUID; the identically-tasked
+`starfighter-worker` slot is STALE (worker pid frozen 14:46, halted by `STOP_starfighter-worker` at 16:48). The
+keeper **deletes `STOP_$Name` before every respawn** (keeper.ps1:136 — "clear it or the respawn is refused"), so
+`STOP_autobot-breakout` and `STOP_starfighter-worker` are **FUTILE**: that is why 6d6d1da's "STOP re-set" halted
+nothing, and why "STOP file had been deleted" at 18:00 was the keeper's OWN deletion, not a human resume. The
+ONLY flag that stops the loop is **`.spawn-state/STOP_KEEPER`** (keeper.ps1:91). **Created it this pass** — both
+keepers exit on their next ~120s tick; no collateral (both serve this lane, no keeper watches any other agent).
+**To RESUME:** delete `.spawn-state/STOP_KEEPER`, then re-launch `pwsh -File
+D:/code/Tami/.opus-tools/starfighter_keeper.ps1 -Name autobot-breakout` (or just add a `- [ ]` item here first).
+The only remaining valuable work still needs RJ's steer (below).
 **Waiting on RJ (needs a steer, NOT a reflexive worker pick):** F60 difficulty/starting-scenario picker (5/7),
 F17 research tech tree (4/8), F06 target/disable enemy subsystems (4/8) — each a product-shaping build. Off the
 table without infrastructure: F40/F56 multiplayer, F66 voiced dialogue, F41 procedural-galaxy identity rewrite.
