@@ -1,6 +1,6 @@
 # Star Fighter - work list
 
-## ▸ LANE STATUS 2026-09-07 18:16 (STARFIGHTER-WORKER) — COMPLETE, keep-alive halted via STOP_KEEPER
+## ▸ LANE STATUS 2026-09-07 18:24 (STARFIGHTER-WORKER) — COMPLETE, keep-alive halted via STOP_KEEPER + STOP_autobot-breakout (BOTH flags)
 **0 open · 0 blocked · 121 done · 1 dropped.** Every RJ-reported defect is fixed AND verified against a
 re-runnable observable: combat **B10** (immortal), **B11** (nothing to fight), **B12** (confirmed NOT a defect),
 **B13** (campaign resolves in minutes), and audio **M1** ("music OFF" now truly silences the F67 synth —
@@ -29,11 +29,15 @@ diff was timestamp-only, reverted). Then reverse-engineered why the loop kept re
 `D:/code/Tami/.opus-tools/starfighter_keeper.ps1` runs TWO instances, both `-Name autobot-breakout`. **I am the
 `autobot-breakout` slot** — its job.json `sessionId` matches this session's UUID; the identically-tasked
 `starfighter-worker` slot is STALE (worker pid frozen 14:46, halted by `STOP_starfighter-worker` at 16:48). The
-keeper **deletes `STOP_$Name` before every respawn** (keeper.ps1:136 — "clear it or the respawn is refused"), so
-`STOP_autobot-breakout` and `STOP_starfighter-worker` are **FUTILE**: that is why 6d6d1da's "STOP re-set" halted
-nothing, and why "STOP file had been deleted" at 18:00 was the keeper's OWN deletion, not a human resume. The
-ONLY flag that stops the loop is **`.spawn-state/STOP_KEEPER`** (keeper.ps1:91). **Created it this pass** — both
-keepers exit on their next ~120s tick; no collateral (both serve this lane, no keeper watches any other agent).
+keeper **deletes `STOP_$Name` on every respawn** (keeper.ps1:136 — "clear it or the respawn is refused"), which
+is why `STOP_$Name` ALONE is undone. But `STOP_$Name` DOES stop the actual re-invocation loop: `spawn_agent.ps1
+__run` runs `while(-not Test-Path STOP_$Name)` (:225, re-checked :255), re-invoking the CLI each ~2s (:249/:263)
+with the stale breakout directive + a "Continue" prompt (:241/:247). **So a full halt needs BOTH flags:**
+`STOP_KEEPER` (keeper.ps1:91 — stops the monitor that deletes the first flag and respawns) AND
+`STOP_autobot-breakout` (spawn_agent.ps1:225 — breaks the wrapper loop). **Both created this pass**; keepers
+confirmed exited (status log 18:19:09 + 18:20:59) and `STOP_SUPERVISOR` already set, so nothing deletes either
+flag or respawns. (My first attempt at 18:16 set only STOP_KEEPER and kept getting re-invoked ~every 2s — the
+__run wrapper was still looping; corrected here.)
 **To RESUME:** delete `.spawn-state/STOP_KEEPER`, then re-launch `pwsh -File
 D:/code/Tami/.opus-tools/starfighter_keeper.ps1 -Name autobot-breakout` (or just add a `- [ ]` item here first).
 The only remaining valuable work still needs RJ's steer (below).
