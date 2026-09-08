@@ -36,7 +36,8 @@
     NORMAL_SCALE: 1.15,
     ATMO_SCALE: 1.055, ATMO_OPACITY: 0.30,
     SMOG_SCALE: 1.012, SMOG_OPACITY: 0.16, SMOG_SPIN: 0.004,
-    LOOKS: LOOKS
+    LOOKS: LOOKS,
+    AUTO: true          // the machine worlds are the game's default look, not a command you have to know
   };
 
   var saved = {}, geoCache = {}, texCache = {}, pending = {}, extras = {}, spinners = [];
@@ -246,6 +247,40 @@
     }, Promise.resolve()).then(function () { return out; });
   }
 
-  window.CYBERTRON = { CFG: CFGX, apply: apply, measure: measure, compare: compare, ready: ready,
-    pathsFor: pathsFor, looks: function () { return LOOKS.slice(); } };
+  // AUTO-APPLY. Everything above was reachable only by typing `cybertron <look>`, which meant the machine worlds
+  // existed and nobody ever saw them - RJ loaded the game and got mining.jpg / agri.jpg exactly as before. The
+  // worlds are the DEFAULT now: one look per planet, chosen from a hash of the planet's own name so a given
+  // galaxy always dresses the same way, and a new galaxy (new seed, new names) dresses differently.
+  function lookFor(name) {
+    var h = 2166136261, i;
+    for (i = 0; i < name.length; i++) { h ^= name.charCodeAt(i); h = (h * 16777619) >>> 0; }
+    return LOOKS[h % LOOKS.length];
+  }
+  function applyAll(only) {
+    var list = planets(), out = {}, i;
+    if (!list.length) return null;
+    for (i = 0; i < list.length; i++) {
+      var p = list[i];
+      if (p._base || p.isPirateStation || p.isScienceStation) continue;   // stations keep their own look
+      var look = only || lookFor(p.name);
+      apply(look, p.name);
+      out[p.name] = look;
+    }
+    return out;
+  }
+  // run once the world exists; the maps stream in behind it and each material lights up as its emissive lands
+  function autoStart(tries) {
+    if (!CFGX.AUTO) return;
+    if (!planets().length) {
+      if ((tries || 0) < 60) return setTimeout(function () { autoStart((tries || 0) + 1); }, 250);
+      return;
+    }
+    var applied = applyAll();
+    if (window.HOST && HOST.term)
+      HOST.term('&#9670; machine worlds online - ' + Object.keys(applied || {}).length + ' planets reskinned', 'sys');
+  }
+  setTimeout(function () { autoStart(0); }, 400);
+
+  window.CYBERTRON = { CFG: CFGX, apply: apply, applyAll: applyAll, lookFor: lookFor, measure: measure,
+    compare: compare, ready: ready, pathsFor: pathsFor, looks: function () { return LOOKS.slice(); } };
 })();
