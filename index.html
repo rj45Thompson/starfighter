@@ -318,7 +318,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
-<script src="panels.js?v=20260906e"></script>
+<script src="panels.js?v=20260907b"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260906b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
@@ -6345,7 +6345,12 @@ function updateTopCam(){ const c=topCenter||(ships[focus]&&ships[focus].pos)||ne
 // TOP-DOWN PRIMARY: TOPDOWN_MAIN swaps the big MAIN view to a close top-down follow of the player; the 3D chase view
 // then lives inside the movable/resizable #chaseWin window (VIEW.chase, driven by that element's on-screen rect).
 // WINDOWS menu state for the things that are not PANELS panels (2026-09-06): the two GL insets and the power dock. Read by renderAll and the layout pass.
-const HUD_WIN=(function(){ const d={top:true,brain:true,power:true}; try{ const s=JSON.parse(localStorage.getItem('SF_WINDOWS_v1')||'null'); if(s&&typeof s==='object') for(const k in d) if(typeof s[k]==='boolean') d[k]=s[k]; }catch(e){} return d; })();
+const HUD_WIN=(function(){ /* RJ 2026-09-07: "start with all windows open except health bar" - the health bar is
+   this power dock, and it is the ONE thing a phone starts without. IS_TOUCH is declared further down the file, so
+   the same test is inlined here rather than reordering the declarations. First-load default only: a saved
+   SF_WINDOWS_v1 still wins, exactly as before. */
+  const coarse = (typeof matchMedia==='function' && matchMedia('(pointer:coarse)').matches) || ('ontouchstart' in window);
+  const d={top:true,brain:true,power:!coarse}; try{ const s=JSON.parse(localStorage.getItem('SF_WINDOWS_v1')||'null'); if(s&&typeof s==='object') for(const k in d) if(typeof s[k]==='boolean') d[k]=s[k]; }catch(e){} return d; })();
 let TOPDOWN_MAIN=false, mainTopZoom=1;   // user 2026-07-13 "the 2d view isn't playable, make the 3d view the background again" - false = fullscreen chase cam main; rear gunner + insets stay
 function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3(); const z=mainTopZoom;
   mainTopCam.aspect=(VIEW.main.w/Math.max(1,VIEW.main.h))||1;

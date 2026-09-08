@@ -115,6 +115,32 @@
   //
   // The FM voices stay exactly where they are. This table is a PREFERENCE, not a replacement: anything that
   // 404s or fails to decode falls through to its oscillator twin, so the game never depends on these files.
+  /* PER-SOUND MIX (RJ 2026-09-07: "some of the effects from spacegame are way too loud").
+     Measured by decoding each file in the browser, which is the same path the game plays them on:
+
+       lockon -8.4 dBFS peak 1.699 | pickup -8.5 peak 1.520 | alarm -10.7 peak 1.164 | warp -12.4
+       beam -13.7 | dock -15.4 peak 1.037 | explode -15.9 | shoot -17.9 | hit -18.1 | ui -21.0
+
+     Two separate faults. FOUR FILES PEAK ABOVE 1.0, so they were not merely loud, they were clipping
+     on every play. And the mix was inverted: lockon and pickup, which fire constantly, were the two
+     loudest sounds in the game while the explosion sat 7 dB under them.
+
+     Each sound gets a target by how OFTEN it fires, not by how big it sounds in isolation - a sound
+     you hear fifty times a minute has to sit under one you hear twice. The gain is target/measured,
+     then clamped so peak * gain <= 0.89 (about -1 dBFS of headroom). That clamp is not decorative:
+     explode wanted +1.9 dB and its peak would have hit 1.16, so it is limited to 0.95 instead. */
+  var SAMPLE_MIX = {   // NOTE: distinct from CFG.SAMPLE_GAIN, which is the single master trim
+    gen_shoot:  0.50,   // -24 dBFS: fires on every trigger pull
+    gen_hit:    0.64,   // -22
+    gen_pickup: 0.21,   // -22, was the joint loudest AND clipping at 1.52
+    gen_ui:     0.89,   // -22
+    gen_lockon: 0.26,   // -20, was the loudest in the game and clipping at 1.70
+    gen_beam:   0.48,   // -20
+    gen_dock:   0.74,   // -18, was clipping at 1.04
+    gen_warp:   0.66,   // -16
+    gen_alarm:  0.54,   // -16, was clipping at 1.16
+    gen_explode:0.95    // peak-limited, not level-matched: the one sound allowed to be the loudest
+  };
   var SAMPLE_FILES = {
     weapon_player: 'weapon_player.wav', weapon_enemy: 'weapon_enemy.wav',
     explosion_player: 'explosion_player.wav', explosion_enemy: 'explosion_enemy.wav', explosion_asteroid: 'explosion_asteroid.wav',
@@ -147,7 +173,8 @@
     try {
       var src = ctx.createBufferSource(); src.buffer = buf;
       src.playbackRate.value = 1 + (Math.random() * 2 - 1) * CFG.SAMPLE_RATE_JITTER;
-      var g = ctx.createGain(); g.gain.value = CFG.SAMPLE_GAIN * (extraVol != null ? extraVol : 1);
+      var mix = SAMPLE_MIX[key]; if (mix == null) mix = 1;      // per-sound level, see SAMPLE_MIX
+      var g = ctx.createGain(); g.gain.value = CFG.SAMPLE_GAIN * mix * (extraVol != null ? extraVol : 1);
       src.connect(g); g.connect(master);
       voices++; src.onended = function () { voices = Math.max(0, voices - 1); };
       src.start(now());

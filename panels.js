@@ -31,6 +31,13 @@ const CFG = {
   OP_MIN:0.25, OP_MAX:1.0, OP_STEP:0.01, TEXT_OP_FLOOR:0.72,   // 0.16-0.97 -> 0.25-1.0 (user 2026-09-06 "the market allows too much transparency and not enough opaque"): every registered window shares this range; the POWER panel's own slider uses the same numbers   // 0.38 -> 0.72 (2026-09-06): the slider now really drives the BOX alpha (the forced-transparent CSS rule is gone), so the text no longer needs to fade with it to make a panel feel see-through; at the new 0.4 default the terminal text had dropped to 56%   // TEXT_OP_FLOOR: the text fades with the same slider but never past this, so a panel dragged to minimum still has a way back
   CHROME_RESERVE:24,   // user report "the terminal pinned box seems to overlap the parasite tab": the ctl cluster/tab float AT the panel's own top corner, which collided with the panel's OWN header content (market's title, the ticker's PARASITE/TERMINAL/... row) - reserving this much top padding on every registered panel gives the chrome a real strip instead of sitting on top of the content
   TAB_W:118, TAB_H:20,         // edge pull-tab footprint
+  /* PHONE STACK (RJ 2026-09-07: "optimize UI for android"). Opening all eight windows on a 375px phone put
+     them on top of each other: measured overlap ratio 1.02 - the panels covered MORE than their own combined
+     area - with khud 460px wide at left -97 and sbhud off the right edge. Free-floating windows are a
+     mouse-and-big-screen idea; on a phone the same eight become one scrolling column. */
+  STACK_TOP:44, STACK_BOTTOM:92,   // clear of the top button row and the chat/fire controls at the foot
+  STACK_ITEM_VH:34,                // each panel's share of the screen before it scrolls internally
+  STACK_PAD:8, STACK_Z:40,
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
   RESIZE_GRIP:26,              // resize-handle footprint (bumped 16->18->26 across "still I can't resize" reports 2026-07-08/09/10 - now a bold, unmistakable corner handle, not a faint 18px hint)
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
@@ -408,7 +415,17 @@ function register(id, el, opts){
   // FIRST-EVER load (saved.open/pinned stay authoritative the moment a player actually opens/closes/pins anything -
   // this never overrides a real preference, only the un-set initial default) - a phone starts clean, every panel
   // still one tap away on its edge tab exactly as before.
-  const touchDefaultOpen = !IS_TOUCH && opts.defaultOpen!==false, touchDefaultPinned = !IS_TOUCH && opts.defaultPinned!==false;
+  /* RJ 2026-09-07: "for android start with all windows open except health bar." That REVERSES the rule the
+     paragraph above describes - it was deliberately hiding every panel on a phone to avoid clutter, and RJ has
+     now asked for the opposite, so a phone gets the same starting layout as a desktop. The one exception, the
+     health/power dock, is not a PANELS panel at all: it is HUD_WIN.power, defaulted off for touch in index.html.
+     Unchanged: this is still only the FIRST-EVER default. The moment a player opens, closes or pins anything,
+     saved.open/saved.pinned win, so nobody's existing layout moves. */
+  // On touch, ALL of them open - RJ asked for every window up, and six panels ship with an explicit
+  // defaultOpen:false (roster, missionlog, market, shop, empire, khud) that a plain `!==false` would still
+  // honour, leaving only two open. Desktop keeps each panel's own default.
+  const touchDefaultOpen = IS_TOUCH ? true : (opts.defaultOpen!==false);
+  const touchDefaultPinned = IS_TOUCH ? true : (opts.defaultPinned!==false);
   // DRAG-TO-REDOCK: once a panel has been manually dragged to an edge at least once (store[id].manualDock), that
   // choice outranks opts.edge/opts.centerX forever - same "your own action beats the shipped default" convention
   // the resize grip already established for w/h.
@@ -513,14 +530,70 @@ function register(id, el, opts){
   if(!retickT) retickT=setInterval(retickTabs, 450);            // follows size changes from OUTSIDE our API (e.g. the ticker's own .big toggle)
   return rec;
 }
+/* The phone layout. Panels are re-parented into one scrolling column and laid out by normal flow instead of
+   the inline left/top the desktop code writes - which is safe here precisely because touch already disables
+   dragging and resizing (see the IS_TOUCH guard in the drag handler), so nothing else owns their position.
+   The desktop chrome that goes with those gestures - drag handle, resize grips, edge pull-tab - is hidden on
+   touch rather than left floating over a column it can no longer control. */
+let stackEl=null, stackHidden=false;
+const STACK_OVERRIDES=['position','left','right','top','bottom','width','max-width','transform','margin',
+                       'max-height','overflow'];
+function mobileStack(){
+  if(!IS_TOUCH) return;
+  if(!stackEl){
+    stackEl=document.createElement('div'); stackEl.id='panelStack';
+    const st=stackEl.style;
+    st.position='fixed'; st.left='0'; st.right='0';
+    st.top=CFG.STACK_TOP+'px'; st.bottom=CFG.STACK_BOTTOM+'px';
+    st.overflowY='auto'; st.webkitOverflowScrolling='touch';
+    st.zIndex=CFG.STACK_Z; st.pointerEvents='auto';
+    document.body.appendChild(stackEl);
+    const btn=document.createElement('button');
+    btn.id='stackToggle'; btn.type='button'; btn.textContent='▤';
+    btn.title='Show or hide the window column';
+    const bs=btn.style;
+    bs.position='fixed'; bs.left='8px'; bs.bottom='8px'; bs.width='48px'; bs.height='48px';
+    bs.zIndex=(CFG.STACK_Z+1); bs.font='18px system-ui,sans-serif'; bs.borderRadius='24px';
+    bs.background='rgba(9,17,27,.86)'; bs.color='#9fd8ff'; bs.border='1px solid rgba(120,200,255,.35)';
+    btn.addEventListener('click', function(){ stackHidden=!stackHidden; mobileStack(); });
+    document.body.appendChild(btn);
+  }
+  let any=false;
+  for(const id in PANELS_){
+    const rec=PANELS_[id], el=rec.el;
+    if(rec.open && !stackHidden){
+      if(el.parentNode!==stackEl) stackEl.appendChild(el);
+      el.style.setProperty('position','static','important');
+      el.style.setProperty('left','auto','important');
+      el.style.setProperty('right','auto','important');
+      el.style.setProperty('top','auto','important');
+      el.style.setProperty('bottom','auto','important');
+      el.style.setProperty('width','auto','important');
+      el.style.setProperty('max-width','none','important');
+      el.style.setProperty('transform','none','important');
+      el.style.setProperty('margin','0 '+CFG.STACK_PAD+'px '+CFG.STACK_PAD+'px','important');
+      el.style.setProperty('max-height',CFG.STACK_ITEM_VH+'vh','important');
+      el.style.setProperty('overflow','auto','important');
+      any=true;
+    } else if(el.parentNode===stackEl){
+      document.body.appendChild(el);
+      STACK_OVERRIDES.forEach(function(k){ el.style.removeProperty(k); });
+    }
+    // the desktop affordances have no meaning in a scrolling column
+    [rec.tab, rec.ctl, rec.grip, rec.gripE, rec.gripS].forEach(function(n){ if(n) n.style.display='none'; });
+  }
+  stackEl.style.display = any ? 'block' : 'none';
+}
+
 let retickT=null;
-function retickTabs(){ for(const id in PANELS_){ const rec=PANELS_[id]; const t=tabPosition(rec);
+function retickTabs(){ if(IS_TOUCH){ mobileStack(); return; }   // the phone has no floating chrome to retick
+  for(const id in PANELS_){ const rec=PANELS_[id]; const t=tabPosition(rec);
   rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.width=c.width; if(rec.grip) positionGrip(rec); } } }
 
-function open(id){ const r=PANELS_[id]; if(r) setOpen(r,true); }
-function close(id){ const r=PANELS_[id]; if(r) setOpen(r,false); }
-function toggle(id){ const r=PANELS_[id]; if(r) setOpen(r,!r.open); return r?r.open:null; }
+function open(id){ const r=PANELS_[id]; if(r){ setOpen(r,true); mobileStack(); } }
+function close(id){ const r=PANELS_[id]; if(r){ setOpen(r,false); mobileStack(); } }
+function toggle(id){ const r=PANELS_[id]; if(r){ setOpen(r,!r.open); mobileStack(); } return r?r.open:null; }
 function isOpen(id){ const r=PANELS_[id]; return r?r.open:null; }
 function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
