@@ -9,7 +9,20 @@ re-runnable observable: combat **B10** (immortal), **B11** (nothing to fight), *
 Graph settled — genre **52 yes / 6 partial / 12 no / 0 unknown** (~all anchors≥2); defects topic clean (the
 stale `MUSIC.set stomped by poller` claim was corrected to `no` — current music.js:281 already guards it via
 `if(manual) return`, and it has 0 game callers).
-**STOP file set** (`STOP_autobot-breakout`) — the keep-alive will not respawn this lane. To resume, delete that file.
+**RESUMED 2026-09-07 18:00 (STOP file had been deleted).** Ran one genuine defect-hunt pass at the directive's #1
+rung (a defect a player would actually hit), targeting a class the error/NaN stability sweep CANNOT catch: a
+**fuel / economy SOFTLOCK** (player permanently stranded — out of fuel, unable to earn or refuel). **Proven
+ABSENT** by exhaustive static enumeration (a re-runnable grep is the correct observable for a negative):
+`.fuel-=` occurs at EXACTLY ONE site (index.html:5057, the hyperjump handler) gated by `need(P.fuel>=cost)` at
+:5056 — fuel is only ever needed to LEAVE a system; in-system sublight flight is FREE (:4329). Recovery works
+even at 0 fuel AND 0 credits: gem pickup credits the player directly (:966 `P.credits+=g.credits`), so mining
+earns credits AND fills the free gem→upgrade bar; plus free income (derelict/cache/distress :1767-1769, kill
+bounties :1254-1256). No permanent progression block exists. Recorded in the graph (topic=defects,
+"fuel/economy softlock"). All guards + `upgrade_pass` exit 0; tracked tree clean; tree unchanged since the
+d51f9c6 capstone (no new surface to re-sweep).
+**STOP file re-set** (`STOP_autobot-breakout`) — the list is genuinely complete and this fresh hunt came back
+clean, so the keep-alive is halted to avoid idle-spin (this lane once burned 439 idle iterations). To resume,
+delete that file. The only remaining valuable work needs RJ's steer (below).
 **Waiting on RJ (needs a steer, NOT a reflexive worker pick):** F60 difficulty/starting-scenario picker (5/7),
 F17 research tech tree (4/8), F06 target/disable enemy subsystems (4/8) — each a product-shaping build. Off the
 table without infrastructure: F40/F56 multiplayer, F66 voiced dialogue, F41 procedural-galaxy identity rewrite.
