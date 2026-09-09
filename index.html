@@ -6134,35 +6134,11 @@ if(window.PANELS){
   PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9, resizable:true, defaultOpen:false,   // closed by default (task #66) - an already-busy screen shouldn't gain a 4th open-by-default left-edge panel; one click on its tab opens it
     onOpenChange:(open)=>{ missionlogOn=open; if(open) updateMissionLog(); } });
-  // TOP-DOWN PRIMARY 3D WINDOW (user 2026-07-12 "keep the 3d view but make it a panel you can resize and move",
-  // then "the 3d view is not working"): the chase view must be TRANSPARENT so the shared WebGL canvas - which
-  // scissor-renders the chase cam into VIEW.chase behind it - shows through. Registering with PANELS forced a
-  // near-opaque panel background (rgba 0.97) that HID the 3D. So it's a self-managed frame: a thin drag bar + a
-  // corner resize grip (pointer-events:auto), over a transparent click-through body (aim/fire pass through). Keep it
-  // over the top-down MAIN view (canvas); parking it on a solid HUD panel would show that panel, not the 3D.
-  (function(){
-    if(document.getElementById('chaseWin')) return;
-    var w=document.createElement('div'); w.id='chaseWin';
-    w.style.cssText='position:fixed;left:150px;top:84px;width:400px;height:250px;z-index:40;border:1px solid #46617e;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
-    document.body.appendChild(w);   // transparent body: the shared canvas scissor-renders the chase into VIEW.chase behind it (cheap, no readback)
-    /* RJ 2026-09-08: "check again all windows have the same code it should be reusable." This window used to
-       carry its own title bar, its own corner grip and its own mousedown/mousemove/mouseup drag - about
-       thirty lines duplicating what panels.js already does for the other eight, and drifting from them: no
-       pin, no edge tab, no saved size, a different resize feel. It registers now like everything else and
-       gets all of that for free. `transparent` is the mode added for it: same chrome, no background fill,
-       body stays click-through so aim and fire still pass through the 3D. */
-    /* CLOSED by default, and OPENING IT IS THE MODE. RJ 2026-09-08: "the 3d window seems broken?" It was an
-       empty bordered box: TOPDOWN_MAIN is false by default, which means the 3D fills the whole screen and the
-       chase window has nothing to render into it. It has always been that way; giving it the shared title bar
-       and pin just made an empty frame look like a broken window instead of a stray border.
-
-       So the window now IS the top-down-primary mode, which is what the design note above describes: open it
-       and the main view becomes the close top-down follow with the 3D in this window; close it and the 3D goes
-       back to fullscreen. Either way you never get a frame with nothing in it. */
-    if(window.PANELS) PANELS.register('chase', w, { title:'BACKUP CAM', edge:'top', rgb:[13,26,42],   // RJ 2026-09-08: "3d view should be renamed to backup cam"
-      transparent:true, resizable:true, defaultOpen:false,
-      onOpenChange:(open)=>{ TOPDOWN_MAIN = open; } });
-  })();
+  /* The self-managed 3D chase window that used to live here is GONE (2026-09-08). It showed the forward
+     view the main screen already shows - RJ: "backup cam looked the same as forward cam?" - and opening
+     it set TOPDOWN_MAIN, which swapped the whole main view to top-down: "then my regular screen looks
+     messed". The rear-facing BACKUP CAM in the table below is what it was meant to be, and it is one row
+     of that table rather than its own forty lines with its own drag, resize and global side effect. */
 
   /* THE FOUR DIRECTIONAL BACKUP CAMS (RJ 2026-09-08: "and also half left backup right backup bottom backup cam
      and top backup cam"). One camera per side, each in its own window, like a vehicle's surround view.
@@ -6175,25 +6151,51 @@ if(window.PANELS){
      `up` is the ship's up, except for the two that look along that axis - a camera looking straight up cannot
      use up as its up vector - where the ship's nose serves instead. */
   const BACKUP_CAM_OUT = 6;      // how far off the hull each camera sits, so the ship itself does not fill it
+  /* RJ 2026-09-08: "rename camera to left side right side top bottom and backupcam. make the windows open in
+     their cardinal directions." So each window docks on the edge it looks through - the left camera lives on
+     the left of the screen, and so on. `edge` is the panel's dock and `place` is where it sits before anyone
+     drags it; both follow the direction, so the layout tells you what you are looking at without reading a
+     title. */
   const BACKUP_CAMS = [
-    { pid:'camleft',   id:'camLeftWin',   title:'LEFT BACKUP',   ax:'x', sgn:-1, top:120 },
-    { pid:'camright',  id:'camRightWin',  title:'RIGHT BACKUP',  ax:'x', sgn: 1, top:300 },
-    { pid:'camtop',    id:'camTopWin',    title:'TOP BACKUP',    ax:'y', sgn: 1, top:480 },
-    { pid:'cambottom', id:'camBottomWin', title:'BOTTOM BACKUP', ax:'y', sgn:-1, top:660 },
+    { pid:'camleft',   id:'camLeftWin',   title:'LEFT SIDE',  ax:'x', sgn:-1, edge:'left',
+      place:'left:14px;top:180px' },
+    { pid:'camright',  id:'camRightWin',  title:'RIGHT SIDE', ax:'x', sgn: 1, edge:'right',
+      place:'right:14px;top:180px' },
+    { pid:'camtop',    id:'camTopWin',    title:'TOP',        ax:'y', sgn: 1, edge:'top',
+      place:'left:14px;top:80px' },
+    { pid:'cambottom', id:'camBottomWin', title:'BOTTOM',     ax:'y', sgn:-1, edge:'bottom',
+      place:'left:14px;bottom:96px' },
+    /* RJ 2026-09-08: "backup cam looked the same as forward cam?" It did, and it was not a rear view at all -
+       it was the CHASE camera, which sits behind the ship and looks FORWARD, so it showed the same thing the
+       main view already shows. A backup cam looks BACKWARD. FWD is (0,0,-1), so rear is +Z, and it joins the
+       other four as the fifth direction rather than being a separate window with its own rules.
+       Top-centre, because that is where a rear-view mirror lives.
+
+       WHY +Z, and why not to "fix" it again. RJ's "backup cam looked the same as forward cam" was about the
+       window this REPLACES - the old chase view, which sat behind the ship and looked FORWARD, so of course it
+       matched the main screen. It is deleted; this is a different camera.
+
+       I did briefly flip this sign, on a measurement that could not support it: the main view's direction dotted
+       -0.933 with FWD*quat on one read and +0.72 on the next, because chaseCam LAGS the ship (CAM_LAG) and the
+       ship was turning. Comparing anything to a lagging camera at an instant measures the turn, not the layout.
+       The game's own code settles it without a measurement - index.html names FWD*quat `nose` where it aims the
+       guns - so the nose is FWD*quat and the rear is +Z. */
+    { pid:'cambackup', id:'camBackWin',   title:'BACKUP CAM', ax:'z', sgn: 1, edge:'top', centerX:true,
+      place:'left:50%;top:78px', w:400, h:230 },
   ];
   BACKUP_CAMS.forEach(function(c, i){
-    c.dir = new T.Vector3(c.ax==='x'?c.sgn:0, c.ax==='y'?c.sgn:0, 0);
+    c.dir = new T.Vector3(c.ax==='x'?c.sgn:0, c.ax==='y'?c.sgn:0, c.ax==='z'?c.sgn:0);
     c.cam = new T.PerspectiveCamera(62, 1, 0.5, 6000);
     c.cam.layers.enable(2);
     c.view = { x:0, y:0, w:0, h:0 };
     if(document.getElementById(c.id)) return;
     const el = document.createElement('div'); el.id = c.id;
-    el.style.cssText = 'position:fixed;left:20px;top:'+c.top+'px;width:300px;height:170px;z-index:40;'
+    el.style.cssText = 'position:fixed;'+c.place+';width:'+(c.w||300)+'px;height:'+(c.h||170)+'px;z-index:40;'
       + 'border:1px solid #46617e;border-radius:8px;background:transparent;'
       + 'box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
     document.body.appendChild(el);
-    if(window.PANELS) PANELS.register(c.pid, el, { title:c.title, edge:'left', rgb:[13,26,42],
-      transparent:true, resizable:true, defaultOpen:false });
+    if(window.PANELS) PANELS.register(c.pid, el, { title:c.title, edge:c.edge, centerX:!!c.centerX,
+      rgb:[13,26,42], transparent:true, resizable:true, defaultOpen:false });
   });
   window.updateBackupCams = function(){
     const s = ships[focus]; if(!s) return;
