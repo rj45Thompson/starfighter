@@ -24,7 +24,10 @@
 // in it. Same IS_TOUCH formula index.html already uses (kept independent - this file stays self-contained).
 const IS_TOUCH = matchMedia('(pointer:coarse)').matches || ('ontouchstart' in window);
 const CFG = {
-  STORE_KEY:'SF_PANELS_v3',   // bumped v2->v3 (2026-09-05 layout review: market now defaultOpen:false and the roster/terminal sizes changed; a v2 save would keep the old open market and the old panel sizes forever). Earlier: v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
+  STORE_KEY:'SF_PANELS_v4',   // v3->v4 (2026-09-08): the all-windows-open default I shipped for Android also
+                              // applied to RJ's touch-capable DESKTOP and got SAVED there, so a stale v3 would
+                              // keep eight windows open forever and hide the new minimized start. Bumping is
+                              // the only way to clear a saved state that a bug wrote.   // bumped v2->v3 (2026-09-05 layout review: market now defaultOpen:false and the roster/terminal sizes changed; a v2 save would keep the old open market and the old panel sizes forever). Earlier: v1->v2 (user 2026-07-07 "i don't see the xwing bars"): powerpanel's defaultOpen flipped false->true, but anyone who'd already loaded the earlier build has a saved open:false for it that would otherwise outrank the new default forever - same fix as the PASSENGER_STATE_v1->v2 bump for the intro story
   AUTO_HIDE_MS:1600,           // unpinned: delay after mouseleave before sliding away
   SLIDE_MS:320,                // slide transition duration
   GAP:8,                       // px between stacked panels on the same edge
@@ -247,10 +250,11 @@ function persist(rec){ store[rec.id]={...(store[rec.id]||{}), pinned:rec.pinned,
 function armAutoHide(rec){
   clearTimeout(rec.hideT);
   if(rec.pinned || !rec.open) return;
-  // ANDROID/TOUCH: auto-hide-on-idle is a hover affordance with no touch equivalent - arming it here would just
-  // close the panel out from under a touch user with no warning. Touch users open/close explicitly (tab or ✕);
-  // the pin button still works exactly the same (still shows "pinned" state, still user-toggleable).
-  if(IS_TOUCH) return;
+  // A PHONE has no hover, so auto-hide-on-idle would close panels out from under the user with no warning.
+  // This used to test IS_TOUCH, which is also true on a touch-capable DESKTOP - so on RJ's machine auto-hide
+  // never armed at all and the pin button did nothing whatsoever, which is exactly what he reported. Same
+  // distinction as the phone column: how you point is not how much room you have.
+  if(isPhone()) return;
   rec.hideT=setTimeout(()=>{
     if(rec.pinned) return;
     if(rec.keepOpenWhile && rec.keepOpenWhile()) { armAutoHide(rec); return; }   // e.g. the chat input still has focus
@@ -266,7 +270,19 @@ function setOpen(rec, open){
 }
 function setPinned(rec, pinned){
   rec.pinned=pinned; applyVisual(rec); persist(rec);
-  if(pinned) clearTimeout(rec.hideT); else if(rec.open) armAutoHide(rec);
+  clearTimeout(rec.hideT);
+  /* UNPIN SLIDES IT AWAY NOW. RJ 2026-09-08: "some windows have a pin icon that doesn't do anything ... make
+     them all have it and they collapse expand the slide out?" Unpinning used to only ARM the idle timer, and
+     that timer then bails while the pointer is still over the panel - which it always is, one pixel after you
+     have clicked the panel's own pin. So the button appeared inert even on a machine where auto-hide worked.
+     Unpin now collapses to the edge tab immediately and pin brings it back, so the control does something you
+     can see on the click that you made. The idle timer still exists for panels left unpinned and hovered away
+     from; this only removes the wait on the deliberate press. */
+  if(!rec.open) return;
+  if(pinned) return;
+  rec.hovering = false;
+  if(rec.keepOpenWhile && rec.keepOpenWhile()){ armAutoHide(rec); return; }   // e.g. the chat still has focus
+  setOpen(rec, false);
 }
 function setOpacity(rec, v){ rec.opacity=clamp01(v); rec.el.style.backgroundColor=rgba(rec.rgb,rec.opacity); rec.el.style.opacity=textOpacityFor(rec.opacity); persist(rec); }
 
@@ -431,9 +447,14 @@ function register(id, el, opts){
   // On touch, ALL of them open - RJ asked for every window up, and six panels ship with an explicit
   // defaultOpen:false (roster, missionlog, market, shop, empire, khud) that a plain `!==false` would still
   // honour, leaving only two open. Desktop keeps each panel's own default.
-  const phone = IS_TOUCH && typeof window!=='undefined' && window.innerWidth <= CFG.PHONE_MAX_W;
-  const touchDefaultOpen = phone ? true : (opts.defaultOpen!==false);
-  const touchDefaultPinned = phone ? true : (opts.defaultPinned!==false);
+  /* RJ 2026-09-08: "start with all windows minimized but the windows menu and the health bar." So every
+     registered panel now starts CLOSED, on every device - not "closed on a phone", not "whatever each panel
+     asked for". A first run is the game plus two things: the always-present WINDOWS menu, and the health bar
+     (the power dock, which is HUD_WIN.power over in index.html and is defaulted ON to match).
+
+     Panels stay PINNED by default, so opening one from its tab keeps it open instead of sliding away again. */
+  const touchDefaultOpen = false;
+  const touchDefaultPinned = opts.defaultPinned!==false;
   // DRAG-TO-REDOCK: once a panel has been manually dragged to an edge at least once (store[id].manualDock), that
   // choice outranks opts.edge/opts.centerX forever - same "your own action beats the shipped default" convention
   // the resize grip already established for w/h.
