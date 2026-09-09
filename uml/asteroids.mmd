@@ -1,0 +1,27 @@
+```mermaid
+graph LR
+  classDef hole fill:#4a2b23,stroke:#d08a5a,color:#ffd9c0;
+  classDef ok fill:#1d2b36,stroke:#5f8fb0,color:#dceaf5;
+  Pilot([Pilot]):::ok
+  Drone([Mining drone]):::ok
+  AI([AI pilot]):::ok
+  UC-A1["UC-A1<br/>A rock exists, drifts, and can be hit<br/><i>8 steps, 1 open</i>"]:::hole
+  UC-A2["UC-A2<br/>Shooting a rock splits it<br/><i>7 steps, complete</i>"]:::ok
+  UC-A3["UC-A3<br/>The gem is the payoff<br/><i>10 steps, 1 open</i>"]:::hole
+  UC-A4["UC-A4<br/>The belt: where the rocks are<br/><i>4 steps, complete</i>"]:::ok
+  UC-A5["UC-A5<br/>The mining drones<br/><i>11 steps, 1 open</i>"]:::hole
+  UC-A6["UC-A6<br/>Drawing 3,200 rocks affordably<br/><i>7 steps, 1 open</i>"]:::hole
+  Drone --> UC-A5
+  AI --> UC-A3
+  Pilot --> UC-A1
+  Pilot --> UC-A2
+  Pilot --> UC-A3
+  Pilot --> UC-A4
+  Pilot --> UC-A5
+  Pilot --> UC-A6
+  UC-A1 -->|a rock to shoot| UC-A2
+  UC-A2 -->|spills| UC-A3
+  UC-A4 -->|is where| UC-A1
+  UC-A5 -->|seams for| UC-A2
+  UC-A6 -.->|draws| UC-A1
+```

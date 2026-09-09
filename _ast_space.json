@@ -1,0 +1,737 @@
+{
+ "game": "asteroids",
+ "features": [
+  {
+   "id": "AST_CELL",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_CHILD_FRAC",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A2"
+   }
+  },
+  {
+   "id": "AST_DMG",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_DRIFT",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_GRID_EVERY",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_HP_PER_SCALE",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_KEEP",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_MAX",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_NOSPLIT",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A2"
+   }
+  },
+  {
+   "id": "AST_SCALE_MAX",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_SCALE_MIN",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A1"
+   }
+  },
+  {
+   "id": "AST_SPLIT_KICK",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A2"
+   }
+  },
+  {
+   "id": "AST_SPLIT_MAX",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A2"
+   }
+  },
+  {
+   "id": "AST_SPLIT_MIN",
+   "where": "index.html:444",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A2"
+   }
+  },
+  {
+   "id": "AST_UNIT",
+   "where": "index.html:1114",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "BOT_ACCEL",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_CONE",
+   "where": "index.html:407",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_DOCK_R",
+   "where": "index.html:407",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_DPS",
+   "where": "index.html:408",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_GEM_R",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_GRAB_R",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_IDLE_R",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_LASER_COL",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_LASER_R",
+   "where": "index.html:408",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_LAUNCH_KICK",
+   "where": "index.html:407",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_LAUNCH_T",
+   "where": "index.html:407",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_MINE_R",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_SEAM_RATE",
+   "where": "index.html:408",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_SIZE",
+   "where": "index.html:408",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_SPEED",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "BOT_STANDOFF",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "GEM_BAR",
+   "where": "index.html:469",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_BAR_MAX",
+   "where": "index.html:469",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_BAR_RATE",
+   "where": "index.html:469",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_CREDIT_PER_SCALE",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_EASE_R",
+   "where": "index.html:390",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_FOOD",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_GRAB_R",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_HULL_CREDIT_MULT",
+   "where": "index.html:632",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_HULL_FRAC",
+   "where": "index.html:631",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_HULL_MIN_CREDITS",
+   "where": "index.html:633",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_HULL_THRESH",
+   "where": "index.html:630",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_LIFE",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_MAGNET",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_PICK_R",
+   "where": "index.html:477",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_PTS_CAP",
+   "where": "index.html:469",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "GEM_SIZE",
+   "where": "index.html:1114",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A3"
+   }
+  },
+  {
+   "id": "MINE_BELT_FRAC",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A4"
+   }
+  },
+  {
+   "id": "MINE_BELT_RIN",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A4"
+   }
+  },
+  {
+   "id": "MINE_BELT_ROUT",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A4"
+   }
+  },
+  {
+   "id": "MINE_BELT_THICK",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A4"
+   }
+  },
+  {
+   "id": "MINING_BOTS",
+   "where": "index.html:406",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  },
+  {
+   "id": "RADAR_ROCK_CAP",
+   "where": "index.html:447",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A4"
+   }
+  },
+  {
+   "id": "ROCK_GEN",
+   "where": "index.html:404",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_GEO_VARIANTS",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_LOD_MAX",
+   "where": "index.html:445",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_LOD_UNIT",
+   "where": "index.html:445",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_NORMAL_SCALE",
+   "where": "index.html:404",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_SHADES",
+   "where": "index.html:443",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "ROCK_TEX_GAIN",
+   "where": "index.html:423",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A6"
+   }
+  },
+  {
+   "id": "SEAM_DMG_MULT",
+   "where": "index.html:408",
+   "cells": {
+    "asteroids": {
+     "v": "yes"
+    }
+   },
+   "ours": {
+    "uc": "UC-A5"
+   }
+  }
+ ]
+}
