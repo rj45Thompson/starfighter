@@ -38,7 +38,13 @@
        two passed `true`, which forces open, so clicking them again re-opened an already-open window and
        nothing appeared to happen. They toggle now, and only do their extra work on the way open. */
     { id:'contracts', t:'CONTRACTS', hint:'the mission board and what is accepted', live:()=>!!window.MISSIONS, go:()=>{ if(panel('missionlog')) cmd('missions'); } },
-    { id:'empire',    t:'EMPIRE',    hint:'your stations and haulers - what you own and what it earns', live:()=>!!window.ECONOMY, go:()=>panel('empire') },
+    /* EMPIRE (the Egosoft layer: economy.js / synod.js / empire.js) is REMOVED FOR NOW - RJ 2026-09-08 "Remove egosoft for
+       now". The scripts are not loaded (index.html), so the tab is gone rather than greyed; the row below is the
+       one line to put back.
+    { id:'empire',    t:'EMPIRE',    hint:'your stations and haulers - what you own and what it earns', live:()=>!!window.ECONOMY, go:()=>panel('empire') }, */
+    /* RJ 2026-09-08: "add a window to watch it run and see the uml cases or logging fill it in as it goes" - the
+       USE CASES window (uc_live.js): every case of the model, lit as the game does it, with a log. */
+    { id:'cases',     t:'CASES',     hint:'the use cases lighting up as the game runs, with a log of what fired', live:()=>!!window.UCLIVE, go:()=>panel('uccases') },
     { id:'passenger', t:'PASSENGER', hint:'talk to the ship AI - it answers from the novel and the live game', live:()=>!!window.PASSENGER,
       go:()=>{ if(!panel('ticker')) return;
         const t=[...document.querySelectorAll('#ticker .tab')].find(e=>/parasite/i.test(e.textContent)); if(t) t.click();
@@ -93,7 +99,10 @@
   function build(){
     if(bar) return;
     bar=document.createElement('div'); bar.id='shellBar';
-    bar.innerHTML=TABS.map(t=>`<button type="button" data-tab="${t.id}" title="${esc(t.hint)}">${t.t}</button>`).join('');
+    // RJ 2026-09-08: "make sure to say this is from starblast.IO and a link to the game" - the credit sits in the
+    // one bar that is always on screen, and opens the original in a new tab.
+    bar.innerHTML=TABS.map(t=>`<button type="button" data-tab="${t.id}" title="${esc(t.hint)}">${t.t}</button>`).join('')
+      +`<a class="shCredit" href="https://starblast.io" target="_blank" rel="noopener" title="This game's mining, upgrade and tier loop is after Starblast.io - play the original">after STARBLAST.io ↗</a>`;
     sheet=document.createElement('div'); sheet.id='shellSheet'; sheet.hidden=true;
     const st=document.createElement('style'); st.textContent=`
       #shellBar{ position:fixed; top:0; left:50%; transform:translateX(-50%); z-index:60; display:flex; gap:1px; padding:3px 4px;
@@ -105,6 +114,8 @@
       #shellBar button.dead{ color:#5b6b7d; cursor:not-allowed; }
       #shellBar button[data-tab="broken"]{ color:#ffb074; margin-left:6px; border-left:1px solid #22344a; border-radius:0 5px 5px 0; }
       #shellBar button[data-tab="broken"].on{ background:#ffb074; color:#1a1008; }
+      #shellBar .shCredit{ align-self:center; margin-left:8px; padding:0 8px; border-left:1px solid #22344a; color:#8fa7bd; text-decoration:none; font-size:10px; letter-spacing:.06em; white-space:nowrap; }
+      #shellBar .shCredit:hover{ color:#dff4ff; }
       #shellSheet{ position:fixed; top:${CFG.BAR_H}px; left:50%; transform:translateX(-50%); z-index:59; width:min(980px,94vw); max-height:74vh; overflow:auto;
         background:rgba(8,14,22,.97); border:1px solid #33465e; border-top:0; border-radius:0 0 10px 10px; color:#dbe7f1;
         font:12px/1.45 'Segoe UI',system-ui,sans-serif; box-shadow:0 10px 34px rgba(0,0,0,.6); }

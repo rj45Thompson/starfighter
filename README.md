@@ -1,6 +1,8 @@
 # Starfighter — space AGI bench (playable front)
 
 Original space-opera visualizer. Coalition Wardens vs the Iron Synod.
+
+**After Starblast.io.** The mining, gem-bar, upgrade and tier-up loop is modelled on [Starblast.io](https://starblast.io) - play the original there. The ships, factions, story and the AI pilots are this game's own.
 Talk to ships: type e.g. `ask ORION whats your story` or `ask ORION any danger`.
 
 Desktop: W thrust, A/D turn, Space fire, 1/2/3 upgrade. Phone: use the terminal/chat (flight keys need a keyboard).
