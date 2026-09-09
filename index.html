@@ -7327,15 +7327,31 @@ chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
 // 500ms (matching this codebase's existing HOST-state-poll idiom, e.g. engbay.js/power_panel.js) so it stays in
 // sync no matter which of the 3 other paths (this button, `voices on/off`, `talk on/off`, the mic auto-enable
 // above) last changed it - no pub/sub wiring needed for a value this cheap to re-check.
+/* RJ 2026-09-08: "also sound on doesn't work." It did not, and that one is mine. This button toggles CHATTER's
+   speech synthesis - the pilots talking ALOUD - and yesterday, fixing "the sound button is not very visible", I
+   relabelled it SOUND ON / SOUND OFF. So it now claimed to be the game's sound switch while still toggling
+   text-to-speech, and pressing it changed nothing anyone could hear. Measured: SOUND.muted() was already false
+   (game audio was never off), and speechSynthesis.getVoices() returns 0 in this browser, so the thing it really
+   controls has no voice to speak with either way.
+
+   A button that says SOUND now controls SOUND. It reads and writes SOUND.muted(), and it calls SOUND.init()
+   first because browsers keep an AudioContext suspended until a user gesture - this click is that gesture, and
+   without it "unmuting" would still be silent. The voices keep their own switch: the `voices on` command. */
 (function(){ const vb=document.getElementById('voiceBtn'); if(!vb) return;
+  const isOn = () => !!(window.SOUND && SOUND.muted && !SOUND.muted());
   // the label states the CURRENT state, not the action - a button reading "SOUND OFF" while sound is off is
   // readable at a glance; one reading "MUTE" makes you work out which way round it is
-  function paint(){ const on=!!(window.CHATTER&&CHATTER.voicesOn()); vb.classList.toggle('on',on);
+  function paint(){ const on=isOn(); vb.classList.toggle('on',on);
     vb.textContent = on ? '🔊 SOUND ON' : '🔇 SOUND OFF';
-    vb.title = on ? 'The Passenger and pilots speak aloud - click to silence them'
-                  : 'Voices are off - click to hear the Passenger and pilots speak aloud'; }
-  vb.onclick=()=>{ if(!window.CHATTER) return; CHATTER.setVoices(!CHATTER.voicesOn()); paint();
-    term(CHATTER.voicesOn()?'🔊 voices ON - the Passenger and pilots will speak aloud.':'🔇 voices off.','sys'); };
+    vb.title = on ? 'Game sound is on - click to mute'
+                  : 'Game sound is muted - click to turn it on'; }
+  vb.onclick=()=>{ if(!window.SOUND) return;
+    try{ SOUND.init(); }catch(e){}                  // this click IS the gesture that unlocks the AudioContext
+    const want = !isOn();
+    if(SOUND.setMute) SOUND.setMute(!want); else if(SOUND.toggleMute) SOUND.toggleMute();
+    if(want){ try{ SOUND.play('ui'); }catch(e){} }   // say it out loud, so "on" is audibly on
+    paint();
+    term(isOn()?'🔊 sound ON.':'🔇 sound muted.','sys'); };
   setInterval(paint,500); paint(); })();
 
 // ---- interactive TOP-DOWN + REASONING views: wheel=zoom, drag=pan, click=inspect (top-down), dbl-click=reset ----
