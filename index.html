@@ -323,7 +323,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
-<script src="panels.js?v=20260908i"></script>
+<script src="panels.js?v=20260908l"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260908b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
@@ -6127,20 +6127,16 @@ if(window.PANELS){
   (function(){
     if(document.getElementById('chaseWin')) return;
     var w=document.createElement('div'); w.id='chaseWin';
-    w.style.cssText='position:fixed;left:150px;top:84px;width:400px;height:250px;z-index:40;border:1px solid #46617e;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none;display:none';
-    var bar=document.createElement('div');
-    bar.style.cssText='position:absolute;top:0;left:0;right:0;height:20px;background:#0d1a2add;border-bottom:1px solid #46617e;border-radius:7px 7px 0 0;cursor:move;pointer-events:auto;font:700 10px/20px ui-monospace,monospace;color:#8fd0ff;letter-spacing:.08em;padding:0 8px;display:flex;justify-content:space-between;align-items:center';
-    bar.innerHTML='<span>◎ 3D VIEW</span><span style="opacity:.55;font-weight:400">drag · resize ↘</span>';
-    var grip=document.createElement('div');
-    grip.style.cssText='position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;pointer-events:auto;background:repeating-linear-gradient(135deg,#46d6ffcc 0,#46d6ffcc 2px,transparent 2px,transparent 5px);border-radius:0 0 6px 0';
-    w.appendChild(bar); w.appendChild(grip); document.body.appendChild(w);   // transparent body: the shared canvas scissor-renders the chase into VIEW.chase behind it (cheap, no readback)
-    var drag=null;
-    bar.addEventListener('mousedown',function(e){ drag={mode:'move',x:e.clientX,y:e.clientY,l:w.offsetLeft,t:w.offsetTop}; e.preventDefault(); });
-    grip.addEventListener('mousedown',function(e){ drag={mode:'size',x:e.clientX,y:e.clientY,ww:w.offsetWidth,hh:w.offsetHeight}; e.preventDefault(); e.stopPropagation(); });
-    window.addEventListener('mousemove',function(e){ if(!drag) return;
-      if(drag.mode==='move'){ w.style.bottom='auto'; w.style.left=Math.max(0,Math.min(innerWidth-70,drag.l+(e.clientX-drag.x)))+'px'; w.style.top=Math.max(0,Math.min(innerHeight-40,drag.t+(e.clientY-drag.y)))+'px'; }
-      else { w.style.width=Math.max(180,drag.ww+(e.clientX-drag.x))+'px'; w.style.height=Math.max(130,drag.hh+(e.clientY-drag.y))+'px'; } });
-    window.addEventListener('mouseup',function(){ drag=null; });
+    w.style.cssText='position:fixed;left:150px;top:84px;width:400px;height:250px;z-index:40;border:1px solid #46617e;border-radius:8px;background:transparent;box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
+    document.body.appendChild(w);   // transparent body: the shared canvas scissor-renders the chase into VIEW.chase behind it (cheap, no readback)
+    /* RJ 2026-09-08: "check again all windows have the same code it should be reusable." This window used to
+       carry its own title bar, its own corner grip and its own mousedown/mousemove/mouseup drag - about
+       thirty lines duplicating what panels.js already does for the other eight, and drifting from them: no
+       pin, no edge tab, no saved size, a different resize feel. It registers now like everything else and
+       gets all of that for free. `transparent` is the mode added for it: same chrome, no background fill,
+       body stays click-through so aim and fire still pass through the 3D. */
+    if(window.PANELS) PANELS.register('chase', w, { title:'3D VIEW', edge:'top', rgb:[13,26,42],
+      transparent:true, resizable:true, defaultOpen:true });
   })();
   // REAR GUNNER window (user 2026-07-13 "move the gunner pod ... move the camera and shoot down the centre"):
   // a second movable/resizable window; rearCam is a TURRET that slews (updateRearCam). Moving the mouse in the gunport
@@ -6422,7 +6418,11 @@ function updateMainTopCam(){ const s=ships[0], c=(s&&s.pos)||new T.Vector3(); co
 // killer (a full-pipeline stall every frame, brutal on the Claude browser's software GL); this removes it entirely.
 function updateChaseView(){ const el=document.getElementById('chaseWin');
   if(!TOPDOWN_MAIN || !el || el.style.display==='none'){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
-  const r=el.getBoundingClientRect(), H=innerH(), TITLE=20;   // chase fills the BODY, below the 20px drag bar
+  // The window's own 20px drag bar is gone - it uses the shared panel chrome now, whose title bar is a
+  // FIXED element floating over the panel's top. Still reserve for it, at the shared strip height, so the
+  // 3D does not render underneath the title.
+  const CHROME=(window.PANELS&&PANELS.CFG&&PANELS.CFG.CHROME_RESERVE)||24;
+  const r=el.getBoundingClientRect(), H=innerH(), TITLE=CHROME;
   if(r.width<8||r.height<8+TITLE){ VIEW.chase.w=0; VIEW.chase.h=0; return; }
   VIEW.chase.x=Math.round(r.left); VIEW.chase.w=Math.round(r.width);
   VIEW.chase.h=Math.round(r.height-TITLE); VIEW.chase.y=Math.round(H-(r.top+r.height));

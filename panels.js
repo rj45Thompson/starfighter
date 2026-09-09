@@ -198,8 +198,16 @@ function textOpacityFor(v){   // user 2026-07-07: "we want the text to be semi-t
 function applyVisual(rec){
   rec.el.style.transition='transform '+CFG.SLIDE_MS+'ms ease, opacity .18s ease';
   rec.el.style.transform = rec.open ? openTransform(rec.centerX) : closedTransform(rec.edge, rec.centerX);
-  rec.el.style.backgroundColor = rgba(rec.rgb, rec.opacity);
-  rec.el.style.opacity = textOpacityFor(rec.opacity);   // fades the panel's OWN text/content - the header controls (.pnl-ctl/.pnl-tab) live outside `el` so they stay fully legible
+  /* A VIEWPORT WINDOW IS A FRAME, NOT A SURFACE. RJ 2026-09-08: "check again all windows have the same code
+     it should be reusable." Two windows could not use it - #chaseWin and #rearWin, which are transparent
+     frames with the 3D scissor-rendered into their rect behind them and a click-through body so aim and fire
+     pass through. This class painted a background over that and captured the pointer, so both carried their
+     own hand-written drag and resize instead. `transparent` is the missing mode: same chrome, same pin, same
+     grips, no fill. */
+  if(!rec.transparent){
+    rec.el.style.backgroundColor = rgba(rec.rgb, rec.opacity);
+    rec.el.style.opacity = textOpacityFor(rec.opacity);   // fades the panel's OWN text/content - the header controls (.pnl-ctl/.pnl-tab) live outside `el` so they stay fully legible
+  }
   const chev = rec.edge==='top'?(rec.open?'▴':'▾') : rec.edge==='bottom'?(rec.open?'▾':'▴') : rec.edge==='left'?(rec.open?'◂':'▸') : (rec.open?'▸':'◂');
   /* RJ 2026-09-08: "put the pin icon on the side contracted windows for expand rather than the words
      pinned." The tab is only ever seen while the window is COLLAPSED now, so "pinned" was both wrong (it is
@@ -490,7 +498,10 @@ function register(id, el, opts){
      (the power dock, which is HUD_WIN.power over in index.html and is defaulted ON to match).
 
      Panels stay PINNED by default, so opening one from its tab keeps it open instead of sliding away again. */
-  const touchDefaultOpen = false;
+  // ...except a VIEWPORT FRAME, which is part of the view rather than something covering it. Minimising the
+  // 3D window by default does not de-clutter the screen, it switches the 3D off, which is not what
+  // "start with all windows minimized" meant.
+  const touchDefaultOpen = opts.transparent ? (opts.defaultOpen!==false) : false;
   const touchDefaultPinned = opts.defaultPinned!==false;
   // DRAG-TO-REDOCK: once a panel has been manually dragged to an edge at least once (store[id].manualDock), that
   // choice outranks opts.edge/opts.centerX forever - same "your own action beats the shipped default" convention
@@ -500,7 +511,7 @@ function register(id, el, opts){
     opacity: clamp01(saved.opacity!=null?saved.opacity:(opts.defaultOpacity!=null?opts.defaultOpacity:0.88)),
     onOpenChange:opts.onOpenChange||null, keepOpenWhile:opts.keepOpenWhile||null, hovering:false, hideT:null };
 
-  el.style.pointerEvents='auto';
+  if(!opts.transparent) el.style.pointerEvents='auto';   // opts, not rec: rec.transparent is assigned further down
   // BUGFIX (user 2026-07-08: "i pinned the knowledge hud and couldn't unpin it... got stuck pinned"): some panels
   // (knowledge_hud.js, power_panel.js) have their OWN legacy internal close button that sets `display:none` DIRECTLY,
   // left over from before they were wired into this module - this system only ever moves a panel via `transform`
@@ -514,6 +525,7 @@ function register(id, el, opts){
   const existingPadTop=parseFloat(getComputedStyle(el).paddingTop)||0;
   el.style.paddingTop=(existingPadTop+CFG.CHROME_RESERVE)+'px';
   const body=document.body||document.documentElement;
+  rec.transparent=!!opts.transparent;   // viewport frames: no fill, no opacity fade, body stays click-through
   rec.resizable=opts.resizable!==false;   // 2026-07-09: resizable is the DEFAULT now - a window you can't resize is the exception, not the rule
   if(rec.resizable && saved.w!=null && saved.h!=null) applyStoredSize(el, saved.w, saved.h);   // a size you set yourself sticks across reloads - the whole point of the feature
   if(saved.manualDock && saved.pos!=null) applyDockPosition(rec, rec.edge, saved.pos);   // a dock spot you dragged yourself sticks across reloads, same convention
@@ -528,7 +540,8 @@ function register(id, el, opts){
      the hotkey the close button used to advertise. */
   pinBtn.title = 'pin (stay open) / unpin (collapse to the edge tab)'
                + (opts.hotkeyLabel ? (' · key ' + opts.hotkeyLabel) : '');
-  ctl.appendChild(titleSpan); ctl.appendChild(pinBtn); ctl.appendChild(op);
+  ctl.appendChild(titleSpan); ctl.appendChild(pinBtn);
+  if(!rec.transparent) ctl.appendChild(op);   // nothing to fade on a frame that draws no background
   rec.ctl=ctl; rec.pinBtn=pinBtn; rec.opInput=op; op.value=rec.opacity;
 
   const tab=document.createElement('div'); tab.className='pnl-tab'; body.appendChild(tab);
@@ -713,7 +726,7 @@ function reflowAll(){ for(const e of Object.keys(EDGE_MEMBERS)) reflowEdge(e); }
 addEventListener('resize', ()=>{ for(const id in PANELS_) applyVisual(PANELS_[id]); reflowAll(); });
 
 function list(){ return Object.keys(PANELS_).map(id=>({ id, title:PANELS_[id].title, open:!!PANELS_[id].open, pinned:!!PANELS_[id].pinned })); }   // 2026-09-06: the WINDOWS menu reads every registered panel from here, so it can never drift from what is registered
-const api={ register, open, close, toggle, isOpen, list, reflow:reflowAll, clearSize, resetLayout,
+const api={ register, open, close, toggle, isOpen, list, reflow:reflowAll, clearSize, resetLayout, CFG,
   isManual:(id)=>!!(store[id]&&store[id].manualDock) };   // 2026-07-09: lets legacy layout code ask "does the player own this panel's position?" before writing to it (the market re-center line was silently stomping manual docks on every viewport pass)
 if(typeof window!=='undefined') window.PANELS=api;
 if(typeof module!=='undefined'&&module.exports) module.exports=api;
