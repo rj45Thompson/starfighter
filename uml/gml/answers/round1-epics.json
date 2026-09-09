@@ -1,0 +1,1050 @@
+[
+ {
+  "target": "E1",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+   "nodes": [
+    {
+     "id": "UC-E1-1",
+     "kind": "usecase",
+     "name": "The page builds a world to fly in",
+     "attrs": {
+      "story": "Opening the page constructs a WebGL renderer and a scene. Until this exists there is no space, no ship, nothing to look at.",
+      "status": "HAVE",
+      "ground": [
+       "renderer",
+       "scene",
+       "EXPOSURE"
+      ],
+      "acceptance": [
+       "with WebGL unavailable the page reports it rather than showing a blank canvas",
+       "the renderer is constructed exactly once per page load"
+      ]
+     }
+    },
+    {
+     "id": "UC-E1-2",
+     "kind": "usecase",
+     "name": "The game gives the pilot a ship",
+     "attrs": {
+      "story": "A ship is built for the player and placed in the world with a hull, a texture and a collision radius.",
+      "status": "HAVE",
+      "ground": [
+       "makeShip",
+       "SHIP_TEX",
+       "SHIP_R"
+      ],
+      "acceptance": [
+       "ships[0] exists with role 'player' after load",
+       "the ship has a non-zero collision radius, so it can be hit"
+      ]
+     }
+    },
+    {
+     "id": "UC-E1-3",
+     "kind": "usecase",
+     "name": "The simulation advances every frame",
+     "attrs": {
+      "story": "A frame loop runs, clamps the timestep so a stalled tab cannot teleport the world, and steps the simulation.",
+      "status": "HAVE",
+      "ground": [
+       "frame",
+       "step"
+      ],
+      "acceptance": [
+       "a frame gap longer than 50ms is clamped rather than integrated whole",
+       "pausing and resuming the tab does not move the ship"
+      ]
+     }
+    },
+    {
+     "id": "UC-E1-4",
+     "kind": "usecase",
+     "name": "The pilot's controls move the ship",
+     "attrs": {
+      "story": "Thrust, yaw and pitch answer the keyboard, bounded by drag and a maximum speed, so the ship is flyable rather than merely present.",
+      "status": "HAVE",
+      "ground": [
+       "THRUST",
+       "DRAG",
+       "VMAX",
+       "YAW_RATE",
+       "PITCH_RATE"
+      ],
+      "acceptance": [
+       "holding thrust raises speed until it plateaus at VMAX, not beyond",
+       "releasing thrust decays speed rather than stopping dead"
+      ]
+     }
+    },
+    {
+     "id": "UC-E1-5",
+     "kind": "usecase",
+     "name": "The pilot can see where the ship is going",
+     "attrs": {
+      "story": "A chase camera trails the ship, leads it slightly, and lags rather than snapping, so the pilot has a usable frame of reference.",
+      "status": "HAVE",
+      "ground": [
+       "CAM_BACK",
+       "CAM_AHEAD",
+       "CAM_LAG",
+       "CAM_UP"
+      ],
+      "acceptance": [
+       "the camera sits behind and above the ship at rest",
+       "a hard turn moves the camera smoothly, with no instantaneous jump"
+      ]
+     }
+    },
+    {
+     "id": "S:sim_running",
+     "kind": "state",
+     "name": "the simulation is stepping"
+    },
+    {
+     "id": "S:controls_live",
+     "kind": "state",
+     "name": "the controls answer the pilot"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E1",
+     "dst": "UC-E1-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E1",
+     "dst": "UC-E1-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E1",
+     "dst": "UC-E1-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E1",
+     "dst": "UC-E1-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E1",
+     "dst": "UC-E1-5",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E1-1",
+     "dst": "S:page_open",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E1-1",
+     "dst": "S:world_built",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E1-2",
+     "dst": "S:world_built",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E1-2",
+     "dst": "S:ship_exists",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E1-3",
+     "dst": "S:ship_exists",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E1-3",
+     "dst": "S:sim_running",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E1-4",
+     "dst": "S:sim_running",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E1-4",
+     "dst": "S:controls_live",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E1-5",
+     "dst": "S:controls_live",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E1-5",
+     "dst": "S:in_flight",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ },
+ {
+  "target": "E2",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+   "nodes": [
+    {
+     "id": "UC-E2-1",
+     "kind": "usecase",
+     "name": "The system populates a belt with rocks",
+     "attrs": {
+      "story": "A mining belt is seeded with instanced asteroids, capped so the field is dense without becoming thousands of draw calls.",
+      "status": "HAVE",
+      "ground": [
+       "makeMiningBelt",
+       "spawnAsteroid",
+       "AST_MAX",
+       "AST_KEEP",
+       "ROCK_POOLS"
+      ],
+      "acceptance": [
+       "the field holds rocks up to AST_MAX and never more",
+       "rocks are drawn from instanced pools, not one mesh each"
+      ]
+     }
+    },
+    {
+     "id": "UC-E2-2",
+     "kind": "usecase",
+     "name": "The system finds the rocks near the pilot cheaply",
+     "attrs": {
+      "story": "A spatial hash rebuilt every few frames answers 'what is near me' without scanning the field, which is what makes a belt of thousands testable every frame.",
+      "status": "HAVE",
+      "ground": [
+       "AST_CELL",
+       "AST_GRID_EVERY"
+      ],
+      "acceptance": [
+       "collision testing does not scan every rock each frame",
+       "a rock marked gone is skipped by the near-query rather than returned"
+      ]
+     }
+    },
+    {
+     "id": "UC-E2-3",
+     "kind": "usecase",
+     "name": "The pilot breaks a rock apart",
+     "attrs": {
+      "story": "A rock that takes enough damage is destroyed, splitting into smaller children carrying a fraction of its size and a kick outward.",
+      "status": "HAVE",
+      "ground": [
+       "destroyAsteroid",
+       "AST_SPLIT_MIN",
+       "AST_SPLIT_MAX",
+       "AST_CHILD_FRAC",
+       "AST_SPLIT_KICK"
+      ],
+      "acceptance": [
+       "a destroyed rock above the no-split size yields between AST_SPLIT_MIN and AST_SPLIT_MAX children",
+       "the children move apart rather than sitting inside each other"
+      ]
+     }
+    },
+    {
+     "id": "UC-E2-4",
+     "kind": "usecase",
+     "name": "Broken rock leaves gems in the world",
+     "attrs": {
+      "story": "The pieces spawn as physical gem pickups whose credit value scales with the size of the rock they came from, and which expire if nobody takes them.",
+      "status": "HAVE",
+      "ground": [
+       "spawnGem",
+       "GEM_CREDIT_PER_SCALE",
+       "GEM_LIFE"
+      ],
+      "acceptance": [
+       "a bigger rock yields gems worth more credits than a smaller one",
+       "an uncollected gem disappears after GEM_LIFE seconds"
+      ]
+     }
+    },
+    {
+     "id": "UC-E2-5",
+     "kind": "usecase",
+     "name": "The pilot scoops a gem",
+     "attrs": {
+      "story": "Flying near a gem collects it, with a magnet radius that widens as the ship is upgraded, so collection is a flight skill rather than a pixel-hunt.",
+      "status": "HAVE",
+      "ground": [
+       "magnetFor",
+       "GEM_MAGNET",
+       "GEM_PICK_R",
+       "GEM_GRAB_R"
+      ],
+      "acceptance": [
+       "a gem inside the magnet radius moves toward the ship without an exact pass-over",
+       "the magnet radius grows when the relevant upgrade is bought"
+      ]
+     }
+    },
+    {
+     "id": "UC-E2-6",
+     "kind": "usecase",
+     "name": "Collected credits bank an upgrade point",
+     "attrs": {
+      "story": "Gem credits fill a bar; each time it fills it converts into one banked upgrade point, up to a cap.",
+      "status": "HAVE",
+      "ground": [
+       "gemBarAdd",
+       "GEM_BAR_MAX",
+       "GEM_BAR_RATE",
+       "GEM_PTS_CAP"
+      ],
+      "acceptance": [
+       "GEM_BAR_MAX credits collected converts to exactly one banked point",
+       "only the player's ship banks points; an AI ship collecting gems banks none",
+       "banked points stop accumulating at GEM_PTS_CAP"
+      ]
+     }
+    },
+    {
+     "id": "S:belt_exists",
+     "kind": "state",
+     "name": "a belt of rocks exists"
+    },
+    {
+     "id": "S:rock_in_range",
+     "kind": "state",
+     "name": "a rock is within reach"
+    },
+    {
+     "id": "S:gems_loose",
+     "kind": "state",
+     "name": "gems are loose in the world"
+    },
+    {
+     "id": "S:gem_pickable",
+     "kind": "state",
+     "name": "a gem can be picked up"
+    },
+    {
+     "id": "S:gem_in_hold",
+     "kind": "state",
+     "name": "gem credits are in the hold"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E2",
+     "dst": "UC-E2-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E2",
+     "dst": "UC-E2-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E2",
+     "dst": "UC-E2-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E2",
+     "dst": "UC-E2-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E2",
+     "dst": "UC-E2-5",
+     "kind": "includes"
+    },
+    {
+     "src": "E2",
+     "dst": "UC-E2-6",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E2-1",
+     "dst": "S:in_flight",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-1",
+     "dst": "S:belt_exists",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E2-2",
+     "dst": "S:belt_exists",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-2",
+     "dst": "S:rock_in_range",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E2-3",
+     "dst": "S:rock_in_range",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-3",
+     "dst": "S:gems_loose",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E2-4",
+     "dst": "S:gems_loose",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-4",
+     "dst": "S:gem_pickable",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E2-5",
+     "dst": "S:gem_pickable",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-5",
+     "dst": "S:gem_in_hold",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E2-6",
+     "dst": "S:gem_in_hold",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E2-6",
+     "dst": "S:point_banked",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ },
+ {
+  "target": "E3",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+   "nodes": [
+    {
+     "id": "UC-E3-1",
+     "kind": "usecase",
+     "name": "The pilot spends a point on one of eight stats",
+     "attrs": {
+      "story": "A banked point goes into one of eight named stats, in flight, each capped so no single stat absorbs the whole run.",
+      "status": "HAVE",
+      "ground": [
+       "spendStat",
+       "STAT_ORDER",
+       "STAT_GAIN",
+       "STAT_MAX"
+      ],
+      "acceptance": [
+       "spending on an unknown stat name is refused with the list of real ones",
+       "a stat already at STAT_MAX refuses further points rather than consuming them"
+      ]
+     }
+    },
+    {
+     "id": "UC-E3-2",
+     "kind": "usecase",
+     "name": "Each point visibly changes how the ship performs",
+     "attrs": {
+      "story": "A stat is a multiplier the simulation actually reads, so a point spent is felt rather than merely displayed.",
+      "status": "HAVE",
+      "ground": [
+       "statMult"
+      ],
+      "acceptance": [
+       "raising speed increases the ship's achieved velocity in flight",
+       "a stat at zero leaves its multiplier at exactly 1.0"
+      ]
+     }
+    },
+    {
+     "id": "UC-E3-3",
+     "kind": "usecase",
+     "name": "Maxing every stat arms the trade-in",
+     "attrs": {
+      "story": "Only when all eight stats are at their cap, with a further point banked, does the ship become eligible for the next hull.",
+      "status": "HAVE",
+      "ground": [
+       "tierUpReady",
+       "TIER_UP",
+       "STAT_MAX"
+      ],
+      "acceptance": [
+       "with seven stats maxed the tier-up is not offered",
+       "with eight maxed and no banked point the tier-up is not offered"
+      ]
+     }
+    },
+    {
+     "id": "UC-E3-4",
+     "kind": "usecase",
+     "name": "The game names the hull that comes next",
+     "attrs": {
+      "story": "The ladder of hulls is a fixed order, and the ship's current class determines exactly which one is on offer.",
+      "status": "HAVE",
+      "ground": [
+       "nextTierHull",
+       "hullTierIdx",
+       "HULL_ORDER_ORIGINAL"
+      ],
+      "acceptance": [
+       "a ship at the top of the ladder is offered nothing",
+       "a generated hull is placed at its size tier's rank rather than off the ladder"
+      ]
+     }
+    },
+    {
+     "id": "UC-E3-5",
+     "kind": "usecase",
+     "name": "Taking the new hull costs every upgrade bought",
+     "attrs": {
+      "story": "Accepting the trade-in swaps the frame and resets all eight stats to zero, which is what makes holding out a real decision rather than a free reward.",
+      "status": "HAVE",
+      "ground": [
+       "takeTierUp"
+      ],
+      "acceptance": [
+       "after a tier-up every stat reads zero",
+       "refusing the tier-up leaves the current hull and stats untouched"
+      ]
+     }
+    },
+    {
+     "id": "S:stat_raised",
+     "kind": "state",
+     "name": "at least one stat is above zero"
+    },
+    {
+     "id": "S:stats_maxed",
+     "kind": "state",
+     "name": "every stat is at its cap"
+    },
+    {
+     "id": "S:tier_offered",
+     "kind": "state",
+     "name": "a next hull is on offer"
+    },
+    {
+     "id": "S:hull_swapped",
+     "kind": "state",
+     "name": "the ship is flying a new frame"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E3",
+     "dst": "UC-E3-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E3",
+     "dst": "UC-E3-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E3",
+     "dst": "UC-E3-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E3",
+     "dst": "UC-E3-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E3",
+     "dst": "UC-E3-5",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E3-1",
+     "dst": "S:point_banked",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-1",
+     "dst": "S:stat_raised",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E3-2",
+     "dst": "S:stat_raised",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-2",
+     "dst": "S:ship_stronger",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E3-3",
+     "dst": "S:stat_raised",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-3",
+     "dst": "S:stats_maxed",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E3-4",
+     "dst": "S:stats_maxed",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-4",
+     "dst": "S:tier_offered",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E3-5",
+     "dst": "S:tier_offered",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-5",
+     "dst": "S:hull_swapped",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ },
+ {
+  "target": "E4",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "The fight as a cost chain: firing costs energy, shots cost range, hits cost shields, exhausted shields cost the hull, the hull costs the cargo, and the cargo costs the run. Each beat is the precondition of the next loss.",
+   "nodes": [
+    {
+     "id": "UC-E4-1",
+     "kind": "usecase",
+     "name": "Firing costs energy the pilot cannot spend forever",
+     "attrs": {
+      "story": "Each shot draws from a capacitor that refills over time, so sustained fire is bounded by a resource rather than by a cooldown alone.",
+      "status": "HAVE",
+      "ground": [
+       "capMaxFor",
+       "LASER_CAP_MAX",
+       "LASER_CAP_REGEN",
+       "LASER_CAP_PER_SHOT"
+      ],
+      "acceptance": [
+       "with the capacitor empty the ship cannot fire",
+       "breaking off refills the capacitor at LASER_CAP_REGEN per second",
+       "raising energyCap raises the ceiling the capacitor refills to"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-2",
+     "kind": "usecase",
+     "name": "The pilot's shots reach and hurt what they hit",
+     "attrs": {
+      "story": "Bullets travel at a finite speed for a finite life and deal damage on contact, so range and lead are real constraints.",
+      "status": "HAVE",
+      "ground": [
+       "BULLET_SPEED",
+       "BULLET_LIFE",
+       "BULLET_DMG",
+       "FIRE_CD"
+      ],
+      "acceptance": [
+       "a bullet expires after BULLET_LIFE seconds rather than travelling forever",
+       "firing faster than FIRE_CD apart is refused"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-3",
+     "kind": "usecase",
+     "name": "Shields take the hit before the hull does",
+     "attrs": {
+      "story": "Damage is absorbed by a directional shield arc, each arc carrying half the ship's total shield, before any of it reaches the hull.",
+      "status": "HAVE",
+      "ground": [
+       "drainShield",
+       "shieldArcMaxFor"
+      ],
+      "acceptance": [
+       "a hit from ahead drains the forward arc and leaves the aft arc untouched",
+       "hull integrity does not fall while the struck arc still has charge"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-4",
+     "kind": "usecase",
+     "name": "A ship that runs out of hull dies",
+     "attrs": {
+      "story": "When damage exhausts the hull the ship is destroyed and removed from the fight, with the kill attributed.",
+      "status": "HAVE",
+      "ground": [
+       "killShip",
+       "killByShip"
+      ],
+      "acceptance": [
+       "a destroyed ship stops being a valid target",
+       "the killer is credited, so a kill is attributable"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-5",
+     "kind": "usecase",
+     "name": "Death spills the cargo for anyone to take",
+     "attrs": {
+      "story": "The credits banked into the hold are dropped into the world on death, so a long uninterrupted run is worth more than the sum of its minutes.",
+      "status": "HAVE",
+      "ground": [
+       "spillGems"
+      ],
+      "acceptance": [
+       "a pilot dying with credits leaves collectable gems at the wreck",
+       "a pilot dying with nothing spills nothing"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-6",
+     "kind": "usecase",
+     "name": "The pilot comes back small after a pause",
+     "attrs": {
+      "story": "After a delay the pilot respawns without the hull they lost, which is the cost that makes the fight matter.",
+      "status": "HAVE",
+      "ground": [
+       "RESPAWN_DELAY"
+      ],
+      "acceptance": [
+       "respawn does not happen before RESPAWN_DELAY seconds have passed",
+       "the respawned ship is not the tier that died"
+      ]
+     }
+    },
+    {
+     "id": "S:weapon_ready",
+     "kind": "state",
+     "name": "the ship can fire"
+    },
+    {
+     "id": "S:in_combat",
+     "kind": "state",
+     "name": "shots are being exchanged"
+    },
+    {
+     "id": "S:shield_stripped",
+     "kind": "state",
+     "name": "a shield arc is down"
+    },
+    {
+     "id": "S:ship_dead",
+     "kind": "state",
+     "name": "the pilot's ship is destroyed"
+    },
+    {
+     "id": "S:gems_spilled",
+     "kind": "state",
+     "name": "the hold is on the floor"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E4",
+     "dst": "UC-E4-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-5",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-6",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E4-1",
+     "dst": "S:in_flight",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-1",
+     "dst": "S:weapon_ready",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-2",
+     "dst": "S:weapon_ready",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-2",
+     "dst": "S:in_combat",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-3",
+     "dst": "S:in_combat",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-3",
+     "dst": "S:shield_stripped",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-4",
+     "dst": "S:shield_stripped",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-4",
+     "dst": "S:ship_dead",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-5",
+     "dst": "S:ship_dead",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-5",
+     "dst": "S:gems_spilled",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-6",
+     "dst": "S:gems_spilled",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-6",
+     "dst": "S:respawned",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ },
+ {
+  "target": "E5",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+   "nodes": [
+    {
+     "id": "UC-E5-1",
+     "kind": "usecase",
+     "name": "The game gathers what is worth keeping",
+     "attrs": {
+      "story": "The player's ship, progress and standing are collected into one versioned snapshot.",
+      "status": "HAVE",
+      "ground": [
+       "gatherSaveState"
+      ],
+      "acceptance": [
+       "the snapshot carries a version field, so an old save is recognisable as old",
+       "with no player ship the snapshot is refused rather than written empty"
+      ]
+     }
+    },
+    {
+     "id": "UC-E5-2",
+     "kind": "usecase",
+     "name": "The snapshot is written where it can be found again",
+     "attrs": {
+      "story": "The snapshot is stored under a known key in browser storage, so it survives the page closing.",
+      "status": "HAVE",
+      "ground": [
+       "SAVE_KEY",
+       "persist"
+      ],
+      "acceptance": [
+       "closing and reopening the page finds the previous snapshot",
+       "a snapshot written under the key replaces the previous one rather than accumulating"
+      ]
+     }
+    },
+    {
+     "id": "UC-E5-3",
+     "kind": "usecase",
+     "name": "The snapshot is kept current, not written only at the end",
+     "attrs": {
+      "story": "Saving runs on a cadence during play, so an unclean exit costs at most one interval rather than the whole session.",
+      "status": "HAVE",
+      "ground": [
+       "SAVE_INTERVAL_S"
+      ],
+      "acceptance": [
+       "a session ended without a clean exit still restores to within SAVE_INTERVAL_S of where it stopped"
+      ]
+     }
+    },
+    {
+     "id": "UC-E5-4",
+     "kind": "usecase",
+     "name": "A returning pilot gets their ship back",
+     "attrs": {
+      "story": "On load a valid snapshot of the right version is applied; an invalid or older one is declined rather than half-applied.",
+      "status": "HAVE",
+      "ground": [
+       "applySaveState"
+      ],
+      "acceptance": [
+       "a snapshot of the wrong version is declined and the pilot starts fresh",
+       "a restored pilot has the hull and stats they had when the snapshot was taken"
+      ]
+     }
+    },
+    {
+     "id": "UC-E5-5",
+     "kind": "usecase",
+     "name": "The run's standing is a weighted total",
+     "attrs": {
+      "story": "Standing combines credits and score under a stated weight rather than counting kills alone, so mining and fighting both register.",
+      "status": "HAVE",
+      "ground": [
+       "SCORE_W"
+      ],
+      "acceptance": [
+       "a run that only mines still produces a non-zero standing",
+       "two runs with equal credits and different scores are ranked apart"
+      ]
+     }
+    },
+    {
+     "id": "S:save_gathered",
+     "kind": "state",
+     "name": "a snapshot of the run exists"
+    },
+    {
+     "id": "S:save_written",
+     "kind": "state",
+     "name": "the snapshot is in storage"
+    },
+    {
+     "id": "S:save_current",
+     "kind": "state",
+     "name": "the stored snapshot is no more than one interval old"
+    },
+    {
+     "id": "S:save_restored",
+     "kind": "state",
+     "name": "a returning pilot has their ship back"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E5",
+     "dst": "UC-E5-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E5",
+     "dst": "UC-E5-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E5",
+     "dst": "UC-E5-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E5",
+     "dst": "UC-E5-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E5",
+     "dst": "UC-E5-5",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E5-1",
+     "dst": "S:respawned",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E5-1",
+     "dst": "S:save_gathered",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E5-2",
+     "dst": "S:save_gathered",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E5-2",
+     "dst": "S:save_written",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E5-3",
+     "dst": "S:save_written",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E5-3",
+     "dst": "S:save_current",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E5-4",
+     "dst": "S:save_current",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E5-4",
+     "dst": "S:save_restored",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E5-5",
+     "dst": "S:save_restored",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E5-5",
+     "dst": "S:session_recorded",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ }
+]

@@ -10,3 +10,9 @@ scratchpad/
 # pass can be undone locally. They are byte-identical copies of committed art; 35 of
 # them is ~200 MB of duplicate history for nothing.
 *.orig
+
+# The GML answer cache is derived, not source: it is rebuilt from uml/gml/answers/
+# by `gml answer-batch`, and it is keyed on a digest of the brief, so an entry is
+# stale the moment a detector or a prompt changes. The answers themselves are
+# committed; the cache of them is not.
+.gml-cache/
