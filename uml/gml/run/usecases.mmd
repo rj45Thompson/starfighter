@@ -82,78 +82,78 @@ flowchart LR
   S_weapon_ready(("the ship can fire"))
   S_world_built(("a world exists to fly in"))
   E1 --> S_page_open
-  S_in_flight --> E1
-  A_pilot --- E1
   E2 --> S_in_flight
-  S_point_banked --> E2
-  A_pilot --- E2
   E3 --> S_point_banked
-  S_ship_stronger --> E3
-  A_pilot --- E3
   E4 --> S_in_flight
-  S_respawned --> E4
-  A_pilot --- E4
   E5 --> S_respawned
-  S_session_recorded --> E5
-  A_system --- E5
-  S_page_open --> UC_E1_1
   UC_E1_1 --> S_world_built
-  S_world_built --> UC_E1_2
   UC_E1_2 --> S_ship_exists
-  S_ship_exists --> UC_E1_3
   UC_E1_3 --> S_sim_running
-  S_sim_running --> UC_E1_4
   UC_E1_4 --> S_controls_live
-  S_controls_live --> UC_E1_5
   UC_E1_5 --> S_in_flight
-  S_in_flight --> UC_E2_1
   UC_E2_1 --> S_belt_exists
-  S_belt_exists --> UC_E2_2
   UC_E2_2 --> S_rock_in_range
-  S_rock_in_range --> UC_E2_3
   UC_E2_3 --> S_gems_loose
-  S_gems_loose --> UC_E2_4
   UC_E2_4 --> S_gem_pickable
-  S_gem_pickable --> UC_E2_5
   UC_E2_5 --> S_gem_in_hold
-  S_gem_in_hold --> UC_E2_6
   UC_E2_6 --> S_point_banked
-  S_point_banked --> UC_E3_1
   UC_E3_1 --> S_stat_raised
-  S_stat_raised --> UC_E3_2
   UC_E3_2 --> S_ship_stronger
-  S_stat_raised --> UC_E3_3
   UC_E3_3 --> S_stats_maxed
-  S_stats_maxed --> UC_E3_4
   UC_E3_4 --> S_tier_offered
-  S_tier_offered --> UC_E3_5
   UC_E3_5 --> S_hull_swapped
-  S_in_flight --> UC_E4_1
-  UC_E4_1 --> S_weapon_ready
-  S_weapon_ready --> UC_E4_2
-  UC_E4_2 --> S_shot_in_flight
-  S_shot_in_flight --> UC_E4_3
-  UC_E4_3 --> S_in_combat
-  S_in_combat --> UC_E4_4
-  UC_E4_4 --> S_shield_stripped
-  S_shield_stripped --> UC_E4_5
-  UC_E4_5 --> S_ship_dead
-  S_ship_dead --> UC_E4_6
-  UC_E4_6 --> S_gems_spilled
-  S_gems_spilled --> UC_E4_7
-  UC_E4_7 --> S_respawned
-  S_respawned --> UC_E5_1
-  UC_E5_1 --> S_save_gathered
-  S_save_gathered --> UC_E5_2
-  UC_E5_2 --> S_save_written
-  S_save_written --> UC_E5_3
-  UC_E5_3 --> S_save_current
-  S_save_current --> UC_E5_4
-  UC_E5_4 --> S_save_restored
-  S_save_restored --> UC_E5_5
-  UC_E5_5 --> S_session_recorded
-  S_hull_swapped --> UC_E3_6
   UC_E3_6 --> S_ship_stronger
+  UC_E4_1 --> S_weapon_ready
+  UC_E4_2 --> S_shot_in_flight
+  UC_E4_3 --> S_in_combat
+  UC_E4_4 --> S_shield_stripped
+  UC_E4_5 --> S_ship_dead
+  UC_E4_6 --> S_gems_spilled
+  UC_E4_7 --> S_respawned
+  UC_E5_1 --> S_save_gathered
+  UC_E5_2 --> S_save_written
+  UC_E5_3 --> S_save_current
+  UC_E5_4 --> S_save_restored
+  UC_E5_5 --> S_session_recorded
+  A_pilot --- E1
+  A_pilot --- E2
+  A_pilot --- E3
+  A_pilot --- E4
+  A_system --- E5
+  S_in_flight --> E1
+  S_point_banked --> E2
+  S_ship_stronger --> E3
+  S_respawned --> E4
+  S_session_recorded --> E5
+  S_page_open --> UC_E1_1
+  S_world_built --> UC_E1_2
+  S_ship_exists --> UC_E1_3
+  S_sim_running --> UC_E1_4
+  S_controls_live --> UC_E1_5
+  S_in_flight --> UC_E2_1
+  S_belt_exists --> UC_E2_2
+  S_rock_in_range --> UC_E2_3
+  S_gems_loose --> UC_E2_4
+  S_gem_pickable --> UC_E2_5
+  S_gem_in_hold --> UC_E2_6
+  S_point_banked --> UC_E3_1
+  S_stat_raised --> UC_E3_2
+  S_stat_raised --> UC_E3_3
+  S_stats_maxed --> UC_E3_4
+  S_tier_offered --> UC_E3_5
+  S_hull_swapped --> UC_E3_6
+  S_in_flight --> UC_E4_1
+  S_weapon_ready --> UC_E4_2
+  S_shot_in_flight --> UC_E4_3
+  S_in_combat --> UC_E4_4
+  S_shield_stripped --> UC_E4_5
+  S_ship_dead --> UC_E4_6
+  S_gems_spilled --> UC_E4_7
+  S_respawned --> UC_E5_1
+  S_save_gathered --> UC_E5_2
+  S_save_written --> UC_E5_3
+  S_save_current --> UC_E5_4
+  S_save_restored --> UC_E5_5
   style UC_E1_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E1_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E1_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
@@ -170,6 +170,7 @@ flowchart LR
   style UC_E3_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E3_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E3_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E4_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E4_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E4_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
@@ -182,7 +183,6 @@ flowchart LR
   style UC_E5_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E5_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E5_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
-  style UC_E3_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
-  style A_system fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
   style A_rival fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_system fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6

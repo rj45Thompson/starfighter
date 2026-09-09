@@ -23,6 +23,10 @@ a citation it cannot resolve.
 | `run/model.gml` | the graph in Graph Modelling Language (yEd, Gephi, Cytoscape, networkx) |
 | `run/usecases.mmd` | the same as a Mermaid flowchart |
 | `run/model.json` | the machine-readable model; a later run resumes from it |
+| `run/CONTRACT.md` | **the build contract** — every clause carrying the id of the node it came from, and every decision it does *not* make listed at the end |
+| `run/contract.json` | the same, machine-readable |
+| `probes.json` | acceptance criteria as expressions the running game is asked |
+| `probes-negative-control.json` | the guard on the guard: probes with known answers, three that must fail |
 
 ## Reproducing it
 
@@ -36,16 +40,36 @@ gml run  starfighter/uml/gml/starblast.spec.json --out starfighter/uml/gml/run -
 With `ANTHROPIC_API_KEY` set, `--oracle auto` does the same thing without the
 round-trip: the engine calls the API itself and the answers land in the cache.
 
-## Where it stands
+## Where it stands, honestly
 
 Five epics, **all five running end to end with no break in the chain**. Twenty-nine
-use cases, thirty state literals, every one grounded in a symbol that resolves.
+use cases, thirty state literals, every one grounded in a symbol that resolves, and
+24 acceptance criteria confirmed against the game running in a browser.
 
-Coverage of the closed space is 22–64% per epic against a 90% gate, so the model is
-a complete *spine* and not yet a complete specification: 161 symbols in scope are
-still owned by no use case, and each one is a question the engine has already
-written. That number is the honest measure of what is left, and it is a count that
-has to reach zero rather than a judgement about whether the document feels finished.
+**And it covers 3.2% of the system.**
+
+| | |
+|---|---:|
+| symbols the extractor found in the source | 2,335 |
+| inside *any* epic's scope | 231 (9.9%) |
+| claimed by a use case | **75 (3.2%)** |
+| outside every scope | **2,104 (90.1%)** |
+
+The per-epic coverage figures read 22–64%, and that was measured against a
+denominator chosen by writing five regexes. A denominator you chose is not a
+denominator. Missions, docking, planets, trade, lore, the campaign, the AI pilots —
+no epic reaches any of them, so no detector could see them and no number counted
+them.
+
+`UNSCOPED_REGION` exists because of this. It walks what falls outside every scope,
+clusters it by the name fragments the symbols themselves carry, and asks what epic
+those are — 18 regions here, `lore` at 36 symbols, `planet` at 26, `hull` at 24,
+`pirate` at 14. It is the most severe detector in the tool and fires before
+decomposition, because an epic that should exist and does not cannot be found by
+refining the epics that do.
+
+So: a complete spine over one tenth of the program, and a tool that now says so
+without being asked.
 
 ## Two findings about this repository, from the extractor rather than from the model
 

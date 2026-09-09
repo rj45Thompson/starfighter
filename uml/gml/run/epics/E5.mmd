@@ -1,0 +1,40 @@
+flowchart LR
+  %% actors
+  A_system(["👤 The game"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E5["E5 — The run ends and is remembered"]
+      direction LR
+      UC_E5_1["<b>UC-E5-1</b><br/>The game gathers what is worth keeping<br/><small>gatherSaveState</small>"]
+      UC_E5_2["<b>UC-E5-2</b><br/>The snapshot is written where it can be found again<br/><small>SAVE_KEY</small>"]
+      UC_E5_3["<b>UC-E5-3</b><br/>The snapshot is kept current, not written only at the end<br/><small>SAVE_INTERVAL_S</small>"]
+      UC_E5_4["<b>UC-E5-4</b><br/>A returning pilot gets their ship back<br/><small>applySaveState</small>"]
+      UC_E5_5["<b>UC-E5-5</b><br/>The run's standing is a weighted total<br/><small>SCORE_W</small>"]
+    end
+  end
+  S_respawned(("the pilot is flying again after dying"))
+  S_save_current(("the stored snapshot is no more than one interval old"))
+  S_save_gathered(("a snapshot of the run exists"))
+  S_save_restored(("a returning pilot has their ship back"))
+  S_save_written(("the snapshot is in storage"))
+  S_session_recorded(("the run is over and what happened is on record"))
+  E5 --> S_respawned
+  UC_E5_1 --> S_save_gathered
+  UC_E5_2 --> S_save_written
+  UC_E5_3 --> S_save_current
+  UC_E5_4 --> S_save_restored
+  UC_E5_5 --> S_session_recorded
+  A_system --- E5
+  S_session_recorded --> E5
+  S_respawned --> UC_E5_1
+  S_save_gathered --> UC_E5_2
+  S_save_written --> UC_E5_3
+  S_save_current --> UC_E5_4
+  S_save_restored --> UC_E5_5
+  style UC_E5_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_system fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (60): E1 -establishes-> S:page_open; E2 -establishes-> S:in_flight; E3 -establishes-> S:point_banked; E4 -establishes-> S:in_flight; UC-E1-1 -establishes-> S:world_built; UC-E1-2 -establishes-> S:ship_exists; UC-E1-3 -establishes-> S:sim_running; UC-E1-4 -establishes-> S:controls_live; UC-E1-5 -establishes-> S:in_flight; UC-E2-1 -establishes-> S:belt_exists; UC-E2-2 -establishes-> S:rock_in_range; UC-E2-3 -establishes-> S:gems_loose; UC-E2-4 -establishes-> S:gem_pickable; UC-E2-5 -establishes-> S:gem_in_hold; UC-E2-6 -establishes-> S:point_banked; UC-E3-1 -establishes-> S:stat_raised; UC-E3-2 -establishes-> S:ship_stronger; UC-E3-3 -establishes-> S:stats_maxed; UC-E3-4 -establishes-> S:tier_offered; UC-E3-5 -establishes-> S:hull_swapped

@@ -1,0 +1,2630 @@
+{
+ "target": "starblast",
+ "complete": false,
+ "stats": {
+  "use_cases": 29,
+  "steps": 0,
+  "states": 30,
+  "clauses": 161,
+  "undecided": 235,
+  "chains_intact": 5,
+  "chains": 5,
+  "symbols_in_source": 2335,
+  "symbols_claimed": 75
+ },
+ "undecided": [
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:base",
+   "detail": "26 symbols sharing 'base', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:battle",
+   "detail": "12 symbols sharing 'battle', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:build",
+   "detail": "21 symbols sharing 'build', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:core",
+   "detail": "15 symbols sharing 'core', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:edge",
+   "detail": "15 symbols sharing 'edge', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:hull",
+   "detail": "24 symbols sharing 'hull', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:keys",
+   "detail": "15 symbols sharing 'keys', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:lore",
+   "detail": "36 symbols sharing 'lore', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:mult",
+   "detail": "16 symbols sharing 'mult', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:pirate",
+   "detail": "14 symbols sharing 'pirate', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:planet",
+   "detail": "26 symbols sharing 'planet', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:rear",
+   "detail": "44 symbols sharing 'rear', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:render",
+   "detail": "12 symbols sharing 'render', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:rock",
+   "detail": "12 symbols sharing 'rock', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:scan",
+   "detail": "13 symbols sharing 'scan', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:ship",
+   "detail": "17 symbols sharing 'ship', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:tick",
+   "detail": "21 symbols sharing 'tick', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNSCOPED_REGION",
+   "where": "R:update",
+   "detail": "22 symbols sharing 'update', inside no epic's scope",
+   "forces": "the writer does not know this part of the system exists, so it will be absent from what they build or invented from scratch",
+   "settled_by": "an EPIC covering these symbols, with its opening and closing state"
+  },
+  {
+   "code": "UNUSED_ACTOR",
+   "where": "A:rival",
+   "detail": "declared as an actor, associated with no epic or use case",
+   "forces": "the writer builds for an actor with no goals, or drops one that should have them",
+   "settled_by": "USECASEs this actor performs, or removal of the actor"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BANK_LERP",
+   "detail": "const at index.html:405, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BANK_MAX",
+   "detail": "const at index.html:405, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:CAM_SHAKE_MAG",
+   "detail": "const at index.html:641, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:CAM_UP_LERP",
+   "detail": "const at index.html:640, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:DRAG_THRESHOLD",
+   "detail": "const at panels.js:56, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:KP_PITCH",
+   "detail": "const at index.html:406, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:KP_YAW",
+   "detail": "const at index.html:406, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:PERIPH_CENTER",
+   "detail": "const at index.html:674, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:PERIPH_DPR",
+   "detail": "const at index.html:676, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:PERIPH_ON",
+   "detail": "const at index.html:672, read 6x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:PERIPH_VIGNETTE",
+   "detail": "const at index.html:675, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:PERIPH_WIDE",
+   "detail": "const at index.html:673, read 5x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_BOUNCE",
+   "detail": "const at index.html:519, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_BULLET_DMG",
+   "detail": "const at index.html:506, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_COLLIDE_SKIP_MULT",
+   "detail": "const at index.html:520, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_LEN",
+   "detail": "const at index.html:1136, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_RAM_MIN_SPEED",
+   "detail": "const at index.html:517, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_TEX_LOADER",
+   "detail": "const at index.html:1166, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIP_YAW",
+   "detail": "const at index.html:1136, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SKY_BAKE_RES",
+   "detail": "const at index.html:414, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SKY_GAIN",
+   "detail": "const at index.html:414, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SKY_MODE",
+   "detail": "const at index.html:413, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SKY_SEED",
+   "detail": "const at index.html:414, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SKY_TINT",
+   "detail": "const at index.html:414, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:THRUST_TEX",
+   "detail": "const at index.html:1095, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:TOPCAM_BACK",
+   "detail": "const at index.html:667, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:TOPCAM_FOV",
+   "detail": "const at index.html:667, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:TOPCAM_UP",
+   "detail": "const at index.html:667, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:resize",
+   "detail": "function at index.html:6653, read 5x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_DMG",
+   "detail": "const at index.html:460, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_DRIFT",
+   "detail": "const at index.html:460, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_HP_PER_SCALE",
+   "detail": "const at index.html:459, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_NOSPLIT",
+   "detail": "const at index.html:460, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_SCALE_MAX",
+   "detail": "const at index.html:459, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_SCALE_MIN",
+   "detail": "const at index.html:459, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AST_UNIT",
+   "detail": "const at index.html:1137, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_ACCEL",
+   "detail": "const at index.html:422, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_CONE",
+   "detail": "const at index.html:423, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_DOCK_R",
+   "detail": "const at index.html:423, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_DPS",
+   "detail": "const at index.html:424, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_GEM_R",
+   "detail": "const at index.html:422, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_GRAB_R",
+   "detail": "const at index.html:422, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_IDLE_R",
+   "detail": "const at index.html:422, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_LASER_COL",
+   "detail": "const at index.html:422, read 7x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_LASER_R",
+   "detail": "const at index.html:424, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_LAUNCH_KICK",
+   "detail": "const at index.html:423, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_LAUNCH_T",
+   "detail": "const at index.html:423, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_MINE_R",
+   "detail": "const at index.html:422, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_SEAM_RATE",
+   "detail": "const at index.html:424, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_SIZE",
+   "detail": "const at index.html:424, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_SPEED",
+   "detail": "const at index.html:422, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:BOT_STANDOFF",
+   "detail": "const at index.html:422, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_BAR",
+   "detail": "const at index.html:492, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_EASE_R",
+   "detail": "const at index.html:406, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_FOOD",
+   "detail": "const at index.html:500, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_HULL_CREDIT_MULT",
+   "detail": "const at index.html:655, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_HULL_FRAC",
+   "detail": "const at index.html:654, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_HULL_MIN_CREDITS",
+   "detail": "const at index.html:656, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_HULL_THRESH",
+   "detail": "const at index.html:653, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_SIZE",
+   "detail": "const at index.html:1137, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:MINING_BOTS",
+   "detail": "const at index.html:422, read 5x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_GEN",
+   "detail": "const at index.html:420, read 7x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_GEO_VARIANTS",
+   "detail": "const at index.html:459, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_LOD_MAX",
+   "detail": "const at index.html:461, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_LOD_UNIT",
+   "detail": "const at index.html:461, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_NORMAL_SCALE",
+   "detail": "const at index.html:420, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_SHADES",
+   "detail": "const at index.html:459, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ROCK_TEX_GAIN",
+   "detail": "const at index.html:439, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:destroyAsteroidObj",
+   "detail": "function at index.html:1359, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:ensureMiningBots",
+   "detail": "function at index.html:951, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:gem",
+   "detail": "const at index.html:886, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:gemBar",
+   "detail": "field at index.html:2305, read 16x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:gemBarPct",
+   "detail": "const at index.html:1026, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:gemGeos",
+   "detail": "const at index.html:1139, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:gemsFetched",
+   "detail": "const at index.html:950, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:hegemon",
+   "detail": "const at index.html:691, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:miningBelt",
+   "detail": "singleton at index.html:1334, read 5x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:miningBots",
+   "detail": "singleton at index.html:925, read 9x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:miningBotsTick",
+   "detail": "function at index.html:967, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:miningStats",
+   "detail": "singleton at index.html:950, read 16x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:GEM_BAR",
+   "detail": "const at index.html:492, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.spendStat",
+   "detail": "method at index.html:6937, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.takeTierUp",
+   "detail": "method at index.html:6937, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULLMODELS",
+   "detail": "module at hullmodels.js:9, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_FAMILIES",
+   "detail": "const at index.html:4089, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_GEN_JITTER",
+   "detail": "const at index.html:4095, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_GEN_SEED",
+   "detail": "const at index.html:4067, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_MOUNTS",
+   "detail": "const at index.html:4001, read 8x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_ORDER",
+   "detail": "const at index.html:3986, read 9x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_SERIES",
+   "detail": "const at index.html:3844, read 13x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_SERIES_KEYS",
+   "detail": "const at index.html:3857, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HULL_SIZE_TIERS",
+   "detail": "const at index.html:4072, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_DEFAULT",
+   "detail": "const at index.html:545, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_DOCK_H",
+   "detail": "const at index.html:646, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_MAX",
+   "detail": "const at index.html:545, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_MIN",
+   "detail": "const at index.html:545, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_MULT_MAX",
+   "detail": "const at index.html:545, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_MULT_MIN",
+   "detail": "const at index.html:545, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_SYS",
+   "detail": "const at index.html:1709, read 6x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_THRESH",
+   "detail": "const at index.html:3058, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:POWER_TOTAL",
+   "detail": "const at index.html:545, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:STAT_LABEL",
+   "detail": "const at index.html:499, read 6x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:UPGRADE",
+   "detail": "const at index.html:712, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:UPGRADE_HULL_DEATHS",
+   "detail": "const at index.html:591, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:doUpgrade",
+   "detail": "function at index.html:6445, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_BUDGET_FRAC",
+   "detail": "const at index.html:593, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_HULL_DREAMS",
+   "detail": "const at index.html:4038, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_LEAD",
+   "detail": "const at index.html:512, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_ARC",
+   "detail": "const at index.html:450, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_BEAMS",
+   "detail": "const at index.html:450, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_DPS_FRAC",
+   "detail": "const at index.html:450, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_PIERCE",
+   "detail": "const at index.html:450, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_POOL",
+   "detail": "const at index.html:6616, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_REAR_RANGE",
+   "detail": "const at index.html:450, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_TANK_AGGR",
+   "detail": "const at index.html:593, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:AI_WEAPON_FAMILIES",
+   "detail": "const at index.html:4034, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.capLaserOf",
+   "detail": "method at index.html:6966, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.setShieldDivert",
+   "detail": "method at index.html:6964, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.shieldArcsOf",
+   "detail": "method at index.html:6965, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.shieldDivertOf",
+   "detail": "method at index.html:6963, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:HOST.shieldOf",
+   "detail": "method at index.html:6962, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:Laser",
+   "detail": "const at index.html:1433, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:MISSILE_AMMO_COST",
+   "detail": "const at index.html:556, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:MISSILE_AMMO_MAX",
+   "detail": "const at index.html:556, read 7x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:MISSILE_AMMO_REGEN",
+   "detail": "const at index.html:556, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:MISSILE_AMMO_START",
+   "detail": "const at index.html:556, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELDS",
+   "detail": "const at index.html:1720, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_ARC_BASE",
+   "detail": "const at index.html:547, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_BASE",
+   "detail": "const at index.html:546, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_BOOST_MULT",
+   "detail": "const at index.html:552, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_DIVERT_MULT",
+   "detail": "const at index.html:547, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_GENS",
+   "detail": "const at index.html:3706, read 11x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_GEN_KEYS",
+   "detail": "const at index.html:3720, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_REGEN_BASE",
+   "detail": "const at index.html:546, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:SHIELD_REGEN_DELAY",
+   "detail": "const at index.html:546, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:TAMI_WASM.damage",
+   "detail": "method at index.html:4295, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:WEAPON_DMG",
+   "detail": "const at index.html:501, read 4x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:WEAPON_FIRE",
+   "detail": "const at index.html:501, read 3x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:WEAPON_ORDER",
+   "detail": "const at index.html:3926, read 11x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:capLaser",
+   "detail": "field at index.html:1762, read 27x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:damage",
+   "detail": "const at index.html:493, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:rearShield",
+   "detail": "singleton at index.html:6537, read 7x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:rearShieldHit",
+   "detail": "function at index.html:6539, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shield",
+   "detail": "const at index.html:451, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldAft",
+   "detail": "field at index.html:1722, read 24x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldCap",
+   "detail": "const at index.html:493, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldFwd",
+   "detail": "field at index.html:1722, read 24x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldGenOf",
+   "detail": "function at index.html:3721, read 2x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldGenPctFor",
+   "detail": "function at index.html:3730, read 5x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldGenType",
+   "detail": "const at index.html:1314, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldRegen",
+   "detail": "const at index.html:493, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shieldTick",
+   "detail": "function at index.html:1721, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:shields",
+   "detail": "const at index.html:1707, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:updateRearShield",
+   "detail": "function at index.html:6540, read 1x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:DEATH_CREDIT_LOSS",
+   "detail": "const at index.html:503, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:persistence",
+   "detail": "const at index.html:5444, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:respawn",
+   "detail": "const at index.html:1308, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNCLAIMED_GROUND",
+   "where": "G:score",
+   "detail": "const at index.html:1307, read 0x, owned by no use case",
+   "forces": "the writer meets a constant or function no requirement explains and guesses what it is for",
+   "settled_by": "a groundedIn edge from the use case that owns it, or a use case that does"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E1-1",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E1-2",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E1-3",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E1-4",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E1-5",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-1",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-2",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-3",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-4",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-5",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E2-6",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-1",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-2",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-3",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-4",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-5",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E3-6",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-1",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-2",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-3",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-4",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-5",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-6",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E4-7",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E5-1",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E5-2",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E5-3",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E5-4",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "UNDECOMPOSED_USECASE",
+   "where": "UC-E5-5",
+   "detail": "0 of at least 3 steps",
+   "forces": "the writer has a goal and no procedure, so the algorithm is theirs to invent",
+   "settled_by": "ordered STEP nodes under the use case, each citing the symbol it rests on"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E1-1",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E1-2",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E1-3",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E1-4",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E1-5",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-1",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-2",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-3",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-4",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-5",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E2-6",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-1",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-2",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-3",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-4",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-5",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E3-6",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-1",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-2",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-3",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-4",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-5",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-6",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E4-7",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E5-1",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E5-2",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E5-3",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E5-4",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  },
+  {
+   "code": "NO_EXCEPTION_PATH",
+   "where": "UC-E5-5",
+   "detail": "0 of at least 1 exception paths",
+   "forces": "the writer decides what happens when it fails, and every writer decides differently",
+   "settled_by": "a USECASE per failure, <<extend>>ing this one, with its trigger condition"
+  }
+ ],
+ "clauses": [
+  {
+   "section": "Actors",
+   "text": "**Pilot** \u2014 performs E1, E2, E3, E4.",
+   "source": "A:pilot",
+   "kind": "fact"
+  },
+  {
+   "section": "Actors",
+   "text": "**Another ship** \u2014 performs nothing.",
+   "source": "A:rival",
+   "kind": "fact"
+  },
+  {
+   "section": "Actors",
+   "text": "**The game** \u2014 performs E5.",
+   "source": "A:system",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "*You open the page. A world exists, you are in a ship in it, and the controls answer. Nothing else in the game can happen until this does.*",
+   "source": "E1",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "Begins when: the page is open and nothing has started. Is finished when: the pilot is flying and in control.",
+   "source": "E1",
+   "kind": "must"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "**UC-E1-1 \u2014 The page builds a world to fly in.** Runs when: the page is open and nothing has started. Leaves true: a world exists to fly in. Status in the existing source: HAVE.",
+   "source": "UC-E1-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Opening the page constructs a WebGL renderer and a scene. Until this exists there is no space, no ship, nothing to look at.",
+   "source": "UC-E1-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Rests on: `renderer`, `scene`, `EXPOSURE`.",
+   "source": "UC-E1-1#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  with WebGL unavailable the page reports it rather than showing a blank canvas",
+   "source": "UC-E1-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  the renderer is constructed exactly once per page load",
+   "source": "UC-E1-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "**UC-E1-2 \u2014 The game gives the pilot a ship.** Runs when: a world exists to fly in. Leaves true: the pilot has a ship in that world. Status in the existing source: HAVE.",
+   "source": "UC-E1-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  A ship is built for the player and placed in the world with a hull, a texture and a collision radius.",
+   "source": "UC-E1-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Rests on: `makeShip`, `SHIP_TEX`, `SHIP_R`.",
+   "source": "UC-E1-2#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  ships[0] exists with role 'player' after load",
+   "source": "UC-E1-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  the ship has a non-zero collision radius, so it can be hit",
+   "source": "UC-E1-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "**UC-E1-3 \u2014 The simulation advances every frame.** Runs when: the pilot has a ship in that world. Leaves true: the simulation is stepping. Status in the existing source: HAVE.",
+   "source": "UC-E1-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  A frame loop runs, clamps the timestep so a stalled tab cannot teleport the world, and steps the simulation.",
+   "source": "UC-E1-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Rests on: `frame`, `step`.",
+   "source": "UC-E1-3#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  a frame gap longer than 50ms is clamped rather than integrated whole",
+   "source": "UC-E1-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  pausing and resuming the tab does not move the ship",
+   "source": "UC-E1-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "**UC-E1-4 \u2014 The pilot's controls move the ship.** Runs when: the simulation is stepping. Leaves true: the controls answer the pilot. Status in the existing source: HAVE.",
+   "source": "UC-E1-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Thrust, yaw and pitch answer the keyboard, bounded by drag and a maximum speed, so the ship is flyable rather than merely present.",
+   "source": "UC-E1-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Rests on: `THRUST`, `DRAG`, `VMAX`, `YAW_RATE`, `PITCH_RATE`.",
+   "source": "UC-E1-4#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  holding thrust raises speed until it plateaus at VMAX, not beyond",
+   "source": "UC-E1-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  releasing thrust decays speed rather than stopping dead",
+   "source": "UC-E1-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "**UC-E1-5 \u2014 The pilot can see where the ship is going.** Runs when: the controls answer the pilot. Leaves true: the pilot is flying and in control. Status in the existing source: HAVE.",
+   "source": "UC-E1-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  A chase camera trails the ship, leads it slightly, and lags rather than snapping, so the pilot has a usable frame of reference.",
+   "source": "UC-E1-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  Rests on: `CAM_BACK`, `CAM_AHEAD`, `CAM_LAG`, `CAM_UP`.",
+   "source": "UC-E1-5#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  the camera sits behind and above the ship at rest",
+   "source": "UC-E1-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E1 \u2014 Arrive and fly",
+   "text": "  a hard turn moves the camera smoothly, with no instantaneous jump",
+   "source": "UC-E1-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "*You fly a small ship at some rocks. You shoot one, it breaks, and the pieces are worth something. You scoop them up and the bar at the bottom fills. When it fills, you are owed something.*",
+   "source": "E2",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "Begins when: the pilot is flying and in control. Is finished when: the pilot is owed at least one upgrade point.",
+   "source": "E2",
+   "kind": "must"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-1 \u2014 The system populates a belt with rocks.** Runs when: the pilot is flying and in control. Leaves true: a belt of rocks exists. Status in the existing source: HAVE.",
+   "source": "UC-E2-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  A mining belt is seeded with instanced asteroids, capped so the field is dense without becoming thousands of draw calls.",
+   "source": "UC-E2-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `makeMiningBelt`, `spawnAsteroid`, `AST_MAX`, `AST_KEEP`, `ROCK_POOLS`.",
+   "source": "UC-E2-1#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  the field holds rocks up to AST_MAX and never more",
+   "source": "UC-E2-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  rocks are drawn from instanced pools, not one mesh each",
+   "source": "UC-E2-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-2 \u2014 The system finds the rocks near the pilot cheaply.** Runs when: a belt of rocks exists. Leaves true: a rock is within reach. Status in the existing source: HAVE.",
+   "source": "UC-E2-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  A spatial hash rebuilt every few frames answers 'what is near me' without scanning the field, which is what makes a belt of thousands testable every frame.",
+   "source": "UC-E2-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `AST_CELL`, `AST_GRID_EVERY`.",
+   "source": "UC-E2-2#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  collision testing does not scan every rock each frame",
+   "source": "UC-E2-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  a rock marked gone is skipped by the near-query rather than returned",
+   "source": "UC-E2-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-3 \u2014 The pilot breaks a rock apart.** Runs when: a rock is within reach. Leaves true: gems are loose in the world. Status in the existing source: HAVE.",
+   "source": "UC-E2-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  A rock that takes enough damage is destroyed, splitting into smaller children carrying a fraction of its size and a kick outward.",
+   "source": "UC-E2-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `destroyAsteroid`, `AST_SPLIT_MIN`, `AST_SPLIT_MAX`, `AST_CHILD_FRAC`, `AST_SPLIT_KICK`.",
+   "source": "UC-E2-3#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  a destroyed rock above the no-split size yields between AST_SPLIT_MIN and AST_SPLIT_MAX children",
+   "source": "UC-E2-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  the children move apart rather than sitting inside each other",
+   "source": "UC-E2-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-4 \u2014 Broken rock leaves gems in the world.** Runs when: gems are loose in the world. Leaves true: a gem can be picked up. Status in the existing source: HAVE.",
+   "source": "UC-E2-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  The pieces spawn as physical gem pickups whose credit value scales with the size of the rock they came from, and which expire if nobody takes them.",
+   "source": "UC-E2-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `spawnGem`, `GEM_CREDIT_PER_SCALE`, `GEM_LIFE`.",
+   "source": "UC-E2-4#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  a bigger rock yields gems worth more credits than a smaller one",
+   "source": "UC-E2-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  an uncollected gem disappears after GEM_LIFE seconds",
+   "source": "UC-E2-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-5 \u2014 The pilot scoops a gem.** Runs when: a gem can be picked up. Leaves true: gem credits are in the hold. Status in the existing source: HAVE.",
+   "source": "UC-E2-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Flying near a gem collects it, with a magnet radius that widens as the ship is upgraded, so collection is a flight skill rather than a pixel-hunt.",
+   "source": "UC-E2-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `magnetFor`, `GEM_MAGNET`, `GEM_PICK_R`, `GEM_GRAB_R`.",
+   "source": "UC-E2-5#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  a gem inside the magnet radius moves toward the ship without an exact pass-over",
+   "source": "UC-E2-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  the magnet radius grows when the relevant upgrade is bought",
+   "source": "UC-E2-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "**UC-E2-6 \u2014 Collected credits bank an upgrade point.** Runs when: gem credits are in the hold. Leaves true: the pilot is owed at least one upgrade point. Status in the existing source: HAVE.",
+   "source": "UC-E2-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Gem credits fill a bar; each time it fills it converts into one banked upgrade point, up to a cap.",
+   "source": "UC-E2-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  Rests on: `gemBarAdd`, `GEM_BAR_MAX`, `GEM_BAR_RATE`, `GEM_PTS_CAP`.",
+   "source": "UC-E2-6#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  GEM_BAR_MAX credits collected converts to exactly one banked point",
+   "source": "UC-E2-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  only the player's ship banks points; an AI ship collecting gems banks none",
+   "source": "UC-E2-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E2 \u2014 Mine the belt",
+   "text": "  banked points stop accumulating at GEM_PTS_CAP",
+   "source": "UC-E2-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "*You have a point. Put it into guns, shields or engines and get a little better now; or hold out, max everything, and trade the whole ship for a bigger frame and lose every upgrade you bought. That is the only real decision in the game.*",
+   "source": "E3",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "Begins when: the pilot is owed at least one upgrade point. Is finished when: the ship is measurably better than it was.",
+   "source": "E3",
+   "kind": "must"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-1 \u2014 The pilot spends a point on one of eight stats.** Runs when: the pilot is owed at least one upgrade point. Leaves true: at least one stat is above zero. Status in the existing source: HAVE.",
+   "source": "UC-E3-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  A banked point goes into one of eight named stats, in flight, each capped so no single stat absorbs the whole run.",
+   "source": "UC-E3-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `spendStat`, `STAT_ORDER`, `STAT_GAIN`, `STAT_MAX`.",
+   "source": "UC-E3-1#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  spending on an unknown stat name is refused with the list of real ones",
+   "source": "UC-E3-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  a stat already at STAT_MAX refuses further points rather than consuming them",
+   "source": "UC-E3-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-2 \u2014 Each point visibly changes how the ship performs.** Runs when: at least one stat is above zero. Leaves true: the ship is measurably better than it was. Status in the existing source: HAVE.",
+   "source": "UC-E3-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  A stat is a multiplier the simulation actually reads, so a point spent is felt rather than merely displayed.",
+   "source": "UC-E3-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `statMult`.",
+   "source": "UC-E3-2#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  raising speed increases the ship's achieved velocity in flight",
+   "source": "UC-E3-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  a stat at zero leaves its multiplier at exactly 1.0",
+   "source": "UC-E3-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-3 \u2014 Maxing every stat arms the trade-in.** Runs when: at least one stat is above zero. Leaves true: every stat is at its cap. Status in the existing source: HAVE.",
+   "source": "UC-E3-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Only when all eight stats are at their cap, with a further point banked, does the ship become eligible for the next hull.",
+   "source": "UC-E3-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `tierUpReady`, `TIER_UP`, `STAT_MAX`.",
+   "source": "UC-E3-3#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  with seven stats maxed the tier-up is not offered",
+   "source": "UC-E3-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  with eight maxed and no banked point the tier-up is not offered",
+   "source": "UC-E3-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-4 \u2014 The game names the hull that comes next.** Runs when: every stat is at its cap. Leaves true: a next hull is on offer. Status in the existing source: HAVE.",
+   "source": "UC-E3-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  The ladder of hulls is a fixed order, and the ship's current class determines exactly which one is on offer.",
+   "source": "UC-E3-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `nextTierHull`, `hullTierIdx`, `HULL_ORDER_ORIGINAL`.",
+   "source": "UC-E3-4#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  a ship at the top of the ladder is offered nothing",
+   "source": "UC-E3-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  a generated hull is placed at its size tier's rank rather than off the ladder",
+   "source": "UC-E3-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-5 \u2014 Taking the new hull costs every upgrade bought.** Runs when: a next hull is on offer. Leaves true: the ship is flying a new frame. Status in the existing source: HAVE.",
+   "source": "UC-E3-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Accepting the trade-in swaps the frame and resets all eight stats to zero, which is what makes holding out a real decision rather than a free reward.",
+   "source": "UC-E3-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `takeTierUp`.",
+   "source": "UC-E3-5#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  after a tier-up every stat reads zero",
+   "source": "UC-E3-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  refusing the tier-up leaves the current hull and stats untouched",
+   "source": "UC-E3-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "**UC-E3-6 \u2014 The traded-up frame outperforms the one it replaced.** Runs when: the ship is flying a new frame. Leaves true: the ship is measurably better than it was. Status in the existing source: HAVE.",
+   "source": "UC-E3-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  A hull class carries its own capacities, so the frame taken in the trade is materially better than the one given up even with every stat reset to zero. This is what makes the trade-in a decision rather than a punishment, and it is the beat that joins the tier-up arm back to the rest of the story.",
+   "source": "UC-E3-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  Rests on: `HULLS`, `shieldMaxFor`.",
+   "source": "UC-E3-6#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  a ship one tier up, with all stats at zero, has a higher base shield capacity than a maxed ship of the tier below",
+   "source": "UC-E3-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  each entry in HULLS declares its own capacities rather than inheriting one shared set",
+   "source": "UC-E3-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E3 \u2014 Spend the point, or save for the hull",
+   "text": "  the balance law the table states -- bigger hold means thinner armour and lower speed -- holds between adjacent tiers, so the trade is a trade and not a strict gain",
+   "source": "UC-E3-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "*Your gun costs energy, so you cannot hold the trigger forever. Your shields soak the first hits and come back if you break away. When you lose, your gems spill for anyone to take and you start again small.*",
+   "source": "E4",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "Begins when: the pilot is flying and in control. Is finished when: the pilot is flying again after dying.",
+   "source": "E4",
+   "kind": "must"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-1 \u2014 Firing costs energy the pilot cannot spend forever.** Runs when: the pilot is flying and in control. Leaves true: the ship can fire. Status in the existing source: HAVE.",
+   "source": "UC-E4-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Each shot draws from a capacitor that refills over time, so sustained fire is bounded by a resource rather than by a cooldown alone.",
+   "source": "UC-E4-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `capMaxFor`, `LASER_CAP_MAX`, `LASER_CAP_REGEN`, `LASER_CAP_PER_SHOT`.",
+   "source": "UC-E4-1#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  with the capacitor empty the ship cannot fire",
+   "source": "UC-E4-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  breaking off refills the capacitor at LASER_CAP_REGEN per second",
+   "source": "UC-E4-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  raising energyCap raises the ceiling the capacitor refills to",
+   "source": "UC-E4-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-2 \u2014 A shot travels a bounded distance.** Runs when: the ship can fire. Leaves true: a shot is travelling. Status in the existing source: HAVE.",
+   "source": "UC-E4-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  A bullet leaves the muzzle at a finite speed and expires after a finite life, which is what gives the weapon a range and makes closing the distance a decision.",
+   "source": "UC-E4-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `BULLET_SPEED`, `BULLET_LIFE`, `MUZZLE_OFF`.",
+   "source": "UC-E4-2#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a bullet expires after BULLET_LIFE seconds rather than travelling forever",
+   "source": "UC-E4-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a target beyond BULLET_SPEED times BULLET_LIFE cannot be reached by a direct shot",
+   "source": "UC-E4-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-3 \u2014 A shot that connects damages what it hit.** Runs when: a shot is travelling. Leaves true: damage is being exchanged. Status in the existing source: HAVE.",
+   "source": "UC-E4-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Contact applies damage, and the gun cannot fire again until the interval its own weapon type declares has passed, so damage over time is bounded by the weapon and by the pilot's investment in fireRate rather than by how fast a key is pressed.",
+   "source": "UC-E4-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `BULLET_DMG`, `BULLET_R`, `WEAPONS`, `statMult`.",
+   "source": "UC-E4-3#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a bullet passing within BULLET_R of a ship registers a hit",
+   "source": "UC-E4-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  the interval between shots is the weapon's own cd from the WEAPONS table, divided by the ship's fireRate multiplier, so buying fireRate visibly shortens it",
+   "source": "UC-E4-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  two weapon types with different cd values fire at visibly different rates on the same hull",
+   "source": "UC-E4-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-4 \u2014 Shields take the hit before the hull does.** Runs when: damage is being exchanged. Leaves true: a shield arc is down. Status in the existing source: HAVE.",
+   "source": "UC-E4-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Damage is absorbed by a directional shield arc, each arc carrying half the ship's total shield, before any of it reaches the hull.",
+   "source": "UC-E4-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `drainShield`, `shieldArcMaxFor`.",
+   "source": "UC-E4-4#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a hit from ahead drains the forward arc and leaves the aft arc untouched",
+   "source": "UC-E4-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  hull integrity does not fall while the struck arc still has charge",
+   "source": "UC-E4-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-5 \u2014 A ship that runs out of hull dies.** Runs when: a shield arc is down. Leaves true: the pilot's ship is destroyed. Status in the existing source: HAVE.",
+   "source": "UC-E4-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  When damage exhausts the hull the ship is destroyed, removed from the fight, and the kill is attributed to whoever landed it.",
+   "source": "UC-E4-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `killShip`, `killByShip`.",
+   "source": "UC-E4-5#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a destroyed ship stops being a valid target",
+   "source": "UC-E4-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  the killer is credited, so a kill is attributable",
+   "source": "UC-E4-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-6 \u2014 Death spills the cargo for anyone to take.** Runs when: the pilot's ship is destroyed. Leaves true: the hold is on the floor. Status in the existing source: HAVE.",
+   "source": "UC-E4-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  The credits banked into the hold are dropped into the world on death, so a long uninterrupted run is worth more than the sum of its minutes.",
+   "source": "UC-E4-6",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `spillGems`.",
+   "source": "UC-E4-6#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a pilot dying with credits leaves collectable gems at the wreck",
+   "source": "UC-E4-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  a pilot dying with nothing spills nothing",
+   "source": "UC-E4-6#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "**UC-E4-7 \u2014 The pilot comes back small after a pause.** Runs when: the hold is on the floor. Leaves true: the pilot is flying again after dying. Status in the existing source: HAVE.",
+   "source": "UC-E4-7",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  After a delay the pilot respawns without the hull they lost, which is the cost that makes the fight matter.",
+   "source": "UC-E4-7",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  Rests on: `RESPAWN_DELAY`.",
+   "source": "UC-E4-7#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  respawn does not happen before RESPAWN_DELAY seconds have passed",
+   "source": "UC-E4-7#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E4 \u2014 Fight, die, and lose the cargo",
+   "text": "  the respawned ship is not the tier that died",
+   "source": "UC-E4-7#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "*The session stops, and what you did survives it: the score, the ship you were flying, the state that has to be there when you come back.*",
+   "source": "E5",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "Begins when: the pilot is flying again after dying. Is finished when: the run is over and what happened is on record.",
+   "source": "E5",
+   "kind": "must"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "**UC-E5-1 \u2014 The game gathers what is worth keeping.** Runs when: the pilot is flying again after dying. Leaves true: a snapshot of the run exists. Status in the existing source: HAVE.",
+   "source": "UC-E5-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  The player's ship, progress and standing are collected into one versioned snapshot.",
+   "source": "UC-E5-1",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Rests on: `gatherSaveState`.",
+   "source": "UC-E5-1#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  the snapshot carries a version field, so an old save is recognisable as old",
+   "source": "UC-E5-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  with no player ship the snapshot is refused rather than written empty",
+   "source": "UC-E5-1#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "**UC-E5-2 \u2014 The snapshot is written where it can be found again.** Runs when: a snapshot of the run exists. Leaves true: the snapshot is in storage. Status in the existing source: HAVE.",
+   "source": "UC-E5-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  The snapshot is stored under a known key in browser storage, so it survives the page closing.",
+   "source": "UC-E5-2",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Rests on: `SAVE_KEY`, `persist`.",
+   "source": "UC-E5-2#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  closing and reopening the page finds the previous snapshot",
+   "source": "UC-E5-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  a snapshot written under the key replaces the previous one rather than accumulating",
+   "source": "UC-E5-2#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "**UC-E5-3 \u2014 The snapshot is kept current, not written only at the end.** Runs when: the snapshot is in storage. Leaves true: the stored snapshot is no more than one interval old. Status in the existing source: HAVE.",
+   "source": "UC-E5-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Saving runs on a cadence during play, so an unclean exit costs at most one interval rather than the whole session.",
+   "source": "UC-E5-3",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Rests on: `SAVE_INTERVAL_S`.",
+   "source": "UC-E5-3#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  a session ended without a clean exit still restores to within SAVE_INTERVAL_S of where it stopped",
+   "source": "UC-E5-3#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "**UC-E5-4 \u2014 A returning pilot gets their ship back.** Runs when: the stored snapshot is no more than one interval old. Leaves true: a returning pilot has their ship back. Status in the existing source: HAVE.",
+   "source": "UC-E5-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  On load a valid snapshot of the right version is applied; an invalid or older one is declined rather than half-applied.",
+   "source": "UC-E5-4",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Rests on: `applySaveState`.",
+   "source": "UC-E5-4#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  a snapshot of the wrong version is declined and the pilot starts fresh",
+   "source": "UC-E5-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  a restored pilot has the hull and stats they had when the snapshot was taken",
+   "source": "UC-E5-4#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "**UC-E5-5 \u2014 The run's standing is a weighted total.** Runs when: a returning pilot has their ship back. Leaves true: the run is over and what happened is on record. Status in the existing source: HAVE.",
+   "source": "UC-E5-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Standing combines credits and score under a stated weight rather than counting kills alone, so mining and fighting both register.",
+   "source": "UC-E5-5",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  Rests on: `SCORE_W`.",
+   "source": "UC-E5-5#groundedIn",
+   "kind": "fact"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  a run that only mines still produces a non-zero standing",
+   "source": "UC-E5-5#acceptance",
+   "kind": "check"
+  },
+  {
+   "section": "E5 \u2014 The run ends and is remembered",
+   "text": "  two runs with equal credits and different scores are ranked apart",
+   "source": "UC-E5-5#acceptance",
+   "kind": "check"
+  }
+ ]
+}

@@ -3,7 +3,7 @@
 
 # starblast — what is still open
 
-**217 open gaps.** The run stopped because: **parked**.
+**217 open gaps.** The run stopped because: **report-only**.
 
 | gap | count | what it means |
 |---|---:|---|
@@ -11,12 +11,6 @@
 | `UNDECOMPOSED_USECASE` | 29 | a use case has no numbered steps, so it is a title not a spec |
 | `NO_EXCEPTION_PATH` | 29 | only the happy path is specified |
 | `UNUSED_ACTOR` | 1 |  |
-
-## Parked (1)
-
-Asked, and awaiting an answer from the oracle. These are not failures: the run carried on around them and they resume from cache the moment they are answered.
-
-- `UNUSED_ACTOR|A:rival`
 
 ## Every open gap
 

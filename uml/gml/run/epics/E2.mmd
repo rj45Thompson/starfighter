@@ -1,0 +1,45 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E2["E2 — Mine the belt"]
+      direction LR
+      UC_E2_1["<b>UC-E2-1</b><br/>The system populates a belt with rocks<br/><small>makeMiningBelt</small>"]
+      UC_E2_2["<b>UC-E2-2</b><br/>The system finds the rocks near the pilot cheaply<br/><small>AST_CELL</small>"]
+      UC_E2_3["<b>UC-E2-3</b><br/>The pilot breaks a rock apart<br/><small>destroyAsteroid</small>"]
+      UC_E2_4["<b>UC-E2-4</b><br/>Broken rock leaves gems in the world<br/><small>spawnGem</small>"]
+      UC_E2_5["<b>UC-E2-5</b><br/>The pilot scoops a gem<br/><small>magnetFor</small>"]
+      UC_E2_6["<b>UC-E2-6</b><br/>Collected credits bank an upgrade point<br/><small>gemBarAdd</small>"]
+    end
+  end
+  S_belt_exists(("a belt of rocks exists"))
+  S_gem_in_hold(("gem credits are in the hold"))
+  S_gem_pickable(("a gem can be picked up"))
+  S_gems_loose(("gems are loose in the world"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_point_banked(("the pilot is owed at least one upgrade point"))
+  S_rock_in_range(("a rock is within reach"))
+  E2 --> S_in_flight
+  UC_E2_1 --> S_belt_exists
+  UC_E2_2 --> S_rock_in_range
+  UC_E2_3 --> S_gems_loose
+  UC_E2_4 --> S_gem_pickable
+  UC_E2_5 --> S_gem_in_hold
+  UC_E2_6 --> S_point_banked
+  A_pilot --- E2
+  S_point_banked --> E2
+  S_in_flight --> UC_E2_1
+  S_belt_exists --> UC_E2_2
+  S_rock_in_range --> UC_E2_3
+  S_gems_loose --> UC_E2_4
+  S_gem_pickable --> UC_E2_5
+  S_gem_in_hold --> UC_E2_6
+  style UC_E2_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (58): E1 -establishes-> S:page_open; E3 -establishes-> S:point_banked; E4 -establishes-> S:in_flight; E5 -establishes-> S:respawned; UC-E1-1 -establishes-> S:world_built; UC-E1-2 -establishes-> S:ship_exists; UC-E1-3 -establishes-> S:sim_running; UC-E1-4 -establishes-> S:controls_live; UC-E1-5 -establishes-> S:in_flight; UC-E3-1 -establishes-> S:stat_raised; UC-E3-2 -establishes-> S:ship_stronger; UC-E3-3 -establishes-> S:stats_maxed; UC-E3-4 -establishes-> S:tier_offered; UC-E3-5 -establishes-> S:hull_swapped; UC-E3-6 -establishes-> S:ship_stronger; UC-E4-1 -establishes-> S:weapon_ready; UC-E4-2 -establishes-> S:shot_in_flight; UC-E4-3 -establishes-> S:in_combat; UC-E4-4 -establishes-> S:shield_stripped; UC-E4-5 -establishes-> S:ship_dead

@@ -1,0 +1,40 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E1["E1 — Arrive and fly"]
+      direction LR
+      UC_E1_1["<b>UC-E1-1</b><br/>The page builds a world to fly in<br/><small>renderer</small>"]
+      UC_E1_2["<b>UC-E1-2</b><br/>The game gives the pilot a ship<br/><small>makeShip</small>"]
+      UC_E1_3["<b>UC-E1-3</b><br/>The simulation advances every frame<br/><small>frame</small>"]
+      UC_E1_4["<b>UC-E1-4</b><br/>The pilot's controls move the ship<br/><small>THRUST</small>"]
+      UC_E1_5["<b>UC-E1-5</b><br/>The pilot can see where the ship is going<br/><small>CAM_BACK</small>"]
+    end
+  end
+  S_controls_live(("the controls answer the pilot"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_page_open(("the page is open and nothing has started"))
+  S_ship_exists(("the pilot has a ship in that world"))
+  S_sim_running(("the simulation is stepping"))
+  S_world_built(("a world exists to fly in"))
+  E1 --> S_page_open
+  UC_E1_1 --> S_world_built
+  UC_E1_2 --> S_ship_exists
+  UC_E1_3 --> S_sim_running
+  UC_E1_4 --> S_controls_live
+  UC_E1_5 --> S_in_flight
+  A_pilot --- E1
+  S_in_flight --> E1
+  S_page_open --> UC_E1_1
+  S_world_built --> UC_E1_2
+  S_ship_exists --> UC_E1_3
+  S_sim_running --> UC_E1_4
+  S_controls_live --> UC_E1_5
+  style UC_E1_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (60): E2 -establishes-> S:in_flight; E3 -establishes-> S:point_banked; E4 -establishes-> S:in_flight; E5 -establishes-> S:respawned; UC-E2-1 -establishes-> S:belt_exists; UC-E2-2 -establishes-> S:rock_in_range; UC-E2-3 -establishes-> S:gems_loose; UC-E2-4 -establishes-> S:gem_pickable; UC-E2-5 -establishes-> S:gem_in_hold; UC-E2-6 -establishes-> S:point_banked; UC-E3-1 -establishes-> S:stat_raised; UC-E3-2 -establishes-> S:ship_stronger; UC-E3-3 -establishes-> S:stats_maxed; UC-E3-4 -establishes-> S:tier_offered; UC-E3-5 -establishes-> S:hull_swapped; UC-E3-6 -establishes-> S:ship_stronger; UC-E4-1 -establishes-> S:weapon_ready; UC-E4-2 -establishes-> S:shot_in_flight; UC-E4-3 -establishes-> S:in_combat; UC-E4-4 -establishes-> S:shield_stripped
