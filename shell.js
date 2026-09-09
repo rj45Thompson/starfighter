@@ -7,7 +7,13 @@
   let bar=null, sheet=null, model=null, openTab=null;
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const cmd=c=>{ if(typeof runCmd==='function') runCmd(c); };
-  const panel=(id,on)=>{ if(!window.PANELS) return; const p=(PANELS.list?PANELS.list():[]).find(x=>x.id===id); const want=on==null?!(p&&p.open):on; want?PANELS.open(id):PANELS.close(id); };
+  /* Returns the state it moved the panel to, so a caller that does extra work on OPEN (contracts runs the
+     missions command, passenger focuses the chat) can skip that work when the click was a close. */
+  const panel=(id,on)=>{ if(!window.PANELS) return false;
+    const p=(PANELS.list?PANELS.list():[]).find(x=>x.id===id);
+    const want=on==null?!(p&&p.open):on;
+    want?PANELS.open(id):PANELS.close(id);
+    return want; };
 
   // Each tab names a place the player can actually go today. `live()` decides whether the button is lit, so a tab
   // never advertises a module that failed to load - it says so instead of throwing on click.
@@ -18,10 +24,16 @@
     { id:'ship',      t:'SHIP',      hint:'engineering bay - hardpoints, gizmos, hull (E)', live:()=>!!window.ENGBAY, go:()=>ENGBAY.toggle() },
     { id:'market',    t:'MARKET',    hint:'buy and sell cargo (M)', live:()=>!!window.PANELS, go:()=>panel('market') },
     { id:'upgrades',  t:'UPGRADES',  hint:'gem bar, the eight stats, tier-up (keys 1-8)', live:()=>!!window.SBHUD, go:()=>panel('sbhud') },
-    { id:'contracts', t:'CONTRACTS', hint:'the mission board and what is accepted', live:()=>!!window.MISSIONS, go:()=>{ panel('missionlog',true); cmd('missions'); } },
+    /* RJ 2026-09-08, on the nav bar: "these should open and close the menus? those buttons open but don't
+       close?" MARKET, UPGRADES and EMPIRE always did - panel() toggles when it is not told which way. These
+       two passed `true`, which forces open, so clicking them again re-opened an already-open window and
+       nothing appeared to happen. They toggle now, and only do their extra work on the way open. */
+    { id:'contracts', t:'CONTRACTS', hint:'the mission board and what is accepted', live:()=>!!window.MISSIONS, go:()=>{ if(panel('missionlog')) cmd('missions'); } },
     { id:'empire',    t:'EMPIRE',    hint:'your stations and haulers - what you own and what it earns', live:()=>!!window.ECONOMY, go:()=>panel('empire') },
     { id:'passenger', t:'PASSENGER', hint:'talk to the ship AI - it answers from the novel and the live game', live:()=>!!window.PASSENGER,
-      go:()=>{ panel('ticker',true); const t=[...document.querySelectorAll('#ticker .tab')].find(e=>/parasite/i.test(e.textContent)); if(t) t.click(); const c=document.getElementById('chat'); if(c) c.focus(); } },
+      go:()=>{ if(!panel('ticker')) return;
+        const t=[...document.querySelectorAll('#ticker .tab')].find(e=>/parasite/i.test(e.textContent)); if(t) t.click();
+        const c=document.getElementById('chat'); if(c) c.focus(); } },
     { id:'broken',    t:'BROKEN',    hint:'what is half built or a toy - listed honestly, not hidden', live:()=>true, sheet:true, go:()=>toggleSheet('broken') }
   ];
 

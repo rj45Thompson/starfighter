@@ -238,6 +238,17 @@ function positionGrip(rec){   // corner grip + the two FREE-edge resize strips (
   // HORIZONTAL free edge (resizes HEIGHT): top edge if bottom-anchored, else bottom edge; leaves the corner clear
   if(rec.gripS){ rec.gripS.style.top=(a.bottom ? r.top : r.bottom-T)+'px'; rec.gripS.style.height=T+'px';
     rec.gripS.style.left=(a.right ? r.left+gw : r.left)+'px'; rec.gripS.style.width=Math.max(0,r.width-gw)+'px'; }
+  /* THE TITLE BAR YIELDS THE CORNER THE GRIP IS USING. RJ 2026-09-08: "the drag button and the close button
+     the windows seem to overlap." Measured: CLOSE sat on top of that same panel's GRIP by 16x18px on three
+     panels, so a click within two pixels of the corner either closed the window or started resizing it.
+     They collide by construction - ctlPosition always puts the bar across the panel's TOP, and the corner
+     grip moves to the TOP edge whenever the panel is bottom-anchored. Neither is wrong, so the bar simply
+     pads itself out of the corner the grip currently occupies, on whichever side that is. */
+  if(rec.ctl){
+    const pad = a.bottom ? (gw + 6) : 0;          // the grip is on the top edge only when bottom-anchored
+    rec.ctl.style.paddingLeft  = (a.right ? pad : 0) + 'px';
+    rec.ctl.style.paddingRight = (a.right ? 0 : pad) + 'px';
+  }
 }
 
 // BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
@@ -264,9 +275,14 @@ function armAutoHide(rec){
 }
 
 function setOpen(rec, open){
-  rec.open=open; applyVisual(rec); persist(rec); reflowEdge(rec.edge);
+  /* OPENING PINS. RJ 2026-09-08: "when you click on the missions unpinned tab it opens the window UNPINNED,
+     so you don't need a close - the pin IS close." That is the whole model, and it is simpler than what was
+     here: a tab or a menu entry opens a window and it STAYS open; the pin closes it. Opening something
+     unpinned meant it slid away again on its own a moment later, which reads as the window refusing to open.
+     Auto-hide is not gone - a panel you unpin without closing still arms it - but nothing arrives unpinned. */
+  rec.open=open; if(open) rec.pinned=true;
+  applyVisual(rec); persist(rec); reflowEdge(rec.edge);
   if(rec.onOpenChange) try{ rec.onOpenChange(open); }catch(e){}
-  if(open && !rec.pinned) armAutoHide(rec);
 }
 function setPinned(rec, pinned){
   rec.pinned=pinned; applyVisual(rec); persist(rec);
