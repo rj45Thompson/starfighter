@@ -1,0 +1,176 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  A_rival(["👤 Another player"])
+  A_server(["👤 The server"])
+  subgraph SYS["starblast-web — system boundary"]
+    direction LR
+    subgraph E1["E1 — Choose a mode and reach the field"]
+      direction LR
+      UC_E1_1["<b>UC-E1-1</b><br/>Player chooses one of the four game modes<br/><small>game mode</small>"]
+      UC_E1_2["<b>UC-E1-2</b><br/>The server places the ship beside its base<br/><small>space station</small>"]
+      UC_E1_3["<b>UC-E1-3</b><br/>Pilot steers the ship<br/><small>steer</small>"]
+      UC_E1_4["<b>UC-E1-4</b><br/>Pilot accelerates the ship<br/><small>accelerate</small>"]
+      UC_E1_5["<b>UC-E1-5</b><br/>Pilot fires the ship's weapon<br/><small>fire</small>"]
+    end
+    subgraph E2["E2 — Mine the belt and fill the cargo"]
+      direction LR
+      UC_E2_1["<b>UC-E2-1</b><br/>Pilot breaks an asteroid apart<br/><small>asteroid</small>"]
+      UC_E2_2["<b>UC-E2-2</b><br/>A broken asteroid leaves crystals in the field<br/><small>gem</small>"]
+      UC_E2_3["<b>UC-E2-3</b><br/>Pilot picks up a loose crystal<br/><small>gem</small>"]
+      UC_E2_4["<b>UC-E2-4</b><br/>The hold refuses crystals past its ceiling<br/><small>cargo capacity</small>"]
+      UC_E2_5["<b>UC-E2-5</b><br/>Pilot weighs asteroid size against exposure<br/><small>asteroid</small>"]
+      UC_E2_6["<b>UC-E2-6</b><br/>The hold fills<br/><small>cargo capacity</small>"]
+    end
+    subgraph E3["E3 — Spend the cargo, or trade up a tier"]
+      direction LR
+      UC_E3_1["<b>UC-E3-1</b><br/>Pilot spends crystals on one of eight statistics<br/><small>upgrade categories</small>"]
+      UC_E3_2["<b>UC-E3-2</b><br/>A raised statistic changes how the ship performs<br/><small>energy regen</small>"]
+      UC_E3_3["<b>UC-E3-3</b><br/>Pilot buys an extra life with a full hold<br/><small>extra life</small>"]
+      UC_E3_4["<b>UC-E3-4</b><br/>A full hold offers the next ship in the tree<br/><small>tier up</small>"]
+      UC_E3_5["<b>UC-E3-5</b><br/>Taking the next ship hands over an un-upgraded one<br/><small>tier up</small>"]
+    end
+    subgraph E4["E4 — Fight, bleed gems, and die back to tier one"]
+      direction LR
+      UC_E4_1["<b>UC-E4-1</b><br/>Pilot trades fire with another ship<br/><small>weapons</small>"]
+      UC_E4_2["<b>UC-E4-2</b><br/>Shields absorb before the hold does<br/><small>shield</small>"]
+      UC_E4_3["<b>UC-E4-3</b><br/>Damage past the shield knocks crystals loose<br/><small>gems as shield</small>"]
+      UC_E4_4["<b>UC-E4-4</b><br/>A ship that runs out of everything dies<br/><small>death</small>"]
+      UC_E4_5["<b>UC-E4-5</b><br/>Death returns the pilot to tier one with nothing<br/><small>death</small>"]
+    end
+    subgraph E5["E5 — The field closes and one player is left"]
+      direction LR
+      UC_E5_1["<b>UC-E5-1</b><br/>A repulsive field grows out from the star<br/><small>gravity field</small>"]
+      UC_E5_2["<b>UC-E5-2</b><br/>The field warns before it reaches a player<br/><small>endgame warning</small>"]
+      UC_E5_3["<b>UC-E5-3</b><br/>The closing field forces players together<br/><small>gravity field</small>"]
+      UC_E5_4["<b>UC-E5-4</b><br/>The last pilot alive takes the round<br/><small>survival objective</small>"]
+      UC_E5_5["<b>UC-E5-5</b><br/>The server ends the round<br/><small>round end</small>"]
+    end
+  end
+  S_at_menu(("the player is at the main menu, in no game"))
+  S_back_at_tier_one(("the pilot is flying again, back at tier one"))
+  S_bleeding_gems(("the pilot is losing crystals to incoming fire"))
+  S_can_move(("the ship moves under the player's control"))
+  S_can_steer(("the ship's heading answers the player"))
+  S_cargo_full(("the ship's crystal cargo is full"))
+  S_field_closing(("the playable area is shrinking"))
+  S_forced_together(("the survivors cannot avoid each other"))
+  S_gems_held(("crystals are in the ship's hold"))
+  S_gems_loose(("crystals are loose in the field"))
+  S_hold_bounded(("the hold has a known ceiling and enforces it"))
+  S_in_field(("the pilot is flying in the asteroid field"))
+  S_life_banked(("the pilot holds a life in reserve"))
+  S_mining_has_a_cost(("the pilot is trading safety for yield"))
+  S_mode_chosen(("a mode is chosen and its objective is set"))
+  S_one_left(("one pilot remains alive"))
+  S_rock_broken(("an asteroid has been broken"))
+  S_round_decided(("the round is over and a winner is known"))
+  S_shield_down(("the shield is depleted"))
+  S_ship_better(("the ship is measurably better than it was"))
+  S_ship_destroyed(("the pilot's ship is destroyed"))
+  S_ship_placed(("the pilot has a ship in the world, near its base"))
+  S_stat_raised(("at least one statistic is above its base"))
+  S_tier_offered(("a next ship is on offer"))
+  S_trading_fire(("shots are being exchanged"))
+  S_under_attack(("⚠ another ship is shooting at the pilot<br/><small>floating</small>"))
+  style S_under_attack fill:#3d2e12,stroke:#ffb74d,color:#e8eef6,stroke-dasharray:4 3
+  S_warned(("players know how much room is left"))
+  E1 --> S_at_menu
+  E2 --> S_in_field
+  E3 --> S_cargo_full
+  E4 --> S_in_field
+  E5 --> S_in_field
+  UC_E1_1 --> S_mode_chosen
+  UC_E1_2 --> S_ship_placed
+  UC_E1_3 --> S_can_steer
+  UC_E1_4 --> S_can_move
+  UC_E1_5 --> S_in_field
+  UC_E2_1 --> S_rock_broken
+  UC_E2_2 --> S_gems_loose
+  UC_E2_3 --> S_gems_held
+  UC_E2_4 --> S_hold_bounded
+  UC_E2_5 --> S_mining_has_a_cost
+  UC_E2_6 --> S_cargo_full
+  UC_E3_1 --> S_stat_raised
+  UC_E3_2 --> S_ship_better
+  UC_E3_3 --> S_life_banked
+  UC_E3_4 --> S_tier_offered
+  UC_E3_5 --> S_ship_better
+  UC_E4_1 --> S_trading_fire
+  UC_E4_2 --> S_shield_down
+  UC_E4_3 --> S_bleeding_gems
+  UC_E4_4 --> S_ship_destroyed
+  UC_E4_5 --> S_back_at_tier_one
+  UC_E5_1 --> S_field_closing
+  UC_E5_2 --> S_warned
+  UC_E5_3 --> S_forced_together
+  UC_E5_4 --> S_one_left
+  UC_E5_5 --> S_round_decided
+  A_pilot --- E1
+  A_pilot --- E2
+  A_pilot --- E3
+  A_pilot --- E4
+  A_server --- E5
+  S_in_field --> E1
+  S_cargo_full --> E2
+  S_ship_better --> E3
+  S_back_at_tier_one --> E4
+  S_round_decided --> E5
+  S_at_menu --> UC_E1_1
+  S_mode_chosen --> UC_E1_2
+  S_ship_placed --> UC_E1_3
+  S_can_steer --> UC_E1_4
+  S_can_move --> UC_E1_5
+  S_in_field --> UC_E2_1
+  S_rock_broken --> UC_E2_2
+  S_gems_loose --> UC_E2_3
+  S_gems_held --> UC_E2_4
+  S_hold_bounded --> UC_E2_5
+  S_mining_has_a_cost --> UC_E2_6
+  S_cargo_full --> UC_E3_1
+  S_stat_raised --> UC_E3_2
+  S_cargo_full --> UC_E3_3
+  S_cargo_full --> UC_E3_4
+  S_tier_offered --> UC_E3_5
+  S_in_field --> UC_E4_1
+  S_trading_fire --> UC_E4_2
+  S_shield_down --> UC_E4_3
+  S_bleeding_gems --> UC_E4_4
+  S_ship_destroyed --> UC_E4_5
+  S_in_field --> UC_E5_1
+  S_field_closing --> UC_E5_2
+  S_warned --> UC_E5_3
+  S_forced_together --> UC_E5_4
+  S_one_left --> UC_E5_5
+  Q_why_UC_E3_3{{"❓ WHY"}}
+  style Q_why_UC_E3_3 fill:#3d1f1f,stroke:#ff6b6b,color:#ffe8e8
+  style UC_E1_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_rival fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_server fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (289): Q:what:UC-E1-1 -answers-> S:mode_chosen; Q:what:UC-E1-2 -answers-> S:ship_placed; Q:what:UC-E1-3 -answers-> S:can_steer; Q:what:UC-E1-4 -answers-> S:can_move; Q:what:UC-E1-5 -answers-> S:in_field; Q:what:UC-E2-1 -answers-> S:rock_broken; Q:what:UC-E2-2 -answers-> S:gems_loose; Q:what:UC-E2-3 -answers-> S:gems_held; Q:what:UC-E2-4 -answers-> S:hold_bounded; Q:what:UC-E2-5 -answers-> S:mining_has_a_cost; Q:what:UC-E2-6 -answers-> S:cargo_full; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_better; Q:what:UC-E3-3 -answers-> S:life_banked; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:ship_better; Q:what:UC-E4-1 -answers-> S:trading_fire; Q:what:UC-E4-2 -answers-> S:shield_down; Q:what:UC-E4-3 -answers-> S:bleeding_gems; Q:what:UC-E4-4 -answers-> S:ship_destroyed

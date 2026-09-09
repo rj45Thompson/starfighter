@@ -1,0 +1,265 @@
+{
+ "subject": "Starblast.io",
+ "gathered": "2026-09-09 via WebSearch; direct page fetch is blocked by this environment's egress policy, so each claim is the content a search returned for the named source",
+ "claims": [
+  {
+   "term": "gem",
+   "says": "Gems (also known as Crystals) are resources gathered by mining asteroids or stolen from other bases, aliens or ships",
+   "source": "https://starblast.fandom.com/wiki/Gems",
+   "found_by": "Starblast.io asteroids mining crystals cargo capacity gems how to collect",
+   "kind": "entity"
+  },
+  {
+   "term": "gem",
+   "says": "To get gems, mine asteroids or steal gems from the enemy",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "entity"
+  },
+  {
+   "term": "asteroid",
+   "says": "Larger chunks of gems are worth more and are typically found in larger asteroids",
+   "source": "https://starblast.fandom.com/wiki/Gems",
+   "found_by": "Starblast.io asteroids mining crystals cargo capacity gems how to collect",
+   "kind": "entity"
+  },
+  {
+   "term": "asteroid",
+   "says": "It is more efficient to mine larger asteroids (more gems per damage dealt), but it is also riskier if enemies come later",
+   "source": "https://iogameguide.com/guides/starblast-io-guide",
+   "found_by": "Starblast.io asteroids mining crystals cargo capacity gems how to collect",
+   "kind": "entity"
+  },
+  {
+   "term": "ship",
+   "says": "There are currently 32 ships spread out across 7 tiers on the vanilla ship tree",
+   "source": "https://starblast.fandom.com/wiki/Ships",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "entity"
+  },
+  {
+   "term": "ship",
+   "says": "You start with a small ship, there are 7 ship levels in total and dozens of different ship models",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "entity"
+  },
+  {
+   "term": "Fly",
+   "says": "The Fly is the only ship available at level one and is arguably the weakest ship in the game with one of the highest agility and speed levels",
+   "source": "https://starblast.fandom.com/wiki/Ships",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "entity"
+  },
+  {
+   "term": "space station",
+   "says": "You will then appear near the space station, which is your base",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "entity"
+  },
+  {
+   "term": "cargo capacity",
+   "says": "The cargo capacity is 20L squared, and when full, an extra life can be purchased or a ship from the next tier can be purchased",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "quantity"
+  },
+  {
+   "term": "cargo capacity",
+   "says": "If the gem would exceed the ship's cargo, the extra gems are lost. A ship cannot pick up more gems when its gem cargo is full",
+   "source": "https://starblast.fandom.com/wiki/Gems",
+   "found_by": "Starblast.io asteroids mining crystals cargo capacity gems how to collect",
+   "kind": "quantity"
+  },
+  {
+   "term": "upgrade cost",
+   "says": "For Tier 1-6, 8 categories can each be upgraded L times for 5L gems, and it takes 40L squared gems to fully upgrade, which is two full cargo loads",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "quantity"
+  },
+  {
+   "term": "upgrade categories",
+   "says": "8 categories can each be upgraded L times",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "quantity"
+  },
+  {
+   "term": "tier",
+   "says": "Generally, ships in higher tiers are stronger yet slower than ships of lower tiers, with a few exceptions",
+   "source": "https://starblast.fandom.com/wiki/Ships",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "quantity"
+  },
+  {
+   "term": "extra life",
+   "says": "when full, an extra life can be purchased (up to a limit, usually 5 for Tier 1-6 and 0 for Tier 7)",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "quantity"
+  },
+  {
+   "term": "tier up",
+   "says": "Each ship can be upgraded to a ship of a higher tier, up to Tier 7, by filling their crystal cargo, from a choice of two ships",
+   "source": "https://starblast.fandom.com/wiki/Ships",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "mechanic"
+  },
+  {
+   "term": "tier up",
+   "says": "When you upgrade your ship, you start with an un-upgraded ship of the next level",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "mechanic"
+  },
+  {
+   "term": "spend gems",
+   "says": "Gems can be used to upgrade your ship's statistics, upgrade to a higher level ship, purchase extra lives, or exchange/donate for trading",
+   "source": "https://starblast.fandom.com/wiki/Upgrades",
+   "found_by": "Starblast.io wiki game mechanics gems upgrades ship tiers",
+   "kind": "mechanic"
+  },
+  {
+   "term": "spend gems",
+   "says": "They can be spent on upgrading ship stats, upgrading to a ship of a higher tier, purchasing extra lives, or contributed to a base for credits",
+   "source": "https://starblast.fandom.com/wiki/Gems",
+   "found_by": "Starblast.io asteroids mining crystals cargo capacity gems how to collect",
+   "kind": "mechanic"
+  },
+  {
+   "term": "shield",
+   "says": "Defensive players prioritize shields and regeneration for durability",
+   "source": "https://iogameguide.com/guides/starblast-io-guide",
+   "found_by": "Starblast.io combat lasers energy regeneration shields dying respawn lose gems",
+   "kind": "mechanic"
+  },
+  {
+   "term": "gems as shield",
+   "says": "When a player's shield runs out, all damage taken will cause that amount of gems to fall off the player. Gems serve as a second shield for spaceships when the shield is depleted",
+   "source": "https://en.namu.wiki/w/Starblast.io/Game_Elements",
+   "found_by": "Starblast.io combat lasers energy regeneration shields dying respawn lose gems",
+   "kind": "mechanic"
+  },
+  {
+   "term": "energy regen",
+   "says": "Upgrading Energy Regen as early as possible speeds up your journey to higher tiers",
+   "source": "https://starblastio.net/starblast-io-tips-and-tricks/",
+   "found_by": "Starblast.io combat lasers energy regeneration shields dying respawn lose gems",
+   "kind": "mechanic"
+  },
+  {
+   "term": "death",
+   "says": "When you die, you respawn as a Tier 1 ship with minimal crystals, and all your upgrades vanish",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io combat lasers energy regeneration shields dying respawn lose gems",
+   "kind": "mechanic"
+  },
+  {
+   "term": "weapons",
+   "says": "Players engage enemies through direct laser fire, torpedoes, and special weapons",
+   "source": "https://iogameguide.com/guides/starblast-io-guide",
+   "found_by": "Starblast.io combat lasers energy regeneration shields dying respawn lose gems",
+   "kind": "mechanic"
+  },
+  {
+   "term": "controls",
+   "says": "The ship can either be controlled with the mouse or keyboard",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "control"
+  },
+  {
+   "term": "accelerate",
+   "says": "right-clicking or pressing the up arrow key accelerates",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "control"
+  },
+  {
+   "term": "steer",
+   "says": "moving the mouse or pressing the left and right arrow keys controls the direction",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "control"
+  },
+  {
+   "term": "fire",
+   "says": "left-clicking or pressing the space bar on the keyboard attacks",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "control"
+  },
+  {
+   "term": "game mode",
+   "says": "There are currently four game modes available to be played via the main menu; Survival, Team mode, Deathmatch, and Invasion",
+   "source": "https://starblast.fandom.com/wiki/Starblast",
+   "found_by": "Starblast.io official documentation modding ECP game modes team survival",
+   "kind": "mode"
+  },
+  {
+   "term": "game mode",
+   "says": "To start, select the mode of your preference. The game offers four modes",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "mode"
+  },
+  {
+   "term": "objective",
+   "says": "The objective varies by game mode: destroy enemy bases, kill everyone else during survival, be first to reach kill target, capture more flags per round",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "objective"
+  },
+  {
+   "term": "objective",
+   "says": "The basics of Starblast are to mine asteroids and shoot other players",
+   "source": "https://starblast.fandom.com/wiki/How_to_play_guide_for_Starblast",
+   "found_by": "Starblast.io how to start playing controls joining a game main menu nickname ship selection",
+   "kind": "objective"
+  },
+  {
+   "term": "survival objective",
+   "says": "the ultimate goal being to last till the Survival Mode period begins, emerge as the last survivor of the game, and claim victory",
+   "source": "https://starblast.fandom.com/wiki/Survival_Mode",
+   "found_by": "Starblast.io survival mode aliens waves objective how the round ends leaderboard score",
+   "kind": "objective"
+  },
+  {
+   "term": "round end",
+   "says": "The server ends once there is only one player left",
+   "source": "https://starblast.fandom.com/wiki/Survival_Mode",
+   "found_by": "Starblast.io survival mode aliens waves objective how the round ends leaderboard score",
+   "kind": "objective"
+  },
+  {
+   "term": "gravity field",
+   "says": "A repulsive gravity field pushes players away from the star, and as the endgame progresses, the field gets bigger and stronger",
+   "source": "https://starblast.fandom.com/wiki/Survival_Mode",
+   "found_by": "Starblast.io survival mode aliens waves objective how the round ends leaderboard score",
+   "kind": "mechanic"
+  },
+  {
+   "term": "endgame warning",
+   "says": "Players will receive warnings at 75%, 50%, 25% and at 0%",
+   "source": "https://starblast.fandom.com/wiki/Survival_Mode",
+   "found_by": "Starblast.io survival mode aliens waves objective how the round ends leaderboard score",
+   "kind": "mechanic"
+  },
+  {
+   "term": "invasion waves",
+   "says": "Invasion Mode features 10 waves and a final boss",
+   "source": "https://en.namu.wiki/w/Starblast.io/Game_Mode",
+   "found_by": "Starblast.io survival mode aliens waves objective how the round ends leaderboard score",
+   "kind": "mode"
+  }
+ ],
+ "contradictions": [
+  [
+   "gem loss on damage",
+   "gems fall off continuously as damage is taken once the shield is depleted (namu.wiki, Game Elements)",
+   "you respawn as a Tier 1 ship with minimal crystals and all upgrades vanish, which describes loss at death (fandom, How to play)"
+  ]
+ ]
+}

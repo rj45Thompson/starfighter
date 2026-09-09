@@ -1,30 +1,27 @@
 {
  "applied": 6,
  "cache": {
-  "hit_ratio": 0.875,
+  "hit_ratio": 0.1,
   "hits": 7,
-  "misses": 1,
+  "misses": 63,
   "writes": 0
  },
  "calls": 7,
  "coverage": {
-  "E1": 0.3696,
-  "E2": 0.32,
-  "E3": 0.375,
-  "E4": 0.2344,
-  "E5": 0.6364
+  "E1": 0.3269,
+  "E2": 0.2609,
+  "E3": 0.3191,
+  "E4": 0.15,
+  "E5": 0.7
  },
  "ground": {
-  "anomalies_certain": 91,
-  "anomalies_probable": 845,
-  "const": 1527,
-  "dead": 809,
-  "field": 37,
-  "function": 633,
-  "method": 75,
-  "module": 8,
-  "singleton": 55,
-  "total": 2335
+  "anomalies_certain": 22,
+  "anomalies_probable": 1,
+  "const": 2855,
+  "dead": 386,
+  "function": 652,
+  "method": 3,
+  "total": 3510
  },
  "model": {
   "actor": 3,
@@ -36,13 +33,13 @@
   "step": 0,
   "usecase": 29
  },
- "open_gaps": 217,
+ "open_gaps": 343,
  "oracle": "transcript",
- "parked": 1,
+ "parked": 63,
  "refused": 1,
- "rounds": 3,
+ "rounds": 8,
  "spec": "starblast",
- "stopped": "parked",
+ "stopped": "round-limit",
  "violations": [
   "FLOATING_STATE [S:under_fire]: state 'something is shooting at the pilot' is neither required nor established"
  ]

@@ -1,0 +1,57 @@
+classDiagram
+  direction LR
+  class E1 {
+    <<subsystem>>
+    +accelerate
+    +controls
+    +fire
+    +game mode
+    +objective
+    +space station
+    +steer
+    +weapons
+  }
+  note for E1 "E1 — Choose a mode and reach the field"
+  class E2 {
+    <<subsystem>>
+    +asteroid
+    +cargo capacity
+    +gem
+    +upgrade cost
+    +weapons
+  }
+  note for E2 "E2 — Mine the belt and fill the cargo"
+  class E3 {
+    <<subsystem>>
+    +energy regen
+    +extra life
+    +ship
+    +spend gems
+    +tier
+    +tier up
+    +upgrade categories
+    +upgrade cost
+  }
+  note for E3 "E3 — Spend the cargo, or trade up a tier"
+  class E4 {
+    <<subsystem>>
+    +death
+    +fire
+    +gems as shield
+    +shield
+    +tier
+    +weapons
+  }
+  note for E4 "E4 — Fight, bleed gems, and die back to tier one"
+  class E5 {
+    <<subsystem>>
+    +endgame warning
+    +gravity field
+    +round end
+    +survival objective
+  }
+  note for E5 "E5 — The field closes and one player is left"
+  E1 ..> E4 : reads
+  E2 ..> E3 : reads
+  E2 ..> E4 : reads
+  E3 ..> E4 : reads

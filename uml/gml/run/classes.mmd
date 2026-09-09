@@ -45,16 +45,13 @@ classDiagram
     +VMAX
     +YAW_RATE
   }
-  class NOVEL_CFG {
-    <<config>>
-    +scene  ⚠ never read
-  }
   class E1 {
     <<subsystem>>
     +SHIP_TEX
     +frame()
     +makeShip()
     +renderer
+    +scene
     +step()
   }
   note for E1 "E1 — Arrive and fly"
@@ -103,7 +100,6 @@ classDiagram
   }
   note for E5 "E5 — The run ends and is remembered"
   E1 ..> CFG : reads
-  E1 ..> NOVEL_CFG : reads
   E2 ..> CFG : reads
   E3 ..> CFG : reads
   E3 ..> E4 : reads

@@ -3,7 +3,7 @@
 
 # starblast — requirements
 
-5 epics · 29 use cases · 0 steps · 30 state literals · 0 open questions · 102 relations
+5 epics · 29 use cases · 0 steps · 30 state literals · 174 open questions · 423 relations
 
 Status: **HAVE** built and cited · **PARTIAL** built, story not fully true · **ABSENT** proven not present · **INFERRED** the chain needs it and nobody wrote it.
 

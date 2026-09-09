@@ -1,0 +1,140 @@
+{
+  "name": "starblast-web",
+  "root": "..",
+  "sources": [],
+  "ground_mode": "web",
+  "corpus": "web/starblast.corpus.json",
+  "actors": [
+    {
+      "id": "A:pilot",
+      "name": "Pilot",
+      "attrs": {
+        "note": "the person flying"
+      }
+    },
+    {
+      "id": "A:server",
+      "name": "The server",
+      "attrs": {
+        "note": "the simulation, acting on its own"
+      }
+    },
+    {
+      "id": "A:rival",
+      "name": "Another player",
+      "attrs": {
+        "note": "everyone else in the field"
+      }
+    }
+  ],
+  "states": [
+    {
+      "id": "S:at_menu",
+      "name": "the player is at the main menu, in no game"
+    },
+    {
+      "id": "S:in_field",
+      "name": "the pilot is flying in the asteroid field"
+    },
+    {
+      "id": "S:cargo_full",
+      "name": "the ship's crystal cargo is full"
+    },
+    {
+      "id": "S:ship_better",
+      "name": "the ship is measurably better than it was"
+    },
+    {
+      "id": "S:under_attack",
+      "name": "another ship is shooting at the pilot"
+    },
+    {
+      "id": "S:back_at_tier_one",
+      "name": "the pilot is flying again, back at tier one"
+    },
+    {
+      "id": "S:round_decided",
+      "name": "the round is over and a winner is known"
+    }
+  ],
+  "epics": [
+    {
+      "id": "E1",
+      "actor": "A:pilot",
+      "name": "Choose a mode and reach the field",
+      "story": "You pick one of four modes from the menu, appear near the space station that is your base, and the ship answers the mouse or the keyboard. Nothing else can happen until it does.",
+      "start": [
+        "S:at_menu"
+      ],
+      "goal": [
+        "S:in_field"
+      ]
+    },
+    {
+      "id": "E2",
+      "actor": "A:pilot",
+      "name": "Mine the belt and fill the cargo",
+      "story": "You shoot asteroids and the crystals they drop are worth something. Bigger rocks pay more per shot and cost more to stay near. The cargo has a ceiling, and gems that would exceed it are simply lost.",
+      "start": [
+        "S:in_field"
+      ],
+      "goal": [
+        "S:cargo_full"
+      ]
+    },
+    {
+      "id": "E3",
+      "actor": "A:pilot",
+      "name": "Spend the cargo, or trade up a tier",
+      "story": "A full cargo can go into eight statistics, into an extra life, or into the next ship in the tree \u2014 and taking the next ship hands you an un-upgraded one. That is the decision the whole loop exists for.",
+      "start": [
+        "S:cargo_full"
+      ],
+      "goal": [
+        "S:ship_better"
+      ]
+    },
+    {
+      "id": "E4",
+      "actor": "A:pilot",
+      "name": "Fight, bleed gems, and die back to tier one",
+      "story": "Shields absorb until they do not, and past that every hit knocks crystals out of your hold for anyone to take. Dying puts you back in a tier one ship with nothing.",
+      "start": [
+        "S:in_field"
+      ],
+      "goal": [
+        "S:back_at_tier_one"
+      ]
+    },
+    {
+      "id": "E5",
+      "actor": "A:server",
+      "name": "The field closes and one player is left",
+      "story": "A repulsive field grows out from the star and pushes everyone inward, warning as it goes. The round ends when one player remains.",
+      "start": [
+        "S:in_field"
+      ],
+      "goal": [
+        "S:round_decided"
+      ]
+    }
+  ],
+  "engine": {
+    "max_rounds": 8,
+    "max_attempts": 3,
+    "batch": 24,
+    "budget": 400,
+    "max_candidates": 40,
+    "coverage_threshold": 0.9
+  },
+  "detect": {
+    "min_usecases_per_epic": 5,
+    "min_steps_per_usecase": 3,
+    "min_exception_paths": 1,
+    "require_acceptance": true,
+    "require_steps": true,
+    "require_exceptions": true,
+    "require_ground": true,
+    "min_region_size": 9999
+  }
+}

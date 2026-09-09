@@ -1,67 +1,67 @@
 {
  "edges": [
   {
-   "dst": "S:world_built",
+   "dst": "S:mode_chosen",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E1-1"
   },
   {
-   "dst": "S:ship_exists",
+   "dst": "S:ship_placed",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E1-2"
   },
   {
-   "dst": "S:sim_running",
+   "dst": "S:can_steer",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E1-3"
   },
   {
-   "dst": "S:controls_live",
+   "dst": "S:can_move",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E1-4"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E1-5"
   },
   {
-   "dst": "S:belt_exists",
+   "dst": "S:rock_broken",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-1"
   },
   {
-   "dst": "S:rock_in_range",
+   "dst": "S:gems_loose",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-2"
   },
   {
-   "dst": "S:gems_loose",
+   "dst": "S:gems_held",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-3"
   },
   {
-   "dst": "S:gem_pickable",
+   "dst": "S:hold_bounded",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-4"
   },
   {
-   "dst": "S:gem_in_hold",
+   "dst": "S:mining_has_a_cost",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-5"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E2-6"
@@ -73,13 +73,13 @@
    "src": "Q:what:UC-E3-1"
   },
   {
-   "dst": "S:ship_stronger",
+   "dst": "S:ship_better",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E3-2"
   },
   {
-   "dst": "S:stats_maxed",
+   "dst": "S:life_banked",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E3-3"
@@ -91,157 +91,139 @@
    "src": "Q:what:UC-E3-4"
   },
   {
-   "dst": "S:hull_swapped",
+   "dst": "S:ship_better",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E3-5"
   },
   {
-   "dst": "S:ship_stronger",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:what:UC-E3-6"
-  },
-  {
-   "dst": "S:weapon_ready",
+   "dst": "S:trading_fire",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E4-1"
   },
   {
-   "dst": "S:shot_in_flight",
+   "dst": "S:shield_down",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E4-2"
   },
   {
-   "dst": "S:in_combat",
+   "dst": "S:bleeding_gems",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E4-3"
   },
   {
-   "dst": "S:shield_stripped",
+   "dst": "S:ship_destroyed",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E4-4"
   },
   {
-   "dst": "S:ship_dead",
+   "dst": "S:back_at_tier_one",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E4-5"
   },
   {
-   "dst": "S:gems_spilled",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:what:UC-E4-6"
-  },
-  {
-   "dst": "S:respawned",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:what:UC-E4-7"
-  },
-  {
-   "dst": "S:save_gathered",
+   "dst": "S:field_closing",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E5-1"
   },
   {
-   "dst": "S:save_written",
+   "dst": "S:warned",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E5-2"
   },
   {
-   "dst": "S:save_current",
+   "dst": "S:forced_together",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E5-3"
   },
   {
-   "dst": "S:save_restored",
+   "dst": "S:one_left",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E5-4"
   },
   {
-   "dst": "S:session_recorded",
+   "dst": "S:round_decided",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:what:UC-E5-5"
   },
   {
-   "dst": "S:page_open",
+   "dst": "S:at_menu",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E1-1"
   },
   {
-   "dst": "S:world_built",
+   "dst": "S:mode_chosen",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E1-2"
   },
   {
-   "dst": "S:ship_exists",
+   "dst": "S:ship_placed",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E1-3"
   },
   {
-   "dst": "S:sim_running",
+   "dst": "S:can_steer",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E1-4"
   },
   {
-   "dst": "S:controls_live",
+   "dst": "S:can_move",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E1-5"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-1"
   },
   {
-   "dst": "S:belt_exists",
+   "dst": "S:rock_broken",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-2"
   },
   {
-   "dst": "S:rock_in_range",
+   "dst": "S:gems_loose",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-3"
   },
   {
-   "dst": "S:gems_loose",
+   "dst": "S:gems_held",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-4"
   },
   {
-   "dst": "S:gem_pickable",
+   "dst": "S:hold_bounded",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-5"
   },
   {
-   "dst": "S:gem_in_hold",
+   "dst": "S:mining_has_a_cost",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E2-6"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E3-1"
@@ -253,13 +235,13 @@
    "src": "Q:when:UC-E3-2"
   },
   {
-   "dst": "S:stat_raised",
+   "dst": "S:cargo_full",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E3-3"
   },
   {
-   "dst": "S:stats_maxed",
+   "dst": "S:cargo_full",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E3-4"
@@ -271,79 +253,61 @@
    "src": "Q:when:UC-E3-5"
   },
   {
-   "dst": "S:hull_swapped",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:when:UC-E3-6"
-  },
-  {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E4-1"
   },
   {
-   "dst": "S:weapon_ready",
+   "dst": "S:trading_fire",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E4-2"
   },
   {
-   "dst": "S:shot_in_flight",
+   "dst": "S:shield_down",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E4-3"
   },
   {
-   "dst": "S:in_combat",
+   "dst": "S:bleeding_gems",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E4-4"
   },
   {
-   "dst": "S:shield_stripped",
+   "dst": "S:ship_destroyed",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E4-5"
   },
   {
-   "dst": "S:ship_dead",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:when:UC-E4-6"
-  },
-  {
-   "dst": "S:gems_spilled",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:when:UC-E4-7"
-  },
-  {
-   "dst": "S:respawned",
+   "dst": "S:in_field",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E5-1"
   },
   {
-   "dst": "S:save_gathered",
+   "dst": "S:field_closing",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E5-2"
   },
   {
-   "dst": "S:save_written",
+   "dst": "S:warned",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E5-3"
   },
   {
-   "dst": "S:save_current",
+   "dst": "S:forced_together",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E5-4"
   },
   {
-   "dst": "S:save_restored",
+   "dst": "S:one_left",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:when:UC-E5-5"
@@ -445,12 +409,6 @@
    "src": "Q:where:UC-E3-5"
   },
   {
-   "dst": "E3",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:where:UC-E3-6"
-  },
-  {
    "dst": "E4",
    "kind": "answers",
    "provenance": "interrogation",
@@ -479,18 +437,6 @@
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:where:UC-E4-5"
-  },
-  {
-   "dst": "E4",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:where:UC-E4-6"
-  },
-  {
-   "dst": "E4",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:where:UC-E4-7"
   },
   {
    "dst": "E5",
@@ -622,12 +568,6 @@
    "dst": "A:pilot",
    "kind": "answers",
    "provenance": "interrogation",
-   "src": "Q:who:UC-E3-6"
-  },
-  {
-   "dst": "A:pilot",
-   "kind": "answers",
-   "provenance": "interrogation",
    "src": "Q:who:UC-E4-1"
   },
   {
@@ -655,43 +595,31 @@
    "src": "Q:who:UC-E4-5"
   },
   {
-   "dst": "A:pilot",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:who:UC-E4-6"
-  },
-  {
-   "dst": "A:pilot",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:who:UC-E4-7"
-  },
-  {
-   "dst": "A:system",
+   "dst": "A:server",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:who:UC-E5-1"
   },
   {
-   "dst": "A:system",
+   "dst": "A:server",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:who:UC-E5-2"
   },
   {
-   "dst": "A:system",
+   "dst": "A:server",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:who:UC-E5-3"
   },
   {
-   "dst": "A:system",
+   "dst": "A:server",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:who:UC-E5-4"
   },
   {
-   "dst": "A:system",
+   "dst": "A:server",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:who:UC-E5-5"
@@ -733,6 +661,12 @@
    "src": "Q:why:UC-E1-5"
   },
   {
+   "dst": "UC-E5-1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-5"
+  },
+  {
    "dst": "UC-E2-2",
    "kind": "answers",
    "provenance": "interrogation",
@@ -769,13 +703,19 @@
    "src": "Q:why:UC-E2-6"
   },
   {
-   "dst": "UC-E3-2",
+   "dst": "UC-E3-3",
    "kind": "answers",
    "provenance": "interrogation",
-   "src": "Q:why:UC-E3-1"
+   "src": "Q:why:UC-E2-6"
   },
   {
-   "dst": "UC-E3-3",
+   "dst": "UC-E3-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-6"
+  },
+  {
+   "dst": "UC-E3-2",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:why:UC-E3-1"
@@ -787,28 +727,16 @@
    "src": "Q:why:UC-E3-2"
   },
   {
-   "dst": "UC-E3-4",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:why:UC-E3-3"
-  },
-  {
    "dst": "UC-E3-5",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:why:UC-E3-4"
   },
   {
-   "dst": "UC-E3-6",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:why:UC-E3-5"
-  },
-  {
    "dst": "E3",
    "kind": "answers",
    "provenance": "interrogation",
-   "src": "Q:why:UC-E3-6"
+   "src": "Q:why:UC-E3-5"
   },
   {
    "dst": "UC-E4-2",
@@ -835,22 +763,10 @@
    "src": "Q:why:UC-E4-4"
   },
   {
-   "dst": "UC-E4-6",
+   "dst": "E4",
    "kind": "answers",
    "provenance": "interrogation",
    "src": "Q:why:UC-E4-5"
-  },
-  {
-   "dst": "UC-E4-7",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:why:UC-E4-6"
-  },
-  {
-   "dst": "UC-E5-1",
-   "kind": "answers",
-   "provenance": "interrogation",
-   "src": "Q:why:UC-E4-7"
   },
   {
    "dst": "UC-E5-2",
@@ -1459,42 +1375,6 @@
    "src": "UC-E3-5"
   },
   {
-   "dst": "Q:how:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "Q:what:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "Q:when:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "Q:where:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "Q:who:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "Q:why:UC-E3-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E3-6"
-  },
-  {
    "dst": "Q:how:UC-E4-1",
    "kind": "asks",
    "provenance": "interrogation",
@@ -1673,78 +1553,6 @@
    "kind": "asks",
    "provenance": "interrogation",
    "src": "UC-E4-5"
-  },
-  {
-   "dst": "Q:how:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:what:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:when:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:where:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:who:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:why:UC-E4-6",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "Q:how:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "Q:what:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "Q:when:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "Q:where:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "Q:who:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "Q:why:UC-E4-7",
-   "kind": "asks",
-   "provenance": "interrogation",
-   "src": "UC-E4-7"
   },
   {
    "dst": "Q:how:UC-E5-1",
@@ -1927,381 +1735,345 @@
    "src": "UC-E5-5"
   },
   {
-   "dst": "S:page_open",
+   "dst": "S:at_menu",
    "kind": "establishes",
    "provenance": "seed",
    "src": "E1"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "establishes",
    "provenance": "seed",
    "src": "E2"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "establishes",
    "provenance": "seed",
    "src": "E3"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "establishes",
    "provenance": "seed",
    "src": "E4"
   },
   {
-   "dst": "S:respawned",
+   "dst": "S:in_field",
    "kind": "establishes",
    "provenance": "seed",
    "src": "E5"
   },
   {
-   "dst": "S:world_built",
+   "dst": "S:mode_chosen",
    "kind": "establishes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-1"
   },
   {
-   "dst": "S:ship_exists",
+   "dst": "S:ship_placed",
    "kind": "establishes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-2"
   },
   {
-   "dst": "S:sim_running",
+   "dst": "S:can_steer",
    "kind": "establishes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-3"
   },
   {
-   "dst": "S:controls_live",
+   "dst": "S:can_move",
    "kind": "establishes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-4"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "establishes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-5"
   },
   {
-   "dst": "S:belt_exists",
+   "dst": "S:rock_broken",
    "kind": "establishes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-1"
-  },
-  {
-   "dst": "S:rock_in_range",
-   "kind": "establishes",
-   "provenance": "Q-29",
-   "src": "UC-E2-2"
   },
   {
    "dst": "S:gems_loose",
    "kind": "establishes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "establishes",
+   "provenance": "Q-6",
    "src": "UC-E2-3"
   },
   {
-   "dst": "S:gem_pickable",
+   "dst": "S:hold_bounded",
    "kind": "establishes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-4"
   },
   {
-   "dst": "S:gem_in_hold",
+   "dst": "S:mining_has_a_cost",
    "kind": "establishes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-5"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "establishes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-6"
   },
   {
    "dst": "S:stat_raised",
    "kind": "establishes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-1"
   },
   {
-   "dst": "S:ship_stronger",
+   "dst": "S:ship_better",
    "kind": "establishes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-2"
   },
   {
-   "dst": "S:stats_maxed",
+   "dst": "S:life_banked",
    "kind": "establishes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-3"
   },
   {
    "dst": "S:tier_offered",
    "kind": "establishes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-4"
   },
   {
-   "dst": "S:hull_swapped",
+   "dst": "S:ship_better",
    "kind": "establishes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-5"
   },
   {
-   "dst": "S:ship_stronger",
+   "dst": "S:trading_fire",
    "kind": "establishes",
-   "provenance": "Q-67",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "S:weapon_ready",
-   "kind": "establishes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-1"
   },
   {
-   "dst": "S:shot_in_flight",
+   "dst": "S:shield_down",
    "kind": "establishes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-2"
   },
   {
-   "dst": "S:in_combat",
+   "dst": "S:bleeding_gems",
    "kind": "establishes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-3"
   },
   {
-   "dst": "S:shield_stripped",
+   "dst": "S:ship_destroyed",
    "kind": "establishes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-4"
   },
   {
-   "dst": "S:ship_dead",
+   "dst": "S:back_at_tier_one",
    "kind": "establishes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-5"
   },
   {
-   "dst": "S:gems_spilled",
+   "dst": "S:field_closing",
    "kind": "establishes",
-   "provenance": "Q-33",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "S:respawned",
-   "kind": "establishes",
-   "provenance": "Q-33",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "S:save_gathered",
-   "kind": "establishes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-1"
   },
   {
-   "dst": "S:save_written",
+   "dst": "S:warned",
    "kind": "establishes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-2"
   },
   {
-   "dst": "S:save_current",
+   "dst": "S:forced_together",
    "kind": "establishes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-3"
   },
   {
-   "dst": "S:save_restored",
+   "dst": "S:one_left",
    "kind": "establishes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-4"
   },
   {
-   "dst": "S:session_recorded",
+   "dst": "S:round_decided",
    "kind": "establishes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-5"
   },
   {
    "dst": "UC-E1-1",
    "kind": "includes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "E1"
   },
   {
    "dst": "UC-E1-2",
    "kind": "includes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "E1"
   },
   {
    "dst": "UC-E1-3",
    "kind": "includes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "E1"
   },
   {
    "dst": "UC-E1-4",
    "kind": "includes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "E1"
   },
   {
    "dst": "UC-E1-5",
    "kind": "includes",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "E1"
   },
   {
    "dst": "UC-E2-1",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E2-2",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E2-3",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E2-4",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E2-5",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E2-6",
    "kind": "includes",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "E2"
   },
   {
    "dst": "UC-E3-1",
    "kind": "includes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "E3"
   },
   {
    "dst": "UC-E3-2",
    "kind": "includes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "E3"
   },
   {
    "dst": "UC-E3-3",
    "kind": "includes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "E3"
   },
   {
    "dst": "UC-E3-4",
    "kind": "includes",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "E3"
   },
   {
    "dst": "UC-E3-5",
    "kind": "includes",
-   "provenance": "Q-30",
-   "src": "E3"
-  },
-  {
-   "dst": "UC-E3-6",
-   "kind": "includes",
-   "provenance": "Q-67",
+   "provenance": "Q-3",
    "src": "E3"
   },
   {
    "dst": "UC-E4-1",
    "kind": "includes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "E4"
   },
   {
    "dst": "UC-E4-2",
    "kind": "includes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "E4"
   },
   {
    "dst": "UC-E4-3",
    "kind": "includes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "E4"
   },
   {
    "dst": "UC-E4-4",
    "kind": "includes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "E4"
   },
   {
    "dst": "UC-E4-5",
    "kind": "includes",
-   "provenance": "Q-33",
-   "src": "E4"
-  },
-  {
-   "dst": "UC-E4-6",
-   "kind": "includes",
-   "provenance": "Q-33",
-   "src": "E4"
-  },
-  {
-   "dst": "UC-E4-7",
-   "kind": "includes",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "E4"
   },
   {
    "dst": "UC-E5-1",
    "kind": "includes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "E5"
   },
   {
    "dst": "UC-E5-2",
    "kind": "includes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "E5"
   },
   {
    "dst": "UC-E5-3",
    "kind": "includes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "E5"
   },
   {
    "dst": "UC-E5-4",
    "kind": "includes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "E5"
   },
   {
    "dst": "UC-E5-5",
    "kind": "includes",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "E5"
   },
   {
@@ -2332,218 +2104,200 @@
    "dst": "E5",
    "kind": "performs",
    "provenance": "seed",
-   "src": "A:system"
+   "src": "A:server"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "requires",
    "provenance": "seed",
    "src": "E1"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "requires",
    "provenance": "seed",
    "src": "E2"
   },
   {
-   "dst": "S:ship_stronger",
+   "dst": "S:ship_better",
    "kind": "requires",
    "provenance": "seed",
    "src": "E3"
   },
   {
-   "dst": "S:respawned",
+   "dst": "S:back_at_tier_one",
    "kind": "requires",
    "provenance": "seed",
    "src": "E4"
   },
   {
-   "dst": "S:session_recorded",
+   "dst": "S:round_decided",
    "kind": "requires",
    "provenance": "seed",
    "src": "E5"
   },
   {
-   "dst": "S:page_open",
+   "dst": "S:at_menu",
    "kind": "requires",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-1"
   },
   {
-   "dst": "S:world_built",
+   "dst": "S:mode_chosen",
    "kind": "requires",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-2"
   },
   {
-   "dst": "S:ship_exists",
+   "dst": "S:ship_placed",
    "kind": "requires",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-3"
   },
   {
-   "dst": "S:sim_running",
+   "dst": "S:can_steer",
    "kind": "requires",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-4"
   },
   {
-   "dst": "S:controls_live",
+   "dst": "S:can_move",
    "kind": "requires",
-   "provenance": "Q-28",
+   "provenance": "Q-1",
    "src": "UC-E1-5"
   },
   {
-   "dst": "S:in_flight",
+   "dst": "S:in_field",
    "kind": "requires",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-1"
   },
   {
-   "dst": "S:belt_exists",
+   "dst": "S:rock_broken",
    "kind": "requires",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-2"
-  },
-  {
-   "dst": "S:rock_in_range",
-   "kind": "requires",
-   "provenance": "Q-29",
-   "src": "UC-E2-3"
   },
   {
    "dst": "S:gems_loose",
    "kind": "requires",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "requires",
+   "provenance": "Q-6",
    "src": "UC-E2-4"
   },
   {
-   "dst": "S:gem_pickable",
+   "dst": "S:hold_bounded",
    "kind": "requires",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-5"
   },
   {
-   "dst": "S:gem_in_hold",
+   "dst": "S:mining_has_a_cost",
    "kind": "requires",
-   "provenance": "Q-29",
+   "provenance": "Q-6",
    "src": "UC-E2-6"
   },
   {
-   "dst": "S:point_banked",
+   "dst": "S:cargo_full",
    "kind": "requires",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-1"
   },
   {
    "dst": "S:stat_raised",
    "kind": "requires",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-2"
   },
   {
-   "dst": "S:stat_raised",
+   "dst": "S:cargo_full",
    "kind": "requires",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-3"
   },
   {
-   "dst": "S:stats_maxed",
+   "dst": "S:cargo_full",
    "kind": "requires",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-4"
   },
   {
    "dst": "S:tier_offered",
    "kind": "requires",
-   "provenance": "Q-30",
+   "provenance": "Q-3",
    "src": "UC-E3-5"
   },
   {
-   "dst": "S:hull_swapped",
+   "dst": "S:in_field",
    "kind": "requires",
-   "provenance": "Q-67",
-   "src": "UC-E3-6"
-  },
-  {
-   "dst": "S:in_flight",
-   "kind": "requires",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-1"
   },
   {
-   "dst": "S:weapon_ready",
+   "dst": "S:trading_fire",
    "kind": "requires",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-2"
   },
   {
-   "dst": "S:shot_in_flight",
+   "dst": "S:shield_down",
    "kind": "requires",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-3"
   },
   {
-   "dst": "S:in_combat",
+   "dst": "S:bleeding_gems",
    "kind": "requires",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-4"
   },
   {
-   "dst": "S:shield_stripped",
+   "dst": "S:ship_destroyed",
    "kind": "requires",
-   "provenance": "Q-33",
+   "provenance": "Q-4",
    "src": "UC-E4-5"
   },
   {
-   "dst": "S:ship_dead",
+   "dst": "S:in_field",
    "kind": "requires",
-   "provenance": "Q-33",
-   "src": "UC-E4-6"
-  },
-  {
-   "dst": "S:gems_spilled",
-   "kind": "requires",
-   "provenance": "Q-33",
-   "src": "UC-E4-7"
-  },
-  {
-   "dst": "S:respawned",
-   "kind": "requires",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-1"
   },
   {
-   "dst": "S:save_gathered",
+   "dst": "S:field_closing",
    "kind": "requires",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-2"
   },
   {
-   "dst": "S:save_written",
+   "dst": "S:warned",
    "kind": "requires",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-3"
   },
   {
-   "dst": "S:save_current",
+   "dst": "S:forced_together",
    "kind": "requires",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-4"
   },
   {
-   "dst": "S:save_restored",
+   "dst": "S:one_left",
    "kind": "requires",
-   "provenance": "Q-32",
+   "provenance": "Q-5",
    "src": "UC-E5-5"
   }
  ],
- "name": "starblast",
+ "name": "starblast-web",
  "nodes": [
   {
    "attrs": {
-    "note": "the human at the keyboard"
+    "note": "the person flying"
    },
    "id": "A:pilot",
    "kind": "actor",
@@ -2552,70 +2306,70 @@
   },
   {
    "attrs": {
-    "note": "an AI pilot or another player"
+    "note": "everyone else in the field"
    },
    "id": "A:rival",
    "kind": "actor",
-   "name": "Another ship",
+   "name": "Another player",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "note": "the simulation acting on its own"
+    "note": "the simulation, acting on its own"
    },
-   "id": "A:system",
+   "id": "A:server",
    "kind": "actor",
-   "name": "The game",
+   "name": "The server",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "scope": "^(CAM_|KP_|SHIP_|PERIPH_|THRUST|DRAG|VMAX|PITCH_RATE|YAW_RATE|BANK_|SKY_|EXPOSURE|TOPCAM)|^(renderer|scene|frame|step|resize|makeShip|hullModel)$",
-    "story": "You open the page. A world exists, you are in a ship in it, and the controls answer. Nothing else in the game can happen until this does."
+    "scope": "",
+    "story": "You pick one of four modes from the menu, appear near the space station that is your base, and the ship answers the mouse or the keyboard. Nothing else can happen until it does."
    },
    "id": "E1",
    "kind": "epic",
-   "name": "Arrive and fly",
+   "name": "Choose a mode and reach the field",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "scope": "^(AST_|GEM_|BOT_|MINING|BELT|ROCK)|[Aa]steroid|[Gg]em|[Mm]agnet|[Mm]ining",
-    "story": "You fly a small ship at some rocks. You shoot one, it breaks, and the pieces are worth something. You scoop them up and the bar at the bottom fills. When it fills, you are owed something."
+    "scope": "",
+    "story": "You shoot asteroids and the crystals they drop are worth something. Bigger rocks pay more per shot and cost more to stay near. The cargo has a ceiling, and gems that would exceed it are simply lost."
    },
    "id": "E2",
    "kind": "epic",
-   "name": "Mine the belt",
+   "name": "Mine the belt and fill the cargo",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "scope": "^(STAT_|HULL|TIER|UPG|GEM_BAR|GEM_PTS|POWER_)|spendStat|statMult|tierUp|takeTier|nextTier|doUpgrade|hullTier",
-    "story": "You have a point. Put it into guns, shields or engines and get a little better now; or hold out, max everything, and trade the whole ship for a bigger frame and lose every upgrade you bought. That is the only real decision in the game."
+    "scope": "",
+    "story": "A full cargo can go into eight statistics, into an extra life, or into the next ship in the tree \u2014 and taking the next ship hands you an un-upgraded one. That is the decision the whole loop exists for."
    },
    "id": "E3",
    "kind": "epic",
-   "name": "Spend the point, or save for the hull",
+   "name": "Spend the cargo, or trade up a tier",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "scope": "^(LASER|SHIELD|BULLET|DMG|WEAPON|MISSILE|AI_|HIT_)|[Ss]hield|[Ll]aser|killShip|killBy|spill|damage|capLaser|capMax",
-    "story": "Your gun costs energy, so you cannot hold the trigger forever. Your shields soak the first hits and come back if you break away. When you lose, your gems spill for anyone to take and you start again small."
+    "scope": "",
+    "story": "Shields absorb until they do not, and past that every hit knocks crystals out of your hold for anyone to take. Dying puts you back in a tier one ship with nothing."
    },
    "id": "E4",
    "kind": "epic",
-   "name": "Fight, die, and lose the cargo",
+   "name": "Fight, bleed gems, and die back to tier one",
    "provenance": "seed"
   },
   {
    "attrs": {
-    "scope": "^(SCORE|SAVE|RESPAWN|DEATH|PERSIST|SESSION)|score|respawn|persist|gatherSave|applySave",
-    "story": "The session stops, and what you did survives it: the score, the ship you were flying, the state that has to be there when you come back."
+    "scope": "",
+    "story": "A repulsive field grows out from the star and pushes everyone inward, warning as it goes. The round ends when one player remains."
    },
    "id": "E5",
    "kind": "epic",
-   "name": "The run ends and is remembered",
+   "name": "The field closes and one player is left",
    "provenance": "seed"
   },
   {
@@ -2626,7 +2380,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "renderer; scene; EXPOSURE"
+      "text": "game mode; objective"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2647,7 +2401,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "makeShip; SHIP_TEX; SHIP_R"
+      "text": "space station"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2668,7 +2422,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "frame; step"
+      "text": "steer; controls"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2689,7 +2443,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "THRUST; DRAG; VMAX; YAW_RATE; PITCH_RATE"
+      "text": "accelerate"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2710,7 +2464,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "CAM_BACK; CAM_AHEAD; CAM_LAG; CAM_UP"
+      "text": "fire; weapons"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2731,7 +2485,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "makeMiningBelt; spawnAsteroid; AST_MAX; AST_KEEP; ROCK_POOLS"
+      "text": "asteroid; weapons"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2752,7 +2506,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "AST_CELL; AST_GRID_EVERY"
+      "text": "gem; asteroid"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2773,7 +2527,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "destroyAsteroid; AST_SPLIT_MIN; AST_SPLIT_MAX; AST_CHILD_FRAC; AST_SPLIT_KICK"
+      "text": "gem"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2794,7 +2548,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "spawnGem; GEM_CREDIT_PER_SCALE; GEM_LIFE"
+      "text": "cargo capacity"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2815,7 +2569,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "magnetFor; GEM_MAGNET; GEM_PICK_R; GEM_GRAB_R"
+      "text": "asteroid"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2836,7 +2590,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "gemBarAdd; GEM_BAR_MAX; GEM_BAR_RATE; GEM_PTS_CAP"
+      "text": "cargo capacity; upgrade cost"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2857,7 +2611,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "spendStat; STAT_ORDER; STAT_GAIN; STAT_MAX"
+      "text": "upgrade categories; upgrade cost; spend gems"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2878,7 +2632,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "statMult"
+      "text": "energy regen"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2899,7 +2653,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "tierUpReady; TIER_UP; STAT_MAX"
+      "text": "extra life"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2920,7 +2674,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "nextTierHull; hullTierIdx; HULL_ORDER_ORIGINAL"
+      "text": "tier up; ship"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2941,7 +2695,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "takeTierUp"
+      "text": "tier up; tier"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -2962,28 +2716,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "HULLS; shieldMaxFor"
-     }
-    ],
-    "asks": "By what mechanism, step by step?",
-    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
-    "interrogative": "how",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:how:UC-E3-6",
-   "kind": "question",
-   "name": "HOW: By what mechanism, step by step?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "capMaxFor; LASER_CAP_MAX; LASER_CAP_REGEN; LASER_CAP_PER_SHOT"
+      "text": "weapons; fire"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3004,7 +2737,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "BULLET_SPEED; BULLET_LIFE; MUZZLE_OFF"
+      "text": "shield"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3025,7 +2758,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "BULLET_DMG; BULLET_R; WEAPONS; statMult"
+      "text": "gems as shield"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3046,7 +2779,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "drainShield; shieldArcMaxFor"
+      "text": "death"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3067,7 +2800,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "killShip; killByShip"
+      "text": "death; tier"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3088,49 +2821,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "spillGems"
-     }
-    ],
-    "asks": "By what mechanism, step by step?",
-    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
-    "interrogative": "how",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:how:UC-E4-6",
-   "kind": "question",
-   "name": "HOW: By what mechanism, step by step?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "RESPAWN_DELAY"
-     }
-    ],
-    "asks": "By what mechanism, step by step?",
-    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
-    "interrogative": "how",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:how:UC-E4-7",
-   "kind": "question",
-   "name": "HOW: By what mechanism, step by step?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "gatherSaveState"
+      "text": "gravity field"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3151,7 +2842,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "SAVE_KEY; persist"
+      "text": "endgame warning"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3172,7 +2863,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "SAVE_INTERVAL_S"
+      "text": "gravity field"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3193,7 +2884,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "applySaveState"
+      "text": "survival objective"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3214,7 +2905,7 @@
       "by": [],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "SCORE_W"
+      "text": "round end"
      }
     ],
     "asks": "By what mechanism, step by step?",
@@ -3233,7 +2924,7 @@
     "answers": [
      {
       "by": [
-       "S:world_built"
+       "S:mode_chosen"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3256,7 +2947,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_exists"
+       "S:ship_placed"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3279,7 +2970,7 @@
     "answers": [
      {
       "by": [
-       "S:sim_running"
+       "S:can_steer"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3302,7 +2993,7 @@
     "answers": [
      {
       "by": [
-       "S:controls_live"
+       "S:can_move"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3325,7 +3016,7 @@
     "answers": [
      {
       "by": [
-       "S:in_flight"
+       "S:in_field"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3348,7 +3039,7 @@
     "answers": [
      {
       "by": [
-       "S:belt_exists"
+       "S:rock_broken"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3371,7 +3062,7 @@
     "answers": [
      {
       "by": [
-       "S:rock_in_range"
+       "S:gems_loose"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3394,7 +3085,7 @@
     "answers": [
      {
       "by": [
-       "S:gems_loose"
+       "S:gems_held"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3417,7 +3108,7 @@
     "answers": [
      {
       "by": [
-       "S:gem_pickable"
+       "S:hold_bounded"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3440,7 +3131,7 @@
     "answers": [
      {
       "by": [
-       "S:gem_in_hold"
+       "S:mining_has_a_cost"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3463,7 +3154,7 @@
     "answers": [
      {
       "by": [
-       "S:point_banked"
+       "S:cargo_full"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3509,7 +3200,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_stronger"
+       "S:ship_better"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3532,7 +3223,7 @@
     "answers": [
      {
       "by": [
-       "S:stats_maxed"
+       "S:life_banked"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3578,7 +3269,7 @@
     "answers": [
      {
       "by": [
-       "S:hull_swapped"
+       "S:ship_better"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3601,30 +3292,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_stronger"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What is true after this that was not true before?",
-    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
-    "interrogative": "what",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:what:UC-E3-6",
-   "kind": "question",
-   "name": "WHAT: What is true after this that was not true before?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:weapon_ready"
+       "S:trading_fire"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3647,7 +3315,7 @@
     "answers": [
      {
       "by": [
-       "S:shot_in_flight"
+       "S:shield_down"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3670,7 +3338,7 @@
     "answers": [
      {
       "by": [
-       "S:in_combat"
+       "S:bleeding_gems"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3693,7 +3361,7 @@
     "answers": [
      {
       "by": [
-       "S:shield_stripped"
+       "S:ship_destroyed"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3716,7 +3384,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_dead"
+       "S:back_at_tier_one"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3739,53 +3407,7 @@
     "answers": [
      {
       "by": [
-       "S:gems_spilled"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What is true after this that was not true before?",
-    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
-    "interrogative": "what",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:what:UC-E4-6",
-   "kind": "question",
-   "name": "WHAT: What is true after this that was not true before?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:respawned"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What is true after this that was not true before?",
-    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
-    "interrogative": "what",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:what:UC-E4-7",
-   "kind": "question",
-   "name": "WHAT: What is true after this that was not true before?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:save_gathered"
+       "S:field_closing"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3808,7 +3430,7 @@
     "answers": [
      {
       "by": [
-       "S:save_written"
+       "S:warned"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3831,7 +3453,7 @@
     "answers": [
      {
       "by": [
-       "S:save_current"
+       "S:forced_together"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3854,7 +3476,7 @@
     "answers": [
      {
       "by": [
-       "S:save_restored"
+       "S:one_left"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3877,7 +3499,7 @@
     "answers": [
      {
       "by": [
-       "S:session_recorded"
+       "S:round_decided"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3900,7 +3522,7 @@
     "answers": [
      {
       "by": [
-       "S:page_open"
+       "S:at_menu"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3923,7 +3545,7 @@
     "answers": [
      {
       "by": [
-       "S:world_built"
+       "S:mode_chosen"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3946,7 +3568,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_exists"
+       "S:ship_placed"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3969,7 +3591,7 @@
     "answers": [
      {
       "by": [
-       "S:sim_running"
+       "S:can_steer"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -3992,7 +3614,7 @@
     "answers": [
      {
       "by": [
-       "S:controls_live"
+       "S:can_move"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4015,7 +3637,7 @@
     "answers": [
      {
       "by": [
-       "S:in_flight"
+       "S:in_field"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4038,7 +3660,7 @@
     "answers": [
      {
       "by": [
-       "S:belt_exists"
+       "S:rock_broken"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4061,7 +3683,7 @@
     "answers": [
      {
       "by": [
-       "S:rock_in_range"
+       "S:gems_loose"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4084,7 +3706,7 @@
     "answers": [
      {
       "by": [
-       "S:gems_loose"
+       "S:gems_held"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4107,7 +3729,7 @@
     "answers": [
      {
       "by": [
-       "S:gem_pickable"
+       "S:hold_bounded"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4130,7 +3752,7 @@
     "answers": [
      {
       "by": [
-       "S:gem_in_hold"
+       "S:mining_has_a_cost"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4153,7 +3775,7 @@
     "answers": [
      {
       "by": [
-       "S:point_banked"
+       "S:cargo_full"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4199,7 +3821,7 @@
     "answers": [
      {
       "by": [
-       "S:stat_raised"
+       "S:cargo_full"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4222,7 +3844,7 @@
     "answers": [
      {
       "by": [
-       "S:stats_maxed"
+       "S:cargo_full"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4268,30 +3890,7 @@
     "answers": [
      {
       "by": [
-       "S:hull_swapped"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What triggers it, and what must already hold for it to be able to run?",
-    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
-    "interrogative": "when",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:when:UC-E3-6",
-   "kind": "question",
-   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:in_flight"
+       "S:in_field"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4314,7 +3913,7 @@
     "answers": [
      {
       "by": [
-       "S:weapon_ready"
+       "S:trading_fire"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4337,7 +3936,7 @@
     "answers": [
      {
       "by": [
-       "S:shot_in_flight"
+       "S:shield_down"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4360,7 +3959,7 @@
     "answers": [
      {
       "by": [
-       "S:in_combat"
+       "S:bleeding_gems"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4383,7 +3982,7 @@
     "answers": [
      {
       "by": [
-       "S:shield_stripped"
+       "S:ship_destroyed"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4406,53 +4005,7 @@
     "answers": [
      {
       "by": [
-       "S:ship_dead"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What triggers it, and what must already hold for it to be able to run?",
-    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
-    "interrogative": "when",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:when:UC-E4-6",
-   "kind": "question",
-   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:gems_spilled"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "What triggers it, and what must already hold for it to be able to run?",
-    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
-    "interrogative": "when",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:when:UC-E4-7",
-   "kind": "question",
-   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "S:respawned"
+       "S:in_field"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4475,7 +4028,7 @@
     "answers": [
      {
       "by": [
-       "S:save_gathered"
+       "S:field_closing"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4498,7 +4051,7 @@
     "answers": [
      {
       "by": [
-       "S:save_written"
+       "S:warned"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4521,7 +4074,7 @@
     "answers": [
      {
       "by": [
-       "S:save_current"
+       "S:forced_together"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4544,7 +4097,7 @@
     "answers": [
      {
       "by": [
-       "S:save_restored"
+       "S:one_left"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -4935,29 +4488,6 @@
     "answers": [
      {
       "by": [
-       "E3"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Where in the system does this happen, and what is it inside?",
-    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
-    "interrogative": "where",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:where:UC-E3-6",
-   "kind": "question",
-   "name": "WHERE: Where in the system does this happen, and what is it inside?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
        "E4"
       ],
       "source": "the model's structure",
@@ -5063,52 +4593,6 @@
     "subject": "UC-E4-5"
    },
    "id": "Q:where:UC-E4-5",
-   "kind": "question",
-   "name": "WHERE: Where in the system does this happen, and what is it inside?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "E4"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Where in the system does this happen, and what is it inside?",
-    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
-    "interrogative": "where",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:where:UC-E4-6",
-   "kind": "question",
-   "name": "WHERE: Where in the system does this happen, and what is it inside?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "E4"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Where in the system does this happen, and what is it inside?",
-    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
-    "interrogative": "where",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:where:UC-E4-7",
    "kind": "question",
    "name": "WHERE: Where in the system does this happen, and what is it inside?",
    "provenance": "interrogation"
@@ -5612,29 +5096,6 @@
     "asks": "Which actor performs this, and on whose behalf?",
     "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
     "interrogative": "who",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:who:UC-E3-6",
-   "kind": "question",
-   "name": "WHO: Which actor performs this, and on whose behalf?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "A:pilot"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Which actor performs this, and on whose behalf?",
-    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
-    "interrogative": "who",
     "subject": "UC-E4-1"
    },
    "id": "Q:who:UC-E4-1",
@@ -5740,53 +5201,7 @@
     "answers": [
      {
       "by": [
-       "A:pilot"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Which actor performs this, and on whose behalf?",
-    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
-    "interrogative": "who",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:who:UC-E4-6",
-   "kind": "question",
-   "name": "WHO: Which actor performs this, and on whose behalf?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "A:pilot"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": ""
-     }
-    ],
-    "asks": "Which actor performs this, and on whose behalf?",
-    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
-    "interrogative": "who",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:who:UC-E4-7",
-   "kind": "question",
-   "name": "WHO: Which actor performs this, and on whose behalf?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "A:system"
+       "A:server"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -5809,7 +5224,7 @@
     "answers": [
      {
       "by": [
-       "A:system"
+       "A:server"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -5832,7 +5247,7 @@
     "answers": [
      {
       "by": [
-       "A:system"
+       "A:server"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -5855,7 +5270,7 @@
     "answers": [
      {
       "by": [
-       "A:system"
+       "A:server"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -5878,7 +5293,7 @@
     "answers": [
      {
       "by": [
-       "A:system"
+       "A:server"
       ],
       "source": "the model's structure",
       "standing": "definitive",
@@ -5905,7 +5320,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E1-2 cannot run until 'a world exists to fly in' holds, and this is what makes it hold"
+      "text": "UC-E1-2 cannot run until 'a mode is chosen and its objective is set' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-1",
+      "standing": "stated",
+      "text": "the objective differs per mode, so it has to be settled before anything else means anything Instead of: one mode with the objective chosen later"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -5928,7 +5349,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E1-3 cannot run until 'the pilot has a ship in that world' holds, and this is what makes it hold"
+      "text": "UC-E1-3 cannot run until 'the pilot has a ship in the world, near its base' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -5951,7 +5372,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E1-4 cannot run until 'the simulation is stepping' holds, and this is what makes it hold"
+      "text": "UC-E1-4 cannot run until \"the ship's heading answers the player\" holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-1",
+      "standing": "stated",
+      "text": "the sources describe two input schemes for the same act, so either alone is incomplete Instead of: mouse only, as many browser shooters do"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -5974,7 +5401,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E1-5 cannot run until 'the controls answer the pilot' holds, and this is what makes it hold"
+      "text": "UC-E1-5 cannot run until \"the ship moves under the player's control\" holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -5994,11 +5421,12 @@
      {
       "by": [
        "UC-E2-1",
-       "UC-E4-1"
+       "UC-E4-1",
+       "UC-E5-1"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-1, UC-E4-1 cannot run until 'the pilot is flying and in control' holds, and this is what makes it hold"
+      "text": "UC-E2-1, UC-E4-1, UC-E5-1 cannot run until 'the pilot is flying in the asteroid field' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6021,7 +5449,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-2 cannot run until 'a belt of rocks exists' holds, and this is what makes it hold"
+      "text": "UC-E2-2 cannot run until 'an asteroid has been broken' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6044,7 +5472,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-3 cannot run until 'a rock is within reach' holds, and this is what makes it hold"
+      "text": "UC-E2-3 cannot run until 'crystals are loose in the field' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6067,7 +5495,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-4 cannot run until 'gems are loose in the world' holds, and this is what makes it hold"
+      "text": "UC-E2-4 cannot run until \"crystals are in the ship's hold\" holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6090,7 +5518,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-5 cannot run until 'a gem can be picked up' holds, and this is what makes it hold"
+      "text": "UC-E2-5 cannot run until 'the hold has a known ceiling and enforces it' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-6",
+      "standing": "stated",
+      "text": "a ceiling is what makes returning to spend a decision rather than a formality Instead of: an unbounded hold, which would remove the reason ever to stop mining"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6113,7 +5547,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E2-6 cannot run until 'gem credits are in the hold' holds, and this is what makes it hold"
+      "text": "UC-E2-6 cannot run until 'the pilot is trading safety for yield' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-6",
+      "standing": "stated",
+      "text": "without the size trade-off mining is a chore rather than a choice Instead of: every asteroid worth the same, which the sources contradict"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6132,11 +5572,13 @@
     "answers": [
      {
       "by": [
-       "UC-E3-1"
+       "UC-E3-1",
+       "UC-E3-3",
+       "UC-E3-4"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E3-1 cannot run until 'the pilot is owed at least one upgrade point' holds, and this is what makes it hold"
+      "text": "UC-E3-1, UC-E3-3, UC-E3-4 cannot run until \"the ship's crystal cargo is full\" holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6155,12 +5597,11 @@
     "answers": [
      {
       "by": [
-       "UC-E3-2",
-       "UC-E3-3"
+       "UC-E3-2"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E3-2, UC-E3-3 cannot run until 'at least one stat is above zero' holds, and this is what makes it hold"
+      "text": "UC-E3-2 cannot run until 'at least one statistic is above its base' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6198,17 +5639,8 @@
   },
   {
    "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "UC-E3-4"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "UC-E3-4 cannot run until 'every stat is at its cap' holds, and this is what makes it hold"
-     }
-    ],
+    "answered": false,
+    "answers": [],
     "asks": "Why does this exist, and what was rejected in choosing it?",
     "good_answer": "a reason that is not a restatement, and at least one real alternative",
     "interrogative": "why",
@@ -6229,7 +5661,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E3-5 cannot run until 'a next hull is on offer' holds, and this is what makes it hold"
+      "text": "UC-E3-5 cannot run until 'a next ship is on offer' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-3",
+      "standing": "stated",
+      "text": "a choice of two is what makes the tree a tree rather than a ladder Instead of: one successor per tier, which would make the path fixed"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6248,11 +5686,17 @@
     "answers": [
      {
       "by": [
-       "UC-E3-6"
+       "E3"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E3-6 cannot run until 'the ship is flying a new frame' holds, and this is what makes it hold"
+      "text": "E3 declares it ends with 'the ship is measurably better than it was' true, and this is the beat that reaches it"
+     },
+     {
+      "by": [],
+      "source": "Q-3",
+      "standing": "stated",
+      "text": "paying the whole hold and losing every upgrade is the cost that makes holding out a decision Instead of: carrying upgrades across the tier, which would make trading up strictly free"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6271,34 +5715,11 @@
     "answers": [
      {
       "by": [
-       "E3"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "E3 declares it ends with 'the ship is measurably better than it was' true, and this is the beat that reaches it"
-     }
-    ],
-    "asks": "Why does this exist, and what was rejected in choosing it?",
-    "good_answer": "a reason that is not a restatement, and at least one real alternative",
-    "interrogative": "why",
-    "subject": "UC-E3-6"
-   },
-   "id": "Q:why:UC-E3-6",
-   "kind": "question",
-   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
        "UC-E4-2"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E4-2 cannot run until 'the ship can fire' holds, and this is what makes it hold"
+      "text": "UC-E4-2 cannot run until 'shots are being exchanged' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6321,7 +5742,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E4-3 cannot run until 'a shot is travelling' holds, and this is what makes it hold"
+      "text": "UC-E4-3 cannot run until 'the shield is depleted' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6344,7 +5765,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E4-4 cannot run until 'damage is being exchanged' holds, and this is what makes it hold"
+      "text": "UC-E4-4 cannot run until 'the pilot is losing crystals to incoming fire' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-4",
+      "standing": "stated",
+      "text": "crystals acting as a second shield is what makes a full hold dangerous to carry Instead of: the hold being safe until death, which would make hoarding free"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6367,7 +5794,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E4-5 cannot run until 'a shield arc is down' holds, and this is what makes it hold"
+      "text": "UC-E4-5 cannot run until \"the pilot's ship is destroyed\" holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6386,11 +5813,11 @@
     "answers": [
      {
       "by": [
-       "UC-E4-6"
+       "E4"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E4-6 cannot run until \"the pilot's ship is destroyed\" holds, and this is what makes it hold"
+      "text": "E4 declares it ends with 'the pilot is flying again, back at tier one' true, and this is the beat that reaches it"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6409,57 +5836,17 @@
     "answers": [
      {
       "by": [
-       "UC-E4-7"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "UC-E4-7 cannot run until 'the hold is on the floor' holds, and this is what makes it hold"
-     }
-    ],
-    "asks": "Why does this exist, and what was rejected in choosing it?",
-    "good_answer": "a reason that is not a restatement, and at least one real alternative",
-    "interrogative": "why",
-    "subject": "UC-E4-6"
-   },
-   "id": "Q:why:UC-E4-6",
-   "kind": "question",
-   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
-       "UC-E5-1"
-      ],
-      "source": "the model's structure",
-      "standing": "definitive",
-      "text": "UC-E5-1 cannot run until 'the pilot is flying again after dying' holds, and this is what makes it hold"
-     }
-    ],
-    "asks": "Why does this exist, and what was rejected in choosing it?",
-    "good_answer": "a reason that is not a restatement, and at least one real alternative",
-    "interrogative": "why",
-    "subject": "UC-E4-7"
-   },
-   "id": "Q:why:UC-E4-7",
-   "kind": "question",
-   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
-   "provenance": "interrogation"
-  },
-  {
-   "attrs": {
-    "answered": true,
-    "answers": [
-     {
-      "by": [
        "UC-E5-2"
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E5-2 cannot run until 'a snapshot of the run exists' holds, and this is what makes it hold"
+      "text": "UC-E5-2 cannot run until 'the playable area is shrinking' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-5",
+      "standing": "stated",
+      "text": "a shrinking field forces contact without a timer deciding the round Instead of: a round timer, which would end the game without anyone having to fight"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6482,7 +5869,13 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E5-3 cannot run until 'the snapshot is in storage' holds, and this is what makes it hold"
+      "text": "UC-E5-3 cannot run until 'players know how much room is left' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-5",
+      "standing": "stated",
+      "text": "a squeeze nobody can see coming is a death nobody can play around Instead of: a silent field, which would make position luck rather than choice"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6505,7 +5898,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E5-4 cannot run until 'the stored snapshot is no more than one interval old' holds, and this is what makes it hold"
+      "text": "UC-E5-4 cannot run until 'the survivors cannot avoid each other' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6528,7 +5921,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "UC-E5-5 cannot run until 'a returning pilot has their ship back' holds, and this is what makes it hold"
+      "text": "UC-E5-5 cannot run until 'one pilot remains alive' holds, and this is what makes it hold"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6551,7 +5944,7 @@
       ],
       "source": "the model's structure",
       "standing": "definitive",
-      "text": "E5 declares it ends with 'the run is over and what happened is on record' true, and this is the beat that reaches it"
+      "text": "E5 declares it ends with 'the round is over and a winner is known' true, and this is the beat that reaches it"
      }
     ],
     "asks": "Why does this exist, and what was rejected in choosing it?",
@@ -6565,275 +5958,253 @@
    "provenance": "interrogation"
   },
   {
-   "attrs": {
-    "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
-    }
-   },
-   "id": "S:belt_exists",
+   "attrs": {},
+   "id": "S:at_menu",
    "kind": "state",
-   "name": "a belt of rocks exists",
-   "provenance": "Q-29"
+   "name": "the player is at the main menu, in no game",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {},
+   "id": "S:back_at_tier_one",
+   "kind": "state",
+   "name": "the pilot is flying again, back at tier one",
+   "provenance": "seed"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-4"
     }
    },
-   "id": "S:controls_live",
+   "id": "S:bleeding_gems",
    "kind": "state",
-   "name": "the controls answer the pilot",
-   "provenance": "Q-28"
+   "name": "the pilot is losing crystals to incoming fire",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-1"
     }
    },
-   "id": "S:gem_in_hold",
+   "id": "S:can_move",
    "kind": "state",
-   "name": "gem credits are in the hold",
-   "provenance": "Q-29"
+   "name": "the ship moves under the player's control",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-1"
     }
    },
-   "id": "S:gem_pickable",
+   "id": "S:can_steer",
    "kind": "state",
-   "name": "a gem can be picked up",
-   "provenance": "Q-29"
+   "name": "the ship's heading answers the player",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {},
+   "id": "S:cargo_full",
+   "kind": "state",
+   "name": "the ship's crystal cargo is full",
+   "provenance": "seed"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-5"
+    }
+   },
+   "id": "S:field_closing",
+   "kind": "state",
+   "name": "the playable area is shrinking",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    }
+   },
+   "id": "S:forced_together",
+   "kind": "state",
+   "name": "the survivors cannot avoid each other",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:gems_held",
+   "kind": "state",
+   "name": "crystals are in the ship's hold",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
     }
    },
    "id": "S:gems_loose",
    "kind": "state",
-   "name": "gems are loose in the world",
-   "provenance": "Q-29"
+   "name": "crystals are loose in the field",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
      "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-6"
     }
    },
-   "id": "S:gems_spilled",
+   "id": "S:hold_bounded",
    "kind": "state",
-   "name": "the hold is on the floor",
-   "provenance": "Q-33"
+   "name": "the hold has a known ceiling and enforces it",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {},
+   "id": "S:in_field",
+   "kind": "state",
+   "name": "the pilot is flying in the asteroid field",
+   "provenance": "seed"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     }
    },
-   "id": "S:hull_swapped",
+   "id": "S:life_banked",
    "kind": "state",
-   "name": "the ship is flying a new frame",
-   "provenance": "Q-30"
+   "name": "the pilot holds a life in reserve",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
      "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-6"
     }
    },
-   "id": "S:in_combat",
+   "id": "S:mining_has_a_cost",
    "kind": "state",
-   "name": "damage is being exchanged",
-   "provenance": "Q-33"
-  },
-  {
-   "attrs": {},
-   "id": "S:in_flight",
-   "kind": "state",
-   "name": "the pilot is flying and in control",
-   "provenance": "seed"
-  },
-  {
-   "attrs": {},
-   "id": "S:page_open",
-   "kind": "state",
-   "name": "the page is open and nothing has started",
-   "provenance": "seed"
-  },
-  {
-   "attrs": {},
-   "id": "S:point_banked",
-   "kind": "state",
-   "name": "the pilot is owed at least one upgrade point",
-   "provenance": "seed"
-  },
-  {
-   "attrs": {},
-   "id": "S:respawned",
-   "kind": "state",
-   "name": "the pilot is flying again after dying",
-   "provenance": "seed"
+   "name": "the pilot is trading safety for yield",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-1"
     }
    },
-   "id": "S:rock_in_range",
+   "id": "S:mode_chosen",
    "kind": "state",
-   "name": "a rock is within reach",
-   "provenance": "Q-29"
+   "name": "a mode is chosen and its objective is set",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     }
    },
-   "id": "S:save_current",
+   "id": "S:one_left",
    "kind": "state",
-   "name": "the stored snapshot is no more than one interval old",
-   "provenance": "Q-32"
+   "name": "one pilot remains alive",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
-    }
-   },
-   "id": "S:save_gathered",
-   "kind": "state",
-   "name": "a snapshot of the run exists",
-   "provenance": "Q-32"
-  },
-  {
-   "attrs": {
-    "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
-    }
-   },
-   "id": "S:save_restored",
-   "kind": "state",
-   "name": "a returning pilot has their ship back",
-   "provenance": "Q-32"
-  },
-  {
-   "attrs": {
-    "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
-    }
-   },
-   "id": "S:save_written",
-   "kind": "state",
-   "name": "the snapshot is in storage",
-   "provenance": "Q-32"
-  },
-  {
-   "attrs": {},
-   "id": "S:session_recorded",
-   "kind": "state",
-   "name": "the run is over and what happened is on record",
-   "provenance": "seed"
-  },
-  {
-   "attrs": {
-    "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
      "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-6"
     }
    },
-   "id": "S:shield_stripped",
+   "id": "S:rock_broken",
    "kind": "state",
-   "name": "a shield arc is down",
-   "provenance": "Q-33"
+   "name": "an asteroid has been broken",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {},
+   "id": "S:round_decided",
+   "kind": "state",
+   "name": "the round is over and a winner is known",
+   "provenance": "seed"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     }
    },
-   "id": "S:ship_dead",
+   "id": "S:shield_down",
    "kind": "state",
-   "name": "the pilot's ship is destroyed",
-   "provenance": "Q-33"
+   "name": "the shield is depleted",
+   "provenance": "Q-4"
   },
   {
    "attrs": {},
-   "id": "S:ship_exists",
-   "kind": "state",
-   "name": "the pilot has a ship in that world",
-   "provenance": "seed"
-  },
-  {
-   "attrs": {},
-   "id": "S:ship_stronger",
+   "id": "S:ship_better",
    "kind": "state",
    "name": "the ship is measurably better than it was",
    "provenance": "seed"
@@ -6841,863 +6212,744 @@
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     }
    },
-   "id": "S:shot_in_flight",
+   "id": "S:ship_destroyed",
    "kind": "state",
-   "name": "a shot is travelling",
-   "provenance": "Q-33"
+   "name": "the pilot's ship is destroyed",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     }
    },
-   "id": "S:sim_running",
+   "id": "S:ship_placed",
    "kind": "state",
-   "name": "the simulation is stepping",
-   "provenance": "Q-28"
+   "name": "the pilot has a ship in the world, near its base",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     }
    },
    "id": "S:stat_raised",
    "kind": "state",
-   "name": "at least one stat is above zero",
-   "provenance": "Q-30"
+   "name": "at least one statistic is above its base",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
-    }
-   },
-   "id": "S:stats_maxed",
-   "kind": "state",
-   "name": "every stat is at its cap",
-   "provenance": "Q-30"
-  },
-  {
-   "attrs": {
-    "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     }
    },
    "id": "S:tier_offered",
    "kind": "state",
-   "name": "a next hull is on offer",
-   "provenance": "Q-30"
+   "name": "a next ship is on offer",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    }
+   },
+   "id": "S:trading_fire",
+   "kind": "state",
+   "name": "shots are being exchanged",
+   "provenance": "Q-4"
   },
   {
    "attrs": {},
-   "id": "S:under_fire",
+   "id": "S:under_attack",
    "kind": "state",
-   "name": "something is shooting at the pilot",
+   "name": "another ship is shooting at the pilot",
    "provenance": "seed"
   },
   {
    "attrs": {
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-5"
     }
    },
-   "id": "S:weapon_ready",
+   "id": "S:warned",
    "kind": "state",
-   "name": "the ship can fire",
-   "provenance": "Q-33"
-  },
-  {
-   "attrs": {},
-   "id": "S:world_built",
-   "kind": "state",
-   "name": "a world exists to fly in",
-   "provenance": "seed"
+   "name": "players know how much room is left",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "acceptance": [
-     "with WebGL unavailable the page reports it rather than showing a blank canvas",
-     "the renderer is constructed exactly once per page load"
+     "each of the four modes is selectable from the main menu",
+     "the objective the mode sets is stated before the round starts"
     ],
+    "because": "the objective differs per mode, so it has to be settled before anything else means anything",
     "ground": [
-     "renderer",
-     "scene",
-     "EXPOSURE"
+     "game mode",
+     "objective"
+    ],
+    "instead_of": [
+     "one mode with the objective chosen later"
     ],
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     },
-    "status": "HAVE",
-    "story": "Opening the page constructs a WebGL renderer and a scene. Until this exists there is no space, no ship, nothing to look at."
+    "status": "HAVE"
    },
    "id": "UC-E1-1",
    "kind": "usecase",
-   "name": "The page builds a world to fly in",
-   "provenance": "Q-28"
+   "name": "Player chooses one of the four game modes",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "acceptance": [
-     "ships[0] exists with role 'player' after load",
-     "the ship has a non-zero collision radius, so it can be hit"
+     "the pilot appears within sight of the station the sources call their base"
     ],
     "ground": [
-     "makeShip",
-     "SHIP_TEX",
-     "SHIP_R"
+     "space station"
     ],
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     },
-    "status": "HAVE",
-    "story": "A ship is built for the player and placed in the world with a hull, a texture and a collision radius."
+    "status": "HAVE"
    },
    "id": "UC-E1-2",
    "kind": "usecase",
-   "name": "The game gives the pilot a ship",
-   "provenance": "Q-28"
+   "name": "The server places the ship beside its base",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "acceptance": [
-     "a frame gap longer than 50ms is clamped rather than integrated whole",
-     "pausing and resuming the tab does not move the ship"
+     "the mouse and the left and right arrow keys both change heading"
     ],
+    "because": "the sources describe two input schemes for the same act, so either alone is incomplete",
     "ground": [
-     "frame",
-     "step"
+     "steer",
+     "controls"
+    ],
+    "instead_of": [
+     "mouse only, as many browser shooters do"
     ],
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     },
-    "status": "HAVE",
-    "story": "A frame loop runs, clamps the timestep so a stalled tab cannot teleport the world, and steps the simulation."
+    "status": "HAVE"
    },
    "id": "UC-E1-3",
    "kind": "usecase",
-   "name": "The simulation advances every frame",
-   "provenance": "Q-28"
+   "name": "Pilot steers the ship",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "acceptance": [
-     "holding thrust raises speed until it plateaus at VMAX, not beyond",
-     "releasing thrust decays speed rather than stopping dead"
+     "right-click and the up arrow both accelerate"
     ],
     "ground": [
-     "THRUST",
-     "DRAG",
-     "VMAX",
-     "YAW_RATE",
-     "PITCH_RATE"
+     "accelerate"
     ],
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     },
-    "status": "HAVE",
-    "story": "Thrust, yaw and pitch answer the keyboard, bounded by drag and a maximum speed, so the ship is flyable rather than merely present."
+    "status": "HAVE"
    },
    "id": "UC-E1-4",
    "kind": "usecase",
-   "name": "The pilot's controls move the ship",
-   "provenance": "Q-28"
+   "name": "Pilot accelerates the ship",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "acceptance": [
-     "the camera sits behind and above the ship at rest",
-     "a hard turn moves the camera smoothly, with no instantaneous jump"
+     "left-click and the space bar both fire",
+     "a pilot who can steer, move and fire is in the field and needs nothing further to play"
     ],
     "ground": [
-     "CAM_BACK",
-     "CAM_AHEAD",
-     "CAM_LAG",
-     "CAM_UP"
+     "fire",
+     "weapons"
     ],
     "rationale": {
-     "ask": "Epic E1 -- 'Arrive and fly' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Five links from an open page to a ship the pilot is actually flying: a world, a ship in it, a clock, controls that answer, and a viewpoint. Each is the precondition of the next, so nothing here is reorderable.",
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-28"
+     "question": "Q-1"
     },
-    "status": "HAVE",
-    "story": "A chase camera trails the ship, leads it slightly, and lags rather than snapping, so the pilot has a usable frame of reference."
+    "status": "HAVE"
    },
    "id": "UC-E1-5",
    "kind": "usecase",
-   "name": "The pilot can see where the ship is going",
-   "provenance": "Q-28"
+   "name": "Pilot fires the ship's weapon",
+   "provenance": "Q-1"
   },
   {
    "attrs": {
     "acceptance": [
-     "the field holds rocks up to AST_MAX and never more",
-     "rocks are drawn from instanced pools, not one mesh each"
+     "an asteroid takes damage from weapons fire and breaks"
     ],
     "ground": [
-     "makeMiningBelt",
-     "spawnAsteroid",
-     "AST_MAX",
-     "AST_KEEP",
-     "ROCK_POOLS"
+     "asteroid",
+     "weapons"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "A mining belt is seeded with instanced asteroids, capped so the field is dense without becoming thousands of draw calls."
+    "status": "HAVE"
    },
    "id": "UC-E2-1",
    "kind": "usecase",
-   "name": "The system populates a belt with rocks",
-   "provenance": "Q-29"
+   "name": "Pilot breaks an asteroid apart",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "collision testing does not scan every rock each frame",
-     "a rock marked gone is skipped by the near-query rather than returned"
+     "a broken asteroid leaves crystals where it was",
+     "a larger asteroid leaves larger chunks than a smaller one"
     ],
     "ground": [
-     "AST_CELL",
-     "AST_GRID_EVERY"
+     "gem",
+     "asteroid"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "A spatial hash rebuilt every few frames answers 'what is near me' without scanning the field, which is what makes a belt of thousands testable every frame."
+    "status": "HAVE"
    },
    "id": "UC-E2-2",
    "kind": "usecase",
-   "name": "The system finds the rocks near the pilot cheaply",
-   "provenance": "Q-29"
+   "name": "A broken asteroid leaves crystals in the field",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "a destroyed rock above the no-split size yields between AST_SPLIT_MIN and AST_SPLIT_MAX children",
-     "the children move apart rather than sitting inside each other"
+     "flying over a loose crystal puts it in the hold"
     ],
     "ground": [
-     "destroyAsteroid",
-     "AST_SPLIT_MIN",
-     "AST_SPLIT_MAX",
-     "AST_CHILD_FRAC",
-     "AST_SPLIT_KICK"
+     "gem"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "A rock that takes enough damage is destroyed, splitting into smaller children carrying a fraction of its size and a kick outward."
+    "status": "HAVE"
    },
    "id": "UC-E2-3",
    "kind": "usecase",
-   "name": "The pilot breaks a rock apart",
-   "provenance": "Q-29"
+   "name": "Pilot picks up a loose crystal",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "a bigger rock yields gems worth more credits than a smaller one",
-     "an uncollected gem disappears after GEM_LIFE seconds"
+     "a pickup that would exceed the ceiling is lost rather than held",
+     "a full hold accepts nothing until something leaves it"
     ],
+    "because": "a ceiling is what makes returning to spend a decision rather than a formality",
     "ground": [
-     "spawnGem",
-     "GEM_CREDIT_PER_SCALE",
-     "GEM_LIFE"
+     "cargo capacity"
+    ],
+    "instead_of": [
+     "an unbounded hold, which would remove the reason ever to stop mining"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "The pieces spawn as physical gem pickups whose credit value scales with the size of the rock they came from, and which expire if nobody takes them."
+    "status": "HAVE"
    },
    "id": "UC-E2-4",
    "kind": "usecase",
-   "name": "Broken rock leaves gems in the world",
-   "provenance": "Q-29"
+   "name": "The hold refuses crystals past its ceiling",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "a gem inside the magnet radius moves toward the ship without an exact pass-over",
-     "the magnet radius grows when the relevant upgrade is bought"
+     "a larger asteroid yields more crystals per unit of damage dealt",
+     "a larger asteroid takes longer, leaving the pilot in one place for longer"
     ],
+    "because": "without the size trade-off mining is a chore rather than a choice",
     "ground": [
-     "magnetFor",
-     "GEM_MAGNET",
-     "GEM_PICK_R",
-     "GEM_GRAB_R"
+     "asteroid"
+    ],
+    "instead_of": [
+     "every asteroid worth the same, which the sources contradict"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "Flying near a gem collects it, with a magnet radius that widens as the ship is upgraded, so collection is a flight skill rather than a pixel-hunt."
+    "status": "HAVE"
    },
    "id": "UC-E2-5",
    "kind": "usecase",
-   "name": "The pilot scoops a gem",
-   "provenance": "Q-29"
+   "name": "Pilot weighs asteroid size against exposure",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "GEM_BAR_MAX credits collected converts to exactly one banked point",
-     "only the player's ship banks points; an AI ship collecting gems banks none",
-     "banked points stop accumulating at GEM_PTS_CAP"
+     "the hold reports itself full at the documented capacity for the tier",
+     "a full hold is what unlocks both the extra life and the next ship"
     ],
     "ground": [
-     "gemBarAdd",
-     "GEM_BAR_MAX",
-     "GEM_BAR_RATE",
-     "GEM_PTS_CAP"
+     "cargo capacity",
+     "upgrade cost"
     ],
     "rationale": {
-     "ask": "Epic E2 -- 'Mine the belt' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
-     "attempt": 1,
-     "because": "The epic's own sentence, one beat per clause: a field exists, you can find a rock in it, you break it, it leaves gems, you scoop them, the bar banks a point. The two system-side beats are in the chain because without them the pilot-side beats have nothing to act on.",
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-29"
+     "question": "Q-6"
     },
-    "status": "HAVE",
-    "story": "Gem credits fill a bar; each time it fills it converts into one banked upgrade point, up to a cap."
+    "status": "HAVE"
    },
    "id": "UC-E2-6",
    "kind": "usecase",
-   "name": "Collected credits bank an upgrade point",
-   "provenance": "Q-29"
+   "name": "The hold fills",
+   "provenance": "Q-6"
   },
   {
    "attrs": {
     "acceptance": [
-     "spending on an unknown stat name is refused with the list of real ones",
-     "a stat already at STAT_MAX refuses further points rather than consuming them"
+     "there are exactly eight categories a crystal can go into",
+     "the cost of the next level in a category rises with the level already held"
     ],
     "ground": [
-     "spendStat",
-     "STAT_ORDER",
-     "STAT_GAIN",
-     "STAT_MAX"
+     "upgrade categories",
+     "upgrade cost",
+     "spend gems"
     ],
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     },
-    "status": "HAVE",
-    "story": "A banked point goes into one of eight named stats, in flight, each capped so no single stat absorbs the whole run."
+    "status": "HAVE"
    },
    "id": "UC-E3-1",
    "kind": "usecase",
-   "name": "The pilot spends a point on one of eight stats",
-   "provenance": "Q-30"
+   "name": "Pilot spends crystals on one of eight statistics",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "acceptance": [
-     "raising speed increases the ship's achieved velocity in flight",
-     "a stat at zero leaves its multiplier at exactly 1.0"
+     "raising energy regeneration visibly shortens the wait between sustained bursts",
+     "a statistic at its base leaves the ship exactly as it was"
     ],
     "ground": [
-     "statMult"
+     "energy regen"
     ],
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     },
-    "status": "HAVE",
-    "story": "A stat is a multiplier the simulation actually reads, so a point spent is felt rather than merely displayed."
+    "status": "HAVE"
    },
    "id": "UC-E3-2",
    "kind": "usecase",
-   "name": "Each point visibly changes how the ship performs",
-   "provenance": "Q-30"
+   "name": "A raised statistic changes how the ship performs",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "acceptance": [
-     "with seven stats maxed the tier-up is not offered",
-     "with eight maxed and no banked point the tier-up is not offered"
+     "an extra life can only be bought with a full hold",
+     "the number of lives that can be held is capped, and the cap depends on the tier"
     ],
     "ground": [
-     "tierUpReady",
-     "TIER_UP",
-     "STAT_MAX"
+     "extra life"
     ],
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     },
-    "status": "HAVE",
-    "story": "Only when all eight stats are at their cap, with a further point banked, does the ship become eligible for the next hull."
+    "status": "HAVE"
    },
    "id": "UC-E3-3",
    "kind": "usecase",
-   "name": "Maxing every stat arms the trade-in",
-   "provenance": "Q-30"
+   "name": "Pilot buys an extra life with a full hold",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "acceptance": [
-     "a ship at the top of the ladder is offered nothing",
-     "a generated hull is placed at its size tier's rank rather than off the ladder"
+     "the offer is a choice between two ships, not a single successor",
+     "a ship at the top tier is offered nothing"
     ],
+    "because": "a choice of two is what makes the tree a tree rather than a ladder",
     "ground": [
-     "nextTierHull",
-     "hullTierIdx",
-     "HULL_ORDER_ORIGINAL"
+     "tier up",
+     "ship"
+    ],
+    "instead_of": [
+     "one successor per tier, which would make the path fixed"
     ],
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     },
-    "status": "HAVE",
-    "story": "The ladder of hulls is a fixed order, and the ship's current class determines exactly which one is on offer."
+    "status": "HAVE"
    },
    "id": "UC-E3-4",
    "kind": "usecase",
-   "name": "The game names the hull that comes next",
-   "provenance": "Q-30"
+   "name": "A full hold offers the next ship in the tree",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "acceptance": [
-     "after a tier-up every stat reads zero",
-     "refusing the tier-up leaves the current hull and stats untouched"
+     "after trading up, every statistic reads its base value",
+     "the new hull is stronger at base than the old one was fully upgraded, or the trade is never worth taking"
     ],
+    "because": "paying the whole hold and losing every upgrade is the cost that makes holding out a decision",
     "ground": [
-     "takeTierUp"
+     "tier up",
+     "tier"
+    ],
+    "instead_of": [
+     "carrying upgrades across the tier, which would make trading up strictly free"
     ],
     "rationale": {
-     "ask": "Epic E3 -- 'Spend the point, or save for the hull' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The decision the epic describes has two arms off one point: spend it now and get stronger immediately, or bank toward a maxed ship and trade the whole thing in. Both arms are in the chain, because the choice only exists if both are reachable.",
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-30"
+     "question": "Q-3"
     },
-    "status": "HAVE",
-    "story": "Accepting the trade-in swaps the frame and resets all eight stats to zero, which is what makes holding out a real decision rather than a free reward."
+    "status": "HAVE"
    },
    "id": "UC-E3-5",
    "kind": "usecase",
-   "name": "Taking the new hull costs every upgrade bought",
-   "provenance": "Q-30"
+   "name": "Taking the next ship hands over an un-upgraded one",
+   "provenance": "Q-3"
   },
   {
    "attrs": {
     "acceptance": [
-     "a ship one tier up, with all stats at zero, has a higher base shield capacity than a maxed ship of the tier below",
-     "each entry in HULLS declares its own capacities rather than inheriting one shared set",
-     "the balance law the table states -- bigger hold means thinner armour and lower speed -- holds between adjacent tiers, so the trade is a trade and not a strict gain"
+     "lasers, torpedoes and special weapons are all available routes to damage"
     ],
     "ground": [
-     "HULLS",
-     "shieldMaxFor"
+     "weapons",
+     "fire"
     ],
     "rationale": {
-     "ask": "'Taking the new hull costs every upgrade bought' establishes 'the ship is flying a new frame' (S:hull_swapped), and no use case requires it and no epic ends on it. Either name the use case that consumes it, or say the postcondition is wrong. A state nothing needs is either a missing beat or a false claim about what this use case is for.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "The gap is real and it is the interesting one in this epic. E3 forks: spend the point now (UC-E3-1 -> UC-E3-2 -> ship_stronger) or bank toward a maxed ship and trade the frame in (UC-E3-3 -> UC-E3-4 -> UC-E3-5 -> hull_swapped). The first arm rejoined the story and the second did not, which means the model was asserting that trading in your ship leaves you no better off. A use case is missing: the one that says the new frame is worth what it cost. HULLS is the table that carries each frame's own capacity, and it is what makes the claim checkable rather than a promise.",
-     "kind": "DANGLING_POSTCONDITION",
-     "question": "Q-67"
-    },
-    "status": "HAVE",
-    "story": "A hull class carries its own capacities, so the frame taken in the trade is materially better than the one given up even with every stat reset to zero. This is what makes the trade-in a decision rather than a punishment, and it is the beat that joins the tier-up arm back to the rest of the story."
-   },
-   "id": "UC-E3-6",
-   "kind": "usecase",
-   "name": "The traded-up frame outperforms the one it replaced",
-   "provenance": "Q-67"
-  },
-  {
-   "attrs": {
-    "acceptance": [
-     "with the capacitor empty the ship cannot fire",
-     "breaking off refills the capacitor at LASER_CAP_REGEN per second",
-     "raising energyCap raises the ceiling the capacitor refills to"
-    ],
-    "ground": [
-     "capMaxFor",
-     "LASER_CAP_MAX",
-     "LASER_CAP_REGEN",
-     "LASER_CAP_PER_SHOT"
-    ],
-    "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     },
-    "status": "HAVE",
-    "story": "Each shot draws from a capacitor that refills over time, so sustained fire is bounded by a resource rather than by a cooldown alone."
+    "status": "HAVE"
    },
    "id": "UC-E4-1",
    "kind": "usecase",
-   "name": "Firing costs energy the pilot cannot spend forever",
-   "provenance": "Q-33"
+   "name": "Pilot trades fire with another ship",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "acceptance": [
-     "a bullet expires after BULLET_LIFE seconds rather than travelling forever",
-     "a target beyond BULLET_SPEED times BULLET_LIFE cannot be reached by a direct shot"
+     "no crystals are lost while the shield still has charge"
     ],
     "ground": [
-     "BULLET_SPEED",
-     "BULLET_LIFE",
-     "MUZZLE_OFF"
+     "shield"
     ],
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     },
-    "status": "HAVE",
-    "story": "A bullet leaves the muzzle at a finite speed and expires after a finite life, which is what gives the weapon a range and makes closing the distance a decision."
+    "status": "HAVE"
    },
    "id": "UC-E4-2",
    "kind": "usecase",
-   "name": "A shot travels a bounded distance",
-   "provenance": "Q-33"
+   "name": "Shields absorb before the hold does",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "acceptance": [
-     "a bullet passing within BULLET_R of a ship registers a hit",
-     "the interval between shots is the weapon's own cd from the WEAPONS table, divided by the ship's fireRate multiplier, so buying fireRate visibly shortens it",
-     "two weapon types with different cd values fire at visibly different rates on the same hull"
+     "with the shield down, damage taken removes that amount of crystals from the hold",
+     "crystals knocked loose are collectable by anyone, including the attacker"
     ],
+    "because": "crystals acting as a second shield is what makes a full hold dangerous to carry",
     "ground": [
-     "BULLET_DMG",
-     "BULLET_R",
-     "WEAPONS",
-     "statMult"
+     "gems as shield"
+    ],
+    "instead_of": [
+     "the hold being safe until death, which would make hoarding free"
     ],
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     },
-    "status": "HAVE",
-    "story": "Contact applies damage, and the gun cannot fire again until the interval its own weapon type declares has passed, so damage over time is bounded by the weapon and by the pilot's investment in fireRate rather than by how fast a key is pressed."
+    "status": "HAVE"
    },
    "id": "UC-E4-3",
    "kind": "usecase",
-   "name": "A shot that connects damages what it hit",
-   "provenance": "Q-33"
+   "name": "Damage past the shield knocks crystals loose",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "acceptance": [
-     "a hit from ahead drains the forward arc and leaves the aft arc untouched",
-     "hull integrity does not fall while the struck arc still has charge"
+     "a destroyed ship leaves the field"
     ],
     "ground": [
-     "drainShield",
-     "shieldArcMaxFor"
+     "death"
     ],
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     },
-    "status": "HAVE",
-    "story": "Damage is absorbed by a directional shield arc, each arc carrying half the ship's total shield, before any of it reaches the hull."
+    "status": "HAVE"
    },
    "id": "UC-E4-4",
    "kind": "usecase",
-   "name": "Shields take the hit before the hull does",
-   "provenance": "Q-33"
+   "name": "A ship that runs out of everything dies",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "acceptance": [
-     "a destroyed ship stops being a valid target",
-     "the killer is credited, so a kill is attributable"
+     "the respawned ship is tier one regardless of the tier that died",
+     "every upgrade bought before death is gone",
+     "the respawned pilot holds minimal crystals, not none and not the hold they had"
     ],
     "ground": [
-     "killShip",
-     "killByShip"
+     "death",
+     "tier"
     ],
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
+     "question": "Q-4"
     },
-    "status": "HAVE",
-    "story": "When damage exhausts the hull the ship is destroyed, removed from the fight, and the kill is attributed to whoever landed it."
+    "status": "HAVE"
    },
    "id": "UC-E4-5",
    "kind": "usecase",
-   "name": "A ship that runs out of hull dies",
-   "provenance": "Q-33"
+   "name": "Death returns the pilot to tier one with nothing",
+   "provenance": "Q-4"
   },
   {
    "attrs": {
     "acceptance": [
-     "a pilot dying with credits leaves collectable gems at the wreck",
-     "a pilot dying with nothing spills nothing"
+     "the field pushes players away from the star rather than pulling them in",
+     "the field grows larger and stronger as the endgame progresses"
     ],
+    "because": "a shrinking field forces contact without a timer deciding the round",
     "ground": [
-     "spillGems"
+     "gravity field"
+    ],
+    "instead_of": [
+     "a round timer, which would end the game without anyone having to fight"
     ],
     "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
-    },
-    "status": "HAVE",
-    "story": "The credits banked into the hold are dropped into the world on death, so a long uninterrupted run is worth more than the sum of its minutes."
-   },
-   "id": "UC-E4-6",
-   "kind": "usecase",
-   "name": "Death spills the cargo for anyone to take",
-   "provenance": "Q-33"
-  },
-  {
-   "attrs": {
-    "acceptance": [
-     "respawn does not happen before RESPAWN_DELAY seconds have passed",
-     "the respawned ship is not the tier that died"
-    ],
-    "ground": [
-     "RESPAWN_DELAY"
-    ],
-    "rationale": {
-     "ask": "Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E4-2. Re-send only what is needed to replace those; leave everything else out.",
-     "attempt": 2,
-     "because": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
-     "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-33"
-    },
-    "status": "HAVE",
-    "story": "After a delay the pilot respawns without the hull they lost, which is the cost that makes the fight matter."
-   },
-   "id": "UC-E4-7",
-   "kind": "usecase",
-   "name": "The pilot comes back small after a pause",
-   "provenance": "Q-33"
-  },
-  {
-   "attrs": {
-    "acceptance": [
-     "the snapshot carries a version field, so an old save is recognisable as old",
-     "with no player ship the snapshot is refused rather than written empty"
-    ],
-    "ground": [
-     "gatherSaveState"
-    ],
-    "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     },
-    "status": "HAVE",
-    "story": "The player's ship, progress and standing are collected into one versioned snapshot."
+    "status": "HAVE"
    },
    "id": "UC-E5-1",
    "kind": "usecase",
-   "name": "The game gathers what is worth keeping",
-   "provenance": "Q-32"
+   "name": "A repulsive field grows out from the star",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "acceptance": [
-     "closing and reopening the page finds the previous snapshot",
-     "a snapshot written under the key replaces the previous one rather than accumulating"
+     "warnings are given at 75%, 50%, 25% and 0%"
     ],
+    "because": "a squeeze nobody can see coming is a death nobody can play around",
     "ground": [
-     "SAVE_KEY",
-     "persist"
+     "endgame warning"
+    ],
+    "instead_of": [
+     "a silent field, which would make position luck rather than choice"
     ],
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     },
-    "status": "HAVE",
-    "story": "The snapshot is stored under a known key in browser storage, so it survives the page closing."
+    "status": "HAVE"
    },
    "id": "UC-E5-2",
    "kind": "usecase",
-   "name": "The snapshot is written where it can be found again",
-   "provenance": "Q-32"
+   "name": "The field warns before it reaches a player",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "acceptance": [
-     "a session ended without a clean exit still restores to within SAVE_INTERVAL_S of where it stopped"
+     "the survivable area is smaller at the end of the round than at the start"
     ],
     "ground": [
-     "SAVE_INTERVAL_S"
+     "gravity field"
     ],
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     },
-    "status": "HAVE",
-    "story": "Saving runs on a cadence during play, so an unclean exit costs at most one interval rather than the whole session."
+    "status": "HAVE"
    },
    "id": "UC-E5-3",
    "kind": "usecase",
-   "name": "The snapshot is kept current, not written only at the end",
-   "provenance": "Q-32"
+   "name": "The closing field forces players together",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "acceptance": [
-     "a snapshot of the wrong version is declined and the pilot starts fresh",
-     "a restored pilot has the hull and stats they had when the snapshot was taken"
+     "victory is being last alive, not holding the highest count of anything"
     ],
     "ground": [
-     "applySaveState"
+     "survival objective"
     ],
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     },
-    "status": "HAVE",
-    "story": "On load a valid snapshot of the right version is applied; an invalid or older one is declined rather than half-applied."
+    "status": "HAVE"
    },
    "id": "UC-E5-4",
    "kind": "usecase",
-   "name": "A returning pilot gets their ship back",
-   "provenance": "Q-32"
+   "name": "The last pilot alive takes the round",
+   "provenance": "Q-5"
   },
   {
    "attrs": {
     "acceptance": [
-     "a run that only mines still produces a non-zero standing",
-     "two runs with equal credits and different scores are ranked apart"
+     "the server ends once one player is left"
     ],
     "ground": [
-     "SCORE_W"
+     "round end"
     ],
     "rationale": {
-     "ask": "Epic E5 -- 'The run ends and is remembered' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
      "attempt": 1,
-     "because": "Persistence as a chain rather than a feature list: gather, write, keep current, restore, score. The cadence beat sits between writing and restoring because a save written only at the end does not survive the way a session actually ends.",
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
      "kind": "UNDECOMPOSED_EPIC",
-     "question": "Q-32"
+     "question": "Q-5"
     },
-    "status": "HAVE",
-    "story": "Standing combines credits and score under a stated weight rather than counting kills alone, so mining and fighting both register."
+    "status": "HAVE"
    },
    "id": "UC-E5-5",
    "kind": "usecase",
-   "name": "The run's standing is a weighted total",
-   "provenance": "Q-32"
+   "name": "The server ends the round",
+   "provenance": "Q-5"
   }
  ],
  "tally": {
   "actor": 3,
-  "edges": 423,
+  "edges": 382,
   "epic": 5,
   "ground": 0,
-  "question": 174,
-  "state": 30,
+  "question": 156,
+  "state": 27,
   "step": 0,
-  "usecase": 29
+  "usecase": 26
  }
 }

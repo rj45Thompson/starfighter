@@ -1,0 +1,47 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast-web — system boundary"]
+    direction LR
+    subgraph E2["E2 — Mine the belt and fill the cargo"]
+      direction LR
+      UC_E2_1["<b>UC-E2-1</b><br/>Pilot breaks an asteroid apart<br/><small>asteroid</small>"]
+      UC_E2_2["<b>UC-E2-2</b><br/>A broken asteroid leaves crystals in the field<br/><small>gem</small>"]
+      UC_E2_3["<b>UC-E2-3</b><br/>Pilot picks up a loose crystal<br/><small>gem</small>"]
+      UC_E2_4["<b>UC-E2-4</b><br/>The hold refuses crystals past its ceiling<br/><small>cargo capacity</small>"]
+      UC_E2_5["<b>UC-E2-5</b><br/>Pilot weighs asteroid size against exposure<br/><small>asteroid</small>"]
+      UC_E2_6["<b>UC-E2-6</b><br/>The hold fills<br/><small>cargo capacity</small>"]
+    end
+  end
+  S_cargo_full(("the ship's crystal cargo is full"))
+  S_gems_held(("crystals are in the ship's hold"))
+  S_gems_loose(("crystals are loose in the field"))
+  S_hold_bounded(("the hold has a known ceiling and enforces it"))
+  S_in_field(("the pilot is flying in the asteroid field"))
+  S_mining_has_a_cost(("the pilot is trading safety for yield"))
+  S_rock_broken(("an asteroid has been broken"))
+  E2 --> S_in_field
+  UC_E2_1 --> S_rock_broken
+  UC_E2_2 --> S_gems_loose
+  UC_E2_3 --> S_gems_held
+  UC_E2_4 --> S_hold_bounded
+  UC_E2_5 --> S_mining_has_a_cost
+  UC_E2_6 --> S_cargo_full
+  A_pilot --- E2
+  S_cargo_full --> E2
+  S_in_field --> UC_E2_1
+  S_rock_broken --> UC_E2_2
+  S_gems_loose --> UC_E2_3
+  S_gems_held --> UC_E2_4
+  S_hold_bounded --> UC_E2_5
+  S_mining_has_a_cost --> UC_E2_6
+  Q_why_UC_E3_3{{"❓ WHY"}}
+  style Q_why_UC_E3_3 fill:#3d1f1f,stroke:#ff6b6b,color:#ffe8e8
+  style UC_E2_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (341): Q:what:UC-E1-1 -answers-> S:mode_chosen; Q:what:UC-E1-2 -answers-> S:ship_placed; Q:what:UC-E1-3 -answers-> S:can_steer; Q:what:UC-E1-4 -answers-> S:can_move; Q:what:UC-E1-5 -answers-> S:in_field; Q:what:UC-E2-1 -answers-> S:rock_broken; Q:what:UC-E2-2 -answers-> S:gems_loose; Q:what:UC-E2-3 -answers-> S:gems_held; Q:what:UC-E2-4 -answers-> S:hold_bounded; Q:what:UC-E2-5 -answers-> S:mining_has_a_cost; Q:what:UC-E2-6 -answers-> S:cargo_full; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_better; Q:what:UC-E3-3 -answers-> S:life_banked; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:ship_better; Q:what:UC-E4-1 -answers-> S:trading_fire; Q:what:UC-E4-2 -answers-> S:shield_down; Q:what:UC-E4-3 -answers-> S:bleeding_gems; Q:what:UC-E4-4 -answers-> S:ship_destroyed

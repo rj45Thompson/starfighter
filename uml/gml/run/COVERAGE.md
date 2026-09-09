@@ -11,11 +11,11 @@ The denominator is real: every constant and function the extractor found in the 
 
 | epic | in scope | claimed | unclaimed | coverage | gate |
 |---|---:|---:|---:|---:|---|
-| E1 | 46 | 17 | 29 | 37.0% | ❌ **fail** |
-| E2 | 75 | 24 | 51 | 32.0% | ❌ **fail** |
-| E3 | 40 | 15 | 25 | 37.5% | ❌ **fail** |
-| E4 | 64 | 15 | 49 | 23.4% | ❌ **fail** |
-| E5 | 11 | 7 | 4 | 63.6% | ❌ **fail** |
+| E1 | 52 | 17 | 35 | 32.7% | ❌ **fail** |
+| E2 | 92 | 24 | 68 | 26.1% | ❌ **fail** |
+| E3 | 47 | 15 | 32 | 31.9% | ❌ **fail** |
+| E4 | 100 | 15 | 85 | 15.0% | ❌ **fail** |
+| E5 | 10 | 7 | 3 | 70.0% | ❌ **fail** |
 
 ## 2. Support vector — per use case, complete or not
 
@@ -95,25 +95,25 @@ The rubric is a stated convention — grounded=40, falsifiable=25, precondition_
 
 ## What the extractor found in the source itself
 
-The ground space holds **2335** atoms across 6 file(s). Two independent readings were taken of every constant — where it is declared, and everywhere it is read — and they disagreed in 91 place(s) with certainty:
+The ground space holds **3510** atoms across 6 file(s). Two independent readings were taken of every constant — where it is declared, and everywhere it is read — and they disagreed in 22 place(s) with certainty:
 
-- index.html: CFG.ROCK_NEAR_R is read 1x and declared nowhere in CFG
-- index.html: CFG.MISSILE_AMMO_ is read 1x and declared nowhere in CFG
-- index.html: CFG.POP is read 1x and declared nowhere in CFG
-- index.html: CFG.MIN_SUPPORT_PROVEN is read 1x and declared nowhere in CFG
-- index.html: CFG.WINDOW_S is read 1x and declared nowhere in CFG
-- index.html: CFG.CHROME_RESERVE is read 2x and declared nowhere in CFG
-- index.html: CFG.BAR_H is read 1x and declared nowhere in CFG
-- index.html: CFG.BAR_GAP is read 1x and declared nowhere in CFG
-- index.html: CFG.TRACK_W is read 1x and declared nowhere in CFG
-- index.html: CFG.RADIAL is read 1x and declared nowhere in CFG
-- index.html: CFG.A10 is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.BRAIN_WORLD_URL is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.DEATH_CREDIT_LOSS is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.FILTER is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.FIRE_CD is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.Fix is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.HOUSING is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.PIRATE_HP is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.RAID_LOOT is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
-- index.html: CFG.REAR_AIM_RANGE is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- MAN.keyFire is read 1x and MAN has no such key
+- miningStats.snapshot is read 3x and miningStats has no such key
+- index.html: CFG.STAR_EMIS is declared and is never read or assigned anywhere
+- index.html: CFG.THR_TURN_EASE is declared and is never read or assigned anywhere
+- index.html: CFG.FIRE_CD is declared and is never read or assigned anywhere
+- index.html: CFG.BOT_IDLE_R is declared and is never read or assigned anywhere
+- index.html: CFG.BRAIN_WORLD_URL is declared and is never read or assigned anywhere
+- index.html: CFG.REAR_GUN_CD is declared and is never read or assigned anywhere
+- index.html: CFG.REAR_AIM_RANGE is declared and is never read or assigned anywhere
+- index.html: CFG.DEATH_CREDIT_LOSS is declared and is never read or assigned anywhere
+- index.html: CFG.SHIELD_ARC_BASE is declared and is never read or assigned anywhere
+- index.html: CFG.SKILL_LEADERSHIP_REWARD is declared and is never read or assigned anywhere
+- index.html: CFG.RAID_LOOT is declared and is never read or assigned anywhere
+- index.html: CFG.PIRATE_HP is declared and is never read or assigned anywhere
+- index.html: CFG.TOP_ZOOM is declared and is never read or assigned anywhere
+- panels.js: CFG.TAB_H is declared and is never read or assigned anywhere
+- panels.js: CFG.TAB_W is declared and is never read or assigned anywhere
+- panels.js: COL.ink is declared and is never read or assigned anywhere
+- panels.js: api.reflow is declared and is never read or assigned anywhere
+- shell.js: CFG.KEY is declared and is never read or assigned anywhere
