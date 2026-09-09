@@ -27,6 +27,21 @@ That cross-check found two facts before a single requirement was written:
 * **`CFG.BOT_IDLE_R` (3.2) is never read.** Declared at `index.html:406`; the only other mention is
   a comment at `index.html:976` saying what it *used to* do. A dead knob.
 
+## The line numbers drift, and they had already drifted
+
+`tools/watch_upgrades.cmd` → `tools/upgrade_pass.py` rewrites `index.html` while you work, and not
+by a uniform offset. An hour after this file was written, **0 of its 59 citations still landed on
+the line they named** — `:406` had been `MINING_BOTS` and was `KP_YAW`; `:1336` had been
+`destroyAsteroid` and was `spawnAsteroid`. Nothing announced it. A document full of confident line
+numbers pointing at the wrong lines is worse than one with none, because it reads as verified.
+
+**So read the backticked SYMBOL as the anchor and the line only as a hint.** Every requirement below
+names the function or constant it rests on; that survives a rewrite, and a line number does not.
+`py tools/reanchor.py ASTEROID_USE_CASES.md` reports how far each has moved (`--write` to rewrite),
+and it reports rather than guesses when a symbol no longer resolves.
+
+Credit where it is due: this hazard was caught by the plain-Opus baseline run, not by this one.
+
 Status: **HAVE** (built and cited) · **PARTIAL** (built, story not fully true) · **INFERRED IR-n**
 (the step needs it and nobody authored a requirement) · **ABSENT** (proven not there, with the search).
 
