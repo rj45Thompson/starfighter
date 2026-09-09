@@ -19,7 +19,16 @@
   // never advertises a module that failed to load - it says so instead of throwing on click.
   const TABS=[
     { id:'fly',       t:'FLY',       hint:'back to the cockpit - close every screen', live:()=>true,
-      go:()=>{ if(window.ENGBAY&&ENGBAY.visible&&ENGBAY.visible()) ENGBAY.hide(); if(window.STARMAP&&STARMAP.isOpen&&STARMAP.isOpen()) STARMAP.close(); if(window.PLANETMENU&&PLANETMENU.isOpen&&PLANETMENU.isOpen()) PLANETMENU.close(); closeSheet(); } },
+      /* RJ 2026-09-08: "remove fly button on the top or fix it so it does something?" Its own hint has always
+         said "close every screen", and it closed the engineering bay, the star map, the planet menu and the
+         sheet - but NOT the eight windows, which are the screens actually covering the cockpit. So on a
+         normal flight, with only panels open, pressing FLY did nothing at all. It closes them too now, which
+         is what the button already claimed to do. */
+      go:()=>{ if(window.ENGBAY&&ENGBAY.visible&&ENGBAY.visible()) ENGBAY.hide();
+        if(window.STARMAP&&STARMAP.isOpen&&STARMAP.isOpen()) STARMAP.close();
+        if(window.PLANETMENU&&PLANETMENU.isOpen&&PLANETMENU.isOpen()) PLANETMENU.close();
+        if(window.PANELS&&PANELS.list) PANELS.list().forEach(p=>{ if(p.open) PANELS.close(p.id); });
+        closeSheet(); } },
     { id:'map',       t:'MAP',       hint:'star map - jump between systems (G)', live:()=>!!window.STARMAP, go:()=>cmd('starmap') },
     { id:'ship',      t:'SHIP',      hint:'engineering bay - hardpoints, gizmos, hull (E)', live:()=>!!window.ENGBAY, go:()=>ENGBAY.toggle() },
     { id:'market',    t:'MARKET',    hint:'buy and sell cargo (M)', live:()=>!!window.PANELS, go:()=>panel('market') },

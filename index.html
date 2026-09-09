@@ -325,7 +325,7 @@
 <script src="power_panel.js?v=20260906b"></script>
 <script src="panels.js?v=20260908i"></script>
 <script src="sbhud.js?v=20260906b"></script>
-<script src="shell.js?v=20260908a"></script>
+<script src="shell.js?v=20260908b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
 <script src="storyline.js?v=20260907a"></script><!-- F31: the authored MAIN STORY spine (The Iron Synod War) - 4 ordered beats polled via window.STORYLINE; advanced on war-win by warWin() -> STORYLINE.onWarWin() -->
 <script src="survey.js?v=20260907a"></script><!-- F45: SELL exploration/survey data (P.discoveries) for a cartographics fee via window.SURVEY; the `survey` command files unfiled records at a dock -->
@@ -2288,7 +2288,7 @@ function tierUpReady(s){ return !!(CFG.TIER_UP && s && s.role==='player' && s.al
 function gemBarAdd(s,credits){ if(!CFG.GEM_BAR||!s||s.role!=='player'||!(credits>0)) return 0; ensureStat(s); if(window.GUIDE) GUIDE.hit('collect');   /* F58 guided loop: player scooped a gem */ s.gemBar+=credits*CFG.GEM_BAR_RATE; let banked=0;
   while(s.gemBar>=CFG.GEM_BAR_MAX && s.gemPts<CFG.GEM_PTS_CAP){ s.gemBar-=CFG.GEM_BAR_MAX; s.gemPts++; banked++; }
   if(s.gemPts>=CFG.GEM_PTS_CAP) s.gemBar=Math.min(s.gemBar,CFG.GEM_BAR_MAX);   // at the cap the bar just sits full - nothing is silently lost into a counter nobody can read
-  if(banked){ term(`◆ GEM BAR full - <b>${banked}</b> upgrade point${banked>1?'s':''} banked (<b>${s.gemPts}</b> ready) - keys <b>1-8</b> spend one`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.flash(); if(window.GUIDE) GUIDE.hit('bank'); }
+  if(banked){ term(`◆ GEM BAR full - <b>${banked}</b> upgrade point${banked>1?'s':''} banked (<b>${s.gemPts}</b> ready) - keys <b>1-8</b> spend one, or open <b>UPGRADES</b> in the top bar to see the eight stats. Max all eight and bank one more to TIER UP the hull.`,'sys'); if(window.SOUND) SOUND.play('ui'); if(window.SBHUD) SBHUD.flash(); if(window.GUIDE) GUIDE.hit('bank'); }
   if(tierUpReady(s)) offerTierUp(s); return banked; }
 function spendStat(s,k){ if(!s) return {ok:false,msg:'no ship'}; ensureStat(s); if(!CFG.STAT_GAIN[k]) return {ok:false,msg:`no such stat - ${CFG.STAT_ORDER.join(' / ')}`};
   if(s.gemPts<1) return {ok:false,msg:`no upgrade point yet - the gem bar is ${Math.round(100*s.gemBar/CFG.GEM_BAR_MAX)}% full`};
@@ -6340,13 +6340,18 @@ function renderShop(){ const el=document.getElementById('shop'), P=ships[0]; if(
       +(can?`<button data-up="${k}" ${ok?'':'disabled'} style="font:700 10px ui-monospace,monospace;padding:4px 8px;border-radius:5px;border:1px solid ${ok?'#3a8ab0':'#2a3a4a'};background:${ok?'#123a52':'#0c1623'};color:${ok?'#cfe9ff':'#5f7a98'};cursor:${ok?'pointer':'default'}">${cost}c</button>`:'')+`</div>`; }).join('');
   el.innerHTML=`<div style="color:#8fb0cc;font-size:9.5px;letter-spacing:.08em;margin-bottom:4px">CREDITS <b style="color:#ffd27a">${Math.round(P.credits)}c</b> · no docking needed</div>${rows}<div style="color:#5f7a98;font-size:9px;margin-top:4px">weapons, hull class and gear are still bought docked (<b>weapon</b>, <b>hull</b>, <b>gizmo</b>)</div>`;
   el.querySelectorAll('button[data-up]').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); const r=doUpgrade(b.dataset.up); term(r.msg, r.ok?'sys':'err'); renderShop(); }; }); }
+let _shopAutoOpened=false;   // did shopTick open it, or did the player? only the former may be auto-closed
 function shopTick(dt){ if(!CFG.SHOP_AUTO||!window.PANELS||!PANELS.isOpen) return; _shopT-=dt; if(_shopT>0) return; _shopT=1.0;
   const P=ships[0]; if(!P||!P.alive) return;
   const affordable=['weapon','engine','hull'].some(k=>canUpgradeLvl(P,k)&&P.credits>=upCost(P,k));
   const open=PANELS.isOpen('shop');
   if(_shopWasOpen&&!open&&affordable) _shopSnoozeUntil=T0+CFG.SHOP_SNOOZE_S;   // closed by hand while still affordable = snooze
-  if(affordable&&!open&&T0>=_shopSnoozeUntil){ PANELS.open('shop'); renderShop(); if(window.SOUND) try{ SOUND.play('pickup'); }catch(e){} }
-  else if(!affordable&&open){ PANELS.close('shop'); }
+  /* RJ 2026-09-08: "when I press the pin on the shop window it is not opening (it was collapsed)". It WAS
+     opening - and then this tick shut it again within the second, because the old rule was "not affordable
+     and open -> close", with no idea who opened it. So the auto-close fought the player's own click and the
+     window looked like it refused to open. It now only closes what it opened itself. */
+  if(affordable&&!open&&T0>=_shopSnoozeUntil){ PANELS.open('shop'); _shopAutoOpened=true; renderShop(); if(window.SOUND) try{ SOUND.play('pickup'); }catch(e){} }
+  else if(!affordable&&open&&_shopAutoOpened){ PANELS.close('shop'); _shopAutoOpened=false; }
   else if(open) renderShop();
   _shopWasOpen=PANELS.isOpen('shop'); }
 
