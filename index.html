@@ -465,10 +465,17 @@ const CFG = {
   // point on one of eight stats (each level a declared multiplier at the ONE site that already reads the quantity); all eight maxed plus
   // one banked point = the next hull tier, taken anywhere in space (applyHull's swap rule resets the old Lv1-10 ladder, same as before).
   KILL_FEED_MAX:60, KILL_CREDIT_S:8, KILL_FEED_SHOWN:5, KILL_FEED_S:22,
-  MUSIC_ON:false,            // MUSIC OFF (RJ 2026-09-07: "just disable music sound okay music OFF"). The bed, the
-                             // ducking and the tracks all stay wired and working - this is the switch, not a
-                             // removal, so turning it back on is one value and nothing has to be rebuilt.
-                             // Sound EFFECTS are unaffected: `mute`/`unmute` still own those.
+  MUSIC_ON:true,             /* MUSIC BACK ON (RJ 2026-09-08: "fix the sounds game has no sound when it is on or
+                                off", then "remove music if it is super shitty not by a top tier model from
+                                kaggle"). It was switched OFF on 2026-09-07 at his own request ("just disable
+                                music sound okay music OFF"), which is most of why the game plays silent - the
+                                effects only fire on events, so with no bed there is nothing between them.
+
+                                His condition is met rather than assumed: the three tracks are MusicGen, the
+                                top-tier model, not the FM synth - so "shitty, not from a top tier model" does
+                                not describe them and the rule says keep. The switch is the only thing that
+                                changed; the bed, the ducking and the tracks were never removed.
+                                Sound EFFECTS remain separate: `mute`/`unmute` own those. */
   MUSIC_TRACK:'starfield',   // the bed that WOULD play under flight (assets/audio/<name>.ogg, generated with MusicGen)
   /* SB-2.6 - the tier-up was 19 minutes away and Starblast does it in one or two.
      The arithmetic, read off the code rather than felt: the gate is statsMaxed && gemPts>=1
@@ -7023,7 +7030,13 @@ try{ SF_LOCK.ch=new BroadcastChannel('SF_SINGLETON');
 // 🎵 the F67 adaptive SYNTH score (music.js) has its OWN gesture-starter (arm()->go()->start()) that never reads CFG.MUSIC_ON,
 // so "music OFF" still let it play on the first keypress (M1). Mirror the bed's gate: setMute is stored before start(), and
 // build() reads it (music.js:90 bus.gain = muted?0:vol), so the synth boots SILENT when off - a switch, not a removal.
-if(window.MUSIC && MUSIC.setMute) MUSIC.setMute(!CFG.MUSIC_ON);
+/* THE SYNTH SCORE STAYS MUTED, even with music on. RJ 2026-09-08: "remove music if it is super shitty not by
+   a top tier model from kaggle." There are TWO music sources here - the generated MusicGen beds
+   (assets/audio/*.ogg) and music.js's adaptive FM synth score. The synth is precisely the one his rule
+   describes, and it used to follow CFG.MUSIC_ON, so turning the good music on would have started both at once
+   and layered the cheap one over it. The beds play; the synth does not. Flip this to !CFG.MUSIC_ON to bring it
+   back. */
+if(window.MUSIC && MUSIC.setMute) MUSIC.setMute(true);
 // ---- VISION: the arc3 eye + fog of war (vision.js) - two retinas, one per mind -------------------------------
 const VIS_CODE={asteroid:1,gem:2,planet:3,base:4,squad:5,pirate:6};   // game-side OPAQUE code table (agents never see these names)
 const VIS_EVERY=12;                                                   // retina tick every N frames (named const)
