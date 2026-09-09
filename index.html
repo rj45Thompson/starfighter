@@ -155,10 +155,15 @@
   /* 🔊 voice-OUTPUT toggle (chatter.js speechSynthesis) - was terminal-command-only (`voices on`), which meant the
      ONLY visible voice affordance (the mic, STT input) never turned on the reply-aloud half - a real "speech never
      worked" trap since clicking the one thing you can see gets you a silent text reply. Docks beside #micBtn. */
-  #voiceBtn{ position:fixed; z-index:7; bottom:12px; width:34px; height:34px; border-radius:9px; font-size:16px;
-    line-height:32px; text-align:center; padding:0; cursor:pointer; pointer-events:auto;
-    background:#0a1420ee; border:1px solid #3a6a8a; color:#eaf2ff; }
-  #voiceBtn.on{ background:#123a2ccc; border-color:#7fdc8a; }
+  /* RJ 2026-09-08: "the sound button on off for the spacefighter is not very visible." It was a 34px square
+     showing only a speaker glyph on a dim slate border - you could not tell it apart from the mic beside it,
+     and crossed-speaker vs speaker is a poor way to read STATE at 16px. It says what it IS now, and the two
+     states differ in colour as well as in wording: amber while muted (something is off), green while on. */
+  #voiceBtn{ position:fixed; z-index:7; bottom:12px; height:34px; min-width:34px; padding:0 11px;
+    border-radius:9px; font:700 12px/32px ui-monospace,monospace; letter-spacing:.06em; white-space:nowrap;
+    text-align:center; cursor:pointer; pointer-events:auto;
+    background:#241a08ee; border:1px solid #d79a3a; color:#ffd9a0; }
+  #voiceBtn.on{ background:#0d2a1ccc; border-color:#7fdc8a; color:#c9ffd9; }
   #market{ position:fixed; top:52px; transform:translateX(-50%); z-index:6; pointer-events:none;
     background:#0a1420dd; border:1px solid #22344a; border-radius:9px; padding:8px 10px;
     max-width:min(94vw,860px); max-height:80vh; overflow:auto; }   /* SR wave grew to 16 planets - the table now exceeds the main viewport; scroll rather than run off-screen unreachably */
@@ -318,7 +323,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
-<script src="panels.js?v=20260908g"></script>
+<script src="panels.js?v=20260908i"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260908a"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
@@ -449,7 +454,19 @@ const CFG = {
                              // removal, so turning it back on is one value and nothing has to be rebuilt.
                              // Sound EFFECTS are unaffected: `mute`/`unmute` still own those.
   MUSIC_TRACK:'starfield',   // the bed that WOULD play under flight (assets/audio/<name>.ogg, generated with MusicGen)
-  GEM_BAR:true, GEM_BAR_MAX:48, GEM_BAR_RATE:1.0, GEM_PTS_CAP:64, STAT_MAX:8, TIER_UP:true,
+  /* SB-2.6 - the tier-up was 19 minutes away and Starblast does it in one or two.
+     The arithmetic, read off the code rather than felt: the gate is statsMaxed && gemPts>=1
+     (tierUpReady), statsMaxed is 8 stats x STAT_MAX 8 = 64 points, so the tier costs 65 points,
+     and at GEM_BAR_MAX 48 that was 65 x 48 = 3,120 gem credits.
+
+     GEM_PTS_CAP was also 64 - one SHORT of the 65 the gate wants. You could bank 64, spend all 64
+     to max out, and then have zero left, so arming the tier-up meant mining a whole further bar
+     after maxing. The cap fought the gate it was supposed to feed; 65 is the number the rest of
+     the file already implies.
+
+     GEM_BAR_MAX 48 -> 8 makes the tier 520 credits instead of 3,120. Everything else about the
+     loop is unchanged - the bar, the banking, the eight stats, the reset-on-tier trade. */
+  GEM_BAR:true, GEM_BAR_MAX:8, GEM_BAR_RATE:1.0, GEM_PTS_CAP:65, STAT_MAX:8, TIER_UP:true,
   STAT_GAIN:{shieldCap:0.10, shieldRegen:0.12, energyCap:0.10, energyRegen:0.12, speed:0.05, agility:0.08, damage:0.07, fireRate:0.06},
   STAT_ORDER:['shieldCap','shieldRegen','energyCap','energyRegen','speed','agility','damage','fireRate'],
   // SB6 - per-model shot pattern: [bolts, half-spread in degrees, damage bonus for splitting the shot]
@@ -7168,7 +7185,12 @@ chatEl.addEventListener('keydown',e=>{ e.stopPropagation();
 // sync no matter which of the 3 other paths (this button, `voices on/off`, `talk on/off`, the mic auto-enable
 // above) last changed it - no pub/sub wiring needed for a value this cheap to re-check.
 (function(){ const vb=document.getElementById('voiceBtn'); if(!vb) return;
-  function paint(){ const on=!!(window.CHATTER&&CHATTER.voicesOn()); vb.classList.toggle('on',on); vb.textContent=on?'🔊':'🔇'; }
+  // the label states the CURRENT state, not the action - a button reading "SOUND OFF" while sound is off is
+  // readable at a glance; one reading "MUTE" makes you work out which way round it is
+  function paint(){ const on=!!(window.CHATTER&&CHATTER.voicesOn()); vb.classList.toggle('on',on);
+    vb.textContent = on ? '🔊 SOUND ON' : '🔇 SOUND OFF';
+    vb.title = on ? 'The Passenger and pilots speak aloud - click to silence them'
+                  : 'Voices are off - click to hear the Passenger and pilots speak aloud'; }
   vb.onclick=()=>{ if(!window.CHATTER) return; CHATTER.setVoices(!CHATTER.voicesOn()); paint();
     term(CHATTER.voicesOn()?'🔊 voices ON - the Passenger and pilots will speak aloud.':'🔇 voices off.','sys'); };
   setInterval(paint,500); paint(); })();

@@ -46,7 +46,7 @@ half is out of reach.
 | **SB-2.3** | When the ship is maxed, a next-tier hull is offered | HAVE | `index.html:2211` `tierUpReady` |
 | **SB-2.4** | Taking the new hull resets every stat to zero — you trade progress for a bigger frame | HAVE | `index.html:2225` `takeTierUp` |
 | **SB-2.5** | There is a ladder of hulls to climb | HAVE | `index.html:2208` `HULL_ORDER_ORIGINAL` — 7 tiers, scout → capital |
-| **SB-2.6** | The tier-up is reachable in a normal session | **PARTIAL** | measured: the gate is `statsMaxed && gemPts>=1` (`index.html:2211`) = 8 stats × 8 levels + 1 = **65 points × 48 gems = 3,120 gems ≈ 19 minutes**. Starblast tiers you in one to two. effort **S** — it is a constant, not a rewrite |
+| **SB-2.6** | The tier-up is reachable in a normal session | HAVE | fixed 2026-09-08: `index.html:469` `GEM_BAR_MAX:8` (was 48) and `GEM_PTS_CAP:65` (was 64). The gate costs 8 stats x 8 + 1 = **65 points**, so the cap at 64 was one short of the number its own gate wanted - you maxed out with nothing left and had to mine another whole bar to arm the tier. Cost is now 65 x 8 = **520 gem credits**, down from 3,120. |
 | **SB-2.7** | Choosing a hull is a ONE-WAY branch you cannot walk back | **NOT BUILT** | `HULL_ORDER_ORIGINAL` is a single LINE, not a tree. There is one successor per tier, so there is no branch to commit to and nothing to regret. effort **M** |
 | **SB-2.8** | At each tier you pick between several models, not one | **NOT BUILT** | `index.html:2209` `nextTierHull` returns exactly `HULL_ORDER_ORIGINAL[i+1]`. effort **M**, and it is the prerequisite for SB-2.7 |
 
