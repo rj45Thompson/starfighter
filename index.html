@@ -2283,6 +2283,30 @@ function ensureStat(s){ if(!s.stat){ s.stat={}; CFG.STAT_ORDER.forEach(k=>s.stat
 function capMaxFor(s){ return CFG.LASER_CAP_MAX*statMult(s,'energyCap'); }
 function hullTierIdx(key){ const H=HULLS[key]; let i=HULL_ORDER_ORIGINAL.indexOf(key); if(i<0&&H&&H.visualClass) i=HULL_ORDER_ORIGINAL.indexOf(H.visualClass); return i; }   // generated hulls sit at their size tier's rank
 function nextTierHull(s){ const i=hullTierIdx(s.hullClass); return (i>=0&&i<HULL_ORDER_ORIGINAL.length-1)?HULL_ORDER_ORIGINAL[i+1]:null; }
+/* SPEND THEM ALL. RJ 2026-09-08: "I don't see how to upgrade my tier." Measured on his session: 65 points
+   banked, all eight stats at ZERO, the cap is 65 and maxing all eight costs 64 - so he was parked at the cap
+   earning nothing, and the only route was 64 separate key presses. That is not a discoverability problem,
+   it is a missing action. This spends round-robin, so the eight come up together rather than one being
+   maxed while the rest sit at zero, and it reports once instead of eight-times-eight. */
+function spendAllStats(s){
+  ensureStat(s);
+  const before = s.gemPts; let spent = 0;
+  while(s.gemPts > 0){
+    const open = CFG.STAT_ORDER.filter(k => s.stat[k] < CFG.STAT_MAX);
+    if(!open.length) break;
+    let moved = false;
+    for(const k of open){ if(s.gemPts < 1) break; s.gemPts--; s.stat[k]++; spent++; moved = true; }
+    if(!moved) break;
+  }
+  if(!spent) return { ok:false, msg: before ? 'every stat is already at the max level' :
+                      `no points banked - the gem bar is ${Math.round(100*s.gemBar/CFG.GEM_BAR_MAX)}% full` };
+  term(`▲ spent <b>${spent}</b> point${spent>1?'s':''} across the eight stats · `
+     + CFG.STAT_ORDER.map(k=>`${CFG.STAT_LABEL[k]} ${s.stat[k]}/${CFG.STAT_MAX}`).join(' · ')
+     + ` · <b>${s.gemPts}</b> left`, 'sys');
+  if(window.SOUND) SOUND.play('ui');
+  if(statsMaxed(s)) offerTierUp(s);
+  return { ok:true, spent };
+}
 function statsMaxed(s){ ensureStat(s); return CFG.STAT_ORDER.every(k=>s.stat[k]>=CFG.STAT_MAX); }
 function tierUpReady(s){ return !!(CFG.TIER_UP && s && s.role==='player' && s.alive && statsMaxed(s) && s.gemPts>=1 && nextTierHull(s)); }
 function gemBarAdd(s,credits){ if(!CFG.GEM_BAR||!s||s.role!=='player'||!(credits>0)) return 0; ensureStat(s); if(window.GUIDE) GUIDE.hit('collect');   /* F58 guided loop: player scooped a gem */ s.gemBar+=credits*CFG.GEM_BAR_RATE; let banked=0;
@@ -5196,8 +5220,10 @@ function runCmd(raw){ const t=(raw||'').trim(); if(!t) return; term('<b style="c
     term('◆ hauler list|buy|route|recall|sell','sys'); return; }
   if(c==='stat'||c==='stats'||c==='spend'){ const d=sbSnapshot(P); if(!a[1]){ term(`◆ GEM BAR ${Math.round(100*d.bar/d.barMax)}% · <b>${d.pts}</b> point${d.pts===1?'':'s'} banked · ${d.hullName} (tier ${d.tier})`,'sys');
       CFG.STAT_ORDER.forEach((k,i)=>term(`&nbsp;&nbsp;<b>${i+1}</b> ${CFG.STAT_LABEL[k].padEnd(12,' ').replace(/ /g,'&nbsp;')} ${'▮'.repeat(d.stat[k])}${'▯'.repeat(CFG.STAT_MAX-d.stat[k])} ×${d.mult[k].toFixed(2)}`,'sys'));
-      term(`&nbsp;&nbsp;<span style="opacity:.6">stat &lt;name|1-8&gt; spends a point · tierup takes the next hull when all eight are maxed${d.tierReady?' - <b>READY NOW</b>':''}</span>`,'sys'); return; }
-    const q=(a[1]||'').toLowerCase(); const k=/^[1-8]$/.test(q)?CFG.STAT_ORDER[+q-1]:CFG.STAT_ORDER.find(x=>x.toLowerCase().startsWith(q)||CFG.STAT_LABEL[x].toLowerCase().replace(' ','').startsWith(q));
+      term(`&nbsp;&nbsp;<span style="opacity:.6">stat &lt;name|1-8&gt; spends one · <b>stat all</b> spends every banked point across the eight · tierup takes the next hull when all eight are maxed${d.tierReady?' - <b>READY NOW</b>':''}</span>`,'sys'); return; }
+    const q=(a[1]||'').toLowerCase();
+    if(q==='all'||q==='max'){ const r=spendAllStats(P); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }
+    const k=/^[1-8]$/.test(q)?CFG.STAT_ORDER[+q-1]:CFG.STAT_ORDER.find(x=>x.toLowerCase().startsWith(q)||CFG.STAT_LABEL[x].toLowerCase().replace(' ','').startsWith(q));
     const r=spendStat(P,k||q); if(!r.ok) term(`◆ ${r.msg}`,'sys'); return; }
   if(c==='tierup'||c==='tier'){ const d=sbSnapshot(P); if(!d.tierReady){ term(`◆ tier-up not ready - ${d.maxed?'bank one more point':'max all eight stats first'} (${CFG.STAT_ORDER.filter(k=>d.stat[k]<CFG.STAT_MAX).length} still below ${CFG.STAT_MAX}); next hull would be <b>${d.nextHullName||'none - top tier'}</b>`,'sys'); return; }
     const want=(a[1]||'').toLowerCase(); const key=want?Object.keys(HULLS).find(x=>x.toLowerCase()===want||HULLS[x].n.toLowerCase()===want||x.toLowerCase().startsWith(want)):null;
