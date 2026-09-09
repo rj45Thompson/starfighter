@@ -318,7 +318,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
-<script src="panels.js?v=20260907f"></script>
+<script src="panels.js?v=20260908a"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260906b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
@@ -6062,7 +6062,10 @@ if(window.PANELS){
     defaultOpacity:0.40, resizable:true,
     defaultOpen:false });   // 2026-09-06: was 0.9 behind a forced 0.34 rule; now the real default   // BACKLOG 2026-07-08: was missing resizable, unlike ticker/powerpanel   // N3 (2026-09-07): CLOSED by default for a FIRST-TIME player - the roster listed 30+ AI ships (~211 on-screen boxes, the single biggest first-load clutter, measured via scratchpad/n3b_verify.js) before a newcomer had even flown. One click on its left-edge tab (or the WINDOWS menu) opens it, and a saved SF_PANELS_v3 open state still wins so returning players are unaffected. Same reasoning as missionlog above (task #66: don't pile open-by-default panels on the left edge). NOT bumping STORE_KEY - that would wipe saved layouts.
   { const shopEl=document.getElementById('shop'); if(shopEl) PANELS.register('shop', shopEl, { title:'SHOP', edge:'right', rgb:[12,22,34],
-      defaultOpacity:0.62, defaultOpen:false, defaultPinned:true, resizable:false }); }   // opened/closed by shopTick, see there (2026-09-06)
+      // RJ 2026-09-08: "check that all windows work". This was the ONE panel opting out of resize; every
+      // other window in the game gets grips from the shared default. A window you cannot size is the
+      // exception and there was no reason for this to be it.
+      defaultOpacity:0.62, defaultOpen:false, defaultPinned:true }); }   // opened/closed by shopTick, see there (2026-09-06)
   PANELS.register('missionlog', document.getElementById('missionlog'), { title:'MISSIONS', edge:'left', rgb:[10,18,28],
     defaultOpacity:0.9, resizable:true, defaultOpen:false,   // closed by default (task #66) - an already-busy screen shouldn't gain a 4th open-by-default left-edge panel; one click on its tab opens it
     onOpenChange:(open)=>{ missionlogOn=open; if(open) updateMissionLog(); } });

@@ -35,6 +35,13 @@ const CFG = {
      them on top of each other: measured overlap ratio 1.02 - the panels covered MORE than their own combined
      area - with khud 460px wide at left -97 and sbhud off the right edge. Free-floating windows are a
      mouse-and-big-screen idea; on a phone the same eight become one scrolling column. */
+  /* A COARSE POINTER IS NOT A PHONE. RJ 2026-09-08: "starfighter windows aren't resizeable or closeable
+     anymore ... upgrade window resize doesn't work either." His desktop is touch-capable, so
+     matchMedia('(pointer:coarse)') and 'ontouchstart' in window are BOTH true on it - the phone column
+     switched itself on over a full-size screen and hid the drag handles, resize grips and close buttons that
+     go with it. Touch-capable says how you can point at it; it says nothing about how much room there is.
+     The phone layout needs both. */
+  PHONE_MAX_W:900,
   STACK_TOP:44, STACK_BOTTOM:92,   // clear of the top button row and the chat/fire controls at the foot
   STACK_ITEM_VH:34,                // each panel's share of the screen before it scrolls internally
   STACK_PAD:8, STACK_Z:40,
@@ -424,8 +431,9 @@ function register(id, el, opts){
   // On touch, ALL of them open - RJ asked for every window up, and six panels ship with an explicit
   // defaultOpen:false (roster, missionlog, market, shop, empire, khud) that a plain `!==false` would still
   // honour, leaving only two open. Desktop keeps each panel's own default.
-  const touchDefaultOpen = IS_TOUCH ? true : (opts.defaultOpen!==false);
-  const touchDefaultPinned = IS_TOUCH ? true : (opts.defaultPinned!==false);
+  const phone = IS_TOUCH && typeof window!=='undefined' && window.innerWidth <= CFG.PHONE_MAX_W;
+  const touchDefaultOpen = phone ? true : (opts.defaultOpen!==false);
+  const touchDefaultPinned = phone ? true : (opts.defaultPinned!==false);
   // DRAG-TO-REDOCK: once a panel has been manually dragged to an edge at least once (store[id].manualDock), that
   // choice outranks opts.edge/opts.centerX forever - same "your own action beats the shipped default" convention
   // the resize grip already established for w/h.
@@ -535,11 +543,13 @@ function register(id, el, opts){
    dragging and resizing (see the IS_TOUCH guard in the drag handler), so nothing else owns their position.
    The desktop chrome that goes with those gestures - drag handle, resize grips, edge pull-tab - is hidden on
    touch rather than left floating over a column it can no longer control. */
-let stackEl=null, stackHidden=false;
+let stackEl=null, stackHidden=false, stackOn=false;
+function isPhone(){ return IS_TOUCH && typeof window!=='undefined' && window.innerWidth <= CFG.PHONE_MAX_W; }
 const STACK_OVERRIDES=['position','left','right','top','bottom','width','max-width','transform','margin',
                        'max-height','overflow'];
 function mobileStack(){
-  if(!IS_TOUCH) return;
+  if(!isPhone()){ if(stackOn) unstack(); return; }
+  stackOn = true;
   if(!stackEl){
     stackEl=document.createElement('div'); stackEl.id='panelStack';
     /* Panel CONTENT is desktop-shaped too, not just the boxes: measured inside the column, roster ran 4582px
@@ -580,6 +590,8 @@ function mobileStack(){
     btn.addEventListener('click', function(){ stackHidden=!stackHidden; mobileStack(); });
     document.body.appendChild(btn);
   }
+  { const b=document.getElementById('stackToggle'); if(b) b.style.display='';
+  }
   let any=false;
   for(const id in PANELS_){
     const rec=PANELS_[id], el=rec.el;
@@ -601,14 +613,32 @@ function mobileStack(){
       document.body.appendChild(el);
       STACK_OVERRIDES.forEach(function(k){ el.style.removeProperty(k); });
     }
-    // the desktop affordances have no meaning in a scrolling column
+    // the desktop affordances have no meaning in a scrolling column - but they are only HIDDEN, and
+    // unstack() puts them back, so widening the window returns a full desktop panel set
     [rec.tab, rec.ctl, rec.grip, rec.gripE, rec.gripS].forEach(function(n){ if(n) n.style.display='none'; });
   }
   stackEl.style.display = any ? 'block' : 'none';
 }
 
+/* Undo the phone layout: panels go back to the body, their forced styles are dropped, and every piece of
+   desktop chrome is shown again. Without this the first narrow moment in a session would take the resize
+   grips away for good. */
+function unstack(){
+  stackOn = false;
+  for(const id in PANELS_){
+    const rec=PANELS_[id], el=rec.el;
+    if(stackEl && el.parentNode===stackEl) document.body.appendChild(el);
+    STACK_OVERRIDES.forEach(function(k){ el.style.removeProperty(k); });
+    [rec.tab, rec.ctl, rec.grip, rec.gripE, rec.gripS].forEach(function(n){ if(n) n.style.display=''; });
+    applyVisual(rec);
+  }
+  if(stackEl) stackEl.style.display='none';
+  const b=document.getElementById('stackToggle'); if(b) b.style.display='none';
+  reflowAll();
+}
+
 let retickT=null;
-function retickTabs(){ if(IS_TOUCH){ mobileStack(); return; }   // the phone has no floating chrome to retick
+function retickTabs(){ if(isPhone() || stackOn){ mobileStack(); return; }   // the phone has no floating chrome to retick
   for(const id in PANELS_){ const rec=PANELS_[id]; const t=tabPosition(rec);
   rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.width=c.width; if(rec.grip) positionGrip(rec); } } }
