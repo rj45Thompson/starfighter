@@ -323,7 +323,7 @@
 <script src="thoughts.js?v=20260714c"></script>
 <script src="tami_battle_ui.js?v=20260906a"></script>
 <script src="power_panel.js?v=20260906b"></script>
-<script src="panels.js?v=20260908l"></script>
+<script src="panels.js?v=20260908n"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260908b"></script>
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
@@ -6135,8 +6135,17 @@ if(window.PANELS){
        pin, no edge tab, no saved size, a different resize feel. It registers now like everything else and
        gets all of that for free. `transparent` is the mode added for it: same chrome, no background fill,
        body stays click-through so aim and fire still pass through the 3D. */
+    /* CLOSED by default, and OPENING IT IS THE MODE. RJ 2026-09-08: "the 3d window seems broken?" It was an
+       empty bordered box: TOPDOWN_MAIN is false by default, which means the 3D fills the whole screen and the
+       chase window has nothing to render into it. It has always been that way; giving it the shared title bar
+       and pin just made an empty frame look like a broken window instead of a stray border.
+
+       So the window now IS the top-down-primary mode, which is what the design note above describes: open it
+       and the main view becomes the close top-down follow with the 3D in this window; close it and the 3D goes
+       back to fullscreen. Either way you never get a frame with nothing in it. */
     if(window.PANELS) PANELS.register('chase', w, { title:'3D VIEW', edge:'top', rgb:[13,26,42],
-      transparent:true, resizable:true, defaultOpen:true });
+      transparent:true, resizable:true, defaultOpen:false,
+      onOpenChange:(open)=>{ TOPDOWN_MAIN = open; } });
   })();
   // REAR GUNNER window (user 2026-07-13 "move the gunner pod ... move the camera and shoot down the centre"):
   // a second movable/resizable window; rearCam is a TURRET that slews (updateRearCam). Moving the mouse in the gunport
@@ -7410,7 +7419,13 @@ const AWAY=(function(){
     const foe=nearestFoe(); const pad_=onPad();
     if(foe){ prompt='foe'; say(`⚔  A hostile blocks your path - press <b>F</b> to engage (turn-based battle)`); }
     else if(pad_){ prompt='pad'; say(`▲  Launch pad - press <b>F</b> to return to your ship in orbit`); }
-    else { prompt=''; const left=foes.filter(f=>f.alive).length; say(`<b>${worldName}</b> - on foot.  <b>W</b> walk · <b>A/D</b> turn · <b>Shift</b> run · <b>F</b> interact${left?`   ·   ${left} hostile${left>1?'s':''} on the surface`:`   ·   surface clear - reach the pad to launch`}`); }
+    /* RJ 2026-09-08: "land on planet seems broken now." It was not - the surface builds and renders fine. What
+       broke was knowing how to LEAVE. The full instructions ("type launch or step on the pad") are printed to
+       the TERMINAL, and the terminal is minimised on a fresh session since "start with all windows minimized",
+       so nobody sees them. This line is always on screen, and it only named the pad when the surface was
+       CLEAR - with hostiles about, which is the normal case, it said nothing about getting out at all. It
+       always says now. */
+    else { prompt=''; const left=foes.filter(f=>f.alive).length; say(`<b>${worldName}</b> - on foot.  <b>W</b> walk · <b>A/D</b> turn · <b>Shift</b> run · <b>F</b> interact   ·   <b>walk to the pad</b> and press <b>F</b> to launch${left?`   ·   ${left} hostile${left>1?'s':''} on the surface`:`   ·   surface clear`}`); }
     rend.render(gScene,gCam); }
 
   // ================================ BATTLE: turn-based grid tactics (Tami-style) ================================

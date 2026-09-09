@@ -51,6 +51,7 @@ const CFG = {
   Z:6,                         // header/tab layer (panels themselves already sit at the game's own z-index)
   RESIZE_GRIP:26,              // resize-handle footprint (bumped 16->18->26 across "still I can't resize" reports 2026-07-08/09/10 - now a bold, unmistakable corner handle, not a faint 18px hint)
   RESIZE_MIN_W:220, RESIZE_MIN_H:120,
+  RESIZE_EDGE_MARGIN:6,        // a window may grow until this far from the far side of the screen, and no further
   RESIZE_EDGE:9,               // thickness of the edge-resize strips (user 2026-07-10 'thicker border + resize cursor on hover, all windows') - bumped to 16 on touch in positionGrip()
   DRAG_THRESHOLD:6,            // px of mouse/touch movement before a tab-press counts as a REDOCK DRAG rather than a plain open/close click
   EDGE_OFFSET:14, TOP_RESERVE:38,   // TOP_RESERVE: the always-visible shell bar owns the top strip - top-docked panels start below it
@@ -241,6 +242,26 @@ function anchorOf(rec){
     : (window.innerHeight - r.bottom) < r.top;
   return { right, bottom };
 }
+/* THE RESIZE CEILING. RJ 2026-09-08: "when windows are max size they shouldn't be able to resize OVER that
+   amount?" There was a floor (RESIZE_MIN_*) and no ceiling, so a window could be dragged well past the screen -
+   measured the knowledge HUD going 1280 -> 1390 wide on a 1280 viewport, its far edge simply gone.
+
+   The first attempt computed the ceiling from which edge anchorOf() said was pinned. That was wrong for half
+   the panels, because a docked panel's pinned edge is not always the one its inline style suggests, and the
+   result was windows landing further off screen than before. So the size is APPLIED and then MEASURED, and
+   whatever hangs off the viewport is subtracted. Measuring beats deducing here: it cannot be wrong about where
+   the panel actually is. */
+function fitToScreen(el, w, h){
+  const r = el.getBoundingClientRect(), M = CFG.RESIZE_EDGE_MARGIN;
+  let over = 0, overV = 0;
+  if(r.right  > window.innerWidth  - M) over  = Math.max(over,  r.right  - (window.innerWidth  - M));
+  if(r.left   < M)                      over  = Math.max(over,  M - r.left);
+  if(r.bottom > window.innerHeight - M) overV = Math.max(overV, r.bottom - (window.innerHeight - M));
+  if(r.top    < M)                      overV = Math.max(overV, M - r.top);
+  if(over > 0.5 || overV > 0.5)
+    applyStoredSize(el, Math.max(CFG.RESIZE_MIN_W, w - over), Math.max(CFG.RESIZE_MIN_H, h - overV));
+}
+
 function positionGrip(rec){   // corner grip + the two FREE-edge resize strips (only meaningful while open)
   const r=rec.el.getBoundingClientRect();
   const gw=rec.grip.offsetWidth||CFG.RESIZE_GRIP, gh=rec.grip.offsetHeight||CFG.RESIZE_GRIP;
@@ -561,12 +582,15 @@ function register(id, el, opts){
     // drag-start (rec._resizeAnch) so a handle can't jump corners mid-drag - that anchor-recompute-every-frame was
     // the 'reversed/odd' feel the user reported.
     const makeResize=(handle,axis)=>{
-      let dragging=false, startX=0, startY=0, startW=0, startH=0, anch={right:false,bottom:false};
+      let dragging=false, startX=0, startY=0, startW=0, startH=0, maxW=Infinity, maxH=Infinity, anch={right:false,bottom:false};
       const onMove=(ev)=>{ if(!dragging) return;
         const x=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX, y=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
         const dw=(axis==='y')?0:(anch.right ? (startX-x) : (x-startX)), dh=(axis==='x')?0:(anch.bottom ? (startY-y) : (y-startY));
-        const w=Math.max(CFG.RESIZE_MIN_W, startW+dw), h=Math.max(CFG.RESIZE_MIN_H, startH+dh);
-        applyStoredSize(el, w, h); positionGrip(rec);
+        const w=Math.min(maxW, Math.max(CFG.RESIZE_MIN_W, startW+dw));
+        const h=Math.min(maxH, Math.max(CFG.RESIZE_MIN_H, startH+dh));
+        applyStoredSize(el, w, h);
+        fitToScreen(el, w, h);          // and pull it back in if that put an edge off the screen
+        positionGrip(rec);
         const c=ctlPosition(rec); ctl.style.top=c.top; ctl.style.left=c.left; ctl.style.width=c.width;   // the title bar tracks the live rect
         if(ev.preventDefault) try{ ev.preventDefault(); }catch(e){} };
       const endDrag=()=>{ if(!dragging) return; dragging=false; rec._resizeAnch=null;
@@ -577,6 +601,7 @@ function register(id, el, opts){
       const startDrag=(ev)=>{ dragging=true;
         freezeCenterX(rec);                         // a centered panel would otherwise grow BOTH ways at half speed - see freezeCenterX
         const r=el.getBoundingClientRect(); startW=r.width; startH=r.height;
+        maxW = Infinity; maxH = Infinity;   // the ceiling is measured per move, in fitToScreen() below
         anch=anchorOf(rec); rec._resizeAnch=anch;   // freeze for the whole drag
         startX=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX; startY=(ev.touches&&ev.touches[0])?ev.touches[0].clientY:ev.clientY;
         document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',endDrag);
