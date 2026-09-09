@@ -140,6 +140,11 @@
     color:#9fe9c4; font:11px/1.5 ui-monospace,monospace; letter-spacing:.03em; pointer-events:none;
     white-space:nowrap; }
   #peaceBadge b{ color:#eaffe9; }
+  /* RJ 2026-09-08: "this is over top of things I need to move.. so maybe add a close button to it." The badge
+     itself stays click-through so it never eats a drag; only the X takes the pointer. */
+  #peaceBadge .px{ pointer-events:auto; cursor:pointer; margin-left:10px; padding:0 4px; border-radius:4px;
+    color:#7fd0a4; font-weight:700; }
+  #peaceBadge .px:hover{ background:rgba(120,240,180,.18); color:#eaffe9; }
   #logbody{ padding:6px 10px 8px; }
   #logbody .tl{ opacity:.94; margin:1px 0; }
   #logbody .tl b{ font-weight:800; }
@@ -7268,12 +7273,23 @@ const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
   // the no-combat badge, driven from the same frame loop for the same reason: it mirrors a live test
   // (inPeaceful of the player's position) rather than trying to catch an event when you cross the line
   const pb=document.createElement('div'); pb.id='peaceBadge';
-  pb.innerHTML='&#9671; <b>PEACEFUL SYSTEM</b> &nbsp;·&nbsp; nothing will attack you here &nbsp;·&nbsp; leave the belt for a fight';
+  pb.innerHTML='&#9671; <b>PEACEFUL SYSTEM</b> &nbsp;·&nbsp; nothing will attack you here &nbsp;·&nbsp; '
+             + 'leave the belt for a fight<span class="px" title="dismiss - it comes back next time you fly '
+             + 'into a peaceful system">&#10005;</span>';
   document.body.appendChild(pb);
+  /* Dismiss is per-VISIT, not forever. Sticking it in localStorage would mean a player who closed it once
+     never learns why nothing shoots at them again; re-arming on re-entry keeps it informative the next time
+     it is actually true, and out of the way in between. */
+  let peaceDismissed = false, wasPeaceful = false;
+  pb.querySelector('.px').addEventListener('click', function(e){
+    e.stopPropagation(); peaceDismissed = true; pb.style.display = 'none';
+  });
   window.__peaceBadgeTick = function(){
     const P = (typeof ships!=='undefined') && ships[0];
     const on = !!(P && P.alive && typeof inPeaceful==='function' && inPeaceful(P.pos));
-    pb.style.display = on ? 'block' : 'none';
+    if(on && !wasPeaceful) peaceDismissed = false;   // flew back in: say it again
+    wasPeaceful = on;
+    pb.style.display = (on && !peaceDismissed) ? 'block' : 'none';
   };
   // Driven by the frame loop reading document.activeElement, NOT by focus/blur events. Two reasons.
   // The guard it mirrors is itself a live `document.activeElement.id === 'chat'` test, so reading the
