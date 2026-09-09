@@ -1,77 +1,101 @@
 flowchart LR
-  subgraph E1["E1 — Arrive and fly"]
+  %% actors
+  A_pilot(["👤 Pilot"])
+  A_rival(["👤 Another ship"])
+  A_system(["👤 The game"])
+  subgraph SYS["starblast — system boundary"]
     direction LR
-    UC_E1_1["<b>UC-E1-1</b><br/>The page builds a world to fly in<br/><small>renderer</small>"]
-    UC_E1_2["<b>UC-E1-2</b><br/>The game gives the pilot a ship<br/><small>makeShip</small>"]
-    UC_E1_3["<b>UC-E1-3</b><br/>The simulation advances every frame<br/><small>frame</small>"]
-    UC_E1_4["<b>UC-E1-4</b><br/>The pilot's controls move the ship<br/><small>THRUST</small>"]
-    UC_E1_5["<b>UC-E1-5</b><br/>The pilot can see where the ship is going<br/><small>CAM_BACK</small>"]
+    subgraph E1["E1 — Arrive and fly"]
+      direction LR
+      UC_E1_1["<b>UC-E1-1</b><br/>The page builds a world to fly in<br/><small>renderer</small>"]
+      UC_E1_2["<b>UC-E1-2</b><br/>The game gives the pilot a ship<br/><small>makeShip</small>"]
+      UC_E1_3["<b>UC-E1-3</b><br/>The simulation advances every frame<br/><small>frame</small>"]
+      UC_E1_4["<b>UC-E1-4</b><br/>The pilot's controls move the ship<br/><small>THRUST</small>"]
+      UC_E1_5["<b>UC-E1-5</b><br/>The pilot can see where the ship is going<br/><small>CAM_BACK</small>"]
+    end
+    subgraph E2["E2 — Mine the belt"]
+      direction LR
+      UC_E2_1["<b>UC-E2-1</b><br/>The system populates a belt with rocks<br/><small>makeMiningBelt</small>"]
+      UC_E2_2["<b>UC-E2-2</b><br/>The system finds the rocks near the pilot cheaply<br/><small>AST_CELL</small>"]
+      UC_E2_3["<b>UC-E2-3</b><br/>The pilot breaks a rock apart<br/><small>destroyAsteroid</small>"]
+      UC_E2_4["<b>UC-E2-4</b><br/>Broken rock leaves gems in the world<br/><small>spawnGem</small>"]
+      UC_E2_5["<b>UC-E2-5</b><br/>The pilot scoops a gem<br/><small>magnetFor</small>"]
+      UC_E2_6["<b>UC-E2-6</b><br/>Collected credits bank an upgrade point<br/><small>gemBarAdd</small>"]
+    end
+    subgraph E3["E3 — Spend the point, or save for the hull"]
+      direction LR
+      UC_E3_1["<b>UC-E3-1</b><br/>The pilot spends a point on one of eight stats<br/><small>spendStat</small>"]
+      UC_E3_2["<b>UC-E3-2</b><br/>Each point visibly changes how the ship performs<br/><small>statMult</small>"]
+      UC_E3_3["<b>UC-E3-3</b><br/>Maxing every stat arms the trade-in<br/><small>tierUpReady</small>"]
+      UC_E3_4["<b>UC-E3-4</b><br/>The game names the hull that comes next<br/><small>nextTierHull</small>"]
+      UC_E3_5["<b>UC-E3-5</b><br/>Taking the new hull costs every upgrade bought<br/><small>takeTierUp</small>"]
+      UC_E3_6["<b>UC-E3-6</b><br/>The traded-up frame outperforms the one it replaced<br/><small>HULLS</small>"]
+    end
+    subgraph E4["E4 — Fight, die, and lose the cargo"]
+      direction LR
+      UC_E4_1["<b>UC-E4-1</b><br/>Firing costs energy the pilot cannot spend forever<br/><small>capMaxFor</small>"]
+      UC_E4_2["<b>UC-E4-2</b><br/>A shot travels a bounded distance<br/><small>BULLET_SPEED</small>"]
+      UC_E4_3["<b>UC-E4-3</b><br/>A shot that connects damages what it hit<br/><small>BULLET_DMG</small>"]
+      UC_E4_4["<b>UC-E4-4</b><br/>Shields take the hit before the hull does<br/><small>drainShield</small>"]
+      UC_E4_5["<b>UC-E4-5</b><br/>A ship that runs out of hull dies<br/><small>killShip</small>"]
+      UC_E4_6["<b>UC-E4-6</b><br/>Death spills the cargo for anyone to take<br/><small>spillGems</small>"]
+      UC_E4_7["<b>UC-E4-7</b><br/>The pilot comes back small after a pause<br/><small>RESPAWN_DELAY</small>"]
+    end
+    subgraph E5["E5 — The run ends and is remembered"]
+      direction LR
+      UC_E5_1["<b>UC-E5-1</b><br/>The game gathers what is worth keeping<br/><small>gatherSaveState</small>"]
+      UC_E5_2["<b>UC-E5-2</b><br/>The snapshot is written where it can be found again<br/><small>SAVE_KEY</small>"]
+      UC_E5_3["<b>UC-E5-3</b><br/>The snapshot is kept current, not written only at the end<br/><small>SAVE_INTERVAL_S</small>"]
+      UC_E5_4["<b>UC-E5-4</b><br/>A returning pilot gets their ship back<br/><small>applySaveState</small>"]
+      UC_E5_5["<b>UC-E5-5</b><br/>The run's standing is a weighted total<br/><small>SCORE_W</small>"]
+    end
   end
-  subgraph E2["E2 — Mine the belt"]
-    direction LR
-    UC_E2_1["<b>UC-E2-1</b><br/>The system populates a belt with rocks<br/><small>makeMiningBelt</small>"]
-    UC_E2_2["<b>UC-E2-2</b><br/>The system finds the rocks near the pilot cheaply<br/><small>AST_CELL</small>"]
-    UC_E2_3["<b>UC-E2-3</b><br/>The pilot breaks a rock apart<br/><small>destroyAsteroid</small>"]
-    UC_E2_4["<b>UC-E2-4</b><br/>Broken rock leaves gems in the world<br/><small>spawnGem</small>"]
-    UC_E2_5["<b>UC-E2-5</b><br/>The pilot scoops a gem<br/><small>magnetFor</small>"]
-    UC_E2_6["<b>UC-E2-6</b><br/>Collected credits bank an upgrade point<br/><small>gemBarAdd</small>"]
-  end
-  subgraph E3["E3 — Spend the point, or save for the hull"]
-    direction LR
-    UC_E3_1["<b>UC-E3-1</b><br/>The pilot spends a point on one of eight stats<br/><small>spendStat</small>"]
-    UC_E3_2["<b>UC-E3-2</b><br/>Each point visibly changes how the ship performs<br/><small>statMult</small>"]
-    UC_E3_3["<b>UC-E3-3</b><br/>Maxing every stat arms the trade-in<br/><small>tierUpReady</small>"]
-    UC_E3_4["<b>UC-E3-4</b><br/>The game names the hull that comes next<br/><small>nextTierHull</small>"]
-    UC_E3_5["<b>UC-E3-5</b><br/>Taking the new hull costs every upgrade bought<br/><small>takeTierUp</small>"]
-    UC_E3_6["<b>UC-E3-6</b><br/>The traded-up frame outperforms the one it replaced<br/><small>HULLS</small>"]
-  end
-  subgraph E4["E4 — Fight, die, and lose the cargo"]
-    direction LR
-    UC_E4_1["<b>UC-E4-1</b><br/>Firing costs energy the pilot cannot spend forever<br/><small>capMaxFor</small>"]
-    UC_E4_2["<b>UC-E4-2</b><br/>A shot travels a bounded distance<br/><small>BULLET_SPEED</small>"]
-    UC_E4_3["<b>UC-E4-3</b><br/>A shot that connects damages what it hit<br/><small>BULLET_DMG</small>"]
-    UC_E4_4["<b>UC-E4-4</b><br/>Shields take the hit before the hull does<br/><small>drainShield</small>"]
-    UC_E4_5["<b>UC-E4-5</b><br/>A ship that runs out of hull dies<br/><small>killShip</small>"]
-    UC_E4_6["<b>UC-E4-6</b><br/>Death spills the cargo for anyone to take<br/><small>spillGems</small>"]
-    UC_E4_7["<b>UC-E4-7</b><br/>The pilot comes back small after a pause<br/><small>RESPAWN_DELAY</small>"]
-  end
-  subgraph E5["E5 — The run ends and is remembered"]
-    direction LR
-    UC_E5_1["<b>UC-E5-1</b><br/>The game gathers what is worth keeping<br/><small>gatherSaveState</small>"]
-    UC_E5_2["<b>UC-E5-2</b><br/>The snapshot is written where it can be found again<br/><small>SAVE_KEY</small>"]
-    UC_E5_3["<b>UC-E5-3</b><br/>The snapshot is kept current, not written only at the end<br/><small>SAVE_INTERVAL_S</small>"]
-    UC_E5_4["<b>UC-E5-4</b><br/>A returning pilot gets their ship back<br/><small>applySaveState</small>"]
-    UC_E5_5["<b>UC-E5-5</b><br/>The run's standing is a weighted total<br/><small>SCORE_W</small>"]
-  end
-  S_page_open(("the page is open and nothing has started"))
-  S_world_built(("a world exists to fly in"))
-  S_ship_exists(("the pilot has a ship in that world"))
-  S_in_flight(("the pilot is flying and in control"))
-  S_point_banked(("the pilot is owed at least one upgrade point"))
-  S_ship_stronger(("the ship is measurably better than it was"))
-  S_respawned(("the pilot is flying again after dying"))
-  S_session_recorded(("the run is over and what happened is on record"))
-  S_sim_running(("the simulation is stepping"))
-  S_controls_live(("the controls answer the pilot"))
   S_belt_exists(("a belt of rocks exists"))
-  S_rock_in_range(("a rock is within reach"))
-  S_gems_loose(("gems are loose in the world"))
-  S_gem_pickable(("a gem can be picked up"))
+  S_controls_live(("the controls answer the pilot"))
   S_gem_in_hold(("gem credits are in the hold"))
+  S_gem_pickable(("a gem can be picked up"))
+  S_gems_loose(("gems are loose in the world"))
+  S_gems_spilled(("the hold is on the floor"))
+  S_hull_swapped(("the ship is flying a new frame"))
+  S_in_combat(("damage is being exchanged"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_page_open(("the page is open and nothing has started"))
+  S_point_banked(("the pilot is owed at least one upgrade point"))
+  S_respawned(("the pilot is flying again after dying"))
+  S_rock_in_range(("a rock is within reach"))
+  S_save_current(("the stored snapshot is no more than one interval old"))
+  S_save_gathered(("a snapshot of the run exists"))
+  S_save_restored(("a returning pilot has their ship back"))
+  S_save_written(("the snapshot is in storage"))
+  S_session_recorded(("the run is over and what happened is on record"))
+  S_shield_stripped(("a shield arc is down"))
+  S_ship_dead(("the pilot's ship is destroyed"))
+  S_ship_exists(("the pilot has a ship in that world"))
+  S_ship_stronger(("the ship is measurably better than it was"))
+  S_shot_in_flight(("a shot is travelling"))
+  S_sim_running(("the simulation is stepping"))
   S_stat_raised(("at least one stat is above zero"))
   S_stats_maxed(("every stat is at its cap"))
   S_tier_offered(("a next hull is on offer"))
-  S_hull_swapped(("the ship is flying a new frame"))
+  S_under_fire(("⚠ something is shooting at the pilot<br/><small>floating</small>"))
+  style S_under_fire fill:#3d2e12,stroke:#ffb74d,color:#e8eef6,stroke-dasharray:4 3
   S_weapon_ready(("the ship can fire"))
-  S_shot_in_flight(("a shot is travelling"))
-  S_in_combat(("damage is being exchanged"))
-  S_shield_stripped(("a shield arc is down"))
-  S_ship_dead(("the pilot's ship is destroyed"))
-  S_gems_spilled(("the hold is on the floor"))
-  S_save_gathered(("a snapshot of the run exists"))
-  S_save_written(("the snapshot is in storage"))
-  S_save_current(("the stored snapshot is no more than one interval old"))
-  S_save_restored(("a returning pilot has their ship back"))
+  S_world_built(("a world exists to fly in"))
+  E1 --> S_page_open
+  S_in_flight --> E1
+  A_pilot --- E1
+  E2 --> S_in_flight
+  S_point_banked --> E2
+  A_pilot --- E2
+  E3 --> S_point_banked
+  S_ship_stronger --> E3
+  A_pilot --- E3
+  E4 --> S_in_flight
+  S_respawned --> E4
+  A_pilot --- E4
+  E5 --> S_respawned
+  S_session_recorded --> E5
+  A_system --- E5
   S_page_open --> UC_E1_1
   UC_E1_1 --> S_world_built
   S_world_built --> UC_E1_2
@@ -159,3 +183,6 @@ flowchart LR
   style UC_E5_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E5_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
   style UC_E3_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_system fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_rival fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6

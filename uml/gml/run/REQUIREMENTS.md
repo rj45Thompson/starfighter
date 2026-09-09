@@ -355,14 +355,15 @@ A bullet leaves the muzzle at a finite speed and expires after a finite life, wh
 - **Status:** HAVE
 - **Precondition:** a shot is travelling
 - **Postcondition:** damage is being exchanged
-- **Implemented by:** `BULLET_DMG`, `BULLET_R`, `FIRE_CD`
+- **Implemented by:** `BULLET_DMG`, `BULLET_R`, `WEAPONS`, `statMult`
 
-Contact applies damage, and the gun cannot be fired again until its cooldown has passed, so damage over time is bounded by the weapon rather than by the key.
+Contact applies damage, and the gun cannot fire again until the interval its own weapon type declares has passed, so damage over time is bounded by the weapon and by the pilot's investment in fireRate rather than by how fast a key is pressed.
 
 **Acceptance — each of these is an observation that would be false if this were not implemented**
 
 - [ ] a bullet passing within BULLET_R of a ship registers a hit
-- [ ] firing faster than FIRE_CD apart is refused
+- [ ] the interval between shots is the weapon's own cd from the WEAPONS table, divided by the ship's fireRate multiplier, so buying fireRate visibly shortens it
+- [ ] two weapon types with different cd values fire at visibly different rates on the same hull
 
 *Support: 5/5 — grounded, precondition_met, postcondition_used, falsifiable, attributed. Rubric 100/100.*
 

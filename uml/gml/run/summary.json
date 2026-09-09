@@ -1,9 +1,9 @@
 {
  "applied": 6,
  "cache": {
-  "hit_ratio": 0.226,
+  "hit_ratio": 0.875,
   "hits": 7,
-  "misses": 24,
+  "misses": 1,
   "writes": 0
  },
  "calls": 7,
@@ -11,12 +11,12 @@
   "E1": 0.3696,
   "E2": 0.32,
   "E3": 0.375,
-  "E4": 0.2188,
+  "E4": 0.2344,
   "E5": 0.6364
  },
  "ground": {
-  "anomalies_certain": 10,
-  "anomalies_probable": 926,
+  "anomalies_certain": 91,
+  "anomalies_probable": 845,
   "const": 1527,
   "dead": 809,
   "field": 37,
@@ -38,7 +38,7 @@
  },
  "open_gaps": 217,
  "oracle": "transcript",
- "parked": 24,
+ "parked": 1,
  "refused": 1,
  "rounds": 3,
  "spec": "starblast",

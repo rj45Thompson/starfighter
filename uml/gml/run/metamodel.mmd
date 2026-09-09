@@ -1,0 +1,86 @@
+classDiagram
+  direction LR
+  class Actor {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Actor "who wants something"
+  class Epic {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Epic "kite level: the spanning story"
+  class Usecase {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Usecase "sea level: one actor goal, one sitting"
+  class Step {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Step "fish level: a subfunction"
+  class State {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for State "a world-state literal — the unit that makes gaps decidable"
+  class Ground {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Ground "an atom of the real system: a symbol that exists"
+  class Question {
+    <<node>>
+    +id
+    +name
+    +attrs
+  }
+  note for Question "an open hole, kept so it is counted"
+  Actor --> Epic : performs
+  Actor --> Step : performs
+  Actor --> Usecase : performs
+  Epic --> Usecase : includes
+  Usecase --> Step : includes
+  Usecase --> Usecase : includes
+  Step --> Usecase : extends
+  Usecase --> Usecase : extends
+  Actor --> Actor : generalizes
+  Usecase --> Usecase : generalizes
+  Epic --> Epic : precedes
+  Step --> Step : precedes
+  Usecase --> Usecase : precedes
+  Epic --> State : requires
+  Step --> State : requires
+  Usecase --> State : requires
+  Epic --> State : establishes
+  Step --> State : establishes
+  Usecase --> State : establishes
+  Epic --> Ground : groundedIn
+  Step --> Ground : groundedIn
+  Usecase --> Ground : groundedIn
+  Actor --> Question : raises
+  Epic --> Question : raises
+  Ground --> Question : raises
+  State --> Question : raises
+  Step --> Question : raises
+  Usecase --> Question : raises
+  Question --> Actor : answers
+  Question --> Epic : answers
+  Question --> Ground : answers
+  Question --> Question : answers
+  Question --> State : answers
+  Question --> Step : answers
+  Question --> Usecase : answers

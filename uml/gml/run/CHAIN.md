@@ -265,7 +265,7 @@
 | **status** | HAVE |
 | **rests on** | `capMaxFor`, `LASER_CAP_MAX`, `LASER_CAP_REGEN`, `LASER_CAP_PER_SHOT` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 2. UC-E4-2 — A shot travels a bounded distance
 
@@ -278,20 +278,20 @@
 | **status** | HAVE |
 | **rests on** | `BULLET_SPEED`, `BULLET_LIFE`, `MUZZLE_OFF` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 3. UC-E4-3 — A shot that connects damages what it hit
 
-*Contact applies damage, and the gun cannot be fired again until its cooldown has passed, so damage over time is bounded by the weapon rather than by the key.*
+*Contact applies damage, and the gun cannot fire again until the interval its own weapon type declares has passed, so damage over time is bounded by the weapon and by the pilot's investment in fireRate rather than by how fast a key is pressed.*
 
 | | |
 |---|---|
 | **needs** | `a shot is travelling` |
 | **leaves true** | `damage is being exchanged` |
 | **status** | HAVE |
-| **rests on** | `BULLET_DMG`, `BULLET_R`, `FIRE_CD` |
+| **rests on** | `BULLET_DMG`, `BULLET_R`, `WEAPONS`, `statMult` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 4. UC-E4-4 — Shields take the hit before the hull does
 
@@ -304,7 +304,7 @@
 | **status** | HAVE |
 | **rests on** | `drainShield`, `shieldArcMaxFor` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 5. UC-E4-5 — A ship that runs out of hull dies
 
@@ -317,7 +317,7 @@
 | **status** | HAVE |
 | **rests on** | `killShip`, `killByShip` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 6. UC-E4-6 — Death spills the cargo for anyone to take
 
@@ -330,7 +330,7 @@
 | **status** | HAVE |
 | **rests on** | `spillGems` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ### 7. UC-E4-7 — The pilot comes back small after a pause
 
@@ -343,7 +343,7 @@
 | **status** | HAVE |
 | **rests on** | `RESPAWN_DELAY` |
 | **why it is here** | *UNDECOMPOSED_EPIC* asked: Epic E4 -- 'Fight, die, and lose the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one si |
-| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. |
+| **answered** | Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it. |
 
 ## E5 — The run ends and is remembered  ·  ✅ intact
 

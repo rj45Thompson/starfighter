@@ -14,7 +14,7 @@ The denominator is real: every constant and function the extractor found in the 
 | E1 | 46 | 17 | 29 | 37.0% | ❌ **fail** |
 | E2 | 75 | 24 | 51 | 32.0% | ❌ **fail** |
 | E3 | 40 | 15 | 25 | 37.5% | ❌ **fail** |
-| E4 | 64 | 14 | 50 | 21.9% | ❌ **fail** |
+| E4 | 64 | 15 | 49 | 23.4% | ❌ **fail** |
 | E5 | 11 | 7 | 4 | 63.6% | ❌ **fail** |
 
 ## 2. Support vector — per use case, complete or not
@@ -42,7 +42,7 @@ Five independent supports. Each is a yes or a no, so their conjunction is corrob
 | `UC-E3-6` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 2 |
 | `UC-E4-1` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 4 |
 | `UC-E4-2` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 3 |
-| `UC-E4-3` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 3 |
+| `UC-E4-3` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 4 |
 | `UC-E4-4` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 2 |
 | `UC-E4-5` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 2 |
 | `UC-E4-6` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 1 |
@@ -95,7 +95,7 @@ The rubric is a stated convention — grounded=40, falsifiable=25, precondition_
 
 ## What the extractor found in the source itself
 
-The ground space holds **2335** atoms across 6 file(s). Two independent readings were taken of every constant — where it is declared, and everywhere it is read — and they disagreed in 10 place(s) with certainty:
+The ground space holds **2335** atoms across 6 file(s). Two independent readings were taken of every constant — where it is declared, and everywhere it is read — and they disagreed in 91 place(s) with certainty:
 
 - index.html: CFG.ROCK_NEAR_R is read 1x and declared nowhere in CFG
 - index.html: CFG.MISSILE_AMMO_ is read 1x and declared nowhere in CFG
@@ -107,3 +107,13 @@ The ground space holds **2335** atoms across 6 file(s). Two independent readings
 - index.html: CFG.BAR_GAP is read 1x and declared nowhere in CFG
 - index.html: CFG.TRACK_W is read 1x and declared nowhere in CFG
 - index.html: CFG.RADIAL is read 1x and declared nowhere in CFG
+- index.html: CFG.A10 is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.BRAIN_WORLD_URL is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.DEATH_CREDIT_LOSS is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.FILTER is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.FIRE_CD is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.Fix is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.HOUSING is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.PIRATE_HP is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.RAID_LOOT is declared and never read -- the symbol occurs exactly once in the file, at its own declaration
+- index.html: CFG.REAR_AIM_RANGE is declared and never read -- the symbol occurs exactly once in the file, at its own declaration

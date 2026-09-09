@@ -7,43 +7,22 @@
 
 | gap | count | what it means |
 |---|---:|---|
-| `UNCLAIMED_GROUND` | 159 | something real in the source that no use case accounts for |
+| `UNCLAIMED_GROUND` | 158 | something real in the source that no use case accounts for |
 | `UNDECOMPOSED_USECASE` | 29 | a use case has no numbered steps, so it is a title not a spec |
 | `NO_EXCEPTION_PATH` | 29 | only the happy path is specified |
+| `UNUSED_ACTOR` | 1 |  |
 
-## Parked (24)
+## Parked (1)
 
 Asked, and awaiting an answer from the oracle. These are not failures: the run carried on around them and they resume from cache the moment they are answered.
 
-- `UNCLAIMED_GROUND|G:BANK_LERP`
-- `UNCLAIMED_GROUND|G:BANK_MAX`
-- `UNCLAIMED_GROUND|G:CAM_SHAKE_MAG`
-- `UNCLAIMED_GROUND|G:CAM_UP_LERP`
-- `UNCLAIMED_GROUND|G:DRAG_THRESHOLD`
-- `UNCLAIMED_GROUND|G:KP_PITCH`
-- `UNCLAIMED_GROUND|G:KP_YAW`
-- `UNCLAIMED_GROUND|G:PERIPH_CENTER`
-- `UNCLAIMED_GROUND|G:PERIPH_DPR`
-- `UNCLAIMED_GROUND|G:PERIPH_ON`
-- `UNCLAIMED_GROUND|G:PERIPH_VIGNETTE`
-- `UNCLAIMED_GROUND|G:PERIPH_WIDE`
-- `UNCLAIMED_GROUND|G:SHIP_BOUNCE`
-- `UNCLAIMED_GROUND|G:SHIP_BULLET_DMG`
-- `UNCLAIMED_GROUND|G:SHIP_COLLIDE_SKIP_MULT`
-- `UNCLAIMED_GROUND|G:SHIP_LEN`
-- `UNCLAIMED_GROUND|G:SHIP_RAM_MIN_SPEED`
-- `UNCLAIMED_GROUND|G:SHIP_TEX_LOADER`
-- `UNCLAIMED_GROUND|G:SHIP_YAW`
-- `UNCLAIMED_GROUND|G:SKY_BAKE_RES`
-- `UNCLAIMED_GROUND|G:SKY_GAIN`
-- `UNCLAIMED_GROUND|G:SKY_MODE`
-- `UNCLAIMED_GROUND|G:SKY_SEED`
-- `UNCLAIMED_GROUND|G:SKY_TINT`
+- `UNUSED_ACTOR|A:rival`
 
 ## Every open gap
 
 | severity | gap | on | detail |
 |---:|---|---|---|
+| 25 | `UNUSED_ACTOR` | `A:rival` | declared as an actor, associated with no epic or use case |
 | 31 | `UNCLAIMED_GROUND` | `G:BANK_LERP` | const at index.html:405, read 1x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:BANK_MAX` | const at index.html:405, read 1x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:CAM_SHAKE_MAG` | const at index.html:641, read 1x, owned by no use case |
@@ -180,7 +159,6 @@ Asked, and awaiting an answer from the oracle. These are not failures: the run c
 | 31 | `UNCLAIMED_GROUND` | `G:SHIELD_REGEN_BASE` | const at index.html:546, read 1x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:SHIELD_REGEN_DELAY` | const at index.html:546, read 1x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:TAMI_WASM.damage` | method at index.html:4295, read 0x, owned by no use case |
-| 31 | `UNCLAIMED_GROUND` | `G:WEAPONS` | const at index.html:3881, read 49x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:WEAPON_DMG` | const at index.html:501, read 4x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:WEAPON_FIRE` | const at index.html:501, read 3x, owned by no use case |
 | 31 | `UNCLAIMED_GROUND` | `G:WEAPON_ORDER` | const at index.html:3926, read 11x, owned by no use case |
