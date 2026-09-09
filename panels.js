@@ -205,6 +205,12 @@ function applyVisual(rec){
   rec.pinBtn.classList.toggle('on', rec.pinned);
   rec.pinBtn.textContent = rec.pinned ? '📌' : '📍';   // filled pin (pinned) vs outline-ish (unpinned) - both render fine, distinct glyphs
   const t=tabPosition(rec); rec.tab.style.top=t.top||''; rec.tab.style.bottom=t.bottom||''; rec.tab.style.left=t.left||''; rec.tab.style.right=t.right||''; rec.tab.style.transform=t.transform||'';
+  /* THE TAB IS THE WAY BACK IN, so it only exists while the window is away. RJ 2026-09-08: "the pinned text
+     overlaps the window." It did, by construction: tabPosition pins a left-edge tab at left:2px, and an OPEN
+     left-docked panel starts at the same place, so "MISSIONS - pinned" was printed across the panel it
+     belonged to. Nothing is lost by hiding it - an open window already has its title bar, and the pin is how
+     you close it. */
+  rec.tab.style.display = rec.open ? 'none' : '';
   rec.ctl.style.display = rec.open ? 'flex' : 'none';
   if(rec.open){ const c=ctlPosition(rec); rec.ctl.style.top=c.top; rec.ctl.style.left=c.left; rec.ctl.style.right=''; rec.ctl.style.width=c.width; }
   if(rec.grip){ const _d=rec.open?'block':'none'; rec.grip.style.display=_d; if(rec.gripE) rec.gripE.style.display=_d; if(rec.gripS) rec.gripS.style.display=_d; if(rec.open) positionGrip(rec); }
@@ -228,15 +234,20 @@ function positionGrip(rec){   // corner grip + the two FREE-edge resize strips (
   const gw=rec.grip.offsetWidth||CFG.RESIZE_GRIP, gh=rec.grip.offsetHeight||CFG.RESIZE_GRIP;
   const a=rec._resizeAnch || anchorOf(rec);   // FROZEN anchor during an active resize so a handle can't flip corners mid-drag (the old 'reversed/odd' feel)
   const T=(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)?16:CFG.RESIZE_EDGE;   // fatter strips on touch
-  // CORNER (both free edges meet) - keeps the diagonal cursor + hatched look
-  rec.grip.style.top =(a.bottom ? r.top : r.bottom-gh)+'px';
+  /* THE CORNER IS ALWAYS THE BOTTOM ONE. RJ 2026-09-08: "the resize grab zone should probably always be on
+     the bottom corner not locked to the side of the screen." It used to follow the dock - a bottom-docked
+     panel put its grip at the TOP, which is where every window in every OS puts its title bar, and is what
+     made it collide with the close button. Bottom is where a hand goes looking for a resize corner, so it
+     lives there whatever edge the panel is docked to. Left/right still follows the free side, so the grip
+     never sits over the screen edge the panel is pressed against. */
+  rec.grip.style.top =(r.bottom-gh)+'px';
   rec.grip.style.left=(a.right ? r.left : r.right-gw)+'px';
-  rec.grip.style.cursor = (a.right !== a.bottom) ? 'nesw-resize' : 'nwse-resize';
+  rec.grip.style.cursor = a.right ? 'nesw-resize' : 'nwse-resize';
   // VERTICAL free edge (resizes WIDTH): left edge if right-anchored, else right edge; leaves the corner clear
   if(rec.gripE){ rec.gripE.style.left=(a.right ? r.left : r.right-T)+'px'; rec.gripE.style.width=T+'px';
-    rec.gripE.style.top=(a.bottom ? r.top+gh : r.top)+'px'; rec.gripE.style.height=Math.max(0,r.height-gh)+'px'; }
+    rec.gripE.style.top=r.top+'px'; rec.gripE.style.height=Math.max(0,r.height-gh)+'px'; }   // stops above the corner
   // HORIZONTAL free edge (resizes HEIGHT): top edge if bottom-anchored, else bottom edge; leaves the corner clear
-  if(rec.gripS){ rec.gripS.style.top=(a.bottom ? r.top : r.bottom-T)+'px'; rec.gripS.style.height=T+'px';
+  if(rec.gripS){ rec.gripS.style.top=(r.bottom-T)+'px'; rec.gripS.style.height=T+'px';   // the bottom edge, with the corner
     rec.gripS.style.left=(a.right ? r.left+gw : r.left)+'px'; rec.gripS.style.width=Math.max(0,r.width-gw)+'px'; }
   /* THE TITLE BAR YIELDS THE CORNER THE GRIP IS USING. RJ 2026-09-08: "the drag button and the close button
      the windows seem to overlap." Measured: CLOSE sat on top of that same panel's GRIP by 16x18px on three
@@ -244,11 +255,10 @@ function positionGrip(rec){   // corner grip + the two FREE-edge resize strips (
      They collide by construction - ctlPosition always puts the bar across the panel's TOP, and the corner
      grip moves to the TOP edge whenever the panel is bottom-anchored. Neither is wrong, so the bar simply
      pads itself out of the corner the grip currently occupies, on whichever side that is. */
-  if(rec.ctl){
-    const pad = a.bottom ? (gw + 6) : 0;          // the grip is on the top edge only when bottom-anchored
-    rec.ctl.style.paddingLeft  = (a.right ? pad : 0) + 'px';
-    rec.ctl.style.paddingRight = (a.right ? 0 : pad) + 'px';
-  }
+  // The bar no longer has to dodge the grip: the grip is always at the BOTTOM and the bar is always at the
+  // top, so they cannot meet on a panel taller than the two of them. Any padding a previous layout left
+  // behind is cleared here rather than left to shrink the title for no reason.
+  if(rec.ctl){ rec.ctl.style.paddingLeft='0px'; rec.ctl.style.paddingRight='0px'; }
 }
 
 // BUGFIX (found live-testing 2026-07-08 "terminal pinning inconsistent"): this used to REPLACE store[id] wholesale
