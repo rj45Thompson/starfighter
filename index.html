@@ -1131,7 +1131,7 @@ const ASSET_CFG={ DIR:'assets/', SHIP_LEN:6.0, SHIP_YAW:Math.PI, ENG_Z:0.46,   /
   VIS_SCALE:{scout:0.8,fighter:1.0,interceptor:1.05,freighter:1.5,cruiser:1.62,dreadnought:1.95,capital:2.6} };  // hull-class silhouette scale (2026-07-07: existing 6 already read scout<fighter/interceptor<freighter/cruiser<dreadnought - kept as-is; capital added noticeably larger than dreadnought)
 const ASSETS={ ready:false, ships:{}, astGeos:[], gemGeos:[] };
 const TEX_MAP=[ ['playership_orange_dff','playerShip_dff.png'], ['playership_orange_nrm','playerShip_nrm.png'],
-  ['enemyship_red_dff','enemyShip_red_dff.png'], ['enemyship_purple_dff','enemyShip_purple_dff.png'],
+  ['enemyship_red_dff','enemyShip_red_dff.jpg'], ['enemyship_purple_dff','enemyShip_purple_dff.png'],
   ['enemyship_nrm','enemyShip_nrm.png'], ['flyerplayershipalbedo','spaceship_dff.png'], ['emission','spaceship_emm.png'] ];
 const PIXEL_URI='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
@@ -1159,7 +1159,7 @@ function assetURL(url){ const u=String(url).toLowerCase().replace(/\\/g,'/');
 const SHIP_TEX_LOADER=new T.TextureLoader();
 function shipTex(file){ const t=SHIP_TEX_LOADER.load(ASSET_CFG.DIR+file); t.flipY=false; t.encoding=T.sRGBEncoding; t.wrapS=t.wrapT=T.RepeatWrapping; return t; }
 const SHIP_TEX={ player:shipTex('playerShip_dff.png'), playerNrm:shipTex('playerShip_nrm.png'),
-  enemyRed:shipTex('enemyShip_red_dff.png'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png'),
+  enemyRed:shipTex('enemyShip_red_dff.jpg'), enemyPurple:shipTex('enemyShip_purple_dff.png'), enemyNrm:shipTex('enemyShip_nrm.png'),
   hull:shipTex('spaceship_dff.png'), hullEmm:shipTex('spaceship_emm.png') };   // Spaceship.fbx's OWN maps: a 4-colour palette albedo (32x32, orange/white/dark) + a 128x512 emissive strip for the lights and vents
 // FBX HULL FOR EVERYONE (GRAPHICS PASS 2026-09-05/06, CFG.FBX_HULLS). CORRECTION 2026-09-06: the first version of
 // this comment claimed vehicle_playerShip.FBX / vehicle_enemyShip.FBX were missing from assets/. They are NOT missing
@@ -6181,7 +6181,7 @@ if(window.PANELS){
        The game's own code settles it without a measurement - index.html names FWD*quat `nose` where it aims the
        guns - so the nose is FWD*quat and the rear is +Z. */
     { pid:'cambackup', id:'camBackWin',   title:'BACKUP CAM', ax:'z', sgn: 1, edge:'top', centerX:true,
-      place:'left:50%;top:78px', w:400, h:230 },
+      place:'left:50%;top:78px', w:400, h:230, open:true },   // RJ: "all cams closed except backup on game start"
   ];
   BACKUP_CAMS.forEach(function(c, i){
     c.dir = new T.Vector3(c.ax==='x'?c.sgn:0, c.ax==='y'?c.sgn:0, c.ax==='z'?c.sgn:0);
@@ -6194,8 +6194,11 @@ if(window.PANELS){
       + 'border:1px solid #46617e;border-radius:8px;background:transparent;'
       + 'box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
     document.body.appendChild(el);
+    /* Only the BACKUP CAM is up on a fresh session - RJ 2026-09-08: "make sure all cams are closed except
+       backup on game start". The four side views are one tab away and would otherwise take a quarter of the
+       screen before anyone asked for them. A saved layout still wins, as everywhere else. */
     if(window.PANELS) PANELS.register(c.pid, el, { title:c.title, edge:c.edge, centerX:!!c.centerX,
-      rgb:[13,26,42], transparent:true, resizable:true, defaultOpen:false });
+      rgb:[13,26,42], transparent:true, resizable:true, defaultOpen:!!c.open });
   });
   window.updateBackupCams = function(){
     const s = ships[focus]; if(!s) return;
