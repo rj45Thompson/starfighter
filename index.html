@@ -130,6 +130,16 @@
     background:rgba(18,34,52,.95); border:1px solid #2f6d99; color:#7fd4ff;
     font:11px/1.5 ui-monospace,monospace; letter-spacing:.03em; pointer-events:none; white-space:nowrap; }
   #flightPaused b{ color:#eaf5ff; }
+  /* RJ 2026-09-08, twice: "my ship still seems invincible." It is not - the whole HOME SYSTEM is a no-combat
+     zone (inPeaceful: within SYSTEM_R*1.05 of a peaceful system, "pirates never target a ship inside the
+     belt"), and nothing on screen said so. Measured: 0 of 23 hostiles had the player as a target while he sat
+     in it; moved to deep space, the nearest pirate locked onto him instantly. A safe start is a fine design,
+     but an unannounced one reads as a broken damage model. */
+  #peaceBadge{ position:fixed; z-index:15; left:50%; transform:translateX(-50%); top:44px; display:none;
+    padding:3px 12px; border-radius:6px; background:rgba(14,40,28,.95); border:1px solid #4fbf86;
+    color:#9fe9c4; font:11px/1.5 ui-monospace,monospace; letter-spacing:.03em; pointer-events:none;
+    white-space:nowrap; }
+  #peaceBadge b{ color:#eaffe9; }
   #logbody{ padding:6px 10px 8px; }
   #logbody .tl{ opacity:.94; margin:1px 0; }
   #logbody .tl b{ font-weight:800; }
@@ -326,6 +336,7 @@
 <script src="panels.js?v=20260908n"></script>
 <script src="sbhud.js?v=20260906b"></script>
 <script src="shell.js?v=20260908b"></script>
+<script src="uc_live.js?v=20260908a"></script><!-- RJ 2026-09-08: the USE CASES window - the model lighting up as the game runs -->
 <script src="guide.js?v=20260907a"></script><!-- F58: the first-run guided loop (shoot->collect->bank->upgrade); notified by gemBarAdd/spendStat via window.GUIDE.hit -->
 <script src="storyline.js?v=20260907a"></script><!-- F31: the authored MAIN STORY spine (The Iron Synod War) - 4 ordered beats polled via window.STORYLINE; advanced on war-win by warWin() -> STORYLINE.onWarWin() -->
 <script src="survey.js?v=20260907a"></script><!-- F45: SELL exploration/survey data (P.discoveries) for a cartographics fee via window.SURVEY; the `survey` command files unfiled records at a dock -->
@@ -339,12 +350,12 @@
 <script src="starmap.js?v=20260714c"></script>
 <script src="conquest.js?v=20260714c"></script>
 <script src="missions.js?v=20260906b"></script>
-<script src="economy.js?v=20260906f"></script>
-<script src="synod.js?v=20260906a"></script>
+<!-- REMOVED FOR NOW (RJ 2026-09-08 "Remove egosoft for now"): <script src="economy.js?v=20260906f"></script> -->
+<!-- REMOVED FOR NOW (RJ 2026-09-08 "Remove egosoft for now"): <script src="synod.js?v=20260906a"></script> -->
 <script src="ground.js?v=20260906d"></script>
 <script src="cybertron.js?v=20260907a"></script>
 <script src="backdrop.js?v=20260907e"></script>
-<script src="empire.js?v=20260907a"></script>
+<!-- REMOVED FOR NOW (RJ 2026-09-08 "Remove egosoft for now"): <script src="empire.js?v=20260907a"></script> -->
 <script src="planetmenu.js?v=20260906g"></script>
 <script src="textquests.js?v=20260714c"></script>
 <!-- MEASUREMENT ONLY, opt-in: ?harness=1 loads sim_harness.js, which drives frame() with a synthetic
@@ -6143,9 +6154,64 @@ if(window.PANELS){
        So the window now IS the top-down-primary mode, which is what the design note above describes: open it
        and the main view becomes the close top-down follow with the 3D in this window; close it and the 3D goes
        back to fullscreen. Either way you never get a frame with nothing in it. */
-    if(window.PANELS) PANELS.register('chase', w, { title:'3D VIEW', edge:'top', rgb:[13,26,42],
+    if(window.PANELS) PANELS.register('chase', w, { title:'BACKUP CAM', edge:'top', rgb:[13,26,42],   // RJ 2026-09-08: "3d view should be renamed to backup cam"
       transparent:true, resizable:true, defaultOpen:false,
       onOpenChange:(open)=>{ TOPDOWN_MAIN = open; } });
+  })();
+
+  /* THE FOUR DIRECTIONAL BACKUP CAMS (RJ 2026-09-08: "and also half left backup right backup bottom backup cam
+     and top backup cam"). One camera per side, each in its own window, like a vehicle's surround view.
+
+     Written as a TABLE, not as four copies of the same forty lines - which is the mistake the chase window and
+     the rear gunner window made, and why they drifted apart. Everything below loops over BACKUP_CAMS: the
+     element, the registration, the per-frame pose, the viewport and the render. Adding a fifth side is a row.
+
+     Each rides ON the ship and looks straight out along its own axis in the SHIP's frame, so they roll with it.
+     `up` is the ship's up, except for the two that look along that axis - a camera looking straight up cannot
+     use up as its up vector - where the ship's nose serves instead. */
+  const BACKUP_CAM_OUT = 6;      // how far off the hull each camera sits, so the ship itself does not fill it
+  const BACKUP_CAMS = [
+    { pid:'camleft',   id:'camLeftWin',   title:'LEFT BACKUP',   ax:'x', sgn:-1, top:120 },
+    { pid:'camright',  id:'camRightWin',  title:'RIGHT BACKUP',  ax:'x', sgn: 1, top:300 },
+    { pid:'camtop',    id:'camTopWin',    title:'TOP BACKUP',    ax:'y', sgn: 1, top:480 },
+    { pid:'cambottom', id:'camBottomWin', title:'BOTTOM BACKUP', ax:'y', sgn:-1, top:660 },
+  ];
+  BACKUP_CAMS.forEach(function(c, i){
+    c.dir = new T.Vector3(c.ax==='x'?c.sgn:0, c.ax==='y'?c.sgn:0, 0);
+    c.cam = new T.PerspectiveCamera(62, 1, 0.5, 6000);
+    c.cam.layers.enable(2);
+    c.view = { x:0, y:0, w:0, h:0 };
+    if(document.getElementById(c.id)) return;
+    const el = document.createElement('div'); el.id = c.id;
+    el.style.cssText = 'position:fixed;left:20px;top:'+c.top+'px;width:300px;height:170px;z-index:40;'
+      + 'border:1px solid #46617e;border-radius:8px;background:transparent;'
+      + 'box-shadow:0 6px 22px rgba(0,0,0,0.55);pointer-events:none';
+    document.body.appendChild(el);
+    if(window.PANELS) PANELS.register(c.pid, el, { title:c.title, edge:'left', rgb:[13,26,42],
+      transparent:true, resizable:true, defaultOpen:false });
+  });
+  window.updateBackupCams = function(){
+    const s = ships[focus]; if(!s) return;
+    const H = innerH();
+    const CH = (window.PANELS && PANELS.CFG && PANELS.CFG.CHROME_RESERVE) || 24;
+    for(const c of BACKUP_CAMS){
+      const el = document.getElementById(c.id);
+      const open = !!(window.PANELS && PANELS.isOpen(c.pid));
+      if(!el || !open){ c.view.w = 0; c.view.h = 0; continue; }
+      const r = el.getBoundingClientRect();
+      if(r.width < 8 || r.height < 8 + CH){ c.view.w = 0; c.view.h = 0; continue; }
+      c.view.x = Math.round(r.left); c.view.w = Math.round(r.width);
+      c.view.h = Math.round(r.height - CH); c.view.y = Math.round(H - (r.top + r.height));
+      const d = c.dir.clone().applyQuaternion(s.quat).normalize();
+      c.cam.position.copy(s.pos).addScaledVector(d, BACKUP_CAM_OUT);
+      // a camera looking along the ship's up axis needs a different up, or lookAt degenerates
+      c.cam.up.copy((c.ax === 'y' ? FWD : UPL).clone().applyQuaternion(s.quat)).normalize();
+      c.cam.lookAt(s.pos.clone().addScaledVector(d, 400));
+      c.cam.aspect = c.view.w / Math.max(1, c.view.h); c.cam.updateProjectionMatrix();
+    }
+  };
+  window.renderBackupCams = function(){ for(const c of BACKUP_CAMS) renderView(c.view, scene, c.cam); };
+  (function(){
   })();
   // REAR GUNNER window (user 2026-07-13 "move the gunner pod ... move the camera and shoot down the centre"):
   // a second movable/resizable window; rearCam is a TURRET that slews (updateRearCam). Moving the mouse in the gunport
@@ -6606,6 +6672,7 @@ function renderAll(){ renderer.setScissorTest(true);
   if(TOPDOWN_MAIN){ renderView(VIEW.main,scene,mainTopCam); }   // TOP-DOWN primary fills the screen
   else if(!(CFG.PERIPH_ON && PERIPH.renderInto(VIEW.main))) renderView(VIEW.main,scene,chaseCam);   // peripheral lens or plain
   if(HUD_WIN.top) renderView(VIEW.top,scene,topCam); if(HUD_WIN.brain) renderView(VIEW.brain,brainScene,brainCam);   // the WINDOWS menu can hide either inset (2026-09-06)
+  if(window.renderBackupCams) renderBackupCams();   // the four directional windows, each self-guarding on w<=0
   if(TOPDOWN_MAIN) renderView(VIEW.chase,scene,chaseCam);   // 3D chase window LAST = always on top (over the minimap/brain insets too); shows through the transparent #chaseWin body
   renderView(VIEW.rear,scene,rearCam);     // REAR GUNNER window (aft view) - renders regardless of TOPDOWN_MAIN so it survives the 3D-main revert; renderView self-guards on w<=0 when #rearWin is hidden
   renderer.setScissorTest(false); }
@@ -7149,15 +7216,23 @@ async function showGeneratedArt(){
 // (whatever is registered, never a hand-kept list) + the two GL insets + the power dock; Screens = the fullscreen
 // modals, each opened through the same command or module the keyboard uses. Inset/dock state persists.
 (function(){ const btn=document.getElementById('winBtn'), list=document.getElementById('winList'); if(!btn||!list) return;
+  /* RJ 2026-09-08: "under windows, screens many of the links are broken." Measured by clicking all eight:
+     six changed nothing a player could see. They were not broken - they ANSWER IN THE TERMINAL, and the
+     terminal is minimised on a fresh session since "start with all windows minimized", so their reply went
+     somewhere invisible. Same root cause as the landing instructions.
+
+     A screen whose whole output is terminal text has to bring the terminal with it. `viaTerm` does exactly
+     that and nothing else, so the fix cannot drift out of step with the list. */
+  const viaTerm = (fn) => () => { if(window.PANELS) PANELS.open('ticker'); fn(); };
   const SCREENS=[
     { t:'Engineering Bay', key:'E', go:()=>{ if(window.ENGBAY) ENGBAY.toggle(); else term('engbay.js not loaded','err'); } },
-    { t:'Star Map', key:'G', go:()=>runCmd('starmap') },
-    { t:'Knowledge Observatory', key:'', go:()=>runCmd('observatory') },
-    { t:'Mission Board (terminal)', key:'', go:()=>runCmd('missions') },
+    { t:'Star Map', key:'G', go:viaTerm(()=>runCmd('starmap')) },
+    { t:'Knowledge Observatory', key:'', go:viaTerm(()=>runCmd('observatory')) },
+    { t:'Mission Board (terminal)', key:'', go:viaTerm(()=>runCmd('missions')) },
     { t:'Market', key:'M', go:()=>{ if(window.PANELS) PANELS.toggle('market'); } },
     { t:'Options', key:'', go:()=>{ const g=document.getElementById('gearBtn'); if(g) g.click(); } },
-    { t:'Help (every command)', key:'', go:()=>runCmd('help') },
-    { t:'Generated art (what was made, from what prompt)', key:'', go:()=>showGeneratedArt() } ];
+    { t:'Help (every command)', key:'', go:viaTerm(()=>runCmd('help')) },
+    { t:'Generated art (what was made, from what prompt)', key:'', go:viaTerm(()=>showGeneratedArt()) } ];
   const INSETS=[ {id:'top',t:'Top-down map (inset)'}, {id:'brain',t:'Ship controls (inset)'}, {id:'power',t:'Power panel + throttle'} ];
   function saveWin(){ try{ localStorage.setItem('SF_WINDOWS_v1', JSON.stringify(HUD_WIN)); }catch(e){} }
   function applyInsets(){ if(typeof resize==='function') resize(); }
@@ -7190,6 +7265,16 @@ const chatEl=document.getElementById('chat'); const cmdHist=[]; let histIdx=-1;
   const b=document.createElement('div'); b.id='flightPaused';
   b.innerHTML='flight paused while you type &nbsp;·&nbsp; <b>Esc</b> to fly';
   document.body.appendChild(b);
+  // the no-combat badge, driven from the same frame loop for the same reason: it mirrors a live test
+  // (inPeaceful of the player's position) rather than trying to catch an event when you cross the line
+  const pb=document.createElement('div'); pb.id='peaceBadge';
+  pb.innerHTML='&#9671; <b>PEACEFUL SYSTEM</b> &nbsp;·&nbsp; nothing will attack you here &nbsp;·&nbsp; leave the belt for a fight';
+  document.body.appendChild(pb);
+  window.__peaceBadgeTick = function(){
+    const P = (typeof ships!=='undefined') && ships[0];
+    const on = !!(P && P.alive && typeof inPeaceful==='function' && inPeaceful(P.pos));
+    pb.style.display = on ? 'block' : 'none';
+  };
   // Driven by the frame loop reading document.activeElement, NOT by focus/blur events. Two reasons.
   // The guard it mirrors is itself a live `document.activeElement.id === 'chat'` test, so reading the
   // same thing cannot drift out of step with it. And focus/blur do not fire at all when the DOCUMENT
@@ -7952,7 +8037,7 @@ function frame(now){ let dt=(now-last)/1000; last=now; if(!(dt>=0)||dt>0.05) dt=
   T0+=dt;
   if(AWAY.active()){ AWAY.frame(dt); backgroundTick(dt); requestAnimationFrame(frame); return; }   // AWAY MISSION takes over rendering - but the empire it promised keeps running, see backgroundTick
   computePlayerSolution();   // ONE fire-control solution per frame -> the forward gun (in step) and the lead box (below) read the SAME lead point, so bullets go where the box is
-  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); miningBotsTick(dt); updateShockFx(dt); starSpinTick(dt); if(window.BACKDROP) BACKDROP.tick(dt, chaseCam.position); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
+  step(dt); updateCamera(dt); headlamp.position.copy(chaseCam.position); updateHitFx(dt); updateMissionArrow(dt); updateTopCam(); updateMainTopCam(); updateChaseView(); if(window.updateBackupCams) updateBackupCams(); if(CFG.REAR_GUN){ updateRearView(); updateRearCam(dt); updateRearBeam(dt); updateAIRearBeams(dt); updateRearShield(); } else { rearGunOff(); MAN.rearActive=false; } missionAutoTick(dt); if(window.ECONOMY) ECONOMY.tick(dt); shopTick(dt); updateFx(dt); scanBadgeTick(); if(window.flightPausedTick) flightPausedTick(); if(window.__peaceBadgeTick) __peaceBadgeTick(); miningBotsTick(dt); updateShockFx(dt); starSpinTick(dt); if(window.BACKDROP) BACKDROP.tick(dt, chaseCam.position); updateSpeech(dt); updateBlips(); updateEnemyHealthBars(); updateBrain(); dockPromptTick(); burstHudTick(); creditsHudTick(); updateTargetingReticle(dt); updateLockReticle(dt); saveTick(dt); ambientDeliberateTick(dt);
   for(const M of ['STARMAP','CONQUEST','MISSIONS','PLANETMENU']) if(window[M]&&window[M].tick) try{ window[M].tick(dt); }catch(e){}   // SR modules
   renderAll(); updateRoster();
   mktAcc+=dt; if(mktAcc>0.25){ mktAcc=0; updateMarket(); }
