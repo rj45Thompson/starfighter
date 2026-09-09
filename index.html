@@ -1265,7 +1265,7 @@ function makeShip(i){
   const s={ id:nextId++, name:PILOTS[i%PILOTS.length], hue, color:new T.Color().setHSL(hue,0.8,0.6),
     pos:sys.center.clone().add(new T.Vector3(rand(-1,1),rand(-0.5,0.5),rand(-1,1)).setLength(rand(30,CFG.SYSTEM_R*0.7))), vel:new T.Vector3(), quat:new T.Quaternion(), bank:0,
     hp:CFG.HP_BASE, maxHp:CFG.HP_BASE, credits:220, score:0, lvl:{weapon:1,engine:1,hull:1}, deaths:0,
-    fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0,
+    fire:0, iframe:1.0, safe:1.0, alive:true, respawn:0, utter:0, speakT:0,
     aggr:rand(CFG.AGGR_MIN,CFG.AGGR_MAX), huntTarget:null, huntUntil:0, cmd:null, team:'squad', commCd:0,   // combat + player-order + comms state
     role:(i/CFG.NSHIPS<CFG.TRADER_FRAC)?'trader':'raider', backstory:BACKSTORY.coalition[i%BACKSTORY.coalition.length],   // traders drive economy; raiders fight/mine; ORIGINAL per-pilot Warden backstory (GIVEN flavor)
     cargo:{}, fuel:CFG.FUEL_START, tradePlan:null, tradeCd:0, warping:false,        // trading + hyperspace state
@@ -1999,7 +1999,7 @@ function addDefender(p,target){ if(ships.length>=CFG.MAX_SHIPS) return null;
   const off=new T.Vector3(rand(-1,1),rand(-1,1),rand(-1,1)).setLength(p.radius*1.6+rand(8,18));
   const s={ id:nextId++, name:'DEF·'+p.name.slice(0,4), hue:0.58, color:new T.Color(0xcfe0f0), pos:p.pos.clone().add(off),
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:CFG.HP_BASE, maxHp:CFG.HP_BASE, credits:0, score:0,
-    lvl:{weapon:2,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
+    lvl:{weapon:2,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, safe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
     huntTarget:null, huntUntil:0, cmd:null, team:'squad', commCd:0, role:'defender', home:p, born:T0, lastThreat:T0, backstory:BACKSTORY.coalition[nextId%BACKSTORY.coalition.length],
     cargo:{}, fuel:0, tradePlan:null, tradeCd:0, warping:false, holdCap:0, fuelCap:0, senseR:CFG.SENSE_R, warpEff:1,
     mode:'HUNT', target:null, lock:null, ctrl:{thr:0,pitch:0,yaw:0}, brain:null, lastLine:'', mesh:fighterMesh(0.58) };
@@ -2026,7 +2026,7 @@ function addPirate(force){ if(!force && ships.filter(s=>s.team==='pirate').lengt
   const rosterName=novelPirateName();   // N3: synod roster canon name when the novel roster is loaded; else legacy HEG tier name
   const s={ id:nextId++, name:rosterName||('HEG·'+HT.n.slice(0,4)+'-'+(1+nextId%89)), hue:0.0, color:new T.Color(HT.col), pos:_pos,
     vel:new T.Vector3(), quat:new T.Quaternion(), bank:0, hp:HT.hp, maxHp:HT.hp, credits:0, score:0,
-    lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
+    lvl:{weapon:1,engine:1,hull:1}, deaths:0, fire:0, iframe:1.0, safe:1.0, alive:true, respawn:0, utter:0, speakT:0, aggr:1,
     huntTarget:null, huntUntil:0, cmd:null, team:'pirate', commCd:rand(0,CFG.COMM_CD), role:'pirate', born:T0, tier:ti, tierDmg:HT.dmg, bounty:HT.bounty,   // SR (was 99 = permanently silent - pirates never coordinated at all; now ready-soon like every other ship, so wolf-pack calls actually happen)
     weaponType:(ti===2?'flame':(ti===1&&rand(0,1)<CFG.FLAME_CRUISER_CHANCE?'flame':(window.SYNOD?SYNOD.gunFor(()=>rand(0,1)):WEAPON_ORDER[ti]))),   // the doctrine's weapon MIX (2026-09-06); Warlords keep the Incinerator   // INCINERATOR (user 2026-07-07): the Hegemon's own terror weapon - every Warlord carries it, some Cruisers too
     backstory:BACKSTORY.hegemon[nextId%BACKSTORY.hegemon.length],
@@ -2682,7 +2682,7 @@ function flyStep(s,dt){
     if(dd<effR){ const n=_v2.copy(s.pos).sub(base.pos); if(n.lengthSq()<1e-4) n.set(1,0,0); n.setLength(1);
       s.pos.copy(base.pos).addScaledVector(n,effR); const vn=s.vel.dot(n);
       if(vn<0){ s.vel.addScaledVector(n,-vn); const tang=_v.copy(s.vel).addScaledVector(n,-s.vel.dot(n)); s.vel.copy(n).multiplyScalar(vn*-0.12).add(tang.multiplyScalar(0.92)); } } }
-  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0)*seriesOf(s).droidMult*((s.droidInst&&s.droidInst.powerMul)||1))*dt); s.iframe=Math.max(0,s.iframe-dt);   // M3: repair droid adds regen; HULL SERIES: Repair boosts droid effectiveness; SR ITEM VARIANCE: droid instance powerMul scales its regen (ship-agnostic)
+  s.hp=Math.min(s.maxHp,s.hp+(CFG.REGEN+(s.regenBonus||0)*seriesOf(s).droidMult*((s.droidInst&&s.droidInst.powerMul)||1))*dt); s.iframe=Math.max(0,s.iframe-dt); s.safe=Math.max(0,(s.safe||0)-dt);   // M3: repair droid adds regen; HULL SERIES: Repair boosts droid effectiveness; SR ITEM VARIANCE: droid instance powerMul scales its regen (ship-agnostic)
   shieldTick(s,dt);                                                                                  // X-WING POWER: shields regen when power is routed there and you haven't been hit recently
   capacitorTick(s,dt);                                                                              // SR X-WING CAPACITORS: laser energy regens off weapons power, engine capacitor regens off engines power (when not boosting)
   _q.setFromAxisAngle(FWD,s.bank); s.mesh.position.copy(s.pos); s.mesh.quaternion.copy(s.quat).multiply(_q);
@@ -2740,7 +2740,7 @@ function step(dt){
         s._thinkAcc=(s._thinkAcc||0)+dt;
         if((s.id+FRAME_N)%CFG.THINK_STRIDE===0 || s===ships[focus]){ think(s,s._thinkAcc); s._thinkAcc=0; } }
       flyStep(s,dt); }
-    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.warping=false; s.tradePlan=null; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s); s.shield=s.shieldFwd+s.shieldAft; s.capLaser=capMaxFor(s); s.capEngine=CFG.ENGINE_CAP_MAX;   // X-WING POWER: a fresh hull gets full shields + capacitors too
+    else { s.respawn-=dt; if(s.respawn<=0){ s.alive=true; s.mesh.visible=true; s.hp=s.maxHp; s.iframe=2; s.safe=2; s.warping=false; s.tradePlan=null; s.shieldFwd=shieldArcMaxFor(s); s.shieldAft=shieldArcMaxFor(s); s.shield=s.shieldFwd+s.shieldAft; s.capLaser=capMaxFor(s); s.capEngine=CFG.ENGINE_CAP_MAX;   // X-WING POWER: a fresh hull gets full shields + capacitors too
       // RETREAT TO TERRITORY (user): the destroyed come back inside COALITION space - a held planet (via the
       // starmap's territory model when loaded), else the Ranger Base - never dumped into a random (possibly lost) system.
       let anchor=null;
@@ -2761,7 +2761,13 @@ function step(dt){
   // Rule now: player bullets hit ANY other ship (ffCanHit); the consequence is ffRetaliate - a betrayed
   // teammate hunts the player + its return fire can hit the player. NPC-vs-NPC keeps the team filter.
   for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i], owner=shipById[b.owner];
-    for(const s of ships){ if(!s.alive||s.id===b.owner||s.iframe>0||s.warping||s.docked) continue;   // DOCKED = safe harbor - no combat damage while docked
+    /* GUNFIRE IGNORES THE COLLISION TIMER. RJ 2026-09-08: "my ship still seems invincible and I didn't even
+       upgrade it." Measured: hurt() and this loop both gated on `iframe`, which is the 1.1s window a rock
+       scrape or a ram sets - so ONE asteroid graze made the ship immune to every bullet in the game for 1.1
+       seconds, and flying through a rock field refreshed it faster than it expired. Permanent immunity, from
+       a timer meant only to stop a single collision being charged twice.
+       `safe` is the spawn/respawn window and is the only thing gunfire respects now. */
+    for(const s of ships){ if(!s.alive||s.id===b.owner||s.safe>0||s.warping||s.docked) continue;   // DOCKED = safe harbor - no combat damage while docked
       if(owner&&owner.team===s.team&&!ffCanHit(owner,s)) continue;   // no friendly fire - except the player (and teammates returning fire at the player)
       if(hasGizmo(s,'ecm') && rand(0,1)<CFG.ECM_DODGE_CHANCE) continue;   // ENGINEERING BAY: jammed fire control - a flat per-hit chance the shot just misses, bullet keeps flying for anyone else
       const hr=CFG.SHIP_R+CFG.BULLET_R; if(segDistSq(b.prev,b.pos,s.pos)<hr*hr){
@@ -2775,7 +2781,7 @@ function step(dt){
         if(b.slow>0){ s.slowT=T0+CFG.SLOW_DUR; s.slowMul=b.slow; }   // SR TRETON: a hit slows the target's engines for SLOW_DUR seconds
         if(s.role==='player'&&window.PASSENGER){ PASSENGER.onEvent('damaged'); if(window.GAMEMOD) GAMEMOD.emit('damaged'); if(window.CHATTER) CHATTER.onEvent('damaged',{hull:Math.round(s.hp)}); if(window.SOUND) SOUND.play('hit'); }   // the symbiont feels every hit you take
         if(owner&&owner.team==='pirate'&&s.team==='squad'&&s.hp<s.maxHp*0.6) broadcast(s,'help',owner);   // call for backup + record the interaction note
-        if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.iframe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
+        if(b.splash>0){ burst(b.pos,0xff7a4a,12,22,3.4); for(const o2 of ships){ if(o2===s||!o2.alive||o2.safe>0||o2.warping||o2.docked||(owner&&owner.team===o2.team&&!ffCanHit(owner,o2))) continue;
             if(o2.pos.distanceTo(b.pos)<b.splash){ const dmg2=rawDmg*0.5*hullResFor(o2,b.dmgType); applyHullDamage(o2, drainShield(o2,dmg2,b.pos)*(1-shieldGenPctFor(o2)), b.pos); ffRetaliate(o2,owner); if(o2.inhabitant) INH.onDamaged((owner&&owner.pos.distanceTo(o2.pos)<=o2.senseR)?owner.name:null,dmg2); if(o2.hp<=0) killByShip(o2,owner); } } }                // M3: missile AoE (gems-as-hull via shared sink); X-WING POWER: shields absorb first; STANDARD GEAR SLOTS: susceptibility+shieldgen per splash victim
         burst(b.pos,b.col!=null?b.col:s.color.getHex(),4,12,2.2); scene.remove(b.mesh); bullets.splice(i,1);   // SR-M6: the weapon's OWN color, not the victim's tint - a laser vs. autocannon vs. missile hit now visibly differ
         if(s.hp<=0) killByShip(s,owner); break; } } }
@@ -2879,7 +2885,7 @@ function applyHullDamage(s,hullDmg,fromPos){
     const spill=Math.min(s.credits, Math.max(1, Math.round(eaten*CFG.GEM_HULL_CREDIT_MULT)));
     s.credits-=spill; spillGems(s,spill,fromPos); hullDmg-=eaten; }
   s.hp-=hullDmg; }
-function hurt(s,d,fromPos){ if(s.iframe>0||!s.alive||s.docked) return; if(s.inhabitant) INH.onDamaged('asteroid',d);   // DOCKED = safe harbor - no combat damage while docked
+function hurt(s,d,fromPos){ if(s.safe>0||!s.alive||s.docked) return;   // collision throttling is the CALLER's job (see the asteroid loop); this gate is spawn safety only if(s.inhabitant) INH.onDamaged('asteroid',d);   // DOCKED = safe harbor - no combat damage while docked
   applyHullDamage(s, drainShield(s,d,fromPos)*(1-shieldGenPctFor(s)), fromPos);   // X-WING POWER: shields absorb first; gems-as-hull buffer inside; STANDARD GEAR SLOTS: Shield Generator flat-% layer
   if(s.hp<=0) killShip(s); }
 // eject `credits` worth of gems off a wounded ship, thrown AWAY from the shooter so they scatter into space to be
