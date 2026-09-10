@@ -1,0 +1,59 @@
+{
+  "name": "starblast-derived",
+  "root": "..",
+  "sources": [],
+  "ground_mode": "web",
+  "corpus": "web/starblast.corpus.json",
+  "actors": [
+    {
+      "id": "A:pilot",
+      "name": "Pilot",
+      "attrs": {
+        "note": "the person flying"
+      }
+    },
+    {
+      "id": "A:server",
+      "name": "The server",
+      "attrs": {
+        "note": "the simulation acting on its own"
+      }
+    },
+    {
+      "id": "A:rival",
+      "name": "Another player",
+      "attrs": {
+        "note": "everyone else in the field"
+      }
+    }
+  ],
+  "states": [
+    {
+      "id": "S:at_menu",
+      "name": "the player is at the main menu, in no game"
+    },
+    {
+      "id": "S:round_decided",
+      "name": "the round is over and a winner is known"
+    }
+  ],
+  "epics": [],
+  "engine": {
+    "max_rounds": 8,
+    "max_attempts": 3,
+    "batch": 24,
+    "budget": 400,
+    "max_candidates": 40
+  },
+  "detect": {
+    "min_epics": 4,
+    "min_usecases_per_epic": 4,
+    "min_steps_per_usecase": 3,
+    "min_exception_paths": 1,
+    "require_acceptance": true,
+    "require_steps": true,
+    "require_exceptions": true,
+    "require_ground": true,
+    "min_region_size": 9999
+  }
+}

@@ -1,0 +1,35 @@
+{
+ "probes": [
+  {
+   "uc": "CTRL-1",
+   "says": "MUST FAIL: asteroids.length is negative",
+   "js": "asteroids.length < 0"
+  },
+  {
+   "uc": "CTRL-2",
+   "says": "MUST FAIL: a maxed stat leaves its multiplier at 1.0",
+   "js": "(function(){var s=ships[0];ensureStat(s);var o=s.stat.speed;s.stat.speed=CFG.STAT_MAX;var m=statMult(s,'speed');s.stat.speed=o;return m===1;})()"
+  },
+  {
+   "uc": "CTRL-3",
+   "says": "MUST FAIL: spending on a real stat with no points succeeds",
+   "js": "(function(){var s=ships[0];ensureStat(s);var p=s.gemPts;s.gemPts=0;var r=spendStat(s,'speed');s.gemPts=p;return !!(r&&r.ok===true);})()"
+  },
+  {
+   "uc": "CTRL-4",
+   "says": "MUST BE UNDETERMINED: references a global that does not exist",
+   "js": "thisGlobalDoesNotExist.value > 0"
+  },
+  {
+   "uc": "CTRL-5",
+   "says": "MUST BE UNDETERMINED: returns a number, not a boolean",
+   "js": "asteroids.length"
+  },
+  {
+   "uc": "CTRL-6",
+   "says": "MUST PASS: the sanity anchor",
+   "js": "asteroids.length > 0"
+  }
+ ],
+ "_comment": "The guard on the guard. A probe harness that reports everything green is worth nothing until it has been shown to report red. Each of these has a known answer: three must come back false, two must come back undetermined (an undefined global, and an expression that returns a number rather than a boolean), one must come back true. If this file ever runs all green, the harness has stopped discriminating and every other result it gives is meaningless."
+}

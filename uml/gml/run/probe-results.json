@@ -1,0 +1,150 @@
+{
+ "url": "http://127.0.0.1:8799/index.html",
+ "results": [
+  {
+   "uc": "UC-E1-2",
+   "says": "ships[0] exists with role 'player' after load",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E1-2",
+   "says": "the ship has a non-zero collision radius, so it can be hit",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E1-4",
+   "says": "holding thrust raises speed until it plateaus at VMAX, not beyond",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E2-1",
+   "says": "the field holds rocks up to AST_MAX and never more",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E2-6",
+   "says": "GEM_BAR_MAX credits collected converts to exactly one banked point",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E2-6",
+   "says": "only the player's ship banks points; an AI ship collecting gems banks none",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E2-6",
+   "says": "banked points stop accumulating at GEM_PTS_CAP",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-1",
+   "says": "spending on an unknown stat name is refused with the list of real ones",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-1",
+   "says": "a stat already at STAT_MAX refuses further points rather than consuming them",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-2",
+   "says": "a stat at zero leaves its multiplier at exactly 1.0",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-2",
+   "says": "raising speed increases the ship's achieved velocity in flight",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-3",
+   "says": "with seven stats maxed the tier-up is not offered",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-3",
+   "says": "with eight maxed and no banked point the tier-up is not offered",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-4",
+   "says": "a ship at the top of the ladder is offered nothing",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-4",
+   "says": "there is a ladder of more than one hull to climb",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E3-5",
+   "says": "refusing the tier-up leaves the current hull and stats untouched",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E4-1",
+   "says": "raising energyCap raises the ceiling the capacitor refills to",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E4-3",
+   "says": "the interval between shots is the weapon's own cd from the WEAPONS table, divided by the ship's fireRate multiplier, so buying fireRate visibly shortens it",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E4-3",
+   "says": "two weapon types with different cd values fire at visibly different rates on the same hull",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E4-4",
+   "says": "each shield arc carries half the ship's total shield",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E4-7",
+   "says": "respawn does not happen before RESPAWN_DELAY seconds have passed",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E5-1",
+   "says": "the snapshot carries a version field, so an old save is recognisable as old",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E5-4",
+   "says": "a snapshot of the wrong version is declined and the pilot starts fresh",
+   "verdict": true,
+   "error": null
+  },
+  {
+   "uc": "UC-E5-3",
+   "says": "a session ended without a clean exit still restores to within SAVE_INTERVAL_S of where it stopped",
+   "verdict": true,
+   "error": null
+  }
+ ],
+ "pageErrors": []
+}

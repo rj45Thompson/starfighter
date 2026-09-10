@@ -1,0 +1,44 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E3["E3 — Spend the point, or save for the hull"]
+      direction LR
+      UC_E3_1["<b>UC-E3-1</b><br/>The pilot spends a point on one of eight stats<br/><small>spendStat</small>"]
+      UC_E3_2["<b>UC-E3-2</b><br/>Each point visibly changes how the ship performs<br/><small>statMult</small>"]
+      UC_E3_3["<b>UC-E3-3</b><br/>Maxing every stat arms the trade-in<br/><small>tierUpReady</small>"]
+      UC_E3_4["<b>UC-E3-4</b><br/>The game names the hull that comes next<br/><small>nextTierHull</small>"]
+      UC_E3_5["<b>UC-E3-5</b><br/>Taking the new hull costs every upgrade bought<br/><small>takeTierUp</small>"]
+      UC_E3_6["<b>UC-E3-6</b><br/>The traded-up frame outperforms the one it replaced<br/><small>HULLS</small>"]
+    end
+  end
+  S_hull_swapped(("the ship is flying a new frame"))
+  S_point_banked(("the pilot is owed at least one upgrade point"))
+  S_ship_stronger(("the ship is measurably better than it was"))
+  S_stat_raised(("at least one stat is above zero"))
+  S_stats_maxed(("every stat is at its cap"))
+  S_tier_offered(("a next hull is on offer"))
+  E3 --> S_point_banked
+  UC_E3_1 --> S_stat_raised
+  UC_E3_2 --> S_ship_stronger
+  UC_E3_3 --> S_stats_maxed
+  UC_E3_4 --> S_tier_offered
+  UC_E3_5 --> S_hull_swapped
+  UC_E3_6 --> S_ship_stronger
+  A_pilot --- E3
+  S_ship_stronger --> E3
+  S_point_banked --> UC_E3_1
+  S_stat_raised --> UC_E3_2
+  S_stat_raised --> UC_E3_3
+  S_stats_maxed --> UC_E3_4
+  S_tier_offered --> UC_E3_5
+  S_hull_swapped --> UC_E3_6
+  style UC_E3_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E3_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (379): Q:what:UC-E1-1 -answers-> S:world_built; Q:what:UC-E1-2 -answers-> S:ship_exists; Q:what:UC-E1-3 -answers-> S:sim_running; Q:what:UC-E1-4 -answers-> S:controls_live; Q:what:UC-E1-5 -answers-> S:in_flight; Q:what:UC-E2-1 -answers-> S:belt_exists; Q:what:UC-E2-2 -answers-> S:rock_in_range; Q:what:UC-E2-3 -answers-> S:gems_loose; Q:what:UC-E2-4 -answers-> S:gem_pickable; Q:what:UC-E2-5 -answers-> S:gem_in_hold; Q:what:UC-E2-6 -answers-> S:point_banked; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_stronger; Q:what:UC-E3-3 -answers-> S:stats_maxed; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:hull_swapped; Q:what:UC-E3-6 -answers-> S:ship_stronger; Q:what:UC-E4-1 -answers-> S:weapon_ready; Q:what:UC-E4-2 -answers-> S:shot_in_flight; Q:what:UC-E4-3 -answers-> S:in_combat

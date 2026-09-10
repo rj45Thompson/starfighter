@@ -1,0 +1,442 @@
+# Arm D — the uml-requirements skill, run by Claude with no engine.
+# Same corpus as arm C (28 terms, 36 claims, 1 contradiction). Every check in the skill's
+# "before you hand it over" list done by hand while writing. Counts reported at the end.
+
+actor A:pilot "Pilot"
+actor A:system "Game server"
+actor A:enemy "Another player"
+
+# ---------------------------------------------------------------- E1: joining a round
+epic E1 "Joining a round" story="From the main menu to a ship the pilot is actually flying."
+performs A:pilot E1
+state S:at_menu "the pilot is at the main menu with no ship"
+state S:mode_chosen "a game mode has been selected for this round"
+state S:objective_known "the pilot knows what winning this mode requires"
+state S:has_ship "the pilot owns a Tier 1 ship"
+state S:at_station "the ship is positioned at its team's space station"
+state S:controls_bound "an input scheme is bound to the ship"
+state S:in_control "the pilot can change the ship's heading"
+state S:under_way "the ship is moving under the pilot's command"
+establishes E1 S:at_menu
+requires E1 S:under_way
+
+usecase UC-E1-1 "Pilot selects a game mode" status=HAVE
+includes E1 UC-E1-1
+performs A:pilot UC-E1-1
+requires UC-E1-1 S:at_menu
+establishes UC-E1-1 S:mode_chosen
+ground UC-E1-1 "game mode"
+accept UC-E1-1 "the main menu offers exactly four modes: Survival, Team, Deathmatch and Invasion"
+because UC-E1-1 "the sources say four modes are chosen from the main menu, so mode selection precedes everything and the whole round's rules follow from it"
+instead UC-E1-1 "dropping the pilot into a default mode and letting them switch later"
+
+usecase UC-E1-2 "Server states the objective for the chosen mode" status=HAVE
+includes E1 UC-E1-2
+performs A:system UC-E1-2
+requires UC-E1-2 S:mode_chosen
+establishes UC-E1-2 S:objective_known
+ground UC-E1-2 objective
+accept UC-E1-2 "the stated objective differs between modes: last survivor, destroy enemy bases, first to a kill target, most flags"
+because UC-E1-2 "the sources are explicit that the objective varies by mode, so it cannot be a constant of the game and has to be established once the mode is known"
+instead UC-E1-2 "one objective for the whole game with mode as a cosmetic variation"
+
+usecase UC-E1-3 "Server spawns the pilot in a Tier 1 ship at the station" status=HAVE
+includes E1 UC-E1-3
+performs A:system UC-E1-3
+requires UC-E1-3 S:objective_known
+establishes UC-E1-3 S:has_ship
+establishes UC-E1-3 S:at_station
+ground UC-E1-3 ship
+ground UC-E1-3 Fly
+ground UC-E1-3 "space station"
+accept UC-E1-3 "the ship the pilot starts with is the Fly, the only Tier 1 hull, and it appears next to the station"
+because UC-E1-3 "the sources name the Fly as the only ship available at level one and place the spawn near the station, so both are facts about the game and not choices to make"
+instead UC-E1-3 "letting the pilot pick a starting hull, which the ship tree does not allow"
+
+usecase UC-E1-4 "Pilot binds a control scheme" status=HAVE
+includes E1 UC-E1-4
+performs A:pilot UC-E1-4
+requires UC-E1-4 S:has_ship
+establishes UC-E1-4 S:controls_bound
+ground UC-E1-4 controls
+accept UC-E1-4 "both a mouse scheme and a keyboard scheme are available and either alone is sufficient to play"
+because UC-E1-4 "the sources say the ship can be controlled with mouse or keyboard, which makes this a real choice with two branches rather than a fixed binding"
+instead UC-E1-4 "one input scheme, which would make steering and firing single use cases with no divergence"
+
+usecase UC-E1-5 "Pilot steers the ship" status=HAVE
+includes E1 UC-E1-5
+performs A:pilot UC-E1-5
+requires UC-E1-5 S:controls_bound
+establishes UC-E1-5 S:in_control
+ground UC-E1-5 steer
+accept UC-E1-5 "moving the mouse changes the heading, and so do the left and right arrow keys"
+because UC-E1-5 "steering is named separately from acceleration in the sources and binds to different inputs, so folding them together would lose one of the two bindings"
+instead UC-E1-5 "one 'fly the ship' use case covering heading and thrust together"
+
+usecase UC-E1-6 "Pilot accelerates the ship" status=HAVE
+includes E1 UC-E1-6
+performs A:pilot UC-E1-6
+requires UC-E1-6 S:in_control
+establishes UC-E1-6 S:under_way
+ground UC-E1-6 accelerate
+accept UC-E1-6 "right-click accelerates, and so does the up arrow; releasing neither does not accelerate"
+because UC-E1-6 "the sources bind acceleration to its own inputs, and a ship that has a heading but no thrust cannot reach an asteroid, so this is the beat that actually starts the game"
+instead UC-E1-6 "constant forward motion with steering only, as in some arcade shooters"
+
+precedes E1 UC-E1-1
+precedes UC-E1-1 UC-E1-2
+precedes UC-E1-2 UC-E1-3
+precedes UC-E1-3 UC-E1-4
+precedes UC-E1-4 UC-E1-5
+precedes UC-E1-5 UC-E1-6
+precedes UC-E1-6 E1
+
+# ---------------------------------------------------------------- E2: mining
+epic E2 "Mining an asteroid" story="Turn an asteroid into a full cargo of gems."
+performs A:pilot E2
+state S:near_asteroid "the ship is within weapon range of an asteroid"
+state S:asteroid_damaged "an asteroid has taken damage this pass"
+state S:gems_loose "gem fragments are floating free in space"
+state S:gems_in_cargo "the ship is carrying gems it did not start with"
+state S:cargo_full "the ship's gem cargo is at capacity"
+establishes E2 S:under_way
+requires E2 S:cargo_full
+
+usecase UC-E2-1 "Pilot closes with an asteroid" status=HAVE
+includes E2 UC-E2-1
+performs A:pilot UC-E2-1
+requires UC-E2-1 S:under_way
+establishes UC-E2-1 S:near_asteroid
+ground UC-E2-1 asteroid
+accept UC-E2-1 "larger asteroids are reachable and are visibly distinguished from smaller ones before they are fired on"
+because UC-E2-1 "the sources say larger asteroids pay more per damage dealt but are riskier, which is a decision the pilot can only make if size is legible before committing"
+instead UC-E2-1 "treating all asteroids as identical, which erases the risk-reward the sources describe"
+
+usecase UC-E2-2 "Pilot fires on the asteroid" status=HAVE
+includes E2 UC-E2-2
+performs A:pilot UC-E2-2
+requires UC-E2-2 S:near_asteroid
+establishes UC-E2-2 S:asteroid_damaged
+ground UC-E2-2 fire
+accept UC-E2-2 "left-click fires, and so does the space bar; an asteroid under fire loses integrity"
+because UC-E2-2 "firing is the same act whether the target is a rock or a ship, so it is one use case that both mining and combat reach rather than two that drift apart"
+instead UC-E2-2 "a separate mining beam, which the sources do not describe"
+
+usecase UC-E2-3 "Server breaks the asteroid into gem fragments" status=HAVE
+includes E2 UC-E2-3
+performs A:system UC-E2-3
+requires UC-E2-3 S:asteroid_damaged
+establishes UC-E2-3 S:gems_loose
+ground UC-E2-3 gem
+ground UC-E2-3 asteroid
+accept UC-E2-3 "a larger asteroid yields larger gem chunks than a smaller one destroyed by the same damage"
+because UC-E2-3 "the sources tie chunk size to asteroid size, so the yield is a property of the target and not of the weapon, and the difference has to be visible or the choice in UC-E2-1 means nothing"
+instead UC-E2-3 "a flat gem yield per asteroid destroyed"
+
+usecase UC-E2-4 "Pilot collects a loose gem" status=HAVE
+includes E2 UC-E2-4
+performs A:pilot UC-E2-4
+requires UC-E2-4 S:gems_loose
+establishes UC-E2-4 S:gems_in_cargo
+ground UC-E2-4 gem
+accept UC-E2-4 "a gem the ship touches is added to its cargo and is no longer collectable by anyone else"
+because UC-E2-4 "the sources treat mining and collecting as separate acts -- gems can also be stolen from bases, aliens and ships -- so collection cannot be folded into destruction"
+instead UC-E2-4 "crediting gems directly on destruction, which would make theft from other ships impossible to express"
+
+usecase UC-E2-5 "Server refuses gems past the cargo limit" status=HAVE
+includes E2 UC-E2-5
+performs A:system UC-E2-5
+requires UC-E2-5 S:gems_in_cargo
+establishes UC-E2-5 S:cargo_full
+ground UC-E2-5 "cargo capacity"
+accept UC-E2-5 "a full ship cannot pick up another gem, and a gem that would exceed the cargo is destroyed rather than left floating"
+because UC-E2-5 "the sources give the capacity as 20L squared and are explicit that excess gems are lost rather than dropped: 20 and 2 are theirs, not mine, and the loss is what makes cargo a real constraint"
+instead UC-E2-5 "leaving the excess gem in space for another pass, which the sources contradict"
+
+precedes E2 UC-E2-1
+precedes UC-E2-1 UC-E2-2
+precedes UC-E2-2 UC-E2-3
+precedes UC-E2-3 UC-E2-4
+precedes UC-E2-4 UC-E2-5
+precedes UC-E2-5 E2
+
+# ---------------------------------------------------------------- E3: growing stronger
+epic E3 "Growing stronger" story="Spend a full cargo on stats, then on a whole new hull."
+performs A:pilot E3
+state S:stat_upgraded "at least one of the ship's statistics is above its base value"
+state S:upgrade_paid "gems have been deducted for an upgrade"
+state S:regen_raised "the ship's energy regeneration is above its base value"
+state S:cargo_refilled "the cargo is full again after spending"
+state S:tier_raised "the pilot is flying a hull from a higher tier"
+state S:ship_stronger "the ship is more capable than the one the pilot started the round with"
+state S:extra_life_held "the pilot holds at least one unspent extra life"
+establishes E3 S:cargo_full
+requires E3 S:ship_stronger
+
+usecase UC-E3-1 "Pilot spends gems on a ship statistic" status=HAVE
+includes E3 UC-E3-1
+performs A:pilot UC-E3-1
+requires UC-E3-1 S:cargo_full
+establishes UC-E3-1 S:stat_upgraded
+ground UC-E3-1 "spend gems"
+ground UC-E3-1 "upgrade categories"
+accept UC-E3-1 "there are 8 upgradable categories and each can be raised L times at tier L"
+because UC-E3-1 "8 and the per-tier limit L are the sources' figures, not chosen here; the categories are separate use cases from tiering up because they spend the same cargo on a different kind of gain"
+instead UC-E3-1 "a single power level, which would collapse the eight categories into one number"
+
+usecase UC-E3-2 "Server charges the tier's upgrade cost" status=HAVE
+includes E3 UC-E3-2
+performs A:system UC-E3-2
+requires UC-E3-2 S:stat_upgraded
+establishes UC-E3-2 S:upgrade_paid
+ground UC-E3-2 "upgrade cost"
+accept UC-E3-2 "one upgrade costs 5L gems, and fully upgrading every category costs 40L squared -- two full cargo loads"
+because UC-E3-2 "5L, 40L squared and 'two full cargo loads' are all stated in the sources; the arithmetic that two loads fill the tree is theirs and is what makes cargo capacity and upgrade cost one system rather than two numbers"
+instead UC-E3-2 "a flat cost per upgrade independent of tier, which would break the two-loads relationship"
+
+usecase UC-E3-3 "Pilot raises energy regeneration early" status=HAVE
+includes E3 UC-E3-3
+performs A:pilot UC-E3-3
+requires UC-E3-3 S:upgrade_paid
+establishes UC-E3-3 S:regen_raised
+ground UC-E3-3 "energy regen"
+accept UC-E3-3 "a ship with raised energy regen sustains fire longer than one without, and reaches the next full cargo sooner"
+because UC-E3-3 "the sources single this category out as the one that speeds the journey to higher tiers, which makes it a named beat rather than an instance of UC-E3-1"
+instead UC-E3-3 "treating all eight categories identically, which would lose the ordering advice the sources give"
+
+usecase UC-E3-4 "Pilot refills the cargo after spending" status=HAVE
+includes E3 UC-E3-4
+performs A:pilot UC-E3-4
+requires UC-E3-4 S:regen_raised
+establishes UC-E3-4 S:cargo_refilled
+ground UC-E3-4 "cargo capacity"
+accept UC-E3-4 "the cargo reaches capacity a second time within the round"
+because UC-E3-4 "spending empties the hold and tiering up needs it full again, so a beat that says so has to exist or the tier-up requires a state nothing re-establishes"
+instead UC-E3-4 "letting stat upgrades and tier-up draw on separate pools, which the sources do not describe"
+
+usecase UC-E3-5 "Pilot exchanges a full cargo for a higher-tier hull" status=HAVE
+includes E3 UC-E3-5
+performs A:pilot UC-E3-5
+requires UC-E3-5 S:cargo_refilled
+establishes UC-E3-5 S:tier_raised
+ground UC-E3-5 "tier up"
+ground UC-E3-5 tier
+accept UC-E3-5 "the choice offered is between exactly two hulls of the next tier, and the ceiling is Tier 7"
+because UC-E3-5 "two hulls, seven tiers and 32 ships are the sources' figures; the choice is what makes the ship tree a tree rather than a ladder, and it is the decision the whole mining loop exists to reach"
+instead UC-E3-5 "an automatic upgrade with no choice, which would flatten the tree"
+
+usecase UC-E3-6 "Server hands over the new hull un-upgraded" status=HAVE
+includes E3 UC-E3-6
+performs A:system UC-E3-6
+requires UC-E3-6 S:tier_raised
+establishes UC-E3-6 S:ship_stronger
+ground UC-E3-6 "tier up"
+accept UC-E3-6 "every category on the new hull reads at its base value immediately after the exchange"
+because UC-E3-6 "the sources say you start with an un-upgraded ship of the next level, which is a real cost the pilot pays and is easy to omit because it reads as a downgrade"
+instead UC-E3-6 "carrying upgrade levels across the tier boundary, which the sources contradict"
+
+usecase UC-E3-7 "Pilot buys an extra life instead of tiering up" status=HAVE guard=S:cargo_refilled
+includes E3 UC-E3-7
+extends UC-E3-7 UC-E3-5
+performs A:pilot UC-E3-7
+requires UC-E3-7 S:cargo_refilled
+establishes UC-E3-7 S:extra_life_held
+ground UC-E3-7 "extra life"
+accept UC-E3-7 "a full cargo buys one extra life, up to 5 held at Tier 1-6 and none at all at Tier 7"
+because UC-E3-7 "5 and the Tier 7 exception are the sources' figures; this is an extension rather than a beat because it is the same full cargo spent a different way, and the main success scenario is tiering up"
+instead UC-E3-7 "a separate currency for lives, which would decouple it from the cargo decision"
+
+# --- added after the engine's audit, which is the only reason it is here. ---------
+# DANGLING_POSTCONDITION on S:at_station: UC-E1-3 put the pilot at the station and
+# nothing in 30 use cases ever needed them to be there. The station was scenery. The
+# corpus says gems can be "contributed to a base for credits", so the missing beat is
+# real and this is it -- written by hand, found by arithmetic.
+state S:credits_banked "gems have been converted into base credits"
+usecase UC-E3-8 "Pilot contributes gems to the base for credits" status=HAVE guard=S:at_station
+includes E3 UC-E3-8
+extends UC-E3-8 UC-E3-1
+performs A:pilot UC-E3-8
+requires UC-E3-8 S:at_station
+requires UC-E3-8 S:cargo_full
+establishes UC-E3-8 S:credits_banked
+ground UC-E3-8 "spend gems"
+ground UC-E3-8 "space station"
+accept UC-E3-8 "gems contributed at the base become credits and leave the ship's cargo"
+because UC-E3-8 "the sources list contributing to a base for credits alongside stats, tiers and lives as one of the four things gems buy, so leaving it out made 'spend gems' three-quarters modelled; it extends UC-E3-1 because it is the same full cargo spent a fourth way"
+instead UC-E3-8 "treating contribution as out of scope, which the sources do not support"
+note UC-E3-8 "OPEN, AND THE SOURCES ARE WHY: nothing in the corpus says what a credit is then used for, so S:credits_banked is consumed by nothing. That is a hole in the source material, not in the model, and it stays visible rather than being closed with an invented answer."
+
+precedes E3 UC-E3-1
+precedes UC-E3-1 UC-E3-2
+precedes UC-E3-2 UC-E3-3
+precedes UC-E3-3 UC-E3-4
+precedes UC-E3-4 UC-E3-5
+precedes UC-E3-5 UC-E3-6
+precedes UC-E3-6 E3
+
+# ---------------------------------------------------------------- E4: fighting and dying
+epic E4 "Fighting and dying" story="What another ship can take from you, in the order it takes it."
+performs A:pilot E4
+performs A:enemy E4
+state S:enemy_engaged "the pilot and another ship are exchanging fire"
+state S:shield_depleted "the ship's shield is at zero"
+state S:gems_dropped "gems the ship was carrying are loose in space again"
+state S:ship_destroyed "the pilot's ship no longer exists"
+state S:fight_resolved "the engagement is over and the pilot is flying again"
+establishes E4 S:ship_stronger
+requires E4 S:fight_resolved
+
+usecase UC-E4-1 "Pilot engages another ship" status=HAVE
+includes E4 UC-E4-1
+performs A:pilot UC-E4-1
+performs A:enemy UC-E4-1
+requires UC-E4-1 S:ship_stronger
+establishes UC-E4-1 S:enemy_engaged
+ground UC-E4-1 weapons
+accept UC-E4-1 "direct laser fire, torpedoes and special weapons are each usable against another ship"
+because UC-E4-1 "the sources name three weapon kinds, so weapons is one use case with three means rather than three use cases, until something distinguishes their preconditions"
+instead UC-E4-1 "one use case per weapon type, which would triple the model with no difference in the chain"
+
+usecase UC-E4-2 "Server absorbs damage with the shield" status=HAVE
+includes E4 UC-E4-2
+performs A:system UC-E4-2
+requires UC-E4-2 S:enemy_engaged
+establishes UC-E4-2 S:shield_depleted
+ground UC-E4-2 shield
+accept UC-E4-2 "damage reduces the shield before it reduces anything else, and a shielded ship loses no gems"
+because UC-E4-2 "the sources describe shields and regeneration as what defensive players prioritise for durability, which only makes sense if the shield is the first thing damage meets"
+instead UC-E4-2 "damage applied to hull and shield together, which would make the gems-as-shield mechanic unreachable"
+
+usecase UC-E4-3 "Server sheds gems once the shield is gone" status=HAVE
+includes E4 UC-E4-3
+performs A:system UC-E4-3
+requires UC-E4-3 S:shield_depleted
+establishes UC-E4-3 S:gems_dropped
+ground UC-E4-3 "gems as shield"
+accept UC-E4-3 "with the shield at zero, damage taken causes that amount of gems to fall off the ship and become collectable"
+because UC-E4-3 "the sources contradict each other here and this records the better-supported reading: one source says gems fall off continuously as damage lands once the shield is depleted, another describes gem loss only at death. The continuous reading is stated in the specific claim about gems serving as a second shield, and the death reading appears only as a summary of what dying costs -- so the specific claim wins and this stays provisional"
+instead UC-E4-3 "losing the whole cargo at death only, which is the other reading in the sources"
+note UC-E4-3 "SOURCES DISAGREE: continuous shedding under fire versus total loss at death. Recorded, not resolved."
+
+usecase UC-E4-4 "Server destroys the ship when damage continues" status=HAVE
+includes E4 UC-E4-4
+performs A:system UC-E4-4
+requires UC-E4-4 S:gems_dropped
+establishes UC-E4-4 S:ship_destroyed
+ground UC-E4-4 death
+accept UC-E4-4 "a ship whose shield and gems are both gone is destroyed by further damage"
+because UC-E4-4 "destruction is a separate beat from shedding because the gems are a buffer with a size: how much damage the buffer absorbs is a question only a separate use case can carry"
+instead UC-E4-4 "destruction the moment the shield fails, which would make gems-as-shield decorative"
+
+usecase UC-E4-5 "Server respawns the pilot at Tier 1" status=HAVE
+includes E4 UC-E4-5
+performs A:system UC-E4-5
+requires UC-E4-5 S:ship_destroyed
+establishes UC-E4-5 S:fight_resolved
+ground UC-E4-5 death
+accept UC-E4-5 "after death the pilot flies a Tier 1 ship with minimal crystals and no upgrades"
+because UC-E4-5 "the sources are explicit that upgrades vanish and the tier resets, which makes death the mirror of the whole of E3 and is why E3 and E4 are separate arcs rather than one"
+instead UC-E4-5 "respawning at the same tier, which would remove the stake from every engagement"
+
+usecase UC-E4-6 "Pilot spends an extra life instead of resetting" status=HAVE guard=S:extra_life_held
+includes E4 UC-E4-6
+extends UC-E4-6 UC-E4-5
+performs A:pilot UC-E4-6
+requires UC-E4-6 S:extra_life_held
+establishes UC-E4-6 S:fight_resolved
+ground UC-E4-6 "extra life"
+accept UC-E4-6 "a pilot holding an extra life keeps their tier and upgrades through one death, and holds one fewer afterwards"
+because UC-E4-6 "this is the beat that makes UC-E3-7 mean anything: without it the extra life is bought in E3 and consumed nowhere, and the branch never rejoins the story"
+instead UC-E4-6 "extra lives as score only, which would leave a purchased state with no consumer"
+
+precedes E4 UC-E4-1
+precedes UC-E4-1 UC-E4-2
+precedes UC-E4-2 UC-E4-3
+precedes UC-E4-3 UC-E4-4
+precedes UC-E4-4 UC-E4-5
+precedes UC-E4-5 E4
+
+# ---------------------------------------------------------------- E5: the round ending
+epic E5 "Ending the round" story="How a server that never stops is made to stop."
+performs A:system E5
+state S:arena_narrowing "the playable area is smaller than it was"
+state S:players_warned "every surviving player has been told how far the endgame has run"
+state S:survival_started "the survival period of the round has begun"
+state S:winner_declared "one player has been named the winner"
+state S:round_over "the server has ended this round"
+establishes E5 S:fight_resolved
+requires E5 S:round_over
+
+usecase UC-E5-1 "Server narrows the arena with a gravity field" status=HAVE
+includes E5 UC-E5-1
+performs A:system UC-E5-1
+requires UC-E5-1 S:fight_resolved
+establishes UC-E5-1 S:arena_narrowing
+ground UC-E5-1 "gravity field"
+accept UC-E5-1 "the repulsive field around the star grows larger and stronger as the endgame runs, and pushes ships outward"
+because UC-E5-1 "the sources describe a repulsive field that grows with the endgame, which is the mechanism that forces contact -- without it a round of survivors avoiding each other never ends"
+instead UC-E5-1 "a hard timer, which would end the round without forcing the fight"
+
+usecase UC-E5-2 "Server warns players as the endgame runs" status=HAVE
+includes E5 UC-E5-2
+performs A:system UC-E5-2
+requires UC-E5-2 S:arena_narrowing
+establishes UC-E5-2 S:players_warned
+ground UC-E5-2 "endgame warning"
+accept UC-E5-2 "warnings are issued at 75%, 50%, 25% and 0% of the endgame and at no other point"
+because UC-E5-2 "75, 50, 25 and 0 are the sources' figures, quoted rather than chosen; the warnings are a separate beat from the field because they are what lets a pilot decide when to stop mining"
+instead UC-E5-2 "a continuously visible countdown, which the sources do not describe"
+
+usecase UC-E5-3 "Pilot survives into the survival period" status=HAVE
+includes E5 UC-E5-3
+performs A:pilot UC-E5-3
+requires UC-E5-3 S:players_warned
+establishes UC-E5-3 S:survival_started
+ground UC-E5-3 "survival objective"
+accept UC-E5-3 "the round enters a phase in which being the last surviving player is the stated win condition"
+because UC-E5-3 "the sources make lasting until the survival period begins the ultimate goal, which makes it a state to reach rather than a rule that was always in force"
+instead UC-E5-3 "survival rules from the first second, which would make the mining loop pointless"
+
+usecase UC-E5-4 "Server names the last survivor the winner" status=HAVE
+includes E5 UC-E5-4
+performs A:system UC-E5-4
+requires UC-E5-4 S:survival_started
+establishes UC-E5-4 S:winner_declared
+ground UC-E5-4 "round end"
+accept UC-E5-4 "exactly one player is named winner, and only once no other player remains alive"
+because UC-E5-4 "declaring the winner and shutting the server down are separate because the sources describe the server ending as a consequence of one player being left, not as the same act"
+instead UC-E5-4 "ending on a timer with the highest score, which is a different mode's rule"
+
+usecase UC-E5-5 "Server ends the round" status=HAVE
+includes E5 UC-E5-5
+performs A:system UC-E5-5
+requires UC-E5-5 S:winner_declared
+establishes UC-E5-5 S:round_over
+ground UC-E5-5 "round end"
+accept UC-E5-5 "the server stops once there is only one player left, and accepts no further play in that round"
+because UC-E5-5 "the sources state the server ends once one player is left, which makes the round finite and is the postcondition the whole model chains toward"
+instead UC-E5-5 "returning survivors to a lobby and continuing, which the sources do not describe"
+
+usecase UC-E5-6 "Server runs invasion waves instead of a survival endgame" status=HAVE guard=S:mode_chosen
+includes E5 UC-E5-6
+extends UC-E5-6 UC-E5-3
+performs A:system UC-E5-6
+requires UC-E5-6 S:mode_chosen
+establishes UC-E5-6 S:survival_started
+ground UC-E5-6 "invasion waves"
+ground UC-E5-6 "game mode"
+accept UC-E5-6 "in Invasion mode the round runs 10 waves and then a final boss, and the survival endgame does not occur"
+because UC-E5-6 "10 waves and the boss are the sources' figures; this is an extension on the endgame rather than a fifth epic because it replaces one beat of the ending and leaves the rest of the round identical"
+instead UC-E5-6 "a separate epic per game mode, which would duplicate the whole mining and combat chain four times"
+
+precedes E5 UC-E5-1
+precedes UC-E5-1 UC-E5-2
+precedes UC-E5-2 UC-E5-3
+precedes UC-E5-3 UC-E5-4
+precedes UC-E5-4 UC-E5-5
+precedes UC-E5-5 E5
+
+precedes E1 E2
+precedes E2 E3
+precedes E3 E4
+precedes E4 E5

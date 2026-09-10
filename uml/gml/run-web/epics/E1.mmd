@@ -1,0 +1,42 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast-web — system boundary"]
+    direction LR
+    subgraph E1["E1 — Choose a mode and reach the field"]
+      direction LR
+      UC_E1_1["<b>UC-E1-1</b><br/>Player chooses one of the four game modes<br/><small>game mode</small>"]
+      UC_E1_2["<b>UC-E1-2</b><br/>The server places the ship beside its base<br/><small>space station</small>"]
+      UC_E1_3["<b>UC-E1-3</b><br/>Pilot steers the ship<br/><small>steer</small>"]
+      UC_E1_4["<b>UC-E1-4</b><br/>Pilot accelerates the ship<br/><small>accelerate</small>"]
+      UC_E1_5["<b>UC-E1-5</b><br/>Pilot fires the ship's weapon<br/><small>fire</small>"]
+    end
+  end
+  S_at_menu(("the player is at the main menu, in no game"))
+  S_can_move(("the ship moves under the player's control"))
+  S_can_steer(("the ship's heading answers the player"))
+  S_in_field(("the pilot is flying in the asteroid field"))
+  S_mode_chosen(("a mode is chosen and its objective is set"))
+  S_ship_placed(("the pilot has a ship in the world, near its base"))
+  E1 --> S_at_menu
+  UC_E1_1 --> S_mode_chosen
+  UC_E1_2 --> S_ship_placed
+  UC_E1_3 --> S_can_steer
+  UC_E1_4 --> S_can_move
+  UC_E1_5 --> S_in_field
+  A_pilot --- E1
+  S_in_field --> E1
+  S_at_menu --> UC_E1_1
+  S_mode_chosen --> UC_E1_2
+  S_ship_placed --> UC_E1_3
+  S_can_steer --> UC_E1_4
+  S_can_move --> UC_E1_5
+  Q_why_UC_E3_3{{"❓ WHY"}}
+  style Q_why_UC_E3_3 fill:#3d1f1f,stroke:#ff6b6b,color:#ffe8e8
+  style UC_E1_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (343): Q:what:UC-E1-1 -answers-> S:mode_chosen; Q:what:UC-E1-2 -answers-> S:ship_placed; Q:what:UC-E1-3 -answers-> S:can_steer; Q:what:UC-E1-4 -answers-> S:can_move; Q:what:UC-E1-5 -answers-> S:in_field; Q:what:UC-E2-1 -answers-> S:rock_broken; Q:what:UC-E2-2 -answers-> S:gems_loose; Q:what:UC-E2-3 -answers-> S:gems_held; Q:what:UC-E2-4 -answers-> S:hold_bounded; Q:what:UC-E2-5 -answers-> S:mining_has_a_cost; Q:what:UC-E2-6 -answers-> S:cargo_full; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_better; Q:what:UC-E3-3 -answers-> S:life_banked; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:ship_better; Q:what:UC-E4-1 -answers-> S:trading_fire; Q:what:UC-E4-2 -answers-> S:shield_down; Q:what:UC-E4-3 -answers-> S:bleeding_gems; Q:what:UC-E4-4 -answers-> S:ship_destroyed

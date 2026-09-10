@@ -1,0 +1,160 @@
+{
+  "name": "starblast",
+  "root": "../..",
+  "sources": [
+    "index.html",
+    "sbhud.js",
+    "shell.js",
+    "panels.js",
+    "hullmodels.js",
+    "sound.js"
+  ],
+  "config_prefixes": [
+    "CFG"
+  ],
+  "actors": [
+    {
+      "id": "A:pilot",
+      "name": "Pilot",
+      "attrs": {
+        "note": "the human at the keyboard"
+      }
+    },
+    {
+      "id": "A:system",
+      "name": "The game",
+      "attrs": {
+        "note": "the simulation acting on its own"
+      }
+    },
+    {
+      "id": "A:rival",
+      "name": "Another ship",
+      "attrs": {
+        "note": "an AI pilot or another player"
+      }
+    }
+  ],
+  "states": [
+    {
+      "id": "S:page_open",
+      "name": "the page is open and nothing has started"
+    },
+    {
+      "id": "S:world_built",
+      "name": "a world exists to fly in"
+    },
+    {
+      "id": "S:ship_exists",
+      "name": "the pilot has a ship in that world"
+    },
+    {
+      "id": "S:in_flight",
+      "name": "the pilot is flying and in control"
+    },
+    {
+      "id": "S:point_banked",
+      "name": "the pilot is owed at least one upgrade point"
+    },
+    {
+      "id": "S:ship_stronger",
+      "name": "the ship is measurably better than it was"
+    },
+    {
+      "id": "S:under_fire",
+      "name": "something is shooting at the pilot"
+    },
+    {
+      "id": "S:respawned",
+      "name": "the pilot is flying again after dying"
+    },
+    {
+      "id": "S:session_recorded",
+      "name": "the run is over and what happened is on record"
+    }
+  ],
+  "epics": [
+    {
+      "id": "E1",
+      "actor": "A:pilot",
+      "name": "Arrive and fly",
+      "story": "You open the page. A world exists, you are in a ship in it, and the controls answer. Nothing else in the game can happen until this does.",
+      "scope": "^(CAM_|KP_|SHIP_|PERIPH_|THRUST|DRAG|VMAX|PITCH_RATE|YAW_RATE|BANK_|SKY_|EXPOSURE|TOPCAM)|^(renderer|scene|frame|step|resize|makeShip|hullModel)$",
+      "start": [
+        "S:page_open"
+      ],
+      "goal": [
+        "S:in_flight"
+      ]
+    },
+    {
+      "id": "E2",
+      "actor": "A:pilot",
+      "name": "Mine the belt",
+      "story": "You fly a small ship at some rocks. You shoot one, it breaks, and the pieces are worth something. You scoop them up and the bar at the bottom fills. When it fills, you are owed something.",
+      "scope": "^(AST_|GEM_|BOT_|MINING|BELT|ROCK)|[Aa]steroid|[Gg]em|[Mm]agnet|[Mm]ining",
+      "start": [
+        "S:in_flight"
+      ],
+      "goal": [
+        "S:point_banked"
+      ]
+    },
+    {
+      "id": "E3",
+      "actor": "A:pilot",
+      "name": "Spend the point, or save for the hull",
+      "story": "You have a point. Put it into guns, shields or engines and get a little better now; or hold out, max everything, and trade the whole ship for a bigger frame and lose every upgrade you bought. That is the only real decision in the game.",
+      "scope": "^(STAT_|HULL|TIER|UPG|GEM_BAR|GEM_PTS|POWER_)|spendStat|statMult|tierUp|takeTier|nextTier|doUpgrade|hullTier",
+      "start": [
+        "S:point_banked"
+      ],
+      "goal": [
+        "S:ship_stronger"
+      ]
+    },
+    {
+      "id": "E4",
+      "actor": "A:pilot",
+      "name": "Fight, die, and lose the cargo",
+      "story": "Your gun costs energy, so you cannot hold the trigger forever. Your shields soak the first hits and come back if you break away. When you lose, your gems spill for anyone to take and you start again small.",
+      "scope": "^(LASER|SHIELD|BULLET|DMG|WEAPON|MISSILE|AI_|HIT_)|[Ss]hield|[Ll]aser|killShip|killBy|spill|damage|capLaser|capMax",
+      "start": [
+        "S:in_flight"
+      ],
+      "goal": [
+        "S:respawned"
+      ]
+    },
+    {
+      "id": "E5",
+      "actor": "A:system",
+      "name": "The run ends and is remembered",
+      "story": "The session stops, and what you did survives it: the score, the ship you were flying, the state that has to be there when you come back.",
+      "scope": "^(SCORE|SAVE|RESPAWN|DEATH|PERSIST|SESSION)|score|respawn|persist|gatherSave|applySave",
+      "start": [
+        "S:respawned"
+      ],
+      "goal": [
+        "S:session_recorded"
+      ]
+    }
+  ],
+  "engine": {
+    "max_rounds": 8,
+    "max_attempts": 3,
+    "batch": 24,
+    "budget": 400,
+    "max_candidates": 90,
+    "coverage_threshold": 0.9
+  },
+  "detect": {
+    "min_usecases_per_epic": 5,
+    "min_steps_per_usecase": 3,
+    "min_exception_paths": 1,
+    "require_acceptance": true,
+    "require_steps": true,
+    "require_exceptions": true,
+    "require_ground": true
+  }
+}

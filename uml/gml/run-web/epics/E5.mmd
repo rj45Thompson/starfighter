@@ -1,0 +1,42 @@
+flowchart LR
+  %% actors
+  A_server(["👤 The server"])
+  subgraph SYS["starblast-web — system boundary"]
+    direction LR
+    subgraph E5["E5 — The field closes and one player is left"]
+      direction LR
+      UC_E5_1["<b>UC-E5-1</b><br/>A repulsive field grows out from the star<br/><small>gravity field</small>"]
+      UC_E5_2["<b>UC-E5-2</b><br/>The field warns before it reaches a player<br/><small>endgame warning</small>"]
+      UC_E5_3["<b>UC-E5-3</b><br/>The closing field forces players together<br/><small>gravity field</small>"]
+      UC_E5_4["<b>UC-E5-4</b><br/>The last pilot alive takes the round<br/><small>survival objective</small>"]
+      UC_E5_5["<b>UC-E5-5</b><br/>The server ends the round<br/><small>round end</small>"]
+    end
+  end
+  S_field_closing(("the playable area is shrinking"))
+  S_forced_together(("the survivors cannot avoid each other"))
+  S_in_field(("the pilot is flying in the asteroid field"))
+  S_one_left(("one pilot remains alive"))
+  S_round_decided(("the round is over and a winner is known"))
+  S_warned(("players know how much room is left"))
+  E5 --> S_in_field
+  UC_E5_1 --> S_field_closing
+  UC_E5_2 --> S_warned
+  UC_E5_3 --> S_forced_together
+  UC_E5_4 --> S_one_left
+  UC_E5_5 --> S_round_decided
+  A_server --- E5
+  S_round_decided --> E5
+  S_in_field --> UC_E5_1
+  S_field_closing --> UC_E5_2
+  S_warned --> UC_E5_3
+  S_forced_together --> UC_E5_4
+  S_one_left --> UC_E5_5
+  Q_why_UC_E3_3{{"❓ WHY"}}
+  style Q_why_UC_E3_3 fill:#3d1f1f,stroke:#ff6b6b,color:#ffe8e8
+  style UC_E5_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E5_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_server fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (343): Q:what:UC-E1-1 -answers-> S:mode_chosen; Q:what:UC-E1-2 -answers-> S:ship_placed; Q:what:UC-E1-3 -answers-> S:can_steer; Q:what:UC-E1-4 -answers-> S:can_move; Q:what:UC-E1-5 -answers-> S:in_field; Q:what:UC-E2-1 -answers-> S:rock_broken; Q:what:UC-E2-2 -answers-> S:gems_loose; Q:what:UC-E2-3 -answers-> S:gems_held; Q:what:UC-E2-4 -answers-> S:hold_bounded; Q:what:UC-E2-5 -answers-> S:mining_has_a_cost; Q:what:UC-E2-6 -answers-> S:cargo_full; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_better; Q:what:UC-E3-3 -answers-> S:life_banked; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:ship_better; Q:what:UC-E4-1 -answers-> S:trading_fire; Q:what:UC-E4-2 -answers-> S:shield_down; Q:what:UC-E4-3 -answers-> S:bleeding_gems; Q:what:UC-E4-4 -answers-> S:ship_destroyed

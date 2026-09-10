@@ -1,0 +1,50 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E4["E4 — Fight, die, and lose the cargo"]
+      direction LR
+      UC_E4_1["<b>UC-E4-1</b><br/>Firing costs energy the pilot cannot spend forever<br/><small>capMaxFor</small>"]
+      UC_E4_2["<b>UC-E4-2</b><br/>A shot travels a bounded distance<br/><small>BULLET_SPEED</small>"]
+      UC_E4_3["<b>UC-E4-3</b><br/>A shot that connects damages what it hit<br/><small>BULLET_DMG</small>"]
+      UC_E4_4["<b>UC-E4-4</b><br/>Shields take the hit before the hull does<br/><small>drainShield</small>"]
+      UC_E4_5["<b>UC-E4-5</b><br/>A ship that runs out of hull dies<br/><small>killShip</small>"]
+      UC_E4_6["<b>UC-E4-6</b><br/>Death spills the cargo for anyone to take<br/><small>spillGems</small>"]
+      UC_E4_7["<b>UC-E4-7</b><br/>The pilot comes back small after a pause<br/><small>RESPAWN_DELAY</small>"]
+    end
+  end
+  S_gems_spilled(("the hold is on the floor"))
+  S_in_combat(("damage is being exchanged"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_respawned(("the pilot is flying again after dying"))
+  S_shield_stripped(("a shield arc is down"))
+  S_ship_dead(("the pilot's ship is destroyed"))
+  S_shot_in_flight(("a shot is travelling"))
+  S_weapon_ready(("the ship can fire"))
+  E4 --> S_in_flight
+  UC_E4_1 --> S_weapon_ready
+  UC_E4_2 --> S_shot_in_flight
+  UC_E4_3 --> S_in_combat
+  UC_E4_4 --> S_shield_stripped
+  UC_E4_5 --> S_ship_dead
+  UC_E4_6 --> S_gems_spilled
+  UC_E4_7 --> S_respawned
+  A_pilot --- E4
+  S_respawned --> E4
+  S_in_flight --> UC_E4_1
+  S_weapon_ready --> UC_E4_2
+  S_shot_in_flight --> UC_E4_3
+  S_in_combat --> UC_E4_4
+  S_shield_stripped --> UC_E4_5
+  S_ship_dead --> UC_E4_6
+  S_gems_spilled --> UC_E4_7
+  style UC_E4_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E4_7 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (377): Q:what:UC-E1-1 -answers-> S:world_built; Q:what:UC-E1-2 -answers-> S:ship_exists; Q:what:UC-E1-3 -answers-> S:sim_running; Q:what:UC-E1-4 -answers-> S:controls_live; Q:what:UC-E1-5 -answers-> S:in_flight; Q:what:UC-E2-1 -answers-> S:belt_exists; Q:what:UC-E2-2 -answers-> S:rock_in_range; Q:what:UC-E2-3 -answers-> S:gems_loose; Q:what:UC-E2-4 -answers-> S:gem_pickable; Q:what:UC-E2-5 -answers-> S:gem_in_hold; Q:what:UC-E2-6 -answers-> S:point_banked; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_stronger; Q:what:UC-E3-3 -answers-> S:stats_maxed; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:hull_swapped; Q:what:UC-E3-6 -answers-> S:ship_stronger; Q:what:UC-E4-1 -answers-> S:weapon_ready; Q:what:UC-E4-2 -answers-> S:shot_in_flight; Q:what:UC-E4-3 -answers-> S:in_combat

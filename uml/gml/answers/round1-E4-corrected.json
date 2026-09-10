@@ -1,0 +1,274 @@
+[
+ {
+  "target": "E4",
+  "kind": "UNDECOMPOSED_EPIC",
+  "text": {
+   "reasoning": "Refused for a compound name, and the objection was right on inspection: reaching and hurting are two separate constraints. Travel is bounded by BULLET_SPEED and BULLET_LIFE, which is what gives the weapon a range; damage is bounded by BULLET_DMG and FIRE_CD, which is what gives it a rate. Splitting them makes the range constraint testable on its own, so the split is worth having rather than a concession to the checker. Re-answered again after DEAD_CITATION: the first two attempts cited CFG.FIRE_CD for the cooldown, which is declared at index.html:408 and occurs nowhere else in the file. The real gate is the per-weapon cd in the WEAPONS table divided by statMult(s,'fireRate'), so the citation named a constant that governs nothing and the acceptance criterion written against it could never have failed a test, because nothing reads it.",
+   "nodes": [
+    {
+     "id": "UC-E4-1",
+     "kind": "usecase",
+     "name": "Firing costs energy the pilot cannot spend forever",
+     "attrs": {
+      "story": "Each shot draws from a capacitor that refills over time, so sustained fire is bounded by a resource rather than by a cooldown alone.",
+      "status": "HAVE",
+      "ground": [
+       "capMaxFor",
+       "LASER_CAP_MAX",
+       "LASER_CAP_REGEN",
+       "LASER_CAP_PER_SHOT"
+      ],
+      "acceptance": [
+       "with the capacitor empty the ship cannot fire",
+       "breaking off refills the capacitor at LASER_CAP_REGEN per second",
+       "raising energyCap raises the ceiling the capacitor refills to"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-2",
+     "kind": "usecase",
+     "name": "A shot travels a bounded distance",
+     "attrs": {
+      "story": "A bullet leaves the muzzle at a finite speed and expires after a finite life, which is what gives the weapon a range and makes closing the distance a decision.",
+      "status": "HAVE",
+      "ground": [
+       "BULLET_SPEED",
+       "BULLET_LIFE",
+       "MUZZLE_OFF"
+      ],
+      "acceptance": [
+       "a bullet expires after BULLET_LIFE seconds rather than travelling forever",
+       "a target beyond BULLET_SPEED times BULLET_LIFE cannot be reached by a direct shot"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-3",
+     "kind": "usecase",
+     "name": "A shot that connects damages what it hit",
+     "attrs": {
+      "story": "Contact applies damage, and the gun cannot fire again until the interval its own weapon type declares has passed, so damage over time is bounded by the weapon and by the pilot's investment in fireRate rather than by how fast a key is pressed.",
+      "status": "HAVE",
+      "ground": [
+       "BULLET_DMG",
+       "BULLET_R",
+       "WEAPONS",
+       "statMult"
+      ],
+      "acceptance": [
+       "a bullet passing within BULLET_R of a ship registers a hit",
+       "the interval between shots is the weapon's own cd from the WEAPONS table, divided by the ship's fireRate multiplier, so buying fireRate visibly shortens it",
+       "two weapon types with different cd values fire at visibly different rates on the same hull"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-4",
+     "kind": "usecase",
+     "name": "Shields take the hit before the hull does",
+     "attrs": {
+      "story": "Damage is absorbed by a directional shield arc, each arc carrying half the ship's total shield, before any of it reaches the hull.",
+      "status": "HAVE",
+      "ground": [
+       "drainShield",
+       "shieldArcMaxFor"
+      ],
+      "acceptance": [
+       "a hit from ahead drains the forward arc and leaves the aft arc untouched",
+       "hull integrity does not fall while the struck arc still has charge"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-5",
+     "kind": "usecase",
+     "name": "A ship that runs out of hull dies",
+     "attrs": {
+      "story": "When damage exhausts the hull the ship is destroyed, removed from the fight, and the kill is attributed to whoever landed it.",
+      "status": "HAVE",
+      "ground": [
+       "killShip",
+       "killByShip"
+      ],
+      "acceptance": [
+       "a destroyed ship stops being a valid target",
+       "the killer is credited, so a kill is attributable"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-6",
+     "kind": "usecase",
+     "name": "Death spills the cargo for anyone to take",
+     "attrs": {
+      "story": "The credits banked into the hold are dropped into the world on death, so a long uninterrupted run is worth more than the sum of its minutes.",
+      "status": "HAVE",
+      "ground": [
+       "spillGems"
+      ],
+      "acceptance": [
+       "a pilot dying with credits leaves collectable gems at the wreck",
+       "a pilot dying with nothing spills nothing"
+      ]
+     }
+    },
+    {
+     "id": "UC-E4-7",
+     "kind": "usecase",
+     "name": "The pilot comes back small after a pause",
+     "attrs": {
+      "story": "After a delay the pilot respawns without the hull they lost, which is the cost that makes the fight matter.",
+      "status": "HAVE",
+      "ground": [
+       "RESPAWN_DELAY"
+      ],
+      "acceptance": [
+       "respawn does not happen before RESPAWN_DELAY seconds have passed",
+       "the respawned ship is not the tier that died"
+      ]
+     }
+    },
+    {
+     "id": "S:weapon_ready",
+     "kind": "state",
+     "name": "the ship can fire"
+    },
+    {
+     "id": "S:shot_in_flight",
+     "kind": "state",
+     "name": "a shot is travelling"
+    },
+    {
+     "id": "S:in_combat",
+     "kind": "state",
+     "name": "damage is being exchanged"
+    },
+    {
+     "id": "S:shield_stripped",
+     "kind": "state",
+     "name": "a shield arc is down"
+    },
+    {
+     "id": "S:ship_dead",
+     "kind": "state",
+     "name": "the pilot's ship is destroyed"
+    },
+    {
+     "id": "S:gems_spilled",
+     "kind": "state",
+     "name": "the hold is on the floor"
+    }
+   ],
+   "edges": [
+    {
+     "src": "E4",
+     "dst": "UC-E4-1",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-2",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-3",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-4",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-5",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-6",
+     "kind": "includes"
+    },
+    {
+     "src": "E4",
+     "dst": "UC-E4-7",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E4-1",
+     "dst": "S:in_flight",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-1",
+     "dst": "S:weapon_ready",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-2",
+     "dst": "S:weapon_ready",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-2",
+     "dst": "S:shot_in_flight",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-3",
+     "dst": "S:shot_in_flight",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-3",
+     "dst": "S:in_combat",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-4",
+     "dst": "S:in_combat",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-4",
+     "dst": "S:shield_stripped",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-5",
+     "dst": "S:shield_stripped",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-5",
+     "dst": "S:ship_dead",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-6",
+     "dst": "S:ship_dead",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-6",
+     "dst": "S:gems_spilled",
+     "kind": "establishes"
+    },
+    {
+     "src": "UC-E4-7",
+     "dst": "S:gems_spilled",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E4-7",
+     "dst": "S:respawned",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ }
+]

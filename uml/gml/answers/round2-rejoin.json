@@ -1,0 +1,48 @@
+[
+ {
+  "target": "S:hull_swapped",
+  "kind": "DANGLING_POSTCONDITION",
+  "text": {
+   "reasoning": "The gap is real and it is the interesting one in this epic. E3 forks: spend the point now (UC-E3-1 -> UC-E3-2 -> ship_stronger) or bank toward a maxed ship and trade the frame in (UC-E3-3 -> UC-E3-4 -> UC-E3-5 -> hull_swapped). The first arm rejoined the story and the second did not, which means the model was asserting that trading in your ship leaves you no better off. A use case is missing: the one that says the new frame is worth what it cost. HULLS is the table that carries each frame's own capacity, and it is what makes the claim checkable rather than a promise.",
+   "nodes": [
+    {
+     "id": "UC-E3-6",
+     "kind": "usecase",
+     "name": "The traded-up frame outperforms the one it replaced",
+     "attrs": {
+      "story": "A hull class carries its own capacities, so the frame taken in the trade is materially better than the one given up even with every stat reset to zero. This is what makes the trade-in a decision rather than a punishment, and it is the beat that joins the tier-up arm back to the rest of the story.",
+      "status": "HAVE",
+      "ground": [
+       "HULLS",
+       "shieldMaxFor"
+      ],
+      "acceptance": [
+       "a ship one tier up, with all stats at zero, has a higher base shield capacity than a maxed ship of the tier below",
+       "each entry in HULLS declares its own capacities rather than inheriting one shared set",
+       "the balance law the table states -- bigger hold means thinner armour and lower speed -- holds between adjacent tiers, so the trade is a trade and not a strict gain"
+      ]
+     }
+    }
+   ],
+   "edges": [
+    {
+     "src": "E3",
+     "dst": "UC-E3-6",
+     "kind": "includes"
+    },
+    {
+     "src": "UC-E3-6",
+     "dst": "S:hull_swapped",
+     "kind": "requires"
+    },
+    {
+     "src": "UC-E3-6",
+     "dst": "S:ship_stronger",
+     "kind": "establishes"
+    }
+   ],
+   "abstain": false,
+   "abstain_reason": ""
+  }
+ }
+]

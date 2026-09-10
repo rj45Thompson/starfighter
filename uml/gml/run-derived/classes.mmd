@@ -1,0 +1,56 @@
+classDiagram
+  direction LR
+  class E1 {
+    <<subsystem>>
+    +Fly
+    +accelerate
+    +controls
+    +fire
+    +game mode
+    +objective
+    +ship
+    +space station
+    +steer
+  }
+  note for E1 "E1 — Enter a round and take control of a ship"
+  class E2 {
+    <<subsystem>>
+    +asteroid
+    +cargo capacity
+    +gem
+  }
+  note for E2 "E2 — Mine the belt until the hold is full"
+  class E3 {
+    <<subsystem>>
+    +energy regen
+    +extra life
+    +spend gems
+    +tier
+    +tier up
+    +upgrade categories
+    +upgrade cost
+  }
+  note for E3 "E3 — Convert a full hold into a better ship"
+  class E4 {
+    <<subsystem>>
+    +death
+    +gems as shield
+    +shield
+    +weapons
+  }
+  note for E4 "E4 — Lose the hold, and then the ship, under fire"
+  class E5 {
+    <<subsystem>>
+    +endgame warning
+    +gravity field
+    +round end
+    +survival objective
+  }
+  note for E5 "E5 — Survive the closing field until one pilot is left"
+  class E6 {
+    <<subsystem>>
+    +game mode
+    +invasion waves
+  }
+  note for E6 "E6 — Hold the field against the invasion instead"
+  E1 ..> E6 : reads

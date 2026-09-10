@@ -1,0 +1,48 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  A_rival(["👤 Another player"])
+  A_server(["👤 The server"])
+  subgraph SYS["starblast-derived — system boundary"]
+    direction LR
+    subgraph E1["E1 — Enter a round and take control of a ship"]
+      direction LR
+    end
+    subgraph E2["E2 — Mine the belt until the hold is full"]
+      direction LR
+    end
+    subgraph E3["E3 — Convert a full hold into a better ship"]
+      direction LR
+    end
+    subgraph E4["E4 — Lose the hold, and then the ship, under fire"]
+      direction LR
+    end
+    subgraph E5["E5 — Survive the closing field until one pilot is left"]
+      direction LR
+    end
+    subgraph E6["E6 — Hold the field against the invasion instead"]
+      direction LR
+    end
+  end
+  S_at_menu(("the player is at the main menu, in no game"))
+  S_back_at_tier_one(("the pilot is flying again, back at tier one with nothing"))
+  S_cargo_full(("the ship's crystal hold is full"))
+  S_in_field(("the pilot is flying in the field, under their own control"))
+  S_round_decided(("the round is over and a winner is known"))
+  S_ship_stronger(("the ship is measurably better than it was"))
+  S_waves_cleared(("the final wave has been beaten"))
+  E1 --> S_at_menu
+  S_in_field --> E1
+  E2 --> S_in_field
+  S_cargo_full --> E2
+  E3 --> S_cargo_full
+  S_ship_stronger --> E3
+  E4 --> S_in_field
+  S_back_at_tier_one --> E4
+  E5 --> S_in_field
+  S_round_decided --> E5
+  E6 --> S_in_field
+  S_waves_cleared --> E6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_server fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  style A_rival fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6

@@ -1,0 +1,43 @@
+{
+ "applied": 5,
+ "cache": {
+  "hit_ratio": 0.067,
+  "hits": 6,
+  "misses": 83,
+  "writes": 0
+ },
+ "calls": 6,
+ "coverage": {},
+ "ground": {
+  "anomalies_certain": 1,
+  "anomalies_probable": 1,
+  "dead": 0,
+  "documented:control": 4,
+  "documented:entity": 5,
+  "documented:mechanic": 9,
+  "documented:mode": 2,
+  "documented:objective": 3,
+  "documented:quantity": 5,
+  "total": 28
+ },
+ "model": {
+  "actor": 3,
+  "edges": 93,
+  "epic": 5,
+  "ground": 0,
+  "question": 0,
+  "state": 27,
+  "step": 0,
+  "usecase": 26
+ },
+ "open_gaps": 85,
+ "oracle": "transcript",
+ "parked": 83,
+ "refused": 1,
+ "rounds": 8,
+ "spec": "starblast-web",
+ "stopped": "round-limit",
+ "violations": [
+  "FLOATING_STATE [S:under_attack]: state 'another ship is shooting at the pilot' is neither required nor established"
+ ]
+}

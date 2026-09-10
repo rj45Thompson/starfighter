@@ -1,0 +1,24 @@
+# ARM A — one-shot baseline. Written cold from what I know of Starblast.io, in one pass,
+# without the corpus in front of me and without the engine's questions. This is what
+# "ask Claude for the use cases" gets you.
+
+UC-1  Player opens the game and picks a mode          pre: at the menu           post: in a match
+UC-2  Player is given a small starter ship            pre: in a match            post: has a ship
+UC-3  Player flies the ship with mouse or keys        pre: has a ship            post: in control
+UC-4  Player fires the ship's weapon                  pre: in control            post: can attack
+UC-5  Player shoots an asteroid until it breaks       pre: can attack            post: asteroid broken
+UC-6  Broken asteroids drop crystals                  pre: asteroid broken       post: crystals loose
+UC-7  Player flies over crystals to collect them      pre: crystals loose        post: crystals held
+UC-8  Crystals fill a cargo bar                       pre: crystals held         post: cargo filling
+UC-9  Player spends crystals on ship stats            pre: cargo filling         post: stats raised
+UC-10 Stats make the ship faster, tougher, deadlier   pre: stats raised          post: ship improved
+UC-11 A full cargo lets the player buy the next ship  pre: cargo filling         post: next ship offered
+UC-12 Taking the next ship resets the stats           pre: next ship offered     post: new ship, no stats
+UC-13 Player fights other players                     pre: in control            post: in combat
+UC-14 Shields absorb damage and regenerate            pre: in combat             post: shields down
+UC-15 Hull damage past shields destroys the ship      pre: shields down          post: ship destroyed
+UC-16 Death drops the player's crystals               pre: ship destroyed        post: crystals dropped
+UC-17 Player respawns in a starter ship               pre: crystals dropped      post: respawned
+UC-18 A leaderboard ranks players by score            pre: in a match            post: ranked
+UC-19 The match ends and a winner is declared         pre: ranked                post: match over
+UC-20 Player returns to the menu                      pre: match over            post: at the menu

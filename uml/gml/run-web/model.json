@@ -1,0 +1,6955 @@
+{
+ "edges": [
+  {
+   "dst": "S:mode_chosen",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E1-1"
+  },
+  {
+   "dst": "S:ship_placed",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E1-2"
+  },
+  {
+   "dst": "S:can_steer",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E1-3"
+  },
+  {
+   "dst": "S:can_move",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E1-4"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E1-5"
+  },
+  {
+   "dst": "S:rock_broken",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-1"
+  },
+  {
+   "dst": "S:gems_loose",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-2"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-3"
+  },
+  {
+   "dst": "S:hold_bounded",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-4"
+  },
+  {
+   "dst": "S:mining_has_a_cost",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-5"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E2-6"
+  },
+  {
+   "dst": "S:stat_raised",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E3-1"
+  },
+  {
+   "dst": "S:ship_better",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E3-2"
+  },
+  {
+   "dst": "S:life_banked",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E3-3"
+  },
+  {
+   "dst": "S:tier_offered",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E3-4"
+  },
+  {
+   "dst": "S:ship_better",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E3-5"
+  },
+  {
+   "dst": "S:trading_fire",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E4-1"
+  },
+  {
+   "dst": "S:shield_down",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E4-2"
+  },
+  {
+   "dst": "S:bleeding_gems",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E4-3"
+  },
+  {
+   "dst": "S:ship_destroyed",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E4-4"
+  },
+  {
+   "dst": "S:back_at_tier_one",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E4-5"
+  },
+  {
+   "dst": "S:field_closing",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E5-1"
+  },
+  {
+   "dst": "S:warned",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E5-2"
+  },
+  {
+   "dst": "S:forced_together",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E5-3"
+  },
+  {
+   "dst": "S:one_left",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E5-4"
+  },
+  {
+   "dst": "S:round_decided",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:what:UC-E5-5"
+  },
+  {
+   "dst": "S:at_menu",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E1-1"
+  },
+  {
+   "dst": "S:mode_chosen",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E1-2"
+  },
+  {
+   "dst": "S:ship_placed",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E1-3"
+  },
+  {
+   "dst": "S:can_steer",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E1-4"
+  },
+  {
+   "dst": "S:can_move",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E1-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-1"
+  },
+  {
+   "dst": "S:rock_broken",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-2"
+  },
+  {
+   "dst": "S:gems_loose",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-3"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-4"
+  },
+  {
+   "dst": "S:hold_bounded",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-5"
+  },
+  {
+   "dst": "S:mining_has_a_cost",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E2-6"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E3-1"
+  },
+  {
+   "dst": "S:stat_raised",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E3-2"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E3-3"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E3-4"
+  },
+  {
+   "dst": "S:tier_offered",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E3-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E4-1"
+  },
+  {
+   "dst": "S:trading_fire",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E4-2"
+  },
+  {
+   "dst": "S:shield_down",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E4-3"
+  },
+  {
+   "dst": "S:bleeding_gems",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E4-4"
+  },
+  {
+   "dst": "S:ship_destroyed",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E4-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E5-1"
+  },
+  {
+   "dst": "S:field_closing",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E5-2"
+  },
+  {
+   "dst": "S:warned",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E5-3"
+  },
+  {
+   "dst": "S:forced_together",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E5-4"
+  },
+  {
+   "dst": "S:one_left",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:when:UC-E5-5"
+  },
+  {
+   "dst": "E1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E1-1"
+  },
+  {
+   "dst": "E1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E1-2"
+  },
+  {
+   "dst": "E1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E1-3"
+  },
+  {
+   "dst": "E1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E1-4"
+  },
+  {
+   "dst": "E1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E1-5"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-1"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-2"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-3"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-4"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-5"
+  },
+  {
+   "dst": "E2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E2-6"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E3-1"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E3-2"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E3-3"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E3-4"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E3-5"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E4-1"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E4-2"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E4-3"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E4-4"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E4-5"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E5-1"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E5-2"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E5-3"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E5-4"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:where:UC-E5-5"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E1-1"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E1-2"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E1-3"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E1-4"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E1-5"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-1"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-2"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-3"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-4"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-5"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E2-6"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E3-1"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E3-2"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E3-3"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E3-4"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E3-5"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E4-1"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E4-2"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E4-3"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E4-4"
+  },
+  {
+   "dst": "A:pilot",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E4-5"
+  },
+  {
+   "dst": "A:server",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E5-1"
+  },
+  {
+   "dst": "A:server",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E5-2"
+  },
+  {
+   "dst": "A:server",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E5-3"
+  },
+  {
+   "dst": "A:server",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E5-4"
+  },
+  {
+   "dst": "A:server",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:who:UC-E5-5"
+  },
+  {
+   "dst": "UC-E1-2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-1"
+  },
+  {
+   "dst": "UC-E1-3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-2"
+  },
+  {
+   "dst": "UC-E1-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-3"
+  },
+  {
+   "dst": "UC-E1-5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-4"
+  },
+  {
+   "dst": "UC-E2-1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-5"
+  },
+  {
+   "dst": "UC-E4-1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-5"
+  },
+  {
+   "dst": "UC-E5-1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E1-5"
+  },
+  {
+   "dst": "UC-E2-2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-1"
+  },
+  {
+   "dst": "UC-E2-3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-2"
+  },
+  {
+   "dst": "UC-E2-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-3"
+  },
+  {
+   "dst": "UC-E2-5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-4"
+  },
+  {
+   "dst": "UC-E2-6",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-5"
+  },
+  {
+   "dst": "UC-E3-1",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-6"
+  },
+  {
+   "dst": "UC-E3-3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-6"
+  },
+  {
+   "dst": "UC-E3-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E2-6"
+  },
+  {
+   "dst": "UC-E3-2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E3-1"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E3-2"
+  },
+  {
+   "dst": "UC-E3-5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E3-4"
+  },
+  {
+   "dst": "E3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E3-5"
+  },
+  {
+   "dst": "UC-E4-2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E4-1"
+  },
+  {
+   "dst": "UC-E4-3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E4-2"
+  },
+  {
+   "dst": "UC-E4-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E4-3"
+  },
+  {
+   "dst": "UC-E4-5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E4-4"
+  },
+  {
+   "dst": "E4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E4-5"
+  },
+  {
+   "dst": "UC-E5-2",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E5-1"
+  },
+  {
+   "dst": "UC-E5-3",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E5-2"
+  },
+  {
+   "dst": "UC-E5-4",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E5-3"
+  },
+  {
+   "dst": "UC-E5-5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E5-4"
+  },
+  {
+   "dst": "E5",
+   "kind": "answers",
+   "provenance": "interrogation",
+   "src": "Q:why:UC-E5-5"
+  },
+  {
+   "dst": "Q:how:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:what:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:when:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:where:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:who:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:why:UC-E1-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "Q:how:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:what:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:when:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:where:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:who:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:why:UC-E1-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "Q:how:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:what:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:when:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:where:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:who:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:why:UC-E1-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "Q:how:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:what:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:when:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:where:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:who:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:why:UC-E1-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "Q:how:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:what:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:when:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:where:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:who:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:why:UC-E1-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "Q:how:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:what:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:when:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:where:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:who:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:why:UC-E2-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "Q:how:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:what:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:when:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:where:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:who:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:why:UC-E2-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "Q:how:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:what:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:when:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:where:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:who:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:why:UC-E2-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "Q:how:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:what:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:when:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:where:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:who:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:why:UC-E2-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "Q:how:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:what:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:when:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:where:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:who:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:why:UC-E2-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "Q:how:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:what:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:when:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:where:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:who:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:why:UC-E2-6",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "Q:how:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:what:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:when:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:where:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:who:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:why:UC-E3-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "Q:how:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:what:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:when:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:where:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:who:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:why:UC-E3-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "Q:how:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:what:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:when:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:where:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:who:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:why:UC-E3-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "Q:how:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:what:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:when:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:where:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:who:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:why:UC-E3-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "Q:how:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:what:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:when:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:where:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:who:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:why:UC-E3-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "Q:how:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:what:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:when:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:where:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:who:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:why:UC-E4-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "Q:how:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:what:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:when:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:where:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:who:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:why:UC-E4-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "Q:how:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:what:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:when:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:where:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:who:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:why:UC-E4-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "Q:how:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:what:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:when:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:where:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:who:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:why:UC-E4-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "Q:how:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:what:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:when:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:where:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:who:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:why:UC-E4-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "Q:how:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:what:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:when:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:where:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:who:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:why:UC-E5-1",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "Q:how:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:what:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:when:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:where:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:who:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:why:UC-E5-2",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "Q:how:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:what:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:when:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:where:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:who:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:why:UC-E5-3",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "Q:how:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:what:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:when:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:where:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:who:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:why:UC-E5-4",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "Q:how:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "Q:what:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "Q:when:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "Q:where:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "Q:who:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "Q:why:UC-E5-5",
+   "kind": "asks",
+   "provenance": "interrogation",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "S:at_menu",
+   "kind": "establishes",
+   "provenance": "seed",
+   "src": "E1"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "seed",
+   "src": "E2"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "establishes",
+   "provenance": "seed",
+   "src": "E3"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "seed",
+   "src": "E4"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "seed",
+   "src": "E5"
+  },
+  {
+   "dst": "S:mode_chosen",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "S:ship_placed",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "S:can_steer",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "S:can_move",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "S:rock_broken",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "S:gems_loose",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "S:hold_bounded",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "S:mining_has_a_cost",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "establishes",
+   "provenance": "Q-6",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "S:stat_raised",
+   "kind": "establishes",
+   "provenance": "Q-3",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "S:ship_better",
+   "kind": "establishes",
+   "provenance": "Q-3",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "S:life_banked",
+   "kind": "establishes",
+   "provenance": "Q-3",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "S:tier_offered",
+   "kind": "establishes",
+   "provenance": "Q-3",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "S:ship_better",
+   "kind": "establishes",
+   "provenance": "Q-3",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "S:trading_fire",
+   "kind": "establishes",
+   "provenance": "Q-4",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "S:shield_down",
+   "kind": "establishes",
+   "provenance": "Q-4",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "S:bleeding_gems",
+   "kind": "establishes",
+   "provenance": "Q-4",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "S:ship_destroyed",
+   "kind": "establishes",
+   "provenance": "Q-4",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "S:back_at_tier_one",
+   "kind": "establishes",
+   "provenance": "Q-4",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "S:field_closing",
+   "kind": "establishes",
+   "provenance": "Q-5",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "S:warned",
+   "kind": "establishes",
+   "provenance": "Q-5",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "S:forced_together",
+   "kind": "establishes",
+   "provenance": "Q-5",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "S:one_left",
+   "kind": "establishes",
+   "provenance": "Q-5",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "S:round_decided",
+   "kind": "establishes",
+   "provenance": "Q-5",
+   "src": "UC-E5-5"
+  },
+  {
+   "dst": "UC-E1-1",
+   "kind": "includes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "UC-E1-2",
+   "kind": "includes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "UC-E1-3",
+   "kind": "includes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "UC-E1-4",
+   "kind": "includes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "UC-E1-5",
+   "kind": "includes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "UC-E2-1",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E2-2",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E2-3",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E2-4",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E2-5",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E2-6",
+   "kind": "includes",
+   "provenance": "Q-6",
+   "src": "E2"
+  },
+  {
+   "dst": "UC-E3-1",
+   "kind": "includes",
+   "provenance": "Q-3",
+   "src": "E3"
+  },
+  {
+   "dst": "UC-E3-2",
+   "kind": "includes",
+   "provenance": "Q-3",
+   "src": "E3"
+  },
+  {
+   "dst": "UC-E3-3",
+   "kind": "includes",
+   "provenance": "Q-3",
+   "src": "E3"
+  },
+  {
+   "dst": "UC-E3-4",
+   "kind": "includes",
+   "provenance": "Q-3",
+   "src": "E3"
+  },
+  {
+   "dst": "UC-E3-5",
+   "kind": "includes",
+   "provenance": "Q-3",
+   "src": "E3"
+  },
+  {
+   "dst": "UC-E4-1",
+   "kind": "includes",
+   "provenance": "Q-4",
+   "src": "E4"
+  },
+  {
+   "dst": "UC-E4-2",
+   "kind": "includes",
+   "provenance": "Q-4",
+   "src": "E4"
+  },
+  {
+   "dst": "UC-E4-3",
+   "kind": "includes",
+   "provenance": "Q-4",
+   "src": "E4"
+  },
+  {
+   "dst": "UC-E4-4",
+   "kind": "includes",
+   "provenance": "Q-4",
+   "src": "E4"
+  },
+  {
+   "dst": "UC-E4-5",
+   "kind": "includes",
+   "provenance": "Q-4",
+   "src": "E4"
+  },
+  {
+   "dst": "UC-E5-1",
+   "kind": "includes",
+   "provenance": "Q-5",
+   "src": "E5"
+  },
+  {
+   "dst": "UC-E5-2",
+   "kind": "includes",
+   "provenance": "Q-5",
+   "src": "E5"
+  },
+  {
+   "dst": "UC-E5-3",
+   "kind": "includes",
+   "provenance": "Q-5",
+   "src": "E5"
+  },
+  {
+   "dst": "UC-E5-4",
+   "kind": "includes",
+   "provenance": "Q-5",
+   "src": "E5"
+  },
+  {
+   "dst": "UC-E5-5",
+   "kind": "includes",
+   "provenance": "Q-5",
+   "src": "E5"
+  },
+  {
+   "dst": "E1",
+   "kind": "performs",
+   "provenance": "seed",
+   "src": "A:pilot"
+  },
+  {
+   "dst": "E2",
+   "kind": "performs",
+   "provenance": "seed",
+   "src": "A:pilot"
+  },
+  {
+   "dst": "E3",
+   "kind": "performs",
+   "provenance": "seed",
+   "src": "A:pilot"
+  },
+  {
+   "dst": "E4",
+   "kind": "performs",
+   "provenance": "seed",
+   "src": "A:pilot"
+  },
+  {
+   "dst": "E5",
+   "kind": "performs",
+   "provenance": "seed",
+   "src": "A:server"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "requires",
+   "provenance": "seed",
+   "src": "E1"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "requires",
+   "provenance": "seed",
+   "src": "E2"
+  },
+  {
+   "dst": "S:ship_better",
+   "kind": "requires",
+   "provenance": "seed",
+   "src": "E3"
+  },
+  {
+   "dst": "S:back_at_tier_one",
+   "kind": "requires",
+   "provenance": "seed",
+   "src": "E4"
+  },
+  {
+   "dst": "S:round_decided",
+   "kind": "requires",
+   "provenance": "seed",
+   "src": "E5"
+  },
+  {
+   "dst": "S:at_menu",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "UC-E1-1"
+  },
+  {
+   "dst": "S:mode_chosen",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "UC-E1-2"
+  },
+  {
+   "dst": "S:ship_placed",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "UC-E1-3"
+  },
+  {
+   "dst": "S:can_steer",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "UC-E1-4"
+  },
+  {
+   "dst": "S:can_move",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "UC-E1-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-1"
+  },
+  {
+   "dst": "S:rock_broken",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-2"
+  },
+  {
+   "dst": "S:gems_loose",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-3"
+  },
+  {
+   "dst": "S:gems_held",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-4"
+  },
+  {
+   "dst": "S:hold_bounded",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-5"
+  },
+  {
+   "dst": "S:mining_has_a_cost",
+   "kind": "requires",
+   "provenance": "Q-6",
+   "src": "UC-E2-6"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "requires",
+   "provenance": "Q-3",
+   "src": "UC-E3-1"
+  },
+  {
+   "dst": "S:stat_raised",
+   "kind": "requires",
+   "provenance": "Q-3",
+   "src": "UC-E3-2"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "requires",
+   "provenance": "Q-3",
+   "src": "UC-E3-3"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "requires",
+   "provenance": "Q-3",
+   "src": "UC-E3-4"
+  },
+  {
+   "dst": "S:tier_offered",
+   "kind": "requires",
+   "provenance": "Q-3",
+   "src": "UC-E3-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "requires",
+   "provenance": "Q-4",
+   "src": "UC-E4-1"
+  },
+  {
+   "dst": "S:trading_fire",
+   "kind": "requires",
+   "provenance": "Q-4",
+   "src": "UC-E4-2"
+  },
+  {
+   "dst": "S:shield_down",
+   "kind": "requires",
+   "provenance": "Q-4",
+   "src": "UC-E4-3"
+  },
+  {
+   "dst": "S:bleeding_gems",
+   "kind": "requires",
+   "provenance": "Q-4",
+   "src": "UC-E4-4"
+  },
+  {
+   "dst": "S:ship_destroyed",
+   "kind": "requires",
+   "provenance": "Q-4",
+   "src": "UC-E4-5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "requires",
+   "provenance": "Q-5",
+   "src": "UC-E5-1"
+  },
+  {
+   "dst": "S:field_closing",
+   "kind": "requires",
+   "provenance": "Q-5",
+   "src": "UC-E5-2"
+  },
+  {
+   "dst": "S:warned",
+   "kind": "requires",
+   "provenance": "Q-5",
+   "src": "UC-E5-3"
+  },
+  {
+   "dst": "S:forced_together",
+   "kind": "requires",
+   "provenance": "Q-5",
+   "src": "UC-E5-4"
+  },
+  {
+   "dst": "S:one_left",
+   "kind": "requires",
+   "provenance": "Q-5",
+   "src": "UC-E5-5"
+  }
+ ],
+ "name": "starblast-web",
+ "nodes": [
+  {
+   "attrs": {
+    "note": "the person flying"
+   },
+   "id": "A:pilot",
+   "kind": "actor",
+   "name": "Pilot",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "note": "everyone else in the field"
+   },
+   "id": "A:rival",
+   "kind": "actor",
+   "name": "Another player",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "note": "the simulation, acting on its own"
+   },
+   "id": "A:server",
+   "kind": "actor",
+   "name": "The server",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "scope": "",
+    "story": "You pick one of four modes from the menu, appear near the space station that is your base, and the ship answers the mouse or the keyboard. Nothing else can happen until it does."
+   },
+   "id": "E1",
+   "kind": "epic",
+   "name": "Choose a mode and reach the field",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "scope": "",
+    "story": "You shoot asteroids and the crystals they drop are worth something. Bigger rocks pay more per shot and cost more to stay near. The cargo has a ceiling, and gems that would exceed it are simply lost."
+   },
+   "id": "E2",
+   "kind": "epic",
+   "name": "Mine the belt and fill the cargo",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "scope": "",
+    "story": "A full cargo can go into eight statistics, into an extra life, or into the next ship in the tree \u2014 and taking the next ship hands you an un-upgraded one. That is the decision the whole loop exists for."
+   },
+   "id": "E3",
+   "kind": "epic",
+   "name": "Spend the cargo, or trade up a tier",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "scope": "",
+    "story": "Shields absorb until they do not, and past that every hit knocks crystals out of your hold for anyone to take. Dying puts you back in a tier one ship with nothing."
+   },
+   "id": "E4",
+   "kind": "epic",
+   "name": "Fight, bleed gems, and die back to tier one",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "scope": "",
+    "story": "A repulsive field grows out from the star and pushes everyone inward, warning as it goes. The round ends when one player remains."
+   },
+   "id": "E5",
+   "kind": "epic",
+   "name": "The field closes and one player is left",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "game mode; objective"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:how:UC-E1-1",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "space station"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:how:UC-E1-2",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "steer; controls"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:how:UC-E1-3",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "accelerate"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:how:UC-E1-4",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "fire; weapons"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:how:UC-E1-5",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "asteroid; weapons"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:how:UC-E2-1",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "gem; asteroid"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:how:UC-E2-2",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "gem"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:how:UC-E2-3",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "cargo capacity"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:how:UC-E2-4",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "asteroid"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:how:UC-E2-5",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "cargo capacity; upgrade cost"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:how:UC-E2-6",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "upgrade categories; upgrade cost; spend gems"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:how:UC-E3-1",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "energy regen"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:how:UC-E3-2",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "extra life"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:how:UC-E3-3",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "tier up; ship"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:how:UC-E3-4",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "tier up; tier"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:how:UC-E3-5",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "weapons; fire"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:how:UC-E4-1",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "shield"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:how:UC-E4-2",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "gems as shield"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:how:UC-E4-3",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "death"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:how:UC-E4-4",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "death; tier"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:how:UC-E4-5",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "gravity field"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:how:UC-E5-1",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "endgame warning"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:how:UC-E5-2",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "gravity field"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:how:UC-E5-3",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "survival objective"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:how:UC-E5-4",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "round end"
+     }
+    ],
+    "asks": "By what mechanism, step by step?",
+    "good_answer": "ordered STEP nodes, or the symbol that implements it where one exists",
+    "interrogative": "how",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:how:UC-E5-5",
+   "kind": "question",
+   "name": "HOW: By what mechanism, step by step?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:mode_chosen"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:what:UC-E1-1",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_placed"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:what:UC-E1-2",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:can_steer"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:what:UC-E1-3",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:can_move"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:what:UC-E1-4",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:in_field"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:what:UC-E1-5",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:rock_broken"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:what:UC-E2-1",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:gems_loose"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:what:UC-E2-2",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:gems_held"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:what:UC-E2-3",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:hold_bounded"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:what:UC-E2-4",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:mining_has_a_cost"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:what:UC-E2-5",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:cargo_full"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:what:UC-E2-6",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:stat_raised"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:what:UC-E3-1",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_better"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:what:UC-E3-2",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:life_banked"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:what:UC-E3-3",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:tier_offered"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:what:UC-E3-4",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_better"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:what:UC-E3-5",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:trading_fire"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:what:UC-E4-1",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:shield_down"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:what:UC-E4-2",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:bleeding_gems"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:what:UC-E4-3",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_destroyed"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:what:UC-E4-4",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:back_at_tier_one"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:what:UC-E4-5",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:field_closing"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:what:UC-E5-1",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:warned"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:what:UC-E5-2",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:forced_together"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:what:UC-E5-3",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:one_left"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:what:UC-E5-4",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:round_decided"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What is true after this that was not true before?",
+    "good_answer": "the STATE literals it requires and establishes -- the change, not the activity",
+    "interrogative": "what",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:what:UC-E5-5",
+   "kind": "question",
+   "name": "WHAT: What is true after this that was not true before?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:at_menu"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:when:UC-E1-1",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:mode_chosen"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:when:UC-E1-2",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_placed"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:when:UC-E1-3",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:can_steer"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:when:UC-E1-4",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:can_move"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:when:UC-E1-5",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:in_field"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:when:UC-E2-1",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:rock_broken"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:when:UC-E2-2",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:gems_loose"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:when:UC-E2-3",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:gems_held"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:when:UC-E2-4",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:hold_bounded"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:when:UC-E2-5",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:mining_has_a_cost"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:when:UC-E2-6",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:cargo_full"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:when:UC-E3-1",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:stat_raised"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:when:UC-E3-2",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:cargo_full"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:when:UC-E3-3",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:cargo_full"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:when:UC-E3-4",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:tier_offered"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:when:UC-E3-5",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:in_field"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:when:UC-E4-1",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:trading_fire"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:when:UC-E4-2",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:shield_down"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:when:UC-E4-3",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:bleeding_gems"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:when:UC-E4-4",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:ship_destroyed"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:when:UC-E4-5",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:in_field"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:when:UC-E5-1",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:field_closing"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:when:UC-E5-2",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:warned"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:when:UC-E5-3",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:forced_together"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:when:UC-E5-4",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "S:one_left"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "What triggers it, and what must already hold for it to be able to run?",
+    "good_answer": "the event that starts it, plus its preconditions as STATE literals",
+    "interrogative": "when",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:when:UC-E5-5",
+   "kind": "question",
+   "name": "WHEN: What triggers it, and what must already hold for it to be able to run?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:where:UC-E1-1",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:where:UC-E1-2",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:where:UC-E1-3",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:where:UC-E1-4",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:where:UC-E1-5",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:where:UC-E2-1",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:where:UC-E2-2",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:where:UC-E2-3",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:where:UC-E2-4",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:where:UC-E2-5",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:where:UC-E2-6",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:where:UC-E3-1",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:where:UC-E3-2",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:where:UC-E3-3",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:where:UC-E3-4",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:where:UC-E3-5",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:where:UC-E4-1",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:where:UC-E4-2",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:where:UC-E4-3",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:where:UC-E4-4",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:where:UC-E4-5",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:where:UC-E5-1",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:where:UC-E5-2",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:where:UC-E5-3",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:where:UC-E5-4",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Where in the system does this happen, and what is it inside?",
+    "good_answer": "the EPIC it belongs to, and the boundary or surface it acts on",
+    "interrogative": "where",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:where:UC-E5-5",
+   "kind": "question",
+   "name": "WHERE: Where in the system does this happen, and what is it inside?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:who:UC-E1-1",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:who:UC-E1-2",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:who:UC-E1-3",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:who:UC-E1-4",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:who:UC-E1-5",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:who:UC-E2-1",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:who:UC-E2-2",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:who:UC-E2-3",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:who:UC-E2-4",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:who:UC-E2-5",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:who:UC-E2-6",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:who:UC-E3-1",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:who:UC-E3-2",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:who:UC-E3-3",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:who:UC-E3-4",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:who:UC-E3-5",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:who:UC-E4-1",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:who:UC-E4-2",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:who:UC-E4-3",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:who:UC-E4-4",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:pilot"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:who:UC-E4-5",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:server"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:who:UC-E5-1",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:server"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:who:UC-E5-2",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:server"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:who:UC-E5-3",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:server"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:who:UC-E5-4",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "A:server"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": ""
+     }
+    ],
+    "asks": "Which actor performs this, and on whose behalf?",
+    "good_answer": "an ACTOR node; if the system does it unprompted, say so and name that actor too",
+    "interrogative": "who",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:who:UC-E5-5",
+   "kind": "question",
+   "name": "WHO: Which actor performs this, and on whose behalf?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E1-2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E1-2 cannot run until 'a mode is chosen and its objective is set' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-1",
+      "standing": "stated",
+      "text": "the objective differs per mode, so it has to be settled before anything else means anything Instead of: one mode with the objective chosen later"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E1-1"
+   },
+   "id": "Q:why:UC-E1-1",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E1-3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E1-3 cannot run until 'the pilot has a ship in the world, near its base' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E1-2"
+   },
+   "id": "Q:why:UC-E1-2",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E1-4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E1-4 cannot run until \"the ship's heading answers the player\" holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-1",
+      "standing": "stated",
+      "text": "the sources describe two input schemes for the same act, so either alone is incomplete Instead of: mouse only, as many browser shooters do"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E1-3"
+   },
+   "id": "Q:why:UC-E1-3",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E1-5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E1-5 cannot run until \"the ship moves under the player's control\" holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E1-4"
+   },
+   "id": "Q:why:UC-E1-4",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-1",
+       "UC-E4-1",
+       "UC-E5-1"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-1, UC-E4-1, UC-E5-1 cannot run until 'the pilot is flying in the asteroid field' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E1-5"
+   },
+   "id": "Q:why:UC-E1-5",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-2 cannot run until 'an asteroid has been broken' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-1"
+   },
+   "id": "Q:why:UC-E2-1",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-3 cannot run until 'crystals are loose in the field' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-2"
+   },
+   "id": "Q:why:UC-E2-2",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-4 cannot run until \"crystals are in the ship's hold\" holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-3"
+   },
+   "id": "Q:why:UC-E2-3",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-5 cannot run until 'the hold has a known ceiling and enforces it' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-6",
+      "standing": "stated",
+      "text": "a ceiling is what makes returning to spend a decision rather than a formality Instead of: an unbounded hold, which would remove the reason ever to stop mining"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-4"
+   },
+   "id": "Q:why:UC-E2-4",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E2-6"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E2-6 cannot run until 'the pilot is trading safety for yield' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-6",
+      "standing": "stated",
+      "text": "without the size trade-off mining is a chore rather than a choice Instead of: every asteroid worth the same, which the sources contradict"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-5"
+   },
+   "id": "Q:why:UC-E2-5",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E3-1",
+       "UC-E3-3",
+       "UC-E3-4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E3-1, UC-E3-3, UC-E3-4 cannot run until \"the ship's crystal cargo is full\" holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E2-6"
+   },
+   "id": "Q:why:UC-E2-6",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E3-2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E3-2 cannot run until 'at least one statistic is above its base' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E3-1"
+   },
+   "id": "Q:why:UC-E3-1",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "E3 declares it ends with 'the ship is measurably better than it was' true, and this is the beat that reaches it"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E3-2"
+   },
+   "id": "Q:why:UC-E3-2",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": false,
+    "answers": [],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E3-3"
+   },
+   "id": "Q:why:UC-E3-3",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E3-5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E3-5 cannot run until 'a next ship is on offer' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-3",
+      "standing": "stated",
+      "text": "a choice of two is what makes the tree a tree rather than a ladder Instead of: one successor per tier, which would make the path fixed"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E3-4"
+   },
+   "id": "Q:why:UC-E3-4",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "E3 declares it ends with 'the ship is measurably better than it was' true, and this is the beat that reaches it"
+     },
+     {
+      "by": [],
+      "source": "Q-3",
+      "standing": "stated",
+      "text": "paying the whole hold and losing every upgrade is the cost that makes holding out a decision Instead of: carrying upgrades across the tier, which would make trading up strictly free"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E3-5"
+   },
+   "id": "Q:why:UC-E3-5",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E4-2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E4-2 cannot run until 'shots are being exchanged' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E4-1"
+   },
+   "id": "Q:why:UC-E4-1",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E4-3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E4-3 cannot run until 'the shield is depleted' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E4-2"
+   },
+   "id": "Q:why:UC-E4-2",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E4-4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E4-4 cannot run until 'the pilot is losing crystals to incoming fire' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-4",
+      "standing": "stated",
+      "text": "crystals acting as a second shield is what makes a full hold dangerous to carry Instead of: the hold being safe until death, which would make hoarding free"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E4-3"
+   },
+   "id": "Q:why:UC-E4-3",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E4-5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E4-5 cannot run until \"the pilot's ship is destroyed\" holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E4-4"
+   },
+   "id": "Q:why:UC-E4-4",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "E4 declares it ends with 'the pilot is flying again, back at tier one' true, and this is the beat that reaches it"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E4-5"
+   },
+   "id": "Q:why:UC-E4-5",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E5-2"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E5-2 cannot run until 'the playable area is shrinking' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-5",
+      "standing": "stated",
+      "text": "a shrinking field forces contact without a timer deciding the round Instead of: a round timer, which would end the game without anyone having to fight"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E5-1"
+   },
+   "id": "Q:why:UC-E5-1",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E5-3"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E5-3 cannot run until 'players know how much room is left' holds, and this is what makes it hold"
+     },
+     {
+      "by": [],
+      "source": "Q-5",
+      "standing": "stated",
+      "text": "a squeeze nobody can see coming is a death nobody can play around Instead of: a silent field, which would make position luck rather than choice"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E5-2"
+   },
+   "id": "Q:why:UC-E5-2",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E5-4"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E5-4 cannot run until 'the survivors cannot avoid each other' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E5-3"
+   },
+   "id": "Q:why:UC-E5-3",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "UC-E5-5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "UC-E5-5 cannot run until 'one pilot remains alive' holds, and this is what makes it hold"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E5-4"
+   },
+   "id": "Q:why:UC-E5-4",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {
+    "answered": true,
+    "answers": [
+     {
+      "by": [
+       "E5"
+      ],
+      "source": "the model's structure",
+      "standing": "definitive",
+      "text": "E5 declares it ends with 'the round is over and a winner is known' true, and this is the beat that reaches it"
+     }
+    ],
+    "asks": "Why does this exist, and what was rejected in choosing it?",
+    "good_answer": "a reason that is not a restatement, and at least one real alternative",
+    "interrogative": "why",
+    "subject": "UC-E5-5"
+   },
+   "id": "Q:why:UC-E5-5",
+   "kind": "question",
+   "name": "WHY: Why does this exist, and what was rejected in choosing it?",
+   "provenance": "interrogation"
+  },
+  {
+   "attrs": {},
+   "id": "S:at_menu",
+   "kind": "state",
+   "name": "the player is at the main menu, in no game",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {},
+   "id": "S:back_at_tier_one",
+   "kind": "state",
+   "name": "the pilot is flying again, back at tier one",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    }
+   },
+   "id": "S:bleeding_gems",
+   "kind": "state",
+   "name": "the pilot is losing crystals to incoming fire",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:can_move",
+   "kind": "state",
+   "name": "the ship moves under the player's control",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:can_steer",
+   "kind": "state",
+   "name": "the ship's heading answers the player",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {},
+   "id": "S:cargo_full",
+   "kind": "state",
+   "name": "the ship's crystal cargo is full",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    }
+   },
+   "id": "S:field_closing",
+   "kind": "state",
+   "name": "the playable area is shrinking",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    }
+   },
+   "id": "S:forced_together",
+   "kind": "state",
+   "name": "the survivors cannot avoid each other",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:gems_held",
+   "kind": "state",
+   "name": "crystals are in the ship's hold",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:gems_loose",
+   "kind": "state",
+   "name": "crystals are loose in the field",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:hold_bounded",
+   "kind": "state",
+   "name": "the hold has a known ceiling and enforces it",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {},
+   "id": "S:in_field",
+   "kind": "state",
+   "name": "the pilot is flying in the asteroid field",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    }
+   },
+   "id": "S:life_banked",
+   "kind": "state",
+   "name": "the pilot holds a life in reserve",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:mining_has_a_cost",
+   "kind": "state",
+   "name": "the pilot is trading safety for yield",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:mode_chosen",
+   "kind": "state",
+   "name": "a mode is chosen and its objective is set",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    }
+   },
+   "id": "S:one_left",
+   "kind": "state",
+   "name": "one pilot remains alive",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    }
+   },
+   "id": "S:rock_broken",
+   "kind": "state",
+   "name": "an asteroid has been broken",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {},
+   "id": "S:round_decided",
+   "kind": "state",
+   "name": "the round is over and a winner is known",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    }
+   },
+   "id": "S:shield_down",
+   "kind": "state",
+   "name": "the shield is depleted",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {},
+   "id": "S:ship_better",
+   "kind": "state",
+   "name": "the ship is measurably better than it was",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    }
+   },
+   "id": "S:ship_destroyed",
+   "kind": "state",
+   "name": "the pilot's ship is destroyed",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:ship_placed",
+   "kind": "state",
+   "name": "the pilot has a ship in the world, near its base",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    }
+   },
+   "id": "S:stat_raised",
+   "kind": "state",
+   "name": "at least one statistic is above its base",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    }
+   },
+   "id": "S:tier_offered",
+   "kind": "state",
+   "name": "a next ship is on offer",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    }
+   },
+   "id": "S:trading_fire",
+   "kind": "state",
+   "name": "shots are being exchanged",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {},
+   "id": "S:under_attack",
+   "kind": "state",
+   "name": "another ship is shooting at the pilot",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    }
+   },
+   "id": "S:warned",
+   "kind": "state",
+   "name": "players know how much room is left",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "each of the four modes is selectable from the main menu",
+     "the objective the mode sets is stated before the round starts"
+    ],
+    "because": "the objective differs per mode, so it has to be settled before anything else means anything",
+    "ground": [
+     "game mode",
+     "objective"
+    ],
+    "instead_of": [
+     "one mode with the objective chosen later"
+    ],
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E1-1",
+   "kind": "usecase",
+   "name": "Player chooses one of the four game modes",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the pilot appears within sight of the station the sources call their base"
+    ],
+    "ground": [
+     "space station"
+    ],
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E1-2",
+   "kind": "usecase",
+   "name": "The server places the ship beside its base",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the mouse and the left and right arrow keys both change heading"
+    ],
+    "because": "the sources describe two input schemes for the same act, so either alone is incomplete",
+    "ground": [
+     "steer",
+     "controls"
+    ],
+    "instead_of": [
+     "mouse only, as many browser shooters do"
+    ],
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E1-3",
+   "kind": "usecase",
+   "name": "Pilot steers the ship",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "right-click and the up arrow both accelerate"
+    ],
+    "ground": [
+     "accelerate"
+    ],
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E1-4",
+   "kind": "usecase",
+   "name": "Pilot accelerates the ship",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "left-click and the space bar both fire",
+     "a pilot who can steer, move and fire is in the field and needs nothing further to play"
+    ],
+    "ground": [
+     "fire",
+     "weapons"
+    ],
+    "rationale": {
+     "ask": "Epic E1 -- 'Choose a mode and reach the field' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Four modes, a base to appear beside, and a ship that answers the controls. The sources describe the controls as three separate things, so they are three beats.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-1"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E1-5",
+   "kind": "usecase",
+   "name": "Pilot fires the ship's weapon",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "an asteroid takes damage from weapons fire and breaks"
+    ],
+    "ground": [
+     "asteroid",
+     "weapons"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-1",
+   "kind": "usecase",
+   "name": "Pilot breaks an asteroid apart",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "a broken asteroid leaves crystals where it was",
+     "a larger asteroid leaves larger chunks than a smaller one"
+    ],
+    "ground": [
+     "gem",
+     "asteroid"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-2",
+   "kind": "usecase",
+   "name": "A broken asteroid leaves crystals in the field",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "flying over a loose crystal puts it in the hold"
+    ],
+    "ground": [
+     "gem"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-3",
+   "kind": "usecase",
+   "name": "Pilot picks up a loose crystal",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "a pickup that would exceed the ceiling is lost rather than held",
+     "a full hold accepts nothing until something leaves it"
+    ],
+    "because": "a ceiling is what makes returning to spend a decision rather than a formality",
+    "ground": [
+     "cargo capacity"
+    ],
+    "instead_of": [
+     "an unbounded hold, which would remove the reason ever to stop mining"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-4",
+   "kind": "usecase",
+   "name": "The hold refuses crystals past its ceiling",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "a larger asteroid yields more crystals per unit of damage dealt",
+     "a larger asteroid takes longer, leaving the pilot in one place for longer"
+    ],
+    "because": "without the size trade-off mining is a chore rather than a choice",
+    "ground": [
+     "asteroid"
+    ],
+    "instead_of": [
+     "every asteroid worth the same, which the sources contradict"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-5",
+   "kind": "usecase",
+   "name": "Pilot weighs asteroid size against exposure",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the hold reports itself full at the documented capacity for the tier",
+     "a full hold is what unlocks both the extra life and the next ship"
+    ],
+    "ground": [
+     "cargo capacity",
+     "upgrade cost"
+    ],
+    "rationale": {
+     "ask": "Epic E2 -- 'Mine the belt and fill the cargo' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.\n\nYour previous answer was accepted apart from UC-E2-5. Re-send only what is needed to replace those; leave everything else out.",
+     "attempt": 2,
+     "because": "Refused for a compound name. Renaming rather than splitting: weighing size against exposure is one judgement the pilot makes at one moment, not two goals \u2014 the objection offers both routes and this is the case it was written for.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-6"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E2-6",
+   "kind": "usecase",
+   "name": "The hold fills",
+   "provenance": "Q-6"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "there are exactly eight categories a crystal can go into",
+     "the cost of the next level in a category rises with the level already held"
+    ],
+    "ground": [
+     "upgrade categories",
+     "upgrade cost",
+     "spend gems"
+    ],
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E3-1",
+   "kind": "usecase",
+   "name": "Pilot spends crystals on one of eight statistics",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "raising energy regeneration visibly shortens the wait between sustained bursts",
+     "a statistic at its base leaves the ship exactly as it was"
+    ],
+    "ground": [
+     "energy regen"
+    ],
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E3-2",
+   "kind": "usecase",
+   "name": "A raised statistic changes how the ship performs",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "an extra life can only be bought with a full hold",
+     "the number of lives that can be held is capped, and the cap depends on the tier"
+    ],
+    "ground": [
+     "extra life"
+    ],
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E3-3",
+   "kind": "usecase",
+   "name": "Pilot buys an extra life with a full hold",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the offer is a choice between two ships, not a single successor",
+     "a ship at the top tier is offered nothing"
+    ],
+    "because": "a choice of two is what makes the tree a tree rather than a ladder",
+    "ground": [
+     "tier up",
+     "ship"
+    ],
+    "instead_of": [
+     "one successor per tier, which would make the path fixed"
+    ],
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E3-4",
+   "kind": "usecase",
+   "name": "A full hold offers the next ship in the tree",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "after trading up, every statistic reads its base value",
+     "the new hull is stronger at base than the old one was fully upgraded, or the trade is never worth taking"
+    ],
+    "because": "paying the whole hold and losing every upgrade is the cost that makes holding out a decision",
+    "ground": [
+     "tier up",
+     "tier"
+    ],
+    "instead_of": [
+     "carrying upgrades across the tier, which would make trading up strictly free"
+    ],
+    "rationale": {
+     "ask": "Epic E3 -- 'Spend the cargo, or trade up a tier' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "A full hold has three destinations in the sources: statistics, an extra life, or the next ship. Taking the next ship hands over an un-upgraded one, which is what makes it a trade rather than a reward.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-3"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E3-5",
+   "kind": "usecase",
+   "name": "Taking the next ship hands over an un-upgraded one",
+   "provenance": "Q-3"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "lasers, torpedoes and special weapons are all available routes to damage"
+    ],
+    "ground": [
+     "weapons",
+     "fire"
+    ],
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E4-1",
+   "kind": "usecase",
+   "name": "Pilot trades fire with another ship",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "no crystals are lost while the shield still has charge"
+    ],
+    "ground": [
+     "shield"
+    ],
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E4-2",
+   "kind": "usecase",
+   "name": "Shields absorb before the hold does",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "with the shield down, damage taken removes that amount of crystals from the hold",
+     "crystals knocked loose are collectable by anyone, including the attacker"
+    ],
+    "because": "crystals acting as a second shield is what makes a full hold dangerous to carry",
+    "ground": [
+     "gems as shield"
+    ],
+    "instead_of": [
+     "the hold being safe until death, which would make hoarding free"
+    ],
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E4-3",
+   "kind": "usecase",
+   "name": "Damage past the shield knocks crystals loose",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "a destroyed ship leaves the field"
+    ],
+    "ground": [
+     "death"
+    ],
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E4-4",
+   "kind": "usecase",
+   "name": "A ship that runs out of everything dies",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the respawned ship is tier one regardless of the tier that died",
+     "every upgrade bought before death is gone",
+     "the respawned pilot holds minimal crystals, not none and not the hold they had"
+    ],
+    "ground": [
+     "death",
+     "tier"
+    ],
+    "rationale": {
+     "ask": "Epic E4 -- 'Fight, bleed gems, and die back to tier one' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "The sources describe a cost chain: shields absorb, and past them damage knocks crystals out of the hold for anyone to take, and past that the ship dies back to tier one with nothing.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-4"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E4-5",
+   "kind": "usecase",
+   "name": "Death returns the pilot to tier one with nothing",
+   "provenance": "Q-4"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the field pushes players away from the star rather than pulling them in",
+     "the field grows larger and stronger as the endgame progresses"
+    ],
+    "because": "a shrinking field forces contact without a timer deciding the round",
+    "ground": [
+     "gravity field"
+    ],
+    "instead_of": [
+     "a round timer, which would end the game without anyone having to fight"
+    ],
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E5-1",
+   "kind": "usecase",
+   "name": "A repulsive field grows out from the star",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "warnings are given at 75%, 50%, 25% and 0%"
+    ],
+    "because": "a squeeze nobody can see coming is a death nobody can play around",
+    "ground": [
+     "endgame warning"
+    ],
+    "instead_of": [
+     "a silent field, which would make position luck rather than choice"
+    ],
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E5-2",
+   "kind": "usecase",
+   "name": "The field warns before it reaches a player",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the survivable area is smaller at the end of the round than at the start"
+    ],
+    "ground": [
+     "gravity field"
+    ],
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E5-3",
+   "kind": "usecase",
+   "name": "The closing field forces players together",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "victory is being last alive, not holding the highest count of anything"
+    ],
+    "ground": [
+     "survival objective"
+    ],
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E5-4",
+   "kind": "usecase",
+   "name": "The last pilot alive takes the round",
+   "provenance": "Q-5"
+  },
+  {
+   "attrs": {
+    "acceptance": [
+     "the server ends once one player is left"
+    ],
+    "ground": [
+     "round end"
+    ],
+    "rationale": {
+     "ask": "Epic E5 -- 'The field closes and one player is left' -- currently holds: nothing yet. Break the epic's story into the ordered actor goals it is made of, at least 5 more. Each one is a single goal a single actor achieves in one sitting. Give each its precondition and its postcondition as state literals, because the order of the story is derived from those and not from the order you list them in.",
+     "attempt": 1,
+     "because": "Survival ends by squeezing the field rather than by a timer. The sources give the mechanism, the warnings, and the ending condition as three separate claims.",
+     "kind": "UNDECOMPOSED_EPIC",
+     "question": "Q-5"
+    },
+    "status": "HAVE"
+   },
+   "id": "UC-E5-5",
+   "kind": "usecase",
+   "name": "The server ends the round",
+   "provenance": "Q-5"
+  }
+ ],
+ "tally": {
+  "actor": 3,
+  "edges": 382,
+  "epic": 5,
+  "ground": 0,
+  "question": 156,
+  "state": 27,
+  "step": 0,
+  "usecase": 26
+ }
+}

@@ -1,0 +1,107 @@
+classDiagram
+  direction LR
+  class CFG {
+    <<config>>
+    +AST_CELL
+    +AST_CHILD_FRAC
+    +AST_GRID_EVERY
+    +AST_KEEP
+    +AST_MAX
+    +AST_SPLIT_KICK
+    +AST_SPLIT_MAX
+    +AST_SPLIT_MIN
+    +BULLET_DMG
+    +BULLET_LIFE
+    +BULLET_R
+    +BULLET_SPEED
+    +CAM_AHEAD
+    +CAM_BACK
+    +CAM_LAG
+    +CAM_UP
+    +DRAG
+    +EXPOSURE
+    +GEM_BAR_MAX
+    +GEM_BAR_RATE
+    +GEM_CREDIT_PER_SCALE
+    +GEM_GRAB_R
+    +GEM_LIFE
+    +GEM_MAGNET
+    +GEM_PICK_R
+    +GEM_PTS_CAP
+    +LASER_CAP_MAX
+    +LASER_CAP_PER_SHOT
+    +LASER_CAP_REGEN
+    +MUZZLE_OFF
+    +PITCH_RATE
+    +RESPAWN_DELAY
+    +SAVE_INTERVAL_S
+    +SCORE_W
+    +SHIP_R
+    +STAT_GAIN
+    +STAT_MAX
+    +STAT_ORDER
+    +THRUST
+    +TIER_UP
+    +VMAX
+    +YAW_RATE
+  }
+  class E1 {
+    <<subsystem>>
+    +SHIP_TEX
+    +frame()
+    +makeShip()
+    +renderer
+    +scene
+    +step()
+  }
+  note for E1 "E1 — Arrive and fly"
+  class E2 {
+    <<subsystem>>
+    +ROCK_POOLS
+    +destroyAsteroid()
+    +gemBarAdd()
+    +magnetFor()
+    +makeMiningBelt()
+    +spawnAsteroid()
+    +spawnGem()
+  }
+  note for E2 "E2 — Mine the belt"
+  class E3 {
+    <<subsystem>>
+    +HULLS
+    +HULL_ORDER_ORIGINAL
+    +hullTierIdx()
+    +nextTierHull()
+    +shieldMaxFor()
+    +spendStat()
+    +statMult()
+    +takeTierUp()
+    +tierUpReady()
+  }
+  note for E3 "E3 — Spend the point, or save for the hull"
+  class E4 {
+    <<subsystem>>
+    +WEAPONS
+    +capMaxFor()
+    +drainShield()
+    +killByShip()
+    +killShip()
+    +shieldArcMaxFor()
+    +spillGems()
+    +statMult()
+  }
+  note for E4 "E4 — Fight, die, and lose the cargo"
+  class E5 {
+    <<subsystem>>
+    +SAVE_KEY
+    +applySaveState()
+    +gatherSaveState()
+    +persist()
+  }
+  note for E5 "E5 — The run ends and is remembered"
+  E1 ..> CFG : reads
+  E2 ..> CFG : reads
+  E3 ..> CFG : reads
+  E3 ..> E4 : reads
+  E4 ..> CFG : reads
+  E5 ..> CFG : reads

@@ -1,0 +1,40 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E1["E1 — Arrive and fly"]
+      direction LR
+      UC_E1_1["<b>UC-E1-1</b><br/>The page builds a world to fly in<br/><small>renderer</small>"]
+      UC_E1_2["<b>UC-E1-2</b><br/>The game gives the pilot a ship<br/><small>makeShip</small>"]
+      UC_E1_3["<b>UC-E1-3</b><br/>The simulation advances every frame<br/><small>frame</small>"]
+      UC_E1_4["<b>UC-E1-4</b><br/>The pilot's controls move the ship<br/><small>THRUST</small>"]
+      UC_E1_5["<b>UC-E1-5</b><br/>The pilot can see where the ship is going<br/><small>CAM_BACK</small>"]
+    end
+  end
+  S_controls_live(("the controls answer the pilot"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_page_open(("the page is open and nothing has started"))
+  S_ship_exists(("the pilot has a ship in that world"))
+  S_sim_running(("the simulation is stepping"))
+  S_world_built(("a world exists to fly in"))
+  E1 --> S_page_open
+  UC_E1_1 --> S_world_built
+  UC_E1_2 --> S_ship_exists
+  UC_E1_3 --> S_sim_running
+  UC_E1_4 --> S_controls_live
+  UC_E1_5 --> S_in_flight
+  A_pilot --- E1
+  S_in_flight --> E1
+  S_page_open --> UC_E1_1
+  S_world_built --> UC_E1_2
+  S_ship_exists --> UC_E1_3
+  S_sim_running --> UC_E1_4
+  S_controls_live --> UC_E1_5
+  style UC_E1_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E1_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (381): Q:what:UC-E1-1 -answers-> S:world_built; Q:what:UC-E1-2 -answers-> S:ship_exists; Q:what:UC-E1-3 -answers-> S:sim_running; Q:what:UC-E1-4 -answers-> S:controls_live; Q:what:UC-E1-5 -answers-> S:in_flight; Q:what:UC-E2-1 -answers-> S:belt_exists; Q:what:UC-E2-2 -answers-> S:rock_in_range; Q:what:UC-E2-3 -answers-> S:gems_loose; Q:what:UC-E2-4 -answers-> S:gem_pickable; Q:what:UC-E2-5 -answers-> S:gem_in_hold; Q:what:UC-E2-6 -answers-> S:point_banked; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_stronger; Q:what:UC-E3-3 -answers-> S:stats_maxed; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:hull_swapped; Q:what:UC-E3-6 -answers-> S:ship_stronger; Q:what:UC-E4-1 -answers-> S:weapon_ready; Q:what:UC-E4-2 -answers-> S:shot_in_flight; Q:what:UC-E4-3 -answers-> S:in_combat

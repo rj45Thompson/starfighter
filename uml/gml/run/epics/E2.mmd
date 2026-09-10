@@ -1,0 +1,45 @@
+flowchart LR
+  %% actors
+  A_pilot(["👤 Pilot"])
+  subgraph SYS["starblast — system boundary"]
+    direction LR
+    subgraph E2["E2 — Mine the belt"]
+      direction LR
+      UC_E2_1["<b>UC-E2-1</b><br/>The system populates a belt with rocks<br/><small>makeMiningBelt</small>"]
+      UC_E2_2["<b>UC-E2-2</b><br/>The system finds the rocks near the pilot cheaply<br/><small>AST_CELL</small>"]
+      UC_E2_3["<b>UC-E2-3</b><br/>The pilot breaks a rock apart<br/><small>destroyAsteroid</small>"]
+      UC_E2_4["<b>UC-E2-4</b><br/>Broken rock leaves gems in the world<br/><small>spawnGem</small>"]
+      UC_E2_5["<b>UC-E2-5</b><br/>The pilot scoops a gem<br/><small>magnetFor</small>"]
+      UC_E2_6["<b>UC-E2-6</b><br/>Collected credits bank an upgrade point<br/><small>gemBarAdd</small>"]
+    end
+  end
+  S_belt_exists(("a belt of rocks exists"))
+  S_gem_in_hold(("gem credits are in the hold"))
+  S_gem_pickable(("a gem can be picked up"))
+  S_gems_loose(("gems are loose in the world"))
+  S_in_flight(("the pilot is flying and in control"))
+  S_point_banked(("the pilot is owed at least one upgrade point"))
+  S_rock_in_range(("a rock is within reach"))
+  E2 --> S_in_flight
+  UC_E2_1 --> S_belt_exists
+  UC_E2_2 --> S_rock_in_range
+  UC_E2_3 --> S_gems_loose
+  UC_E2_4 --> S_gem_pickable
+  UC_E2_5 --> S_gem_in_hold
+  UC_E2_6 --> S_point_banked
+  A_pilot --- E2
+  S_point_banked --> E2
+  S_in_flight --> UC_E2_1
+  S_belt_exists --> UC_E2_2
+  S_rock_in_range --> UC_E2_3
+  S_gems_loose --> UC_E2_4
+  S_gem_pickable --> UC_E2_5
+  S_gem_in_hold --> UC_E2_6
+  style UC_E2_1 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_2 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_3 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_4 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_5 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style UC_E2_6 fill:#153a2c,stroke:#5ee6a8,color:#e8eef6
+  style A_pilot fill:#1b2a3a,stroke:#7fb3ff,color:#e8eef6
+  %% NOT DRAWN (379): Q:what:UC-E1-1 -answers-> S:world_built; Q:what:UC-E1-2 -answers-> S:ship_exists; Q:what:UC-E1-3 -answers-> S:sim_running; Q:what:UC-E1-4 -answers-> S:controls_live; Q:what:UC-E1-5 -answers-> S:in_flight; Q:what:UC-E2-1 -answers-> S:belt_exists; Q:what:UC-E2-2 -answers-> S:rock_in_range; Q:what:UC-E2-3 -answers-> S:gems_loose; Q:what:UC-E2-4 -answers-> S:gem_pickable; Q:what:UC-E2-5 -answers-> S:gem_in_hold; Q:what:UC-E2-6 -answers-> S:point_banked; Q:what:UC-E3-1 -answers-> S:stat_raised; Q:what:UC-E3-2 -answers-> S:ship_stronger; Q:what:UC-E3-3 -answers-> S:stats_maxed; Q:what:UC-E3-4 -answers-> S:tier_offered; Q:what:UC-E3-5 -answers-> S:hull_swapped; Q:what:UC-E3-6 -answers-> S:ship_stronger; Q:what:UC-E4-1 -answers-> S:weapon_ready; Q:what:UC-E4-2 -answers-> S:shot_in_flight; Q:what:UC-E4-3 -answers-> S:in_combat
