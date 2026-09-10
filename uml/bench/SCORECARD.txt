@@ -1,0 +1,66 @@
+THE SCORECARD
+
+                                        arm A        arm C        arm D   
+  ------------------------------------------------------------------------
+  use cases                                20           26           31   volume, worth no points
+  epics declared                            0            5            5   arm A did not decompose
+
+  MADE — a dimension satisfied (+)
+    corpus terms claimed                    0           26           28   
+    use cases grounded                      0           26           31   
+    use cases with acceptance               0           26           31   
+    decisions argued                        0            9           31   
+    intervals ruled on                      0            0           32   
+    chains intact                           0            5            5   
+    TOTAL MADE                              0           92          158   
+
+  OPEN, DECLARED — the arm's own report names it (−)
+    CHAIN_INTERVAL                          0           31            0   
+    DANGLING_POSTCONDITION                  0            1            0   
+    UNANSWERED                              0            1            0   
+    UNARGUED                                0           16            0   
+    UNUSED_ACTOR                            0            1            0   
+    TOTAL DECLARED OPEN                     0           50            0   
+
+  OPEN, UNKNOWN — only the instrument found it; the arm thought it was done (−−)
+    CHAIN_INTERVAL                         21            0            0   
+    DANGLING_POSTCONDITION                  3            0            1   
+    NO_ACCEPTANCE                          20            0            0   
+    UNANSWERED                             43            0            0   
+    UNARGUED                               17            0            0   
+    UNCLAIMED_GROUND                       28           10            0   
+    UNDECIDED_QUANTITY                      0            1            0   
+    UNDECOMPOSED_SYSTEM                     1            0            0   
+    UNGROUNDED_USECASE                     20            0            0   
+    TOTAL UNKNOWN OPEN                    153           11            1   
+
+  WRONG — asserted, and false (−−−)
+    CHAIN_BREAK                             3            0            0   
+    TOTAL WRONG                             3            0            0   
+
+
+THE SCORE, under three weightings
+
+  strict                                 -474            9        155 ◀   made +1 · declared -1 · unknown -3 · wrong -5
+  gentle on holes                        -168           56        157 ◀   made +1 · declared -0.5 · unknown -1 · wrong -5
+  honesty-blind                          -312          -30        156 ◀   made +1 · declared -2 · unknown -2 · wrong -2
+
+
+THE SAME SCORE WITH THE CORPUS TAKEN OUT
+  Arm A was never given the corpus. Every line below is one all three arms could
+  have scored on with nothing but the ability to think about their own output.
+
+                                        arm A        arm C        arm D   
+  ------------------------------------------------------------------------
+    made                                    0           40           99   
+    open, declared                          0           50            0   
+    open, unknown                         105            0            1   
+    wrong                                   3            0            0   
+    strict                               -330          -10         96 ◀   
+    gentle on holes                      -120           15         98 ◀   
+    honesty-blind                        -216          -60         97 ◀   
+
+  RANKING
+    strict             arm D > arm C > arm A
+    gentle on holes    arm D > arm C > arm A
+    honesty-blind      arm D > arm C > arm A

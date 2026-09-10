@@ -74,3 +74,30 @@ run is actually worth is the two-way audit:
   produced a branch or a cross-epic dependency at all.
 
 Read `armD-README.md` for the detail.
+
+## The scorecard
+
+`python3 bench/scorecard.py` in TDRE; output kept in `SCORECARD.txt`.
+
+The scoring idea is RJ's and it is the one that makes the table honest: **a gap detected
+and not filled is a different thing from a gap nobody noticed.** Scoring them the same is
+what let arm A look respectable — it left more undone than any other arm and declared none
+of it, so on a count of open items it came first.
+
+So every shortfall is charged twice: once for being a shortfall, and again if the arm did
+not know. Four ledgers, and the split between the middle two is decided by text rather
+than by charity — a gap counts as declared only where the arm's own report names its code.
+
+| ledger | what it is |
+|---|---|
+| **MADE** | a dimension satisfied. The only credit column. |
+| **OPEN, DECLARED** | a gap the arm's own output names. Incomplete, and honest about it. |
+| **OPEN, UNKNOWN** | a gap only the outside instrument found. The arm believed it was finished. |
+| **WRONG** | something asserted that is false. Not a hole — a claim. |
+
+Weights are a judgement, so three schemes run side by side and are printed with the
+result. The ranking is the same under all three, which is the only thing that makes it a
+finding about the arms rather than about the weights.
+
+A second table removes every corpus-dependent line, because arm A was never given the
+corpus and charging it for citations is charging it for its handicap.
