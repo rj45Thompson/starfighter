@@ -50,3 +50,27 @@ mechanics simply never come up.
 
 **Arm B is not yet run.** Until it is, the honest reading of this table is "structure plus
 grounding beats one pass", not "structure beats iteration" — those have not been separated.
+
+There is also a confound in the table above that iteration does not explain: arm C's briefs
+contained the 28-term list and arm A's did not. So 17% against 92% is substantially *having
+the answer sheet*, and is not on its own evidence that the system reasons better.
+
+## Arm D, run 2026-09-10 — the method, no engine
+
+`armD-skill.ops` and `armD-README.md`. Claude given the engine's method as a skill and the
+same corpus arm C had, writing the whole model by hand with no engine at all. This removes
+both confounds above: same corpus, and the method is no longer the thing being withheld.
+
+Arm D leads arm C on every metric they differ on, and that is the least interesting result
+on the page — the skill's checklist and the scorer's metric list are the same list. What the
+run is actually worth is the two-way audit:
+
+- **The engine found a missing requirement in arm D** — a state established in the first
+  epic that thirty use cases never consumed. Found by subtraction, after a hand pass with
+  the same checklist had declared itself clean.
+- **Arm D found two defects in the engine** — an `<<extend>>` walked as a beat of the main
+  success scenario, and a chain walk that stopped at the epic boundary while the story
+  continued across it. Neither could appear in arm C's own output, because arm C never
+  produced a branch or a cross-epic dependency at all.
+
+Read `armD-README.md` for the detail.
