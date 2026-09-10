@@ -1,0 +1,366 @@
+{
+ "edges": [
+  {
+   "dst": "S:at_menu",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E2"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E3"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E4"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E5"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "establishes",
+   "provenance": "Q-1",
+   "src": "E6"
+  },
+  {
+   "dst": "S:in_field",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E1"
+  },
+  {
+   "dst": "S:cargo_full",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E2"
+  },
+  {
+   "dst": "S:ship_stronger",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E3"
+  },
+  {
+   "dst": "S:back_at_tier_one",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E4"
+  },
+  {
+   "dst": "S:round_decided",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E5"
+  },
+  {
+   "dst": "S:waves_cleared",
+   "kind": "requires",
+   "provenance": "Q-1",
+   "src": "E6"
+  }
+ ],
+ "name": "starblast-derived",
+ "nodes": [
+  {
+   "attrs": {
+    "note": "the person flying"
+   },
+   "id": "A:pilot",
+   "kind": "actor",
+   "name": "Pilot",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "note": "everyone else in the field"
+   },
+   "id": "A:rival",
+   "kind": "actor",
+   "name": "Another player",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "note": "the simulation acting on its own"
+   },
+   "id": "A:server",
+   "kind": "actor",
+   "name": "The server",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "because": "the sources describe entering as three separable acts - choosing a mode, being placed, and gaining control - and a story that assumes any of them leaves a builder guessing",
+    "ground": [
+     "game mode",
+     "objective",
+     "space station",
+     "controls",
+     "accelerate",
+     "steer",
+     "fire",
+     "ship",
+     "Fly"
+    ],
+    "instead_of": [
+     "starting the arc in the field, which would leave the mode choice and its objective unspecified"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "You pick one of four modes, appear beside the space station that is your base, and the ship answers the mouse or the keyboard. Nothing else in the game can happen until this has."
+   },
+   "id": "E1",
+   "kind": "epic",
+   "name": "Enter a round and take control of a ship",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "because": "a bounded hold is what makes returning to spend a decision instead of a formality",
+    "ground": [
+     "asteroid",
+     "gem",
+     "cargo capacity"
+    ],
+    "instead_of": [
+     "an unbounded hold, which removes any reason to stop mining"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "You shoot asteroids and the crystals they drop are worth something. Bigger rocks pay more per shot and cost more to stay near. The hold has a ceiling and crystals past it are simply lost."
+   },
+   "id": "E2",
+   "kind": "epic",
+   "name": "Mine the belt until the hold is full",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "because": "the sources give a full hold three destinations, and a story covering only the statistics would hide the choice that gives the tree its shape",
+    "ground": [
+     "spend gems",
+     "upgrade categories",
+     "upgrade cost",
+     "extra life",
+     "tier",
+     "tier up",
+     "energy regen"
+    ],
+    "instead_of": [
+     "one destination, which would make a full hold a reward rather than a decision"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "A full hold goes into eight statistics, into an extra life, or into the next ship in the tree - and taking the next ship hands you an un-upgraded one. That trade is the decision the whole loop exists for."
+   },
+   "id": "E3",
+   "kind": "epic",
+   "name": "Convert a full hold into a better ship",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "because": "the sources describe two separate losses - crystals bleeding out under fire, and the ship itself - and collapsing them into one would lose the reason a full hold is dangerous to carry",
+    "ground": [
+     "weapons",
+     "shield",
+     "gems as shield",
+     "death"
+    ],
+    "instead_of": [
+     "loss only at death, which is what one of the two sources describes and is recorded as the open contradiction"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "Shields absorb until they do not, and past that every hit knocks crystals out of your hold for anyone to take. Dying puts you back in a tier one ship with nothing."
+   },
+   "id": "E4",
+   "kind": "epic",
+   "name": "Lose the hold, and then the ship, under fire",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "because": "a shrinking field forces contact without a clock deciding the round",
+    "ground": [
+     "gravity field",
+     "endgame warning",
+     "survival objective",
+     "round end"
+    ],
+    "instead_of": [
+     "a round timer, which would end the game without anyone having to fight"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "A repulsive field grows out from the star and pushes everyone inward, warning as it goes. The round ends when one player remains."
+   },
+   "id": "E5",
+   "kind": "epic",
+   "name": "Survive the closing field until one pilot is left",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "because": "the sources document four modes, and an epic set that covers one of them describes a game narrower than the one being cloned",
+    "ground": [
+     "invasion waves",
+     "game mode"
+    ],
+    "instead_of": [
+     "covering survival alone, which is what the previous hand-written seed did"
+    ],
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    },
+    "story": "One of the four documented modes replaces the last-survivor ending with waves of attackers and a final boss. It is a different arc to the same field, and leaving it out would leave a documented mode in no story."
+   },
+   "id": "E6",
+   "kind": "epic",
+   "name": "Hold the field against the invasion instead",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {},
+   "id": "S:at_menu",
+   "kind": "state",
+   "name": "the player is at the main menu, in no game",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:back_at_tier_one",
+   "kind": "state",
+   "name": "the pilot is flying again, back at tier one with nothing",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:cargo_full",
+   "kind": "state",
+   "name": "the ship's crystal hold is full",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:in_field",
+   "kind": "state",
+   "name": "the pilot is flying in the field, under their own control",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {},
+   "id": "S:round_decided",
+   "kind": "state",
+   "name": "the round is over and a winner is known",
+   "provenance": "seed"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:ship_stronger",
+   "kind": "state",
+   "name": "the ship is measurably better than it was",
+   "provenance": "Q-1"
+  },
+  {
+   "attrs": {
+    "rationale": {
+     "ask": "The model has 0 epic(s) -- none -- and the ground above holds 28 things the sources describe. What are the spanning stories?\n\nAn epic is one arc a player lives through from beginning to end, not a feature area. Name at least 4. Give each its story in the vocabulary the sources use, the state it opens in and the state it must end in, and cite the documented terms it covers, so that between them the epics account for the ground rather than leaving most of it in no story at all.\n\nStates with nothing establishing them are where a story can begin: S:at_menu, S:round_decided. States nothing requires are where one can end: S:at_menu, S:round_decided.\n\nDo not write use cases yet. This is the largest level, and the beats come after the arc they are beats of.",
+     "attempt": 1,
+     "because": "Six arcs, chosen so that between them they account for the ground rather than leaving most of it outside any story. The sources document four modes, so the fourth arc is the survival squeeze and the fifth is the invasion alternative \u2014 leaving invasion out would have left a documented mode in no story at all.",
+     "kind": "UNDECOMPOSED_SYSTEM",
+     "question": "Q-1"
+    }
+   },
+   "id": "S:waves_cleared",
+   "kind": "state",
+   "name": "the final wave has been beaten",
+   "provenance": "Q-1"
+  }
+ ],
+ "tally": {
+  "actor": 3,
+  "edges": 12,
+  "epic": 6,
+  "ground": 0,
+  "question": 0,
+  "state": 7,
+  "step": 0,
+  "usecase": 0
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "applied": 1,
+ "cache": {
+  "hit_ratio": 0.059,
+  "hits": 1,
+  "misses": 16,
+  "writes": 0
+ },
+ "calls": 1,
+ "coverage": {},
+ "ground": {
+  "anomalies_certain": 1,
+  "anomalies_probable": 1,
+  "dead": 0,
+  "documented:control": 4,
+  "documented:entity": 5,
+  "documented:mechanic": 9,
+  "documented:mode": 2,
+  "documented:objective": 3,
+  "documented:quantity": 5,
+  "total": 28
+ },
+ "model": {
+  "actor": 3,
+  "edges": 12,
+  "epic": 6,
+  "ground": 0,
+  "question": 0,
+  "state": 7,
+  "step": 0,
+  "usecase": 0
+ },
+ "open_gaps": 16,
+ "oracle": "transcript",
+ "parked": 16,
+ "refused": 0,
+ "rounds": 6,
+ "spec": "starblast-derived",
+ "stopped": "parked",
+ "violations": []
+}
