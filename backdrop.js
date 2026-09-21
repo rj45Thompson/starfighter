@@ -9,15 +9,18 @@
 //
 // Depth comes from parallax, and parallax needs things at actual distances. This builds three shells of them:
 //
-//   FAR    (12-20k)  galaxies and distant clusters. Barely move. They set the scale of everything else.
-//   MID    (5-9k)    nebula sheets, large and faint, each on its own plane and rotation. These are what you
-//                    notice moving when you fly - the layer that does most of the work.
-//   NEAR   (1.5-3k)  thin dust veils and a scatter of foreground stars. They slide visibly, which is what tells
+//   FAR    (5000)    galaxies and distant clusters. At follow 1.00 they do not move AT ALL - they ride the
+//                    camera exactly, so they are a second painted sky over the cube map rather than a
+//                    parallax layer. That is deliberate: they set the scale the other two are read against.
+//   MID    (3600)    nebula sheets, large and faint, each on its own arc and roll. These are what you notice
+//                    moving when you fly - the layer that does most of the work.
+//   NEAR   (1400)    thin dust veils and a scatter of foreground stars. They slide visibly, which is what tells
 //                    you the mid layer is far rather than small.
 //
-// Every card is a textured quad ("cut up objs with textures" - a billboard, not geometry, because a nebula has no
-// silhouette to model and 200 quads cost less than one lit mesh). They are additive with depthWrite off, so they
-// never cut a ship, and they sit on renderOrder -5 so they draw behind everything the game puts in front.
+// Each piece is a SPHERICAL PATCH - a slice of an inverted sphere at the layer's radius - textured and additive
+// with depthWrite off, so it never cuts a ship, on renderOrder -5 so it draws behind everything in front of it.
+// It began as a flat quad ("cut up objs with textures"), and that version is still here under CFG.GEOM:'card';
+// see GEOM for why the curved one replaced it as the default.
 //
 // One global: window.BACKDROP. BACKDROP.build(opts) once the renderer and scene exist; BACKDROP.tick(dt) each
 // frame to drift them. Nothing here reads game state.
@@ -26,18 +29,53 @@
 
   var CFG = {
     ENABLED: true,
-    FAR:  { count: 7,  dist: [12000, 20000], size: [2600, 5200], opacity: 0.34 },
-    MID:  { count: 11, dist: [5000, 9000],   size: [2200, 4600], opacity: 0.20 },
-    NEAR: { count: 9,  dist: [1500, 3000],   size: [700, 1600],  opacity: 0.10 },
-    DRIFT: 0.004,           // radians/sec the whole field turns, so a parked ship is not a still image
+
+    // GEOMETRY. 'shell' = each piece is a spherical patch at the layer's radius; 'card' = the flat quad this
+    // started as, kept so the two can be compared. A card has to be AIMED, and lookAt aims it at the layer
+    // group's origin - but the group LAGS the camera, and that lag is the whole point of it. So the further you
+    // fly the further you stand from the one point every card is facing: at ARENA_R 2100 the near layer's origin
+    // ends up ~500 units away from you against a 1400-unit radius, and its cards skew, foreshorten, and the
+    // edge-on ones thin to nothing. A patch has no facing to get wrong. Every vertex of it is at the layer
+    // radius from the group origin, so it reads correctly from anywhere inside it, and it costs ~560 triangles
+    // instead of 2 - which, 27 times over, is 15k triangles for the entire sky.
+    GEOM: 'shell',
+
+    // Angular width `ang` is in RADIANS, not world units: how much sky the piece covers. That is what you
+    // actually see, and stating it directly means a layer's apparent size no longer moves when its distance is
+    // retuned for the budget below. (The old world-unit sizes divided by their old distances give these.)
+    //
+    // DISTANCES ARE BUDGETED AGAINST THE CAMERA'S FAR PLANE, which is 6000 - index.html:738 chaseCam and
+    // index.html:748 mainTopCam, and nothing reassigns it. They were not budgeted before. FAR sat at
+    // 12000-20000 and the outer star shell at 9000, so the GPU clipped all 7 far cards and all 2200 outer stars
+    // in projection, before rasterising: `depthTest:false` and `frustumCulled:false` do not save them, because
+    // the far plane clips the vertex, it does not lose a depth comparison. The 5000-9000 MID cards were worse
+    // than absent - each was SLICED, cut along the straight line where the far plane crossed it.
+    //
+    // Pulling them inside costs nothing, because a layer that rides the camera has no true distance; what you
+    // see is the angular slide, and that is
+    //
+    //     parallax  ~  (1 - follow) / dist
+    //
+    // so a layer brought closer keeps its old look exactly if (1 - follow) shrinks by the same factor. Each
+    // layer below is the old one carried through that rule, then checked against the worst case the arena can
+    // produce, dist + ARENA_R * (1 - follow) with ARENA_R 2100:
+    //                                                                          worst case | old parallax -> new
+    FAR:  { count: 7,  dist: 5000, ang: [0.16, 0.33], opacity: 0.34, follow: 1.00 },  //  5000 |  0      ->  0
+    MID:  { count: 11, dist: 3600, ang: [0.31, 0.66], opacity: 0.20, follow: 0.93 },  //  3747 |  2.00e-5 -> 1.94e-5
+    NEAR: { count: 9,  dist: 1400, ang: [0.31, 0.71], opacity: 0.10, follow: 0.76 },  //  1904 |  1.69e-4 -> 1.71e-4
+    EDGE_FADE: 0.35,        // fraction of the patch, each side, spent ramping its colour to nothing - see feather()
+    DRIFT: 0.004,           // radians/sec each layer turns, so a parked ship is not a still image
     // `px` is the sprite's diameter in SCREEN pixels, not world units. three.js sizes an attenuated point as
     // size * (drawingBufferHeight/2) / distance, so a world size that looks right at 9000 is a dinner plate at
     // 1900 - which is exactly the bug this replaced: 4200 stars at world size 26-46 drew as 10-20px squares.
     // The world size is now SOLVED per shell from its distance, so all three read as stars.
-    STAR_SHELLS: [
-      { n: 2200, dist: 9000,  px: 6,  opacity: 0.85 },
-      { n: 1400, dist: 4200,  px: 8,  opacity: 0.65 },   // closer stars: these are the ones that parallax
-      { n: 600,  dist: 1900,  px: 11, opacity: 0.40 }
+    // `follow` was derived here (1 - j*0.13); it is written out now because it is no longer independent of
+    // `dist` - the two together are the parallax, by the rule in the layer block above. Shell positions jitter
+    // to dist*1.15, which is in the worst case below too.
+    STAR_SHELLS: [                                                      //  worst case | old parallax -> new
+      { n: 2200, dist: 4800, px: 6,  opacity: 0.85, follow: 1.00 },     //  5520 |  0       ->  0
+      { n: 1400, dist: 3000, px: 8,  opacity: 0.65, follow: 0.91 },     //  3639 |  3.10e-5 -> 3.00e-5
+      { n: 600,  dist: 1600, px: 11, opacity: 0.40, follow: 0.78 }      //  2302 |  1.37e-4 -> 1.37e-4
     ],
     TEX: ['assets/gen/nebula_a.jpg', 'assets/gen/nebula_b.jpg', 'assets/gen/galaxy_a.jpg', 'assets/gen/galaxy_b.jpg']
   };
@@ -64,11 +102,52 @@
     return t;
   }
 
-  // one card: a quad at a distance, facing the origin, rolled at random so no two read as the same sheet
+  // A patch ends on a hard rectangle in ANGLE, and a curved hard edge shows more than a flat one does - the eye
+  // follows the arc to its end. These materials are ADDITIVE, so fading the vertex colour to black is fading to
+  // nothing; no alpha channel is involved, which is just as well because r128's MeshBasicMaterial takes RGB
+  // vertex colours only. The ramp runs over the outer EDGE_FADE of the patch in both u and v and multiplies the
+  // material's own tint, so a piece dissolves into the sky instead of ending on a line.
+  function feather(g, TT) {
+    var uv = g.attributes.uv, n = uv.count, col = new Float32Array(n * 3), f = CFG.EDGE_FADE;
+    for (var i = 0; i < n; i++) {
+      var a = Math.min(1, Math.min(uv.getX(i), 1 - uv.getX(i)) / f) * Math.min(1, Math.min(uv.getY(i), 1 - uv.getY(i)) / f);
+      a = a * a * (3 - 2 * a);               // smoothstep: a linear ramp leaves a visible shoulder where it tops out
+      col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = a;
+    }
+    g.setAttribute('color', new TT.BufferAttribute(col, 3));
+  }
+
+  // one piece of a layer: a spherical patch at the layer's radius, swung onto a random direction and rolled so
+  // no two read as the same sheet. Note what is NOT here - the patch is not positioned at a distance and not
+  // aimed at anything. Its geometry already carries the radius, so the mesh sits at the group origin, and there
+  // is no facing to go stale as the group lags behind the camera.
+  function patch(layer, texPath) {
+    var TT = three();
+    var aw = rnd(layer.ang[0], layer.ang[1]);          // angular width, radians
+    var ah = aw * rnd(0.6, 1.0);                       // and height - the old card's 0.6-1.0 aspect, kept
+    var g = new TT.SphereGeometry(layer.dist, 20, 14,
+      -aw / 2, aw,                                     // phi:   centred on the patch's own axis
+      Math.PI / 2 - ah / 2, ah);                       // theta: centred on the equator
+    feather(g, TT);
+    var m = new TT.Mesh(g, new TT.MeshBasicMaterial({ map: tex(texPath), transparent: true, opacity: layer.opacity,
+      blending: TT.AdditiveBlending, depthWrite: false, depthTest: false, side: TT.BackSide, vertexColors: true,
+      color: new TT.Color().setHSL(rnd(0.55, 0.75), rnd(0.15, 0.5), rnd(0.45, 0.7)) }));
+    // three.js puts phi=0 on the equator at -X, so -X is where the patch was built; swing that onto a direction.
+    var dir = new TT.Vector3(rnd(-1, 1), rnd(-0.55, 0.55), rnd(-1, 1)).normalize();
+    m.quaternion.setFromUnitVectors(new TT.Vector3(-1, 0, 0), dir);
+    m.rotateOnWorldAxis(dir, rnd(0, Math.PI * 2));     // roll about the direction it faces
+    m.renderOrder = -5;
+    m.frustumCulled = false;
+    m.visible = false;                       // shown by tex()'s onLoad, never before
+    (waiting[texPath] = waiting[texPath] || []).push(m);
+    return m;
+  }
+
+  // the flat-quad original, behind CFG.GEOM:'card'. Its size comes from the same angular width the patch uses,
+  // so flipping GEOM changes the SHAPE of a layer piece and nothing else about the layer.
   function card(layer, texPath) {
     var TT = three();
-    var d = rnd(layer.dist[0], layer.dist[1]);
-    var size = rnd(layer.size[0], layer.size[1]);
+    var aw = rnd(layer.ang[0], layer.ang[1]), size = 2 * layer.dist * Math.tan(aw / 2);
     var m = new TT.Mesh(
       new TT.PlaneGeometry(size, size * rnd(0.6, 1.0)),
       new TT.MeshBasicMaterial({ map: tex(texPath), transparent: true, opacity: layer.opacity,
@@ -76,15 +155,17 @@
         color: new TT.Color().setHSL(rnd(0.55, 0.75), rnd(0.15, 0.5), rnd(0.45, 0.7)) }));
     // a random direction, then face the middle: a card edge-on is an invisible card
     var dir = new TT.Vector3(rnd(-1, 1), rnd(-0.55, 0.55), rnd(-1, 1)).normalize();
-    m.position.copy(dir).multiplyScalar(d);
+    m.position.copy(dir).multiplyScalar(layer.dist);
     m.lookAt(0, 0, 0);
     m.rotateZ(rnd(0, Math.PI * 2));
     m.renderOrder = -5;
     m.frustumCulled = false;
-    m.visible = false;                       // shown by tex()'s onLoad, never before
+    m.visible = false;
     (waiting[texPath] = waiting[texPath] || []).push(m);
     return m;
   }
+
+  function piece(layer, texPath) { return CFG.GEOM === 'card' ? card(layer, texPath) : patch(layer, texPath); }
 
   // A point sprite with NO map is a SOLID SQUARE - WebGL fills the whole gl_PointSize quad and there is nothing
   // to shape it. That is not a subtle artifact: it is what put grey squares across the entire sky in the first
@@ -173,23 +254,19 @@
     rend = opts.renderer || null;
     projPx = livePx();          // a first guess; refit() in tick() corrects it once the canvas has real height
     group = new T.Group(); group.name = 'backdrop';
-    var layers = [
-      { cfg: CFG.FAR,  follow: 1.00 },
-      { cfg: CFG.MID,  follow: 0.86 },
-      { cfg: CFG.NEAR, follow: 0.62 }
-    ];
+    var layers = [CFG.FAR, CFG.MID, CFG.NEAR];
     for (var li = 0; li < layers.length; li++) {
       var lg = new T.Group();
       lg.userData.follow = layers[li].follow;
-      for (var k = 0; k < layers[li].cfg.count; k++) {
-        var m = card(layers[li].cfg, CFG.TEX[(li + k) % CFG.TEX.length]);
+      for (var k = 0; k < layers[li].count; k++) {
+        var m = piece(layers[li], CFG.TEX[(li + k) % CFG.TEX.length]);
         lg.add(m); cards.push(m);
       }
       group.add(lg); layerGroups.push(lg);
     }
     for (var j = 0; j < CFG.STAR_SHELLS.length; j++) {
       var sg = new T.Group();
-      sg.userData.follow = 1 - j * 0.13;      // the nearest shell lags most, and is what you see move
+      sg.userData.follow = CFG.STAR_SHELLS[j].follow;   // the nearest shell lags most, and is what you see move
       var pts = starShell(CFG.STAR_SHELLS[j]);
       shellsOut.push({ pts: pts, px: CFG.STAR_SHELLS[j].px, dist: CFG.STAR_SHELLS[j].dist });
       sg.add(pts);
@@ -202,16 +279,24 @@
              stars: CFG.STAR_SHELLS.reduce(function (a, s) { return a + s.n; }, 0) };
   }
 
+  // The drift used to be `group.rotation.y += ...` on the PARENT, and a parent's rotation turns its children's
+  // POSITIONS as well as their contents. Those positions are the follow offsets, written below in world terms -
+  // so every offset was being swung around the origin by an angle that grows without bound (DRIFT 0.004 rad/s is
+  // a quarter turn in six and a half minutes). Six minutes in, the layer meant to sit exactly on the camera sat
+  // 2100 units off it instead, far enough to push it back through the far plane. Turning each layer about its
+  // OWN origin is the same sky turning - each layer about its own anchor - and it leaves the offsets alone.
+  var drift = 0;
   function tick(dt, camPos) {
     if (!built) return;
     refit();
-    if (camPos) {
-      for (var i = 0; i < layerGroups.length; i++) {
+    drift += CFG.DRIFT * dt;
+    for (var i = 0; i < layerGroups.length; i++) {
+      if (camPos) {
         var f = layerGroups[i].userData.follow;
         layerGroups[i].position.set(camPos.x * f, camPos.y * f, camPos.z * f);
       }
+      layerGroups[i].rotation.y = drift;
     }
-    group.rotation.y += CFG.DRIFT * dt;
   }
 
   window.BACKDROP = { CFG: CFG, build: build, tick: tick, refit: refit,
