@@ -41,6 +41,12 @@ node tools\bareargs.js
 set BARE=%errorlevel%
 node tools\module_selftests.js
 set MODS=%errorlevel%
+node tools\swallowed_comments.js
+set SWALLOW=%errorlevel%
+node tools\audio_assets.js
+set AUDIO=%errorlevel%
+node tools\ground_determinism.js
+set GROUND=%errorlevel%
 REM last: it grades the rules in CLAUDE.md, including that every check above is enrolled and self-tested
 node tools\rule_grader.js
 set RULES=%errorlevel%
@@ -55,6 +61,9 @@ echo   save_symmetry   exit %SYM%   (non-zero = a player field is SAVED but neve
 echo   order_in_table  exit %ORDER% (non-zero = a *_ORDER key has no table entry - TABLE[key] undefined -^> crash on use)
 echo   bareargs        exit %BARE%  (non-zero = a matcher with an empty-defaulted a[N] arg - bare command hits the FIRST item)
 echo   module_selftests exit %MODS% (non-zero = a node-safe module self-test failed: conquest/power_panel/textquests/kripke/sober/tom/centroid/item_variance)
+echo   swallowed_comments exit %SWALLOW% (non-zero = a // comment swallowed code that followed it on the same line)
+echo   audio_assets    exit %AUDIO%  (non-zero = an audio file the game references is missing - it falls back to the synth silently)
+echo   ground_determinism exit %GROUND% (non-zero = the same planet no longer builds identical terrain colour)
 echo   rule_grader     exit %RULES% (non-zero = a CLAUDE.md rule has an open finding, no test, or a blind test - see tools/rule_stats.json)
 
 if not "%PASS%"=="0" exit /b %PASS%
@@ -66,6 +75,9 @@ if not "%SYM%"=="0" exit /b %SYM%
 if not "%ORDER%"=="0" exit /b %ORDER%
 if not "%BARE%"=="0" exit /b %BARE%
 if not "%MODS%"=="0" exit /b %MODS%
+if not "%SWALLOW%"=="0" exit /b %SWALLOW%
+if not "%AUDIO%"=="0" exit /b %AUDIO%
+if not "%GROUND%"=="0" exit /b %GROUND%
 if not "%RULES%"=="0" exit /b %RULES%
 echo   all clear
 exit /b 0

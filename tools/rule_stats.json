@@ -2,50 +2,56 @@
  "note": "written by tools/rule_grader.js - see its header",
  "rules": {
   "R1": {
-   "runs": 1,
-   "ms": 1
+   "runs": 3,
+   "ms": 4
   },
   "R2": {
-   "runs": 1,
-   "ms": 579
+   "runs": 3,
+   "ms": 2599
   },
   "R3": {
-   "runs": 1,
-   "ms": 35
+   "runs": 3,
+   "ms": 104
   },
   "R4": {
-   "runs": 1,
-   "ms": 119
+   "runs": 3,
+   "ms": 352
   },
   "R5": {
-   "runs": 1,
-   "ms": 1
+   "runs": 3,
+   "ms": 3
   }
  },
  "items": {
   "R5:tools/audio_assets.js": {
    "rule": "R5",
-   "status": "open",
+   "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
    "first_sha": "51d09b9",
-   "reopened": 0
+   "reopened": 0,
+   "fixed": "2026-10-23T04:27",
+   "fixed_sha": "2fa3d7e"
   },
   "R5:tools/ground_determinism.js": {
    "rule": "R5",
-   "status": "open",
+   "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
    "first_sha": "51d09b9",
-   "reopened": 0
+   "reopened": 0,
+   "fixed": "2026-10-23T04:27",
+   "fixed_sha": "2fa3d7e"
   },
   "R5:tools/swallowed_comments.js": {
    "rule": "R5",
-   "status": "open",
+   "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
    "first_sha": "51d09b9",
-   "reopened": 0
+   "reopened": 0,
+   "fixed": "2026-10-23T04:27",
+   "fixed_sha": "2fa3d7e"
   }
  },
  "history": [
@@ -55,6 +61,11 @@
    "open": {
     "R5": 3
    }
+  },
+  {
+   "at": "2026-10-23T04:27",
+   "sha": "2fa3d7e",
+   "open": {}
   }
  ]
 }

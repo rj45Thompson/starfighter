@@ -8,10 +8,41 @@
 // determinism; a different name -> different colours proves the colour is seed-driven (off
 // hashSeed(planet.name)), not a constant that would be "identical" trivially. Exits non-zero
 // if the property ever regresses (e.g. an unseeded Math.random creeping back into terrain).
+//
+//   node tools/ground_determinism.js              # exit 1 if terrain colour is not deterministic
+//   node tools/ground_determinism.js --self-test  # prove it by planting non-determinism in a copy first
 const fs = require('fs');
 const path = require('path');
 
-const GROUND = path.join(__dirname, '..', 'ground.js');   // tools/ -> repo root
+// --self-test: two plants in scratch copies of ground.js, and each must exit 1. A live Math.random( is caught by the
+// static scan below; a seed that drifts on every rngOf call is unseeded WITHOUT the word Math.random, so only the
+// build1==build2 comparison can catch it. The real file must still exit 0.
+if (process.argv.includes('--self-test')) {
+  const os = require('os'), cp = require('child_process');
+  const real = path.join(__dirname, '..', 'ground.js');
+  const clean = fs.readFileSync(real, 'utf8');
+  const SITE = 'function rngOf(seed) { return function () {';
+  if (clean.split(SITE).length !== 2) { console.log('self-test FAIL - the rngOf plant site moved; update SITE'); process.exit(1); }
+  const plants = {
+    'live Math.random': clean.replace(SITE, SITE + ' Math.random();'),
+    'drifting seed': clean.replace(SITE, 'function rngOf(seed) { seed += (rngOf.n = (rngOf.n | 0) + 1); return function () {'),
+  };
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ground_det-'));
+  const run = f => cp.spawnSync(process.execPath, [__filename, '--file', f], { encoding: 'utf8' }).status;
+  const res = Object.entries(plants).map(([name, txt]) => {
+    const f = path.join(dir, name.replace(/\W+/g, '_') + '.js');
+    fs.writeFileSync(f, txt);
+    return [name, run(f)];
+  });
+  const cleanCode = run(real);
+  fs.rmSync(dir, { recursive: true, force: true });
+  const ok = res.every(([, c]) => c === 1) && cleanCode === 0;
+  console.log(`self-test ${ok ? 'PASS' : 'FAIL'} - ${res.map(([n, c]) => `${n} plant exit ${c}`).join(', ')}, real ground.js exit ${cleanCode}`);
+  process.exit(ok ? 0 : 1);
+}
+
+const fileArg = process.argv.indexOf('--file');
+const GROUND = fileArg > 0 ? path.resolve(process.argv[fileArg + 1]) : path.join(__dirname, '..', 'ground.js');   // tools/ -> repo root
 const src = fs.readFileSync(GROUND, 'utf8').split(/\r?\n/);
 
 // pull the real core out of the file (1-indexed lines 52..96); fail loudly if it moved
