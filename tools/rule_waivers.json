@@ -1,0 +1,3 @@
+{
+ "_how": "finding id (from node tools/rule_grader.js --list) -> why it is a false alarm. Each waiver counts against that rule's test in tools/rule_stats.json; a rule that is mostly waived reads NOISY."
+}

@@ -11,15 +11,50 @@ Most of it is checked by nobody else. So work as if every change is being graded
 grading it, and a shortcut that fools the grader fools you too. The iron law in `IRON_LAW_AUDIT.md` (no
 scripted policy, no omniscience, no handed advantage) applies to your own work as well as to the AI pilots.
 
-In practice:
+In practice (the tag on each rule is its test in `tools/rule_grader.js`):
 
-- **A check that cannot fail is a cheat.** Do not write a test, guard or metric that your code games. A
+- **A check that cannot fail is a cheat.** [R1] Do not write a test, guard or metric that your code games. A
   vacuous green is the same violation as a scripted AI wearing a "learned" label.
-- **Prove a check can go red before trusting its green.** Break the thing on a scratch copy and watch the
+  *Test:* every check the scheduled run trusts (`tools/watch_upgrades.cmd` and the `module_selftests.js`
+  list) has a failing exit in its source. It does not prove that exit is reachable.
+- **Prove a check can go red before trusting its green.** [R2] Break the thing on a scratch copy and watch the
   check fail, the way `item_variance.js` was enrolled in `tools/module_selftests.js` (`TASKS.md` F15).
-- **Report what you observed, not what you expected.** Quote the command and its output. Partial is
+  *Test:* every node guard in `watch_upgrades.cmd` has a `--self-test` that plants a failure, and it passes.
+  The per-module self-tests inside `module_selftests.js` are not covered.
+- **Report what you observed, not what you expected.** [R3] Quote the command and its output. Partial is
   partial; unverified is unverified.
-- **When you find your own earlier work was wrong, fix it and say so** (e.g. `9228ca8`, "Every line number
-  in the asteroid model was already wrong"). Changing course is cheap when you already know which way is
-  right; defending a wrong result is not.
-- **Same standard whether or not anyone reads the transcript.**
+  *Test:* every `- [x]` line in `TASKS.md` written after this rule quotes a backticked command followed by
+  `->` and its result. It does not check that the result is true.
+- **When you find your own earlier work was wrong, fix it and say so** [R4] (e.g. `9228ca8`, "Every line
+  number in the asteroid model was already wrong"). Changing course is cheap when you already know which way
+  is right; defending a wrong result is not.
+  *Test:* every `file:line` citation in a root `*.md` written after this rule names a backticked symbol that
+  still exists in that file. It catches a claim that went wrong or could never be re-checked; it does not
+  test the "say so" part.
+- **Same standard whether or not anyone reads the transcript.** [R5]
+  *Test:* every check in `tools/*.js` is run by the unattended `watch_upgrades.cmd`, not only by hand.
+
+## Keeping score on these rules
+
+User directive (2026-10-23, typos fixed): *"Keep stats to see if this helps or hurts things. Keep stats for
+all rules, but there has to be a token-efficient test to know if one exists, then add the grader so it's
+self-improving."*
+
+    node tools/rule_grader.js          # one line per rule; exit 1 on an open finding or an untested rule
+    node tools/rule_grader.js --list   # name each open finding
+
+Run it before you call work done; the scheduled `watch_upgrades.cmd` runs it too. Every run first plants a
+violation for each rule and fails as BLIND if a test misses it. `tools/rule_stats.json` keeps the score
+across runs and sessions; commit it with your work. R3 and R4 only hold lines written after the rule's tag
+was committed (by `git blame`), so older prose is not convicted retroactively.
+
+How to read and act on the verdict column:
+
+- HELPS: its test flagged something that was then fixed. Keep the rule.
+- NOISY: mostly waived. Either the test is wrong or the rule is; fix one, don't keep waiving.
+- QUIET: never fired in 10+ runs although its plant is caught. Followed, or not worth its run time.
+- NEW: not enough runs to say.
+- A false alarm goes in `tools/rule_waivers.json` with the reason. That counts against the rule's test,
+  which is the point: a test that cries wolf costs attention.
+- A new rule ships with a tag and a test in `rule_grader.js`, or the grader fails it as UNTESTED. Change or
+  drop a rule that stats show hurts, and say why in the commit.

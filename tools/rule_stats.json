@@ -1,0 +1,60 @@
+{
+ "note": "written by tools/rule_grader.js - see its header",
+ "rules": {
+  "R1": {
+   "runs": 1,
+   "ms": 1
+  },
+  "R2": {
+   "runs": 1,
+   "ms": 579
+  },
+  "R3": {
+   "runs": 1,
+   "ms": 35
+  },
+  "R4": {
+   "runs": 1,
+   "ms": 119
+  },
+  "R5": {
+   "runs": 1,
+   "ms": 1
+  }
+ },
+ "items": {
+  "R5:tools/audio_assets.js": {
+   "rule": "R5",
+   "status": "open",
+   "why": "a check that only runs when someone runs it by hand",
+   "first": "2026-10-23T04:26",
+   "first_sha": "51d09b9",
+   "reopened": 0
+  },
+  "R5:tools/ground_determinism.js": {
+   "rule": "R5",
+   "status": "open",
+   "why": "a check that only runs when someone runs it by hand",
+   "first": "2026-10-23T04:26",
+   "first_sha": "51d09b9",
+   "reopened": 0
+  },
+  "R5:tools/swallowed_comments.js": {
+   "rule": "R5",
+   "status": "open",
+   "why": "a check that only runs when someone runs it by hand",
+   "first": "2026-10-23T04:26",
+   "first_sha": "51d09b9",
+   "reopened": 0
+  }
+ },
+ "history": [
+  {
+   "at": "2026-10-23T04:26",
+   "sha": "51d09b9",
+   "open": {
+    "R5": 3
+   }
+  }
+ ]
+}
