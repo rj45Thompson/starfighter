@@ -16,23 +16,25 @@ In practice (the tag on each rule is its test in `tools/rule_grader.js`):
 - **A check that cannot fail is a cheat.** [R1] Do not write a test, guard or metric that your code games. A
   vacuous green is the same violation as a scripted AI wearing a "learned" label.
   *Test:* every check the scheduled run trusts (`tools/watch_upgrades.cmd` and the `module_selftests.js`
-  list) has a failing exit in its source. It does not prove that exit is reachable.
+  list) has a failing exit in its code, outside its `--self-test` branch; comments don't count. It does not
+  prove that exit is reachable.
 - **Prove a check can go red before trusting its green.** [R2] Break the thing on a scratch copy and watch the
   check fail, the way `item_variance.js` was enrolled in `tools/module_selftests.js` (`TASKS.md` F15).
-  *Test:* every node guard in `watch_upgrades.cmd` has a `--self-test` that plants a failure, and it passes.
-  The per-module self-tests inside `module_selftests.js` are not covered.
+  *Test:* every node guard in `watch_upgrades.cmd` has a `--self-test` in its code that exits 0 and says it
+  planted something. The per-module self-tests inside `module_selftests.js` are not covered.
 - **Report what you observed, not what you expected.** [R3] Quote the command and its output. Partial is
   partial; unverified is unverified.
-  *Test:* every `- [x]` line in `TASKS.md` written after this rule quotes a backticked command followed by
-  `->` and its result. It does not check that the result is true.
+  *Test:* every `- [x]` entry in `TASKS.md` (with its wrapped lines) written after this rule quotes a
+  backticked command and what it printed (`->`, "printed", "exits" ...). It does not check that it is true.
 - **When you find your own earlier work was wrong, fix it and say so** [R4] (e.g. `9228ca8`, "Every line
   number in the asteroid model was already wrong"). Changing course is cheap when you already know which way
   is right; defending a wrong result is not.
-  *Test:* every `file:line` citation in a root `*.md` written after this rule names a backticked symbol that
-  still exists in that file. It catches a claim that went wrong or could never be re-checked; it does not
-  test the "say so" part.
+  *Test:* every `file:line` citation in a root `*.md` written after this rule has, in a code span on the
+  same line, an identifier that still exists in that file, and the line is not past the file's end. It
+  catches a claim that went wrong or could never be re-checked; it does not test the "say so" part.
 - **Same standard whether or not anyone reads the transcript.** [R5]
-  *Test:* every check in `tools/*.js` is run by the unattended `watch_upgrades.cmd`, not only by hand.
+  *Test:* every check in `tools/*.js` is run by the unattended `watch_upgrades.cmd`, not only by hand, and
+  its exit can fail that run.
 
 ## Keeping score on these rules
 
@@ -44,15 +46,21 @@ self-improving."*
     node tools/rule_grader.js --list   # name each open finding
 
 Run it before you call work done; the scheduled `watch_upgrades.cmd` runs it too. Every run first plants a
-violation for each rule and fails as BLIND if a test misses it. `tools/rule_stats.json` keeps the score
-across runs and sessions; commit it with your work. R3 and R4 only hold lines written after the rule's tag
-was committed (by `git blame`), so older prose is not convicted retroactively.
+violation for each rule and fails as BLIND if a test misses it (and then records nothing). A missing input
+or a corrupt stats file is an ERROR, never a quiet pass. `tools/rule_stats.json` keeps the score across
+runs and sessions, counts each tree graded once, and is only rewritten when the score changes; commit it
+with your work. R3 and R4 only hold lines whose commit descends from the one that added the rule's tag
+(`git blame` plus ancestry, not dates), so older prose is not convicted retroactively and a backdated
+commit does not escape. A shallow clone cut before that commit fails as ERROR: `git fetch --unshallow`.
+`tools/rule_grader.js`'s header lists what the tests cannot see.
 
 How to read and act on the verdict column:
 
-- HELPS: its test flagged something that was then fixed. Keep the rule.
+- HELPS: its test flagged something that was then fixed, with the flagged file still there and the grader
+  unchanged. A finding that went away any other way is counted `gone`, not fixed. Keep the rule.
 - NOISY: mostly waived. Either the test is wrong or the rule is; fix one, don't keep waiving.
-- QUIET: never fired in 10+ runs although its plant is caught. Followed, or not worth its run time.
+- QUIET: never fired across 10+ graded trees although its plant is caught. Followed, or not worth its run
+  time.
 - NEW: not enough runs to say.
 - A false alarm goes in `tools/rule_waivers.json` with the reason. That counts against the rule's test,
   which is the point: a test that cries wolf costs attention.

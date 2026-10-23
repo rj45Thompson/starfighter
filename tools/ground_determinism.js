@@ -14,34 +14,45 @@
 const fs = require('fs');
 const path = require('path');
 
-// --self-test: two plants in scratch copies of ground.js, and each must exit 1. A live Math.random( is caught by the
-// static scan below; a seed that drifts on every rngOf call is unseeded WITHOUT the word Math.random, so only the
-// build1==build2 comparison can catch it. The real file must still exit 0.
+// exit 1 means "determinism broke" and nothing else: a crash (a plant that broke the syntax, a missing file) exits 2,
+// so the self-test below cannot mistake a crash for a catch
+process.on('uncaughtException', e => { console.error('ERROR (not a determinism verdict): ' + e.message); process.exit(2); });
+
+// --self-test: two plants in scratch copies of ground.js. A live Math.random( must be caught by the static scan below;
+// a seed that drifts on every rngOf call is unseeded WITHOUT the word Math.random, so only the build1==build2
+// comparison can catch it. Each must exit 1 AND print its own failure line, and the real file must still exit 0.
 if (process.argv.includes('--self-test')) {
   const os = require('os'), cp = require('child_process');
   const real = path.join(__dirname, '..', 'ground.js');
   const clean = fs.readFileSync(real, 'utf8');
   const SITE = 'function rngOf(seed) { return function () {';
   if (clean.split(SITE).length !== 2) { console.log('self-test FAIL - the rngOf plant site moved; update SITE'); process.exit(1); }
-  const plants = {
-    'live Math.random': clean.replace(SITE, SITE + ' Math.random();'),
-    'drifting seed': clean.replace(SITE, 'function rngOf(seed) { seed += (rngOf.n = (rngOf.n | 0) + 1); return function () {'),
-  };
+  const plants = [
+    ['live Math.random', clean.replace(SITE, SITE + ' Math.random();'), 'FAIL: live Math.random'],
+    ['drifting seed', clean.replace(SITE, 'function rngOf(seed) { seed += (rngOf.n = (rngOf.n | 0) + 1); return function () {'), 'DIFFERS('],
+  ];
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ground_det-'));
-  const run = f => cp.spawnSync(process.execPath, [__filename, '--file', f], { encoding: 'utf8' }).status;
-  const res = Object.entries(plants).map(([name, txt]) => {
-    const f = path.join(dir, name.replace(/\W+/g, '_') + '.js');
-    fs.writeFileSync(f, txt);
-    return [name, run(f)];
-  });
-  const cleanCode = run(real);
-  fs.rmSync(dir, { recursive: true, force: true });
-  const ok = res.every(([, c]) => c === 1) && cleanCode === 0;
-  console.log(`self-test ${ok ? 'PASS' : 'FAIL'} - ${res.map(([n, c]) => `${n} plant exit ${c}`).join(', ')}, real ground.js exit ${cleanCode}`);
+  const run = f => { const r = cp.spawnSync(process.execPath, [__filename, '--file', f], { encoding: 'utf8' }); return { code: r.status, out: r.stdout + r.stderr }; };
+  let res, cleanRun;
+  try {
+    res = plants.map(([name, txt, marker]) => {
+      const f = path.join(dir, name.replace(/\W+/g, '_') + '.js');
+      fs.writeFileSync(f, txt);
+      const r = run(f);
+      return { name, code: r.code, caught: r.code === 1 && r.out.includes(marker) };
+    });
+    cleanRun = run(real);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  const ok = res.every(r => r.caught) && cleanRun.code === 0;
+  console.log(`self-test ${ok ? 'PASS' : 'FAIL'} - ${res.map(r => `${r.name} plant exit ${r.code}${r.caught ? ' (caught)' : ' (NOT caught)'}`).join(', ')}, real ground.js exit ${cleanRun.code}`);
   process.exit(ok ? 0 : 1);
 }
 
 const fileArg = process.argv.indexOf('--file');
+if (fileArg > 0 && !(process.argv[fileArg + 1] && fs.existsSync(process.argv[fileArg + 1]))) {
+  console.error('usage: node tools/ground_determinism.js [--file <copy of ground.js>]  (no such file: ' + process.argv[fileArg + 1] + ')');
+  process.exit(2);
+}
 const GROUND = fileArg > 0 ? path.resolve(process.argv[fileArg + 1]) : path.join(__dirname, '..', 'ground.js');   // tools/ -> repo root
 const src = fs.readFileSync(GROUND, 'utf8').split(/\r?\n/);
 

@@ -3,23 +3,23 @@
  "rules": {
   "R1": {
    "runs": 3,
-   "ms": 4
+   "ms": 9
   },
   "R2": {
    "runs": 3,
-   "ms": 2599
+   "ms": 1007
   },
   "R3": {
    "runs": 3,
-   "ms": 104
+   "ms": 47
   },
   "R4": {
    "runs": 3,
-   "ms": 352
+   "ms": 126
   },
   "R5": {
    "runs": 3,
-   "ms": 3
+   "ms": 2
   }
  },
  "items": {
@@ -28,44 +28,49 @@
    "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
-   "first_sha": "51d09b9",
+   "first_sha": "51d09b9+dirty",
    "reopened": 0,
    "fixed": "2026-10-23T04:27",
-   "fixed_sha": "2fa3d7e"
+   "fixed_sha": "2fa3d7e+dirty",
+   "subject": "tools/audio_assets.js"
   },
   "R5:tools/ground_determinism.js": {
    "rule": "R5",
    "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
-   "first_sha": "51d09b9",
+   "first_sha": "51d09b9+dirty",
    "reopened": 0,
    "fixed": "2026-10-23T04:27",
-   "fixed_sha": "2fa3d7e"
+   "fixed_sha": "2fa3d7e+dirty",
+   "subject": "tools/ground_determinism.js"
   },
   "R5:tools/swallowed_comments.js": {
    "rule": "R5",
    "status": "fixed",
    "why": "a check that only runs when someone runs it by hand",
    "first": "2026-10-23T04:26",
-   "first_sha": "51d09b9",
+   "first_sha": "51d09b9+dirty",
    "reopened": 0,
    "fixed": "2026-10-23T04:27",
-   "fixed_sha": "2fa3d7e"
+   "fixed_sha": "2fa3d7e+dirty",
+   "subject": "tools/swallowed_comments.js"
   }
  },
  "history": [
   {
    "at": "2026-10-23T04:26",
-   "sha": "51d09b9",
+   "sha": "51d09b9+dirty",
    "open": {
     "R5": 3
    }
   },
   {
    "at": "2026-10-23T04:27",
-   "sha": "2fa3d7e",
+   "sha": "2fa3d7e+dirty",
    "open": {}
   }
- ]
+ ],
+ "tree": "a1c2d4f+dirty",
+ "grader": "4b27b7e32903"
 }
